@@ -1,0 +1,136 @@
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */ 
+/** USBX Component                                                        */ 
+/**                                                                       */
+/**   System                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+
+/**************************************************************************/ 
+/*                                                                        */ 
+/*  COMPONENT DEFINITION                                   RELEASE        */ 
+/*                                                                        */ 
+/*    ux_system.h                                         PORTABLE C      */ 
+/*                                                           6.0          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */ 
+/*    This file contains all the header and extern functions used by the  */
+/*    USBX main system component.                                         */ 
+/*                                                                        */ 
+/*  RELEASE HISTORY                                                       */ 
+/*                                                                        */ 
+/*    DATE              NAME                      DESCRIPTION             */ 
+/*                                                                        */ 
+/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*                                                                        */
+/**************************************************************************/
+
+#ifndef UX_SYSTEM_HOST_H
+#define UX_SYSTEM_HOST_H
+
+/* Define System component function prototypes.  Note that since ux_api.h 
+   includes this file, the APIs are only declared if this file is included 
+   by internal code in order to prevent duplicate declarations for 
+   applications.  */
+
+
+#ifdef UX_SOURCE_CODE
+UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
+                            VOID *cache_safe_memory_pool_start, ULONG cache_safe_memory_size);
+UINT  _ux_system_uninitialize(VOID);
+#endif
+
+/* Define System component external data references.  */
+
+extern UX_SYSTEM *_ux_system;
+extern UX_SYSTEM_HOST *_ux_system_host;
+extern UX_SYSTEM_SLAVE *_ux_system_slave;
+extern UX_SYSTEM_OTG *_ux_system_otg;
+extern UCHAR _ux_system_endpoint_descriptor_structure[];
+extern UCHAR _ux_system_device_descriptor_structure[];
+extern UCHAR _ux_system_configuration_descriptor_structure[];
+extern UCHAR _ux_system_interface_descriptor_structure[];
+extern UCHAR _ux_system_interface_association_descriptor_structure[];
+extern UCHAR _ux_system_string_descriptor_structure[];
+extern UCHAR _ux_system_dfu_functional_descriptor_structure[];
+extern UCHAR _ux_system_hub_descriptor_structure[];
+extern UCHAR _ux_system_hid_descriptor_structure[];
+extern UCHAR _ux_system_class_audio_interface_descriptor_structure[];
+extern UCHAR _ux_system_class_audio_input_terminal_descriptor_structure[];
+extern UCHAR _ux_system_class_audio_output_terminal_descriptor_structure[];
+extern UCHAR _ux_system_class_audio_feature_unit_descriptor_structure[];
+extern UCHAR _ux_system_class_audio_streaming_interface_descriptor_structure[];
+extern UCHAR _ux_system_class_audio_streaming_endpoint_descriptor_structure[];
+extern UCHAR _ux_system_class_pima_storage_structure[];
+extern UCHAR _ux_system_class_pima_object_structure[];
+extern UCHAR _ux_system_ecm_interface_descriptor_structure[];
+
+extern UINT  _ux_system_host_hcd_periodic_tree_entries[32]; 
+
+extern UCHAR _ux_system_host_class_hub_name[];  
+extern UCHAR _ux_system_host_class_printer_name[]; 
+extern UCHAR _ux_system_host_class_storage_name[]; 
+extern UCHAR _ux_system_host_class_hid_name[];     
+extern UCHAR _ux_system_host_class_audio_name[];   
+extern UCHAR _ux_system_host_class_cdc_acm_name[];   
+extern UCHAR _ux_system_host_class_cdc_dlc_name[];   
+extern UCHAR _ux_system_host_class_cdc_ecm_name[];   
+extern UCHAR _ux_system_host_class_prolific_name[];   
+extern UCHAR _ux_system_host_class_dpump_name[];  
+extern UCHAR _ux_system_host_class_pima_name[];  
+extern UCHAR _ux_system_host_class_asix_name[];   
+extern UCHAR _ux_system_host_class_swar_name[];   
+extern UCHAR _ux_system_host_class_gser_name[];   
+extern UCHAR _ux_system_host_class_hid_client_remote_control_name[];
+extern UCHAR _ux_system_host_class_hid_client_mouse_name[]; 
+extern UCHAR _ux_system_host_class_hid_client_keyboard_name[]; 
+
+extern UCHAR _ux_system_host_hcd_ohci_name[]; 
+extern UCHAR _ux_system_host_hcd_ehci_name[]; 
+extern UCHAR _ux_system_host_hcd_isp1161_name[]; 
+extern UCHAR _ux_system_host_hcd_isp1362_name[]; 
+extern UCHAR _ux_system_host_hcd_sh2_name[]; 
+extern UCHAR _ux_system_host_hcd_rx_name[]; 
+extern UCHAR _ux_system_host_hcd_pic32_name[]; 
+extern UCHAR _ux_system_host_hcd_stm32_name[]; 
+extern UCHAR _ux_system_host_hcd_musb_name[];
+extern UCHAR _ux_system_host_hcd_atm7_name[];
+extern UCHAR _ux_system_host_hcd_simulator_name[]; 
+
+extern UCHAR _ux_system_slave_class_storage_name[]; 
+extern UCHAR _ux_system_slave_class_storage_vendor_id[]; 
+extern UCHAR _ux_system_slave_class_storage_product_id[]; 
+extern UCHAR _ux_system_slave_class_storage_product_rev[]; 
+extern UCHAR _ux_system_slave_class_storage_product_serial[]; 
+extern UCHAR _ux_system_slave_class_audio_name[]; 
+extern UCHAR _ux_system_slave_class_cdc_acm_name[]; 
+extern UCHAR _ux_system_slave_class_dpump_name[]; 
+extern UCHAR _ux_system_slave_class_pima_name[]; 
+extern UCHAR _ux_system_slave_class_hid_name[]; 
+extern UCHAR _ux_system_slave_class_rndis_name[]; 
+extern UCHAR _ux_system_slave_class_cdc_ecm_name[]; 
+extern UCHAR _ux_system_slave_class_dfu_name[];
+
+
+
+#endif
+

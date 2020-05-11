@@ -1,0 +1,208 @@
+/**************************************************************************/
+/*                                                                        */
+/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*                                                                        */
+/*       This software is licensed under the Microsoft Software License   */
+/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
+/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
+/*       and in the root directory of this software.                      */
+/*                                                                        */
+/**************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */ 
+/** USBX Component                                                        */ 
+/**                                                                       */
+/**   Storage Class                                                       */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+
+/* Include necessary system files.  */
+
+#define UX_SOURCE_CODE
+
+#include "ux_api.h"
+#include "ux_host_class_storage.h"
+#include "ux_host_stack.h"
+
+
+/**************************************************************************/ 
+/*                                                                        */ 
+/*  FUNCTION                                               RELEASE        */ 
+/*                                                                        */ 
+/*    _ux_host_class_storage_deactivate                   PORTABLE C      */ 
+/*                                                           6.0          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */ 
+/*    This function is called when this instance of the storage device    */ 
+/*    has been removed from the bus either directly or indirectly. The    */ 
+/*    bulk in\out pipes will be destroyed and the instanced removed.      */ 
+/*                                                                        */ 
+/*  INPUT                                                                 */ 
+/*                                                                        */ 
+/*    command                               Pointer to class command      */ 
+/*                                                                        */ 
+/*  OUTPUT                                                                */ 
+/*                                                                        */ 
+/*    Completion Status                                                   */ 
+/*                                                                        */ 
+/*  CALLS                                                                 */ 
+/*                                                                        */ 
+/*    fx_media_close                        Close media                   */ 
+/*    _ux_host_stack_endpoint_transfer_abort Abort transfer request       */ 
+/*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
+/*    _ux_utility_memory_free               Free memory block             */ 
+/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
+/*    _ux_utility_semaphore_delete          Delete protection semaphore   */ 
+/*    _ux_utility_thread_schedule_other     Schedule other threads        */
+/*                                                                        */ 
+/*  CALLED BY                                                             */ 
+/*                                                                        */ 
+/*    Storage Class                                                       */ 
+/*                                                                        */ 
+/*  RELEASE HISTORY                                                       */ 
+/*                                                                        */ 
+/*    DATE              NAME                      DESCRIPTION             */ 
+/*                                                                        */ 
+/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _ux_host_class_storage_deactivate(UX_HOST_CLASS_COMMAND *command)
+{
+
+UX_HOST_CLASS_STORAGE           *storage;
+UINT                            media_index;
+FX_MEDIA                        *media;
+UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
+UX_HOST_CLASS                   *class;
+VOID                            *memory;
+
+
+    /* Get the instance for this class.  */
+    storage =  (UX_HOST_CLASS_STORAGE *) command -> ux_host_class_command_instance;
+    
+    /* We need the class container.  */
+    class =  storage -> ux_host_class_storage_class;
+    
+    /* Point the media structure to the first media in the container.  */
+    storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) class -> ux_host_class_media;
+
+    /* The storage device is being shut down.  */
+    storage -> ux_host_class_storage_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
+
+    /* We come to this point when the device has been extracted. So there may have been a transaction
+       being scheduled. We make sure the transaction has been completed by the controller driver.
+       When the device is extracted, the controller tries multiple times the transaction and retires it
+       with a DEVICE_NOT_RESPONDING error code.  
+       
+       First we take care of endpoint OUT.  */
+
+    /* We need to abort transactions on the bulk pipes.  */
+    if (storage -> ux_host_class_storage_bulk_out_endpoint != UX_NULL)
+        _ux_host_stack_endpoint_transfer_abort(storage -> ux_host_class_storage_bulk_out_endpoint);
+    
+    /* Then endpoint IN.  */       
+    if (storage -> ux_host_class_storage_bulk_in_endpoint != UX_NULL)
+        _ux_host_stack_endpoint_transfer_abort(storage -> ux_host_class_storage_bulk_in_endpoint);
+       
+#ifdef UX_HOST_CLASS_STORAGE_INCLUDE_LEGACY_PROTOCOL_SUPPORT
+    /* Was the protocol CBI ? */
+    if (storage -> ux_host_class_storage_interface -> ux_interface_descriptor.bInterfaceProtocol == UX_HOST_CLASS_STORAGE_PROTOCOL_CBI)
+    {
+
+        /* Was there an interrupt endpoint?  */
+        if (storage -> ux_host_class_storage_interrupt_endpoint != UX_NULL)
+        {
+
+            /* Then interrupt endpoint.  */
+            transfer_request =  &storage -> ux_host_class_storage_interrupt_endpoint -> ux_endpoint_transfer_request;
+
+            /* Abort the data transfer on the interrupt endpoint.  */
+            _ux_host_stack_endpoint_transfer_abort(storage -> ux_host_class_storage_interrupt_endpoint);
+
+            /* Free the memory that was used by the interrupt endpoint.  */
+            if (storage -> ux_host_class_storage_interrupt_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_data_pointer != UX_NULL)
+                _ux_utility_memory_free(storage -> ux_host_class_storage_interrupt_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_data_pointer);
+        }
+    }
+#endif
+
+    /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
+       endpoints to exit properly.  */
+    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+
+    /* Inform FileX of the deactivation of all Media attached to this instance.  */
+    for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA; media_index++)
+    {
+
+        /* Get the FileX Media attached to this media.  */
+        media = &storage_media -> ux_host_class_storage_media;
+
+        /* Check if the media belongs to the device being removed.  */
+        if (((UX_HOST_CLASS_STORAGE *) media -> fx_media_driver_info) == storage)
+        {
+
+            /* Check if the media was properly opened.  */
+            if (storage_media -> ux_host_class_storage_media_status == UX_HOST_CLASS_STORAGE_MEDIA_MOUNTED)
+            {
+            
+                /* We preserve the memory used by this media.  */
+                memory =  storage_media -> ux_host_class_storage_media_memory;
+
+                /* Ask FileX to unmount the partition.  */
+                fx_media_close(media);
+
+                /* This device is now unmounted.  */
+                storage_media -> ux_host_class_storage_media_status =  UX_HOST_CLASS_STORAGE_MEDIA_UNMOUNTED;
+            
+                /* Reset the media ID.  */
+                media -> fx_media_id =  0;
+                                
+                /* Free the memory block used for data transfer on behalf of FileX.  */
+                _ux_utility_memory_free(memory);
+            }                
+        }
+
+        /* Move to next entry in the media array.  */
+        storage_media++;
+    }
+
+    /* Protect thread reentry to this instance.  */
+    _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+
+    /* Destroy the instance.  */
+    _ux_host_stack_class_instance_destroy(storage -> ux_host_class_storage_class, (VOID *) storage);
+
+    /* Destroy the protection semaphore.  */
+    _ux_utility_semaphore_delete(&storage -> ux_host_class_storage_semaphore);
+
+    /* Before we free the device resources, we need to inform the application
+        that the device is removed.  */
+    if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+    {
+        
+        /* Inform the application the device is removed.  */
+        _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, storage -> ux_host_class_storage_class, (VOID *) storage);
+    }
+
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_STORAGE_DEACTIVATE, storage, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
+
+    /* If trace is enabled, register this object.  */
+    UX_TRACE_OBJECT_UNREGISTER(storage);
+
+    /* Free the storage instance memory.  */
+    _ux_utility_memory_free(storage);
+
+    /* Return successful completion.  */
+    return(UX_SUCCESS);         
+}
+
