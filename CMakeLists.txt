@@ -39,7 +39,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/common)
 # If the user provided an override, copy it to the custom directory
 if (NOT UX_USER_FILE)
     message(STATUS "Using default ux_user.h file")
-    set(UX_USER_FILE ${CMAKE_CURRENT_LIST_DIR}/common/inc/ux_user_sample.h)
+    set(UX_USER_FILE ${CMAKE_CURRENT_LIST_DIR}/common/core/inc/ux_user_sample.h)
 else()
     message(STATUS "Using custom ux_user.h file from ${UX_USER_FILE}")
 endif()
