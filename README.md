@@ -1,4 +1,4 @@
-# Azure RTOS UsbX
+# Azure RTOS USBX
 
 A high-performance USB host, device, and on-the-go (OTG) embedded stack, Azure RTOS USBX is fully integrated with Azure RTOS ThreadX and available for all Azure RTOS ThreadX–supported processors. Like Azure RTOS ThreadX, Azure RTOS USBX is designed to have a small footprint and high performance, making it ideal for deeply embedded applications that require an interface with USB devices.
 
