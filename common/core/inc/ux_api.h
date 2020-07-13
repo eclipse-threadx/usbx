@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  06-30-2020     Chaoqiong Xiao           Modified comment(s), and      */
+/*                                            updated product constants,  */
+/*                                            avoided div 0 in overflow   */
+/*                                            checking macro,             */
+/*                                            resulting in version 6.0.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -128,6 +133,12 @@ typedef signed char               SCHAR;
 #define UX_HOST_HNP_POLLING_THREAD_STACK                    UX_THREAD_STACK_SIZE
 #endif
 
+/* Define basic constants for the USBX Stack.  */
+#define AZURE_RTOS_USBX
+#define USBX_MAJOR_VERSION            6
+#define USBX_MINOR_VERSION            0
+#define USBX_PATCH_VERSION            1
+
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
 #define UX_CONCAT_BASE(x,y)           x ## y
@@ -155,9 +166,9 @@ typedef signed char               SCHAR;
 #define UX_UNDERFLOW_CHECK_MINUS(a, b)           ((a) < (b))
 
 /* Overflow check optimized in case multiplying a 2nd factor of const.  */
-#define UX_OVERFLOW_CHECK_MULC_ULONG(v, c)       ((v) > 0xFFFFFFFFul / (c))
-#define UX_OVERFLOW_CHECK_MULC_USHORT(v, c)      ((v) > 0xFFFFul / (c))
-#define UX_OVERFLOW_CHECK_MULC_UCHAR(v, c)       ((v) > 0xFFul / (c))
+#define UX_OVERFLOW_CHECK_MULC_ULONG(v, c)       (((c) != 0) && ((v) > 0xFFFFFFFFul / (c)))
+#define UX_OVERFLOW_CHECK_MULC_USHORT(v, c)      (((c) != 0) && ((v) > 0xFFFFul / (c)))
+#define UX_OVERFLOW_CHECK_MULC_UCHAR(v, c)       (((c) != 0) && ((v) > 0xFFul / (c)))
 
 /* Overflow check optimized in case multiplying factors of variables and division instruction unavailable.  */
 #define UX_OVERFLOW_CHECK_MULV_ULONG(v, v1)      ((v) * (v1) < UX_MIN(v, v1))
