@@ -88,7 +88,12 @@ ULONG           value_carry;
     /* Ensure that the potential Halt bit is removed in the head ED.  */
     value_td =  (ULONG) _ux_utility_virtual_address(ed -> ux_ohci_ed_head_td) & UX_OHCI_ED_MASK_TD;
     head_td =   (UX_OHCI_TD *) _ux_utility_physical_address((VOID *) value_td);
-    
+#if 1  // ADDED_BY_LJ  QEPDCLQU <2020.07.24>
+	// because in the line of 'while (head_td != tail_td)', tail_td is a virtual address,
+	// and if it is the first entry the while,head_td->ux_ohci_td_next_td will be an exception,
+	// because virtual addr is not same with physical addr in some CPU, like MIPS , the CPU need a virtual addr not a physical
+	head_td = (UX_OHCI_TD*)value_td;
+#endif
     /* Remove all the tds from this ED and leave the head and tail pointing
        to the dummy TD.  */
     tail_td =  _ux_utility_virtual_address(ed -> ux_ohci_ed_tail_td);
