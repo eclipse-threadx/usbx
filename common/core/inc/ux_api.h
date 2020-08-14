@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.0.1        */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -49,6 +49,9 @@
 /*                                            avoided div 0 in overflow   */
 /*                                            checking macro,             */
 /*                                            resulting in version 6.0.1  */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s), and      */
+/*                                            updated product constants,  */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -137,7 +140,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            0
-#define USBX_PATCH_VERSION            1
+#define USBX_PATCH_VERSION            2
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 

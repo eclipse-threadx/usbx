@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_report_get                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, accepted both INPUT  */
+/*                                            and FEATURE reports,        */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report)
@@ -112,8 +117,9 @@ UINT                            status;
     /* Get the report pointer from the caller.  */
     hid_report =  client_report -> ux_host_class_hid_client_report;
 
-    /* Ensure this is a INPUT report.  */
-    if (hid_report -> ux_host_class_hid_report_type != UX_HOST_CLASS_HID_REPORT_TYPE_INPUT)
+    /* Ensure this is a INPUT report or FEATURE report.  */
+    if (hid_report -> ux_host_class_hid_report_type != UX_HOST_CLASS_HID_REPORT_TYPE_INPUT &&
+        hid_report -> ux_host_class_hid_report_type != UX_HOST_CLASS_HID_REPORT_TYPE_FEATURE)
     {
 
         /* Unprotect thread reentry to this instance.  */
@@ -202,7 +208,7 @@ UINT                            status;
             {
                 
                 /* We have enough memory to store the raw buffer.  */
-                _ux_utility_memory_copy(client_report -> ux_host_class_hid_client_report_buffer, report_buffer, transfer_request -> ux_transfer_request_actual_length);
+                _ux_utility_memory_copy(client_report -> ux_host_class_hid_client_report_buffer, report_buffer, transfer_request -> ux_transfer_request_actual_length); /* Use case of memcpy is verified. */
                 
                 /* Set status to success.  */
                 status =  UX_SUCCESS;

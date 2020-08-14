@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_idle_set                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            protected default control   */
+/*                                            endpoint before using it,   */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_idle_set(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id)
@@ -96,6 +100,21 @@ UINT            status;
     status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
+
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the 
+       transfer request function.  */
+    status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+
+    /* Check for status.  */
+    if (status != UX_SUCCESS)
+    {
+
+        /* Something went wrong. */
+        /* Unprotect thread reentry to this instance.  */
+        _ux_utility_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+
+        return(status);
+    }
 
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &hid -> ux_host_class_hid_device -> ux_device_control_endpoint;

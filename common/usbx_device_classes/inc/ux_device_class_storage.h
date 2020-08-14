@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_storage.h                           PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added mode related macros,  */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -167,11 +170,22 @@
 
 #define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_MEDIUM_TYPE_6    1
 #define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_MEDIUM_TYPE_10   2
+#define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_FLAGS_6          2
+#define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_FLAGS_10         3
+#define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_FLAG_WP          0x80
 #define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_HEADER_LENGTH_6  4
 #define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_HEADER_LENGTH_10 8
 
 #define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_COMMAND_LENGTH_UFI         12
 #define UX_SLAVE_CLASS_STORAGE_MODE_SENSE_COMMAND_LENGTH_SBC         12
+
+#define UX_SLAVE_CLASS_STORAGE_IEC_MODE_PAGE_PAGE_LENGTH             0x0A
+
+#define UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_PAGE_LENGTH         0x12
+#define UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_CODE                0
+#define UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_LENGTH              1
+#define UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_FLAGS               2
+#define UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_FLAG_WCE            (1u<<2)
 
 
 /* Define Storage Class SCSI request sense command constants.  */

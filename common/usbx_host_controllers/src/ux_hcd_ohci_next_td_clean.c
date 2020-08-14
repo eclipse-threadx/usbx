@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_next_td_clean                          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed physical and virtual  */
+/*                                            address conversion,         */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_next_td_clean(UX_OHCI_TD *td)
@@ -83,12 +87,12 @@ ULONG           value_carry;
     ed =  td -> ux_ohci_td_ed;
 
     /* Ensure that the potential Carry bit is maintained in the head ED.  */
-    value_carry =  (ULONG) _ux_utility_virtual_address(ed -> ux_ohci_ed_head_td) & UX_OHCI_ED_TOGGLE_CARRY;
+    value_carry =  (ULONG)(ed -> ux_ohci_ed_head_td) & UX_OHCI_ED_TOGGLE_CARRY;
 
     /* Ensure that the potential Halt bit is removed in the head ED.  */
     value_td =  (ULONG) _ux_utility_virtual_address(ed -> ux_ohci_ed_head_td) & UX_OHCI_ED_MASK_TD;
-    head_td =   (UX_OHCI_TD *) _ux_utility_physical_address((VOID *) value_td);
-    
+    head_td =   (UX_OHCI_TD *)value_td;
+
     /* Remove all the tds from this ED and leave the head and tail pointing
        to the dummy TD.  */
     tail_td =  _ux_utility_virtual_address(ed -> ux_ohci_ed_tail_td);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_interrupt_endpoint_create              PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,6 +87,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed physical and virtual  */
+/*                                            address conversion,         */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_interrupt_endpoint_create(UX_HCD_OHCI *hcd_ohci, UX_ENDPOINT *endpoint)
@@ -199,7 +203,10 @@ UINT            interval_ohci;
     /* Check for end of tree which happens for devices with interval of 1. In this case
        there might not be a next_ed.  */
     if (next_ed != UX_NULL)
+    {
+        next_ed = _ux_utility_virtual_address(next_ed);
         next_ed -> ux_ohci_ed_previous_ed =  ed;
+    }
     ed -> ux_ohci_ed_next_ed =  _ux_utility_physical_address(next_ed);
     ed -> ux_ohci_ed_previous_ed =  ed_list;
     ed_list -> ux_ohci_ed_next_ed =  _ux_utility_physical_address(ed);

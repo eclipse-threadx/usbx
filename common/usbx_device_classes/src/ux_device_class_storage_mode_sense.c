@@ -47,8 +47,8 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 #else
 #define USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CDROM_LENGTH (0)
 #endif
-#define USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CACHE_LENGTH (0x12 + 2)
-#define USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_IEC_LENGTH   (0x0A + 2)
+#define USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CACHE_LENGTH (UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_PAGE_LENGTH + 2)
+#define USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_IEC_LENGTH   (UX_SLAVE_CLASS_STORAGE_IEC_MODE_PAGE_PAGE_LENGTH + 2)
 
 /* Ensure sense pages can fit in the bulk in endpoint's transfer buffer.  */
 #define USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_ALL_RESPONSE_LENGTH (    \
@@ -65,7 +65,7 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_mode_sense                 PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -104,6 +104,11 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used mode related macros,   */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -120,7 +125,7 @@ ULONG                   page_code;
 ULONG                   mode_sense_command;
 UCHAR                   read_only_flag;
 ULONG                   response_header_length;
-ULONG                   medium_type_index;
+ULONG                   flags_index;
 ULONG                   mode_data_length;
 UCHAR                   *page_pointer;
 ULONG                   page_length;
@@ -146,7 +151,7 @@ ULONG                   page_length;
 
         /* Extract the length to be returned by the cbwcb.  */
         mode_sense_reply_length =  (ULONG) *(cbwcb + UX_SLAVE_CLASS_STORAGE_MODE_SENSE_ALLOCATION_LENGTH_6);
-        medium_type_index = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_MEDIUM_TYPE_6;
+        flags_index = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_FLAGS_6;
         response_header_length = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_HEADER_LENGTH_6;
     }
 
@@ -155,7 +160,7 @@ ULONG                   page_length;
 
         /* Extract the length to be returned by the cbwcb.  */
         mode_sense_reply_length =  _ux_utility_short_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_MODE_SENSE_ALLOCATION_LENGTH_10);
-        medium_type_index = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_MEDIUM_TYPE_10;
+        flags_index = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_FLAGS_10;
         response_header_length = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_HEADER_LENGTH_10;
     }
 
@@ -164,13 +169,13 @@ ULONG                   page_length;
         mode_sense_reply_length = UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE;
 
     /* Ensure memory buffer cleaned.  */
-    _ux_utility_memory_set(transfer_request -> ux_slave_transfer_request_data_pointer, 0, mode_sense_reply_length);
+    _ux_utility_memory_set(transfer_request -> ux_slave_transfer_request_data_pointer, 0, mode_sense_reply_length); /* Use case of memset is verified. */
 
     /* Establish READ ONLY flag.  */
     if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_read_only_flag == UX_TRUE)
     
         /* This device is Read Only.  */
-        read_only_flag = 0x80;
+        read_only_flag = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_FLAG_WP;
     
     else
     
@@ -191,7 +196,7 @@ ULONG                   page_length;
         page_length = USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CDROM_LENGTH;
 
         /* Copy page data.  */
-        _ux_utility_memory_copy(page_pointer, usbx_device_class_storage_mode_sense_page_cdrom, page_length);
+        _ux_utility_memory_copy(page_pointer, usbx_device_class_storage_mode_sense_page_cdrom, page_length); /* Use case of memcpy is verified. */
 
         /* Update pointer and length.  */
         mode_data_length += page_length;
@@ -210,10 +215,12 @@ ULONG                   page_length;
         *(page_pointer) = UX_SLAVE_CLASS_STORAGE_PAGE_CODE_CACHE;
 
         /* Store the length of the page data.  */
-        *(page_pointer + 1) = 0x12;
+        *(page_pointer + UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_LENGTH) =
+                            UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_PAGE_LENGTH;
 
         /* Set the Write Cache Enabled (WCE) bit.  */
-        *(page_pointer + 2) |= 0x04;
+        *(page_pointer + UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_FLAGS) |=
+                            UX_SLAVE_CLASS_STORAGE_CACHING_MODE_PAGE_FLAG_WCE;
 
         mode_data_length += page_length;
         page_pointer += page_length;
@@ -229,7 +236,7 @@ ULONG                   page_length;
         *(page_pointer) = UX_SLAVE_CLASS_STORAGE_PAGE_CODE_IEC;
 
         /* Store the length of the page data.  */
-        *(page_pointer + 1) = 0x0A;
+        *(page_pointer + 1) = UX_SLAVE_CLASS_STORAGE_IEC_MODE_PAGE_PAGE_LENGTH;
 
         mode_data_length += page_length;
         page_pointer += page_length;
@@ -242,7 +249,7 @@ ULONG                   page_length;
         _ux_utility_short_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer, (USHORT)mode_data_length);
 
     /* Store the write protection flag.  */
-    *(transfer_request -> ux_slave_transfer_request_data_pointer + medium_type_index + 1) = read_only_flag;
+    *(transfer_request -> ux_slave_transfer_request_data_pointer + flags_index) = read_only_flag;
 
     /* Send a payload with the response buffer.  */
     _ux_device_stack_transfer_request(transfer_request, mode_sense_reply_length, mode_sense_reply_length); 

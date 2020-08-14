@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid.h                                 PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed struct field          */
+/*                                            definition issues,          */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -847,7 +851,7 @@ typedef struct UX_HOST_CLASS_HID_FIELD_STRUCT
     ULONG           ux_host_class_hid_field_number_usage;
     ULONG           *ux_host_class_hid_field_values;
     ULONG           ux_host_class_hid_field_number_values;
-    struct UX_HOST_CLASS_HID_REPORT 
+    struct UX_HOST_CLASS_HID_REPORT_STRUCT 
                     *ux_host_class_hid_field_report;
     struct UX_HOST_CLASS_HID_FIELD_STRUCT 
                     *ux_host_class_hid_field_next_field;

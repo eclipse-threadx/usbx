@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_idle_get                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.0.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            protected default control   */
+/*                                            endpoint before using it,   */
+/*                                            resulting in version 6.0.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_idle_get(UX_HOST_CLASS_HID *hid, USHORT *idle_time, USHORT report_id)
@@ -114,6 +118,25 @@ UINT            status;
 
         /* Return error status.  */
         return(UX_MEMORY_INSUFFICIENT);
+    }
+
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the 
+       transfer request function.  */
+    status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+
+    /* Check for status.  */
+    if (status != UX_SUCCESS)
+    {
+
+        /* Something went wrong. */
+
+        /* Free allocated memory.  */
+        _ux_utility_memory_free(idle_byte);
+
+        /* Unprotect thread reentry to this instance.  */
+        _ux_utility_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+
+        return(status);
     }
 
     /* Create a transfer request for the GET_IDLE request.  */
