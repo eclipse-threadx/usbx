@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_initialize                     PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -109,7 +114,7 @@ UINT                                    status = UX_SUCCESS;
                     _ux_device_class_hid_interrupt_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) class -> ux_slave_class_thread_stack,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
 
     /* Check the creation of this thread.  */
     if (status == UX_SUCCESS)
@@ -147,7 +152,7 @@ UINT                                    status = UX_SUCCESS;
             hid -> ux_slave_class_hid_instance_deactivate = hid_parameter -> ux_slave_class_hid_instance_deactivate;
 
             /* By default no event wait timeout.  */
-            hid -> ux_device_class_hid_event_wait_timeout = TX_WAIT_FOREVER;
+            hid -> ux_device_class_hid_event_wait_timeout = UX_WAIT_FOREVER;
 
             /* Create a event flag group for the hid class to synchronize with the event interrupt thread.  */
             status =  _ux_utility_event_flags_create(&hid -> ux_device_class_hid_event_flags_group, "ux_device_class_hid_event_flag");

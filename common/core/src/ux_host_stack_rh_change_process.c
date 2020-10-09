@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_rh_change_process                    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used new interrupt macros,  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_rh_change_process(VOID)
@@ -76,7 +79,7 @@ UX_HCD      *hcd;
 UINT        hcd_index;
 ULONG       port_status;
 UINT        port_index;
-UX_INT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
     /* This thread was maybe awaken by one or more HCD controllers. Check each 
        of the HCD to see where there has been a change of topology.  */
@@ -102,9 +105,9 @@ UX_INT_SAVE_AREA
                     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_RH_CHANGE_PROCESS, port_index, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
                     /* Reset that port activity signal.  */
-                    UX_DISABLE_INTS
+                    UX_DISABLE
                     hcd -> ux_hcd_root_hub_signal[port_index]--;
-                    UX_RESTORE_INTS
+                    UX_RESTORE
 
                     /* Call HCD for port status.  */
                     port_status =  hcd -> ux_hcd_entry_function(hcd, UX_HCD_GET_PORT_STATUS, (VOID *)((ALIGN_TYPE)port_index));
@@ -139,9 +142,9 @@ UX_INT_SAVE_AREA
                                 {
 
                                     /* We need to get back in synch now.  */
-                                    UX_DISABLE_INTS
+                                    UX_DISABLE
                                     hcd -> ux_hcd_root_hub_signal[port_index] = 0;
-                                    UX_RESTORE_INTS
+                                    UX_RESTORE
                             
                                     /* First extract the device.  */
                                     _ux_host_stack_rh_device_extraction(hcd,port_index);

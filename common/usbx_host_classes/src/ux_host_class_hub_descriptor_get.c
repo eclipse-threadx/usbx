@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_descriptor_get                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_descriptor_get(UX_HOST_CLASS_HUB *hub)
@@ -79,7 +83,9 @@ UCHAR           *descriptor;
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 UINT            status;
+#if UX_MAX_DEVICES > 1
 ULONG           port_index;
+#endif
 
 
     /* We need to get the default control endpoint transfer request pointer.  */
@@ -110,6 +116,7 @@ ULONG           port_index;
         if (transfer_request -> ux_transfer_request_actual_length == UX_HUB_DESCRIPTOR_LENGTH)
         {
 
+#if UX_MAX_DEVICES > 1
             /* Parse the device descriptor and create the local descriptor.  */
             _ux_utility_descriptor_parse(descriptor, _ux_system_hub_descriptor_structure, UX_HUB_DESCRIPTOR_ENTRIES,
                                                                     (UCHAR *) &hub -> ux_host_class_hub_descriptor);
@@ -159,6 +166,7 @@ ULONG           port_index;
                 /* We should never get here. In this case the protocol value of the HUB is illegal.  */
                 status =  UX_DESCRIPTOR_CORRUPTED;
             }
+#endif /* #if UX_MAX_DEVICES > 1 */
         }
         else
         {

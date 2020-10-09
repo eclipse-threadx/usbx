@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_video.h                               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,14 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added new definition, field */
+/*                                            and functions for video     */
+/*                                            control handling, used UX   */
+/*                                            prefix to refer to TX       */
+/*                                            symbols instead of using    */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -243,6 +251,7 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_WRONG_TYPE                                                      0x90
 #define UX_HOST_CLASS_VIDEO_WRONG_INTERFACE                                                 0x91
 #define UX_HOST_CLASS_VIDEO_PARAMETER_ERROR                                                 0x92
+#define UX_HOST_CLASS_VIDEO_DEVICE_NOT_READY                                                0x93
 
 /* Define Video Class Terminal Control Selectors.  */
 #define UX_HOST_CLASS_VIDEO_TCS_VC_CONTROL_UNDEFINED                                        0x00
@@ -481,7 +490,8 @@ typedef struct UX_HOST_CLASS_VIDEO_STRUCT
     UX_TRANSFER     ux_host_class_video_transfer_requests[UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST_COUNT];
     ULONG           ux_host_class_video_transfer_request_start_index;
     ULONG           ux_host_class_video_transfer_request_end_index;
-    TX_SEMAPHORE    ux_host_class_video_semaphore;
+    UX_SEMAPHORE    ux_host_class_video_semaphore;
+    UX_SEMAPHORE    ux_host_class_video_semaphore_control_request;
     VOID            (*ux_host_class_video_transfer_completion_function)(UX_TRANSFER*);
 
 } UX_HOST_CLASS_VIDEO;
@@ -497,7 +507,7 @@ typedef struct UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST_STRUCT
     ULONG           ux_host_class_video_transfer_request_requested_length;
     ULONG           ux_host_class_video_transfer_request_actual_length;
     VOID            (*ux_host_class_video_transfer_request_completion_function) (struct UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST_STRUCT *);
-    TX_SEMAPHORE    ux_host_class_video_transfer_request_semaphore;
+    UX_SEMAPHORE    ux_host_class_video_transfer_request_semaphore;
     VOID            *ux_host_class_video_transfer_request_class_instance;
     UINT            ux_host_class_video_transfer_request_completion_code;
     struct UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST_STRUCT   
@@ -612,7 +622,15 @@ ULONG   _ux_host_class_video_max_payload_get(UX_HOST_CLASS_VIDEO *video);
 UINT    _ux_host_class_video_transfer_buffer_add(UX_HOST_CLASS_VIDEO *video, UCHAR* buffer);
 UINT    _ux_host_class_video_transfer_buffers_add(UX_HOST_CLASS_VIDEO *video, UCHAR** buffers, ULONG num_buffers);
 VOID    _ux_host_class_video_transfer_callback_set(UX_HOST_CLASS_VIDEO *video, VOID (*callback_function)(UX_TRANSFER*));
-
+UINT    _ux_host_class_video_entities_parse(UX_HOST_CLASS_VIDEO *video,
+                        UINT(*parse_function)(VOID  *arg,
+                                            UCHAR *packed_interface_descriptor,
+                                            UCHAR *packed_entity_descriptor),
+                        VOID* arg);
+UINT    _ux_host_class_video_control_request(UX_HOST_CLASS_VIDEO *video,
+                        UINT request, UCHAR interface_index,
+                        UINT entity_id, UINT control_selector,
+                        UCHAR *parameter, UINT parameter_size);
 
 /* Define Video Class API prototypes.  */
 
@@ -629,6 +647,8 @@ VOID    _ux_host_class_video_transfer_callback_set(UX_HOST_CLASS_VIDEO *video, V
 #define ux_host_class_video_transfer_buffer_add     _ux_host_class_video_transfer_buffer_add
 #define ux_host_class_video_transfer_buffers_add    _ux_host_class_video_transfer_buffers_add
 #define ux_host_class_video_transfer_callback_set   _ux_host_class_video_transfer_callback_set
+#define ux_host_class_video_entities_parse          _ux_host_class_video_entities_parse
+#define ux_host_class_video_control_request         _ux_host_class_video_control_request
 
 #endif
 

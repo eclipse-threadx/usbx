@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_class_call                           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,44 +66,51 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UX_HOST_CLASS  *_ux_host_stack_class_call(UX_HOST_CLASS_COMMAND *class_command)
 {
 
-UX_HOST_CLASS        *class;
+UINT            status = UX_NO_CLASS_MATCH;
+UX_HOST_CLASS   *class_inst;
+#if UX_MAX_CLASS_DRIVER > 1
 ULONG           class_index;
-UINT            status;
-
+#endif
 
     /* Start from the 1st registered classes with USBX.  */
-    class =  _ux_system_host -> ux_system_host_class_array;
+    class_inst =  _ux_system_host -> ux_system_host_class_array;
 
     /* Parse all the class drivers.  */
+#if UX_MAX_CLASS_DRIVER > 1
     for (class_index = 0; class_index < _ux_system_host -> ux_system_host_max_class; class_index++)
     {
+#endif
 
         /* Check if this class driver is used.  */
-        if (class -> ux_host_class_status == UX_USED)
+        if (class_inst -> ux_host_class_status == UX_USED)
         {
 
             /* We have found a potential candidate. Call this registered class entry function.  */
-            status = class -> ux_host_class_entry_function(class_command);
+            status = class_inst -> ux_host_class_entry_function(class_command);
 
             /* The status tells us if the registered class wants to own this class.  */
             if (status == UX_SUCCESS)
             {
 
                 /* Yes, return this class pointer.  */
-                return(class); 
+                return(class_inst); 
             }
         }    
-
+#if UX_MAX_CLASS_DRIVER > 1
         /* Move to the next registered class. */
-        class++;
-    }       
+        class_inst ++;
+    }
+#endif
 
     /* There is no driver who want to own this class!  */
     return(UX_NULL);
 }
-

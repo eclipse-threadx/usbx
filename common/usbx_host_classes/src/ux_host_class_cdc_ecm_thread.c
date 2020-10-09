@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_thread                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_thread(ULONG parameter)
@@ -114,7 +120,7 @@ UINT                        status;
 
                 /* We can accept reception. Get a NX Packet. */
                 status =  nx_packet_allocate(&cdc_ecm -> ux_host_class_cdc_ecm_packet_pool, &packet, 
-                                             NX_RECEIVE_PACKET, MS_TO_TICK(UX_HOST_CLASS_CDC_ECM_PACKET_POOL_WAIT));
+                                             NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_HOST_CLASS_CDC_ECM_PACKET_POOL_WAIT));
 
                 if (status == NX_SUCCESS)
                 {
@@ -158,7 +164,7 @@ UINT                        status;
                         {
 
                             /* Wait for the completion of the transfer request.  */
-                            _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, TX_WAIT_FOREVER);
+                            _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_WAIT_FOREVER);
 
                             /* Check the transfer status. If there is a transport error, we ignore the packet
                                and restart it. */

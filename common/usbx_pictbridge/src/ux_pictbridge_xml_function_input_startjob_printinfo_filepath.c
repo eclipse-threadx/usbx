@@ -33,8 +33,9 @@
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
-/*    _ux_pictbridge_xml_function_input_                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*    _ux_pictbridge_xml_function_input_startjob_printinfo_filepath       */ 
+/*                                                        PORTABLE C      */ 
+/*                                                           6.1          */
 /*                                                                        */ 
 /*                                                                        */ 
 /*  AUTHOR                                                                */
@@ -68,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_filepath(UX_PICTBRIDGE *pictbridge, 
@@ -80,7 +85,7 @@ UINT    length = 0;
     UX_PARAMETER_NOT_USED(input_variable);
 
     /* Get the length of the parameter. */
-    status = _ux_utility_string_length_check(xml_parameter, &length, UX_PICTBRIDGE_MAX_TAG_SIZE);
+    status = _ux_utility_string_length_check(xml_parameter, &length, UX_PICTBRIDGE_MAX_STRING_SIZE);
     if (status != UX_SUCCESS)
         return(status);
     
@@ -92,7 +97,7 @@ UINT    length = 0;
     
     /* We need to copy the filepath.  */
     _ux_utility_memory_copy(pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_printinfo_current -> ux_pictbridge_printinfo_filepath,
-                            xml_parameter, length);
+                            xml_parameter, length); /* Use case of memcpy is verified. */
 
     /* Operation is successful.  */
     return(UX_SUCCESS);

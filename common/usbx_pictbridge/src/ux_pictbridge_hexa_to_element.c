@@ -33,8 +33,8 @@
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
-/*    _ux_pictbridge_element_to_hexa                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*    _ux_pictbridge_hexa_to_element                      PORTABLE C      */ 
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_hexa_to_element(ULONG hexa_value, UCHAR *element)
@@ -78,7 +82,7 @@ UCHAR                   element_hexa;
 ULONG                   element_shift;
     
     /* Reset the element buffer.  */
-    _ux_utility_memory_set(element, 0, 8);
+    _ux_utility_memory_set(element, 0, 8); /* Use case of memset is verified. */
        
     /* Reset the value of the length.*/
     element_length = 0;

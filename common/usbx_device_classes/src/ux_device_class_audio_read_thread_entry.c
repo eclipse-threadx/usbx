@@ -33,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_class_audio_read_thread                  PORTABLE C      */
-/*                                                           6.0          */
+/*    _ux_device_class_audio_read_thread_entry            PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID _ux_device_class_audio_read_thread_entry(ULONG audio_stream)
@@ -137,7 +141,7 @@ ULONG                           actual_length;
             stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_pos = 0;
             _ux_utility_memory_copy(stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_data,
                             transfer -> ux_slave_transfer_request_data_pointer,
-                            actual_length);
+                            actual_length); /* Use case of memcpy is verified. */
 
             /* For simple, do not advance the transfer position if there is overflow.  */
             next_pos = (UCHAR *)stream -> ux_device_class_audio_stream_transfer_pos;

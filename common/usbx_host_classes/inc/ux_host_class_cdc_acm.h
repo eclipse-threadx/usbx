@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_cdc_acm.h                             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -194,7 +199,7 @@ typedef struct UX_HOST_CLASS_CDC_ACM_STRUCT
     UX_INTERFACE   *ux_host_class_cdc_acm_interface;
     UINT           ux_host_class_cdc_acm_instance_status;
     UINT           ux_host_class_cdc_acm_state;
-    TX_SEMAPHORE   ux_host_class_cdc_acm_semaphore;
+    UX_SEMAPHORE   ux_host_class_cdc_acm_semaphore;
     ULONG          ux_host_class_cdc_acm_notification_count;
     UCHAR          ux_host_class_cdc_acm_capabilities;
     ULONG          ux_host_class_cdc_acm_device_state;
@@ -220,7 +225,7 @@ typedef struct UX_HOST_CLASS_CDC_DLC_STRUCT
     UX_INTERFACE   *ux_host_class_cdc_dlc_interface;
     UINT           ux_host_class_cdc_dlc_instance_status;
     UINT           ux_host_class_cdc_dlc_state;
-    TX_SEMAPHORE   ux_host_class_cdc_dlc_semaphore;
+    UX_SEMAPHORE   ux_host_class_cdc_dlc_semaphore;
     ULONG          ux_host_class_cdc_dlc_notification_count;
     UCHAR          ux_host_class_cdc_dlc_capabilities;
     struct UX_HOST_CLASS_CDC_DLC_RECEPTION_STRUCT  

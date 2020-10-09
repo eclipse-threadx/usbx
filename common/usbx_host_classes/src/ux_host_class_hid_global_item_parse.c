@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_global_item_parse                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_global_item_parse(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_ITEM *item, UCHAR *descriptor)
@@ -205,7 +209,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
                         
         else
             _ux_utility_memory_copy(&hid_parser -> ux_host_class_hid_parser_global_pool[hid_parser -> ux_host_class_hid_parser_number_global++],
-                                        &hid_parser -> ux_host_class_hid_parser_global, sizeof(UX_HOST_CLASS_HID_GLOBAL_ITEM));
+                                        &hid_parser -> ux_host_class_hid_parser_global, sizeof(UX_HOST_CLASS_HID_GLOBAL_ITEM)); /* Use case of memcpy is verified. */
         break;
 
      
@@ -226,7 +230,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
         else
             _ux_utility_memory_copy(&hid_parser -> ux_host_class_hid_parser_global,
                                    &hid_parser -> ux_host_class_hid_parser_global_pool[--hid_parser -> ux_host_class_hid_parser_number_global],
-                                        sizeof(UX_HOST_CLASS_HID_GLOBAL_ITEM));
+                                        sizeof(UX_HOST_CLASS_HID_GLOBAL_ITEM)); /* Use case of memcpy is verified. */
 
         break;
 

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_request_control_transfer               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_request_control_transfer(UX_HCD_OHCI *hcd_ohci, UX_TRANSFER *transfer_request)
@@ -244,7 +247,7 @@ UINT            status;
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_COMMAND_STATUS, ohci_register);
 
    /* Wait for the completion of the transfer request.  */
-    status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_CONTROL_TRANSFER_TIMEOUT));
+    status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_CONTROL_TRANSFER_TIMEOUT));
 
     /* If the semaphore did not succeed we probably have a time out.  */
     if (status != UX_SUCCESS)

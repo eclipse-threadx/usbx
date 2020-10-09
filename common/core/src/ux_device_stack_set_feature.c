@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_set_feature                        PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions, stalled on not */
+/*                                            supported device requests,  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_set_feature(ULONG request_type, ULONG request_value, ULONG request_index)
@@ -121,25 +126,29 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
 #ifdef UX_OTG_SUPPORT
         /* Check if we have a A_HNP_SUPPORT Feature. This is set when the Host is HNP capable. */
         if (request_value == UX_OTG_FEATURE_A_HNP_SUPPORT)
+        {
 
             /* Store the A_HNP_SUPPORT flag.  */
             _ux_system_otg -> ux_system_otg_slave_set_feature_flag |= UX_OTG_FEATURE_A_HNP_SUPPORT;
-        else
+
+            /* OK.  */
+            return(UX_SUCCESS);
+        }
+
+        /* Check if the host asks us to perform HNP.  If also we become the host.  */
+        if (request_value == UX_OTG_FEATURE_B_HNP_ENABLE)
         {
 
-            /* Check if the host asks us to perform HNP.  If also we become the host.  */
-            if (request_value == UX_OTG_FEATURE_B_HNP_ENABLE)
-            {
+            /* The ISR will pick up the suspend event and check if we need to become IDLE or HOST.  */
+            _ux_system_otg -> ux_system_otg_slave_set_feature_flag |= UX_OTG_FEATURE_B_HNP_ENABLE;
 
-                /* The ISR will pick up the suspend event and check if we need to become IDLE or HOST.  */
-                _ux_system_otg -> ux_system_otg_slave_set_feature_flag |= UX_OTG_FEATURE_B_HNP_ENABLE;
-
-            }
-
+            /* OK.  */
+            return(UX_SUCCESS);
         }
 #endif
-            
-        break;
+
+        /* Request value not supported.  */
+        return(UX_FUNCTION_NOT_SUPPORTED);
 
     case UX_REQUEST_TARGET_ENDPOINT:
 
@@ -148,9 +157,10 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
            We need to find the endpoint through the interface(s). */
         interface =  device -> ux_slave_device_first_interface;
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         while (interface != UX_NULL)
         {
-
+#endif
             /* Get the first endpoint for this interface.  */
             endpoint_target =  interface -> ux_slave_interface_first_endpoint;
                 
@@ -173,9 +183,11 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
                 endpoint_target =  endpoint_target -> ux_slave_endpoint_next_endpoint;
             }
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Next interface.  */
             interface =  interface -> ux_slave_interface_next_interface;
         }
+#endif
 
         /* We get here when the endpoint is wrong. Should not happen though.  */
         /* Intentionally fall through into the default case. */
@@ -188,8 +200,4 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
         /* No more work to do here.  The command failed but the upper layer does not depend on it.  */
         return(UX_SUCCESS);            
     }
-
-    /* Return the function status.  */
-    return(UX_SUCCESS);
 }
-

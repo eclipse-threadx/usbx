@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_report_set                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_set(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report)
@@ -161,7 +165,7 @@ UINT                        status;
         {
 
             /* We have enough memory to store the raw buffer.  */
-            _ux_utility_memory_copy(current_report_buffer, client_report -> ux_host_class_hid_client_report_buffer, hid_report -> ux_host_class_hid_report_byte_length);
+            _ux_utility_memory_copy(current_report_buffer, client_report -> ux_host_class_hid_client_report_buffer, hid_report -> ux_host_class_hid_report_byte_length); /* Use case of memcpy is verified. */
         }
         else
         {

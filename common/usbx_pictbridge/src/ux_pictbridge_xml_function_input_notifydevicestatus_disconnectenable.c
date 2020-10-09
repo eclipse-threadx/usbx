@@ -36,7 +36,7 @@
 /*    _ux_pictbridge_xml_function_input_notifydevicestatus_               */
 /*                                        disconnectenable                */ 
 /*                                                         POTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*                                                                        */ 
 /*                                                                        */ 
 /*                                                                        */ 
@@ -71,6 +71,8 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_disconnectenable(UX_PICTBRIDGE *pictbridge, 

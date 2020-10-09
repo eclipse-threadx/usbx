@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_configuration_set                    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_configuration_set(UX_CONFIGURATION *configuration)
@@ -93,11 +97,11 @@ UX_HCD          *hcd;
 
         /* For HNP to work the device has to be connected directly to the Root Hub and not
            a down stream hub.  If the parent is NULL, the device is on the root hub.  */
-        if (device -> ux_device_parent == UX_NULL)
+        if (UX_DEVICE_PARENT_IS_ROOTHUB(device))
         {
 
             /* With the device we have the pointer to the HCD.  */
-            hcd =  device -> ux_device_hcd;
+            hcd = UX_DEVICE_HCD_GET(device);
     
             /* Check the HCD to ensure we have an OTG host controller.  */
             if (hcd -> ux_hcd_otg_capabilities & UX_HCD_OTG_CAPABLE)

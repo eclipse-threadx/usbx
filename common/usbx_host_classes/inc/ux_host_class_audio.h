@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_audio.h                               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -338,7 +343,7 @@ typedef struct UX_HOST_CLASS_AUDIO_STRUCT
     UINT            ux_host_class_audio_channels;
     ULONG           ux_host_class_audio_channel_control[UX_HOST_CLASS_AUDIO_MAX_CHANNEL];
     UCHAR           ux_host_class_audio_name[UX_HOST_CLASS_AUDIO_NAME_LENGTH];
-    TX_SEMAPHORE    ux_host_class_audio_semaphore;
+    UX_SEMAPHORE    ux_host_class_audio_semaphore;
 } UX_HOST_CLASS_AUDIO;
 
 
@@ -352,7 +357,7 @@ typedef struct UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST_STRUCT
     ULONG           ux_host_class_audio_transfer_request_requested_length;
     ULONG           ux_host_class_audio_transfer_request_actual_length;
     VOID            (*ux_host_class_audio_transfer_request_completion_function) (struct UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST_STRUCT *);
-    TX_SEMAPHORE    ux_host_class_audio_transfer_request_semaphore;
+    UX_SEMAPHORE    ux_host_class_audio_transfer_request_semaphore;
     VOID            *ux_host_class_audio_transfer_request_class_instance;
     UINT            ux_host_class_audio_transfer_request_completion_code;
     struct UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST_STRUCT   

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_data_get            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,6 +64,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_data_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, UCHAR *object_buffer, ULONG object_offset,
@@ -97,7 +103,7 @@ UINT                            status;
             pima_object_buffer = object_info -> ux_device_class_pima_object_buffer;
     
             /* Copy the demanded object data portion.  */
-            _ux_utility_memory_copy(object_buffer, pima_object_buffer + object_offset, object_length_requested);
+            _ux_utility_memory_copy(object_buffer, pima_object_buffer + object_offset, object_length_requested); /* Use case of memcpy is verified. */
     
             /* Update the length requested. for a demo, we do not do any checking.  */
             *object_actual_length = object_length_requested;
@@ -109,7 +115,7 @@ UINT                            status;
                 if (pictbridge -> ux_pictbridge_host_client_state_machine & UX_PICTBRIDGE_STATE_MACHINE_CLIENT_REQUEST_PENDING)
                 
                     /* Yes we are pending, send an event to release the pending request.  */
-                    _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, TX_OR);                
+                    _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, UX_OR);                
 
                 /* Since we are in host request, this indicates we are done with the cycle.  */
                 pictbridge -> ux_pictbridge_host_client_state_machine = UX_PICTBRIDGE_STATE_MACHINE_IDLE;

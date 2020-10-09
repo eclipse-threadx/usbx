@@ -202,6 +202,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_capacity_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_characteristics_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_format_capacity_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_lock.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_mount.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_open.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_storage_media_protection_check.c
@@ -235,11 +237,13 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_configure.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_control_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_control_list_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_control_request.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_control_value_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_control_value_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_deactivate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_descriptor_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_endpoints_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_entities_parse.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_format_data_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_video_frame_data_get.c

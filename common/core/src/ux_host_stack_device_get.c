@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_get                           PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,19 +69,25 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_get(ULONG device_index, UX_DEVICE **device)
 {
 
 UX_DEVICE   *current_device;
+#if UX_MAX_DEVICES > 1
 ULONG       current_device_index;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_GET, device_index, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
     /* Check if the device index is still within the limits.  */
-    if (device_index >= _ux_system_host -> ux_system_host_max_devices)
+    if (device_index >= UX_SYSTEM_HOST_MAX_DEVICES_GET())
     {
 
         /* Error trap. */
@@ -92,6 +98,8 @@ ULONG       current_device_index;
 
         return(UX_DEVICE_HANDLE_UNKNOWN);
     }
+
+#if UX_MAX_DEVICES > 1
 
     /* Start with the first device.  */
     current_device =        _ux_system_host -> ux_system_host_device_array;
@@ -123,6 +131,16 @@ ULONG       current_device_index;
         /* Move to next device.  */
         current_device++;
     }
+#else
+
+    /* Only one device, just check if it's used.  */
+    current_device = _ux_system_host -> ux_system_host_device_array;
+    if (current_device -> ux_device_handle != UX_UNUSED)
+    {
+        *device = current_device;
+        return(UX_SUCCESS);
+    }
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DEVICE_HANDLE_UNKNOWN, device, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -130,4 +148,3 @@ ULONG       current_device_index;
     /* Return error.  */
     return(UX_DEVICE_HANDLE_UNKNOWN);
 }
-

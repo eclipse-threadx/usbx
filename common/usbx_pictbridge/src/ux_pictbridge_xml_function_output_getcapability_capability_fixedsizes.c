@@ -36,7 +36,7 @@
 /*    _ux_pictbridge_xml_function_output_getcapability_capability_        */
 /*                                                     fixedsizes         */ 
 /*                                                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*                                                                        */ 
 /*                                                                        */ 
 /*  AUTHOR                                                                */
@@ -70,6 +70,8 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_xml_function_output_getcapability_capability_fixedsizes(UX_PICTBRIDGE *pictbridge, 

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_rh_device_insertion                  PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked HCD status before   */
+/*                                            retrying enumeration,       */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_rh_device_insertion(UX_HCD *hcd, UINT port_index)
@@ -142,10 +146,17 @@ UINT        status;
                 /* Return success to the caller.  */
                 return(UX_SUCCESS);
             }
-            else if (index_loop < UX_RH_ENUMERATION_RETRY - 1)
+            else
+            {
 
-                /* Simulate remove to free allocated resources before retry.  */
+                /* Return error if HCD is dead.  */
+                if (hcd -> ux_hcd_status != UX_HCD_STATUS_OPERATIONAL)
+                    return(UX_CONTROLLER_DEAD);
+
+                /* Simulate remove to free allocated resources if retry.  */
+                if (index_loop < UX_RH_ENUMERATION_RETRY - 1)
                 _ux_host_stack_device_remove(hcd, UX_NULL, port_index);
+        }
         }
 
         /* We get here if something did not go well. Either the port did not respond

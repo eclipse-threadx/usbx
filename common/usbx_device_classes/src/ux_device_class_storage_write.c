@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_write                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_write(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -92,6 +95,8 @@ ULONG                   number_blocks;
 ULONG                   media_status;
 ULONG                   total_length;
 ULONG                   transfer_length;
+
+    UX_PARAMETER_NOT_USED(endpoint_in);
 
     /* Get the LBA from the CBWCB.  */
     lba =  _ux_utility_long_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_WRITE_LBA);
@@ -119,9 +124,10 @@ ULONG                   transfer_length;
                             lun, storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id, &media_status);
     
     /* Update the request sense.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  (UCHAR) (media_status & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  (UCHAR) ((media_status >> 8 ) & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  (UCHAR) ((media_status >> 16 ) & 0xff);
+    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status = media_status;
+
+    /* Default CSW to failed.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
     /* If there is a problem, return a failed command.  */
     if (status != UX_SUCCESS)
@@ -130,9 +136,6 @@ ULONG                   transfer_length;
         /* We have a problem, media status error. Return a bad completion and wait for the
            REQUEST_SENSE command.  */
         _ux_device_stack_endpoint_stall(endpoint_out);
-
-        /* Now we return a CSW with failure.  */
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
 
         /* We are done here.  */
         return(UX_ERROR);
@@ -143,16 +146,13 @@ ULONG                   transfer_length;
     {
 
         /* Update the request sense.  */
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  UX_SLAVE_CLASS_STORAGE_SENSE_KEY_DATA_PROTECT;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  UX_SLAVE_CLASS_STORAGE_REQUEST_CODE_MEDIA_PROTECTED;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0;
+        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+                UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(UX_SLAVE_CLASS_STORAGE_SENSE_KEY_DATA_PROTECT,
+                                            UX_SLAVE_CLASS_STORAGE_REQUEST_CODE_MEDIA_PROTECTED,0);
 
         /* We have a problem, cannot write to RO drive. Return a bad completion and wait for the
            REQUEST_SENSE command.  */
         _ux_device_stack_endpoint_stall(endpoint_out);
-
-        /* Now we return a CSW with failure.  */
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
 
         /* We are done here.  */
         return(UX_ERROR);
@@ -186,13 +186,9 @@ ULONG                   transfer_length;
             _ux_device_stack_endpoint_stall(endpoint_out);
 
             /* And update the REQUEST_SENSE codes.  */
-            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x02;
-            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x54;
-            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x00;
+            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+                                                UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(0x02,0x54,0x00);
     
-            /* Now we return a CSW with failure.  */
-            _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
-
             /* Return an error.  */
             return(UX_ERROR);
         }
@@ -212,13 +208,8 @@ ULONG                   transfer_length;
             _ux_device_stack_endpoint_stall(endpoint_out);
     
             /* And update the REQUEST_SENSE codes.  */
-            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  (UCHAR) (media_status & 0xff);
-            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  (UCHAR) ((media_status >> 8 ) & 0xff);
-            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  (UCHAR) ((media_status >> 16 ) & 0xff);
+            storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status = media_status;
     
-            /* Now we return a CSW with failure.  */
-            _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
-
             /* Return an error.  */
             return(UX_ERROR);
         }
@@ -230,8 +221,8 @@ ULONG                   transfer_length;
         total_length -= transfer_length;        
     }
 
-    /* Now we return a CSW with success.  */
-    status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
+    /* Now we set the CSW with success.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
                                     
     /* Return completion status.  */
     return(status);

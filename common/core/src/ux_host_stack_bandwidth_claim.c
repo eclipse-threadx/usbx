@@ -29,12 +29,13 @@
 #include "ux_host_stack.h"
 
 
+#if UX_MAX_DEVICES > 1
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_bandwidth_claim                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +75,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_bandwidth_claim(UX_HCD *hcd, UX_ENDPOINT *endpoint)
@@ -242,3 +247,4 @@ const UCHAR     overheads[4][3] = {
        to the root port.  */
     return;
 }
+#endif /* #if UX_MAX_DEVICES > 1 */

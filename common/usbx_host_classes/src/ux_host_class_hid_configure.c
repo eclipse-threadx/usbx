@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_configure                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_configure(UX_HOST_CLASS_HID *hid)
@@ -77,8 +81,10 @@ UINT  _ux_host_class_hid_configure(UX_HOST_CLASS_HID *hid)
 
 UINT                    status;
 UX_CONFIGURATION        *configuration;
+#if UX_MAX_DEVICES > 1
 UX_DEVICE               *device;
 UX_DEVICE               *parent_device;
+#endif
 
 
     /* If the device has been configured already, we don't need to do it again. */
@@ -99,9 +105,10 @@ UX_DEVICE               *parent_device;
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
     }
         
+#if UX_MAX_DEVICES > 1
     /* Get the device container for this configuration.  */
     device =  configuration -> ux_configuration_device;
-    
+
     /* Get the parent container for this device.  */
     parent_device =  device -> ux_device_parent;
     
@@ -124,7 +131,8 @@ UX_DEVICE               *parent_device;
             return(UX_CONNECTION_INCOMPATIBLE);
         }            
     }
-    
+#endif
+
     /* We have the valid configuration. Ask the USBX stack to set this configuration.  */        
     status =  _ux_host_stack_device_configuration_select(configuration);
 

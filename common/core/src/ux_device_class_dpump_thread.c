@@ -37,7 +37,7 @@ VOID  _ux_device_class_dpump_thread(ULONG dpump_class);
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dpump_thread                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@ VOID  _ux_device_class_dpump_thread(ULONG dpump_class);
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_dpump_thread(ULONG dpump_class)
@@ -141,7 +145,7 @@ ULONG                       length;
                 /* Copy the buffer to the target in endpoint.  */
                 _ux_utility_memory_copy(endpoint_in -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer,
                                         endpoint_out -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer,
-                                        length);
+                                        length); /* Use case of memcpy is verified. */
 
                 /* Now we send the packet back to the host. On the endpoint In.  */
                 transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;

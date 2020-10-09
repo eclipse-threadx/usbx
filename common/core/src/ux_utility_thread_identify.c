@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_utility_thread_identify                         PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,14 +64,19 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-TX_THREAD *_ux_utility_thread_identify(VOID)
+UX_THREAD *_ux_utility_thread_identify(VOID)
 {
 
 
     /* If we're under interrupt, the thread returned by tx_thread_identify
         is the thread running prior to the ISR. Instead, we set it to null.  */
-    return(TX_THREAD_GET_SYSTEM_STATE() ? UX_NULL : tx_thread_identify());
+    return(UX_THREAD_GET_SYSTEM_STATE() ? UX_NULL : tx_thread_identify());
 }
 

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_write                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
@@ -169,7 +173,7 @@ UINT                        status = 0;
             /* On a out, we copy the buffer to the caller. Not very efficient but it makes the API
                easier.  */
             _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer,
-                                buffer, local_requested_length);
+                                buffer, local_requested_length); /* Use case of memcpy is verified. */
         
             /* Send the request to the device controller.  */
             status =  _ux_device_stack_transfer_request(transfer_request, local_requested_length, local_requested_length);

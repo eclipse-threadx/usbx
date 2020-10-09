@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -39,6 +39,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -137,21 +142,21 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
 {
     UX_SLAVE_INTERFACE                  *ux_slave_class_cdc_acm_interface;
     UX_SLAVE_CLASS_CDC_ACM_PARAMETER    ux_slave_class_cdc_acm_parameter;
-    TX_MUTEX                            ux_slave_class_cdc_acm_endpoint_in_mutex;
-    TX_MUTEX                            ux_slave_class_cdc_acm_endpoint_out_mutex;
+    UX_MUTEX                            ux_slave_class_cdc_acm_endpoint_in_mutex;
+    UX_MUTEX                            ux_slave_class_cdc_acm_endpoint_out_mutex;
     ULONG                               ux_slave_class_cdc_acm_baudrate;
     UCHAR                               ux_slave_class_cdc_acm_stop_bit;
     UCHAR                               ux_slave_class_cdc_acm_parity;
     UCHAR                               ux_slave_class_cdc_acm_data_bit;
     UCHAR                               ux_slave_class_cdc_acm_data_dtr_state;
     UCHAR                               ux_slave_class_cdc_acm_data_rts_state;
-    TX_THREAD                           ux_slave_class_cdc_acm_bulkin_thread;
-    TX_THREAD                           ux_slave_class_cdc_acm_bulkout_thread;
+    UX_THREAD                           ux_slave_class_cdc_acm_bulkin_thread;
+    UX_THREAD                           ux_slave_class_cdc_acm_bulkout_thread;
     UCHAR                               *ux_slave_class_cdc_acm_bulkin_thread_stack;
     UCHAR                               *ux_slave_class_cdc_acm_bulkout_thread_stack;
     UINT                                (*ux_device_class_cdc_acm_write_callback)(struct UX_SLAVE_CLASS_CDC_ACM_STRUCT *cdc_acm, UINT status, ULONG length);
     UINT                                (*ux_device_class_cdc_acm_read_callback)(struct UX_SLAVE_CLASS_CDC_ACM_STRUCT *cdc_acm, UINT status, UCHAR *data_pointer, ULONG length);
-    TX_EVENT_FLAGS_GROUP                ux_slave_class_cdc_acm_event_flags_group;
+    UX_EVENT_FLAGS_GROUP                ux_slave_class_cdc_acm_event_flags_group;
     ULONG                               ux_slave_class_cdc_acm_transmission_status;
     ULONG                               ux_slave_class_cdc_acm_scheduled_write;
     ULONG                               ux_slave_class_cdc_acm_callback_total_length;

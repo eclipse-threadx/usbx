@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_hcd_transfer_request                 PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,22 +65,20 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_hcd_transfer_request(UX_TRANSFER *transfer_request)
 {
 
-UX_ENDPOINT     *endpoint;
-UX_DEVICE       *device;
 UINT            status;
 UX_HCD          *hcd;
     
-    /* Get the endpoint container from the transfer request.  */
-    endpoint =  transfer_request -> ux_transfer_request_endpoint;
-
-    /* Obtain the HCD for this endpoint.  */
-    device =  endpoint -> ux_endpoint_device;
-    hcd =  device -> ux_device_hcd;
+    /* Obtain the HCD.  */
+    hcd = UX_DEVICE_HCD_GET(transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_device);
 
     /* Call the HCD entry function to process the transfer request.  */
     status =  hcd -> ux_hcd_entry_function(hcd, UX_HCD_TRANSFER_REQUEST, (VOID *) transfer_request);

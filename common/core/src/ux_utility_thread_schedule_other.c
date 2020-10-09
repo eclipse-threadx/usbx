@@ -32,8 +32,8 @@
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
-/*    _ux_utility_thread_priority_change                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*    _ux_utility_thread_schedule_other                   PORTABLE C      */ 
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_utility_thread_schedule_other(UINT caller_priority)
@@ -72,7 +77,7 @@ UINT  _ux_utility_thread_schedule_other(UINT caller_priority)
 
 UINT        status;
 UINT        old_priority;
-TX_THREAD   *my_thread;
+UX_THREAD   *my_thread;
 
     UX_PARAMETER_NOT_USED(caller_priority);
 

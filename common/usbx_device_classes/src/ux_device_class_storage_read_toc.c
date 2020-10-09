@@ -30,12 +30,16 @@
 #include "ux_device_stack.h"
 
 
+#if UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE < 20
+#error UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE too small, please check
+#endif
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_read_toc                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +77,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_read_toc(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -84,8 +93,10 @@ UINT                    status;
 UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   allocation_length;
 ULONG                   toc_length;
-UCHAR                   toc_buffer[20];
+UCHAR                   *toc_buffer;
 
+
+    UX_PARAMETER_NOT_USED(lun);
     UX_PARAMETER_NOT_USED(endpoint_out);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -94,8 +105,11 @@ UCHAR                   toc_buffer[20];
     /* Obtain the pointer to the transfer request.  */
     transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
 
+    /* Obtain TOC buffer.  */
+    toc_buffer = transfer_request -> ux_slave_transfer_request_data_pointer;
+
     /* Reset this buffer.  */
-    _ux_utility_memory_set(toc_buffer,0,20);
+    _ux_utility_memory_set(toc_buffer,0,20); /* Use case of memset is verified. */
 
     /* Get the allocation length.  */
     allocation_length =  _ux_utility_short_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_READ_TOC_ALLOCATION_LENGTH);
@@ -166,9 +180,6 @@ UCHAR                   toc_buffer[20];
             break;
     }
             
-    /* Copy the TOC Buffer into the transfer request memory.  */
-    _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, toc_buffer, toc_length);
-
     /* Check how much we can send back.  */
     if (allocation_length > toc_length)
     
@@ -178,8 +189,9 @@ UCHAR                   toc_buffer[20];
     /* Send a data payload with the TOC response buffer.  */
     _ux_device_stack_transfer_request(transfer_request, allocation_length, allocation_length);
     
-    /* Now we return a CSW with success.  */
-    status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
+    /* Now we set the CSW with success.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+    status = UX_SUCCESS;
     
     /* Return completion status.  */
     return(status);

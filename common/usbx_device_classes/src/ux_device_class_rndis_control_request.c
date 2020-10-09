@@ -28,12 +28,18 @@
 #include "ux_device_class_rndis.h"
 #include "ux_device_stack.h"
 
+
+#if UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH < UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_LENGTH ||\
+    UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH < UX_DEVICE_CLASS_RNDIS_MAX_CONTROL_RESPONSE_LENGTH
+#error UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH too small, please check
+#endif
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_control_request              PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +80,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -163,13 +175,13 @@ UX_SLAVE_CLASS_RNDIS    *rndis;
             transfer_request_in =  &rndis -> ux_slave_class_rndis_interrupt_endpoint -> ux_slave_endpoint_transfer_request;
 
             /* Reset the buffer.  */
-            _ux_utility_memory_set(transfer_request_in -> ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_LENGTH);
+            _ux_utility_memory_set(transfer_request_in -> ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_LENGTH); /* Use case of memset is verified. */
 
             /* Set the buffer of this transfer request with the flag for response available.  */
             transfer_request_in -> ux_slave_transfer_request_data_pointer[0] = UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_AVAILABLE_FLAG;
 
             /* Set an event to wake up the interrupt thread.  */
-            _ux_utility_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_INTERRUPT_EVENT, TX_OR);                
+            _ux_utility_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_INTERRUPT_EVENT, UX_OR);                
             
             break;
             
@@ -178,7 +190,7 @@ UX_SLAVE_CLASS_RNDIS    *rndis;
            
             /* Copy the response into the request data buffer.  */
             _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, rndis -> ux_slave_class_rndis_response,
-                                    rndis -> ux_slave_class_rndis_response_length);
+                                    rndis -> ux_slave_class_rndis_response_length); /* Use case of memcpy is verified. */
 
             /* Set the phase of the transfer to data out.  */
             transfer_request -> ux_slave_transfer_request_phase =  UX_TRANSFER_PHASE_DATA_OUT;

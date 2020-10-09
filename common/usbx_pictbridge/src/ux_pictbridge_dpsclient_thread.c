@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_thread                     PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_pictbridge_dpsclient_thread(ULONG parameter)
@@ -92,7 +98,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *pima_object;
         /* We should wait for the host to send a script with a command.  */
         status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, (UX_PICTBRIDGE_EVENT_FLAG_NOTIFY_JOB_STATUS | 
                                                                                                 UX_PICTBRIDGE_EVENT_FLAG_NOTIFY_DEVICE_STATUS), 
-                                                                                                TX_OR_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
+                                                                                                UX_OR_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
         /* Check the status.  */
         if (status == UX_SUCCESS)
@@ -116,7 +122,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *pima_object;
                 object_length =  0;
                 
                 /* Clear the object memory buffer.  */
-                _ux_utility_memory_set(pima_object_buffer, 0, UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER);
+                _ux_utility_memory_set(pima_object_buffer, 0, UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER); /* Use case of memset is verified. */
             
                 /* Add the line <?xml version="1.0"?>  */
                 status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_xmlversion, 

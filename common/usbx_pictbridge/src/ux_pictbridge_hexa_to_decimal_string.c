@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_hexa_to_decimal_string               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_hexa_to_decimal_string(ULONG hexa_value, UCHAR *decimal_string, 
@@ -127,7 +131,7 @@ ULONG                   decimal_max[8] = {9, 99, 999, 9999, 99999, 999999, 99999
         leading_flag = UX_TRUE;
     
     /* Reset the decimal_string buffer.  */
-    _ux_utility_memory_set(decimal_string, 0, max_digit_string_size);
+    _ux_utility_memory_set(decimal_string, 0, max_digit_string_size); /* Use case of memset is verified. */
 
     /* We parse the hexa value and build the decimal string one byte at a type.  */
     while(decimal_string_shift)

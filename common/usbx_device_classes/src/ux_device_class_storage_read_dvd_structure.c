@@ -162,7 +162,7 @@ UCHAR usbx_device_class_storage_dvd_structure[] = {
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_read_dvd_structure         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -198,6 +198,11 @@ UCHAR usbx_device_class_storage_dvd_structure[] = {
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_read_dvd_structure(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -249,7 +254,7 @@ UCHAR                   *dvd_structure_pointer;
         /* Copy the CSW into the transfer request memory.  */
         _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
                                             dvd_structure_pointer, 
-                                            transfer_length);
+                                            transfer_length); /* Use case of memcpy is verified. */
     
         /* Send a data payload with the read_capacity response buffer.  */
         status =  _ux_device_stack_transfer_request(transfer_request, 
@@ -267,8 +272,10 @@ UCHAR                   *dvd_structure_pointer;
         allocation_length -= transfer_length;
     }
     
-    /* Now we return a CSW with success.  */
-    status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
+    /* Now we set the CSW with success.  */
+    UX_PARAMETER_NOT_USED(lun);
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+    status = UX_SUCCESS;
     
     /* Return completion status.  */
     return(status);

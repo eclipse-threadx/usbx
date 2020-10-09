@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_read                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,8 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_read(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
@@ -137,7 +139,7 @@ UINT            media_retry;
                 /* We got an error during read. Packet not complete.  */
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_TRANSFER_DATA_LESS_THAN_EXPECTED);
 
-                /* Return to FileX.  */
+                /* Return to UX_MEDIA (default FileX).  */
                 return(UX_ERROR);
             }
 
@@ -149,7 +151,7 @@ UINT            media_retry;
     }
 
     /* Check if the media in the device has been removed. If so
-       we have to tell FileX that the media is closed.  */
+       we have to tell UX_MEDIA (default FileX) that the media is closed.  */
     return(UX_HOST_CLASS_STORAGE_SENSE_ERROR);                                            
 }
 

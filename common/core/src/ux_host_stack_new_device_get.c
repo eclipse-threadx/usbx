@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_new_device_get                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,23 +64,32 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions, verified       */
+/*                                            memset and memcpy cases,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UX_DEVICE  *_ux_host_stack_new_device_get(VOID)
 {
 
+#if UX_MAX_DEVICES > 1
 ULONG           container_index;
+#endif
 UX_DEVICE       *device;
     
 
     /* Start with the first device.  */
     device =  _ux_system_host -> ux_system_host_device_array;    
 
+#if UX_MAX_DEVICES > 1
     /* Reset the container index.  */
     container_index =  0;
 
     /* Search the list until the end.  */
     while (container_index++ < _ux_system_host -> ux_system_host_max_devices)
+#endif
     {
 
         /* Until we have found an unused entry.  */
@@ -88,7 +97,7 @@ UX_DEVICE       *device;
         {
 
             /* Reset the entire entry.  */
-            _ux_utility_memory_set(device, 0, sizeof(UX_DEVICE));
+            _ux_utility_memory_set(device, 0, sizeof(UX_DEVICE)); /* Use case of memset is verified. */
 
             /* This entry is now used.  */
             device -> ux_device_handle =  UX_USED;
@@ -96,9 +105,11 @@ UX_DEVICE       *device;
             /* Return the device pointer.  */
             return(device);
         }
+#if UX_MAX_DEVICES > 1
 
         /* Move to the next device entry.  */
         device++;
+#endif
     }
 
     /* No unused devices, return NULL.  */

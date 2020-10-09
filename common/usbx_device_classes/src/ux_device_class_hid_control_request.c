@@ -33,8 +33,8 @@
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
-/*    _ux_device_class_hid_control_request                 PORTABLE C     */ 
-/*                                                           6.0          */
+/*    _ux_device_class_hid_control_request                PORTABLE C      */ 
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -154,20 +160,20 @@ UX_SLAVE_CLASS_HID          *hid;
                     {
 
                         /* No need to repeat last report, no timeout.  */
-                        hid -> ux_device_class_hid_event_wait_timeout = TX_WAIT_FOREVER;
+                        hid -> ux_device_class_hid_event_wait_timeout = UX_WAIT_FOREVER;
                     }
                     else
                     {
 
                         /* Calculate the timeout value.  Weighted as 4ms.  */
-                        hid -> ux_device_class_hid_event_wait_timeout = MS_TO_TICK((ULONG)duration << 2u);
+                        hid -> ux_device_class_hid_event_wait_timeout = UX_MS_TO_TICK((ULONG)duration << 2u);
 
                         /* Be sure to have a timeout that is not zero.  */
                         if (hid -> ux_device_class_hid_event_wait_timeout == 0)
                             hid -> ux_device_class_hid_event_wait_timeout ++;
 
                         /* Set an event to wake up the interrupt thread.  */
-                        _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_IDLE_RATE, TX_OR);
+                        _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_IDLE_RATE, UX_OR);
                     }
                 }
             }

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_info_get               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle)
@@ -81,7 +85,11 @@ UX_SLAVE_CLASS_PIMA_OBJECT  *object;
 ULONG                       object_info_length;
 UCHAR                       *object_info;
 UCHAR                       *object_info_pointer;
-ULONG                       unicode_string_length;
+ULONG                       file_name_length;
+ULONG                       capture_date_length;
+ULONG                       modification_date_length;
+ULONG                       keywords_length;
+
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_PIMA_OBJECT_INFO_GET, pima, object_handle, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
@@ -98,13 +106,38 @@ ULONG                       unicode_string_length;
     else
     {    
     
+        /* Length calculation and overflow check.  */
+        file_name_length = ((ULONG) *object -> ux_device_class_pima_object_filename * 2 ) + 1;
+        capture_date_length = ((ULONG) *object -> ux_device_class_pima_object_capture_date *2 ) + 1;
+        modification_date_length = ((ULONG) *object -> ux_device_class_pima_object_modification_date * 2 ) + 1;
+        keywords_length = ((ULONG) *object -> ux_device_class_pima_object_keywords * 2 ) +1;
+        object_info_length = UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE +
+                            UX_DEVICE_CLASS_PIMA_OBJECT_VARIABLE_OFFSET +
+                            file_name_length +
+                            capture_date_length +
+                            modification_date_length +
+                            keywords_length;
+
+        /* Ensure the object info data can fit in the endpoint's data buffer.  */
+        if (object_info_length > UX_SLAVE_REQUEST_DATA_MAX_LENGTH)
+        {
+
+            /* If trace is enabled, insert this event into the trace buffer.  */
+            UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+            /* We return an error.  */
+            _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_GENERAL_ERROR, 0, 0, 0, 0);
+
+            /* Return overflow error.  */
+            return(UX_MEMORY_INSUFFICIENT);
+        }
 
         /* Obtain the pointer to the transfer request.  */
         transfer_request =  &pima -> ux_device_class_pima_bulk_in_endpoint -> ux_slave_endpoint_transfer_request;
 
         /* Obtain memory for this object info. Use the transfer request pre-allocated memory.  */
         object_info =  transfer_request -> ux_slave_transfer_request_data_pointer;
-        
+
         /* Fill in the data container type.  */
         _ux_utility_short_put(object_info + UX_DEVICE_CLASS_PIMA_DATA_HEADER_TYPE,
                                 UX_DEVICE_CLASS_PIMA_CT_DATA_BLOCK);
@@ -129,46 +162,29 @@ ULONG                       unicode_string_length;
         /* Copy the object filename  field.  Point to the beginning of the object description string.  */
         object_info_pointer += UX_DEVICE_CLASS_PIMA_OBJECT_VARIABLE_OFFSET;
         
-        /* Get the unicode string length for the filename.  */
-        unicode_string_length =  ((ULONG) *object -> ux_device_class_pima_object_filename * 2 ) + 1;
-        
         /* Copy that string into the object description field.  */
-        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_filename, unicode_string_length);
+        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_filename, file_name_length); /* Use case of memcpy is verified. */
     
         /* Point to the next field.  */
-        object_info_pointer += unicode_string_length;
+        object_info_pointer += file_name_length;
         
-        /* Get the unicode string length of the capture date.  */
-        unicode_string_length =  ((ULONG) *object -> ux_device_class_pima_object_capture_date *2 ) + 1;
-    
         /* Copy that string into the capture date field.  */
-        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_capture_date, unicode_string_length);
+        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_capture_date, capture_date_length); /* Use case of memcpy is verified. */
     
         /* Point to the next field.  */
-        object_info_pointer += unicode_string_length;
-
-
+        object_info_pointer += capture_date_length;
         
-        /* Get the unicode string length.  */
-        unicode_string_length =  ((ULONG) *object -> ux_device_class_pima_object_modification_date * 2 ) + 1;
-    
         /* Copy that string into the modification date field.  */
-        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_modification_date, unicode_string_length);
+        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_modification_date, modification_date_length); /* Use case of memcpy is verified. */
     
         /* Point to the next field.  */
-        object_info_pointer += unicode_string_length;
+        object_info_pointer += modification_date_length;
         
-        /* Get the unicode string length.  */
-        unicode_string_length =  ((ULONG) *object -> ux_device_class_pima_object_keywords * 2 ) +1;
-    
         /* Copy that string into the keywords field.  */
-        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_keywords, unicode_string_length);
+        _ux_utility_memory_copy(object_info_pointer, object -> ux_device_class_pima_object_keywords, keywords_length); /* Use case of memcpy is verified. */
 
         /* Point to the end of the variable length.  */
-        object_info_pointer += unicode_string_length;
-        
-        /* Compute the overall length of the device info structure.  */
-        object_info_length = (ULONG) ((ALIGN_TYPE) object_info_pointer - (ALIGN_TYPE) object_info);
+        object_info_pointer += keywords_length;
         
         /* Fill in the size of the response header.  */
         _ux_utility_long_put(object_info + UX_DEVICE_CLASS_PIMA_DATA_HEADER_LENGTH, 

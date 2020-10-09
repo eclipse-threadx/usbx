@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_endpoint_reset                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_endpoint_reset(UX_ENDPOINT *endpoint)
@@ -106,7 +110,7 @@ UINT            status;
     {
 
         /* Pickup HCD pointer.  */
-        hcd =  device -> ux_device_hcd;
+        hcd = UX_DEVICE_HCD_GET(device);
 
         /* Call HCD entry function.  */
         status =  hcd -> ux_hcd_entry_function(hcd, UX_HCD_RESET_ENDPOINT, endpoint);

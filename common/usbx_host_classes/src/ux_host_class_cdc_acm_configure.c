@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_acm_configure                    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_configure(UX_HOST_CLASS_CDC_ACM *cdc_acm)
@@ -77,7 +81,9 @@ UINT  _ux_host_class_cdc_acm_configure(UX_HOST_CLASS_CDC_ACM *cdc_acm)
 
 UINT                    status;
 UX_CONFIGURATION        *configuration;
+#if UX_MAX_DEVICES > 1
 UX_DEVICE               *parent_device;
+#endif
 
 
     /* If the device has been configured already, we don't need to do it
@@ -99,7 +105,8 @@ UX_DEVICE               *parent_device;
     
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
     }
-        
+
+#if UX_MAX_DEVICES > 1
     /* Check the cdc_acm power source and check the parent power source for 
        incompatible connections.  */
     if (cdc_acm -> ux_host_class_cdc_acm_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED)
@@ -122,7 +129,8 @@ UX_DEVICE               *parent_device;
             return(UX_CONNECTION_INCOMPATIBLE);
         }            
     }
-    
+#endif
+
     /* We have the valid configuration. Ask the USBX stack to set this configuration.  */        
     status =  _ux_host_stack_device_configuration_select(configuration);
     if (status != UX_SUCCESS)

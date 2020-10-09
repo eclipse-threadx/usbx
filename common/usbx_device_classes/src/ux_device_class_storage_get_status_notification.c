@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_get_status_notification    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_status_notification(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -88,7 +93,10 @@ ULONG                   notification_class;
     UX_PARAMETER_NOT_USED(endpoint_out);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_READ_CAPACITY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_READ_CAPACITY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0);
+
+    /* Default CSW to failed.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
     /* Ensure the callback has been initialized.  */
     if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_notification == UX_NULL)
@@ -97,8 +105,9 @@ ULONG                   notification_class;
         /* We need to STALL the IN endpoint.  The endpoint will be reset by the host.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
 
-        /* Now we return a CSW with Error.  */
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
+        /* And update the REQUEST_SENSE codes.  */
+        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+                                               UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(0x05,0x26,0x01);
 
         /* Return error.  */
         return(UX_FUNCTION_NOT_SUPPORTED);
@@ -114,15 +123,26 @@ ULONG                   notification_class;
                                 &media_notification, 
                                 &media_notification_length);
 
+    /* Check the notification length.  */
+    if (media_notification_length > UX_SLAVE_REQUEST_DATA_MAX_LENGTH - sizeof(USHORT))
+    {
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        /* Error callback.  */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
+
+        /* Set status code.  */
+        status = UX_MEMORY_INSUFFICIENT;
+    }
+
     /* Check the status for error.  */
     if (status != UX_SUCCESS)
     {
         
         /* We need to STALL the IN endpoint.  The endpoint will be reset by the host.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
-
-        /* Now we return a CSW with Error.  */
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
     }    
     else
     {
@@ -136,7 +156,7 @@ ULONG                   notification_class;
         /* Copy the CSW into the transfer request memory.  */
         _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + sizeof (USHORT), 
                                             media_notification, 
-                                            media_notification_length);
+                                            media_notification_length); /* Use case of memcpy is verified. */
         
         /* Update the notification length. */
         media_notification_length += (ULONG)sizeof (USHORT);
@@ -146,8 +166,9 @@ ULONG                   notification_class;
                                   media_notification_length,
                                   media_notification_length);
         
-        /* Now we return a CSW with success.  */
-        status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
+        /* Now we set the CSW with success.  */
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+        status = UX_SUCCESS;
     }
         
     /* Return completion status.  */

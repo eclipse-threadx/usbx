@@ -32,10 +32,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_class_hid_descriptor_send                  PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_class_hid_descriptor_send                PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_descriptor_send(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type, 
@@ -140,9 +144,24 @@ ULONG                           length;
                 else                            
                     length =  host_length;                
 
+                /* Check buffer length, since descriptor length may exceed buffer...  */
+                if (length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
+                {
+
+                    /* Error trap. */
+                    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
+
+                    /* If trace is enabled, insert this event into the trace buffer.  */
+                    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, hid, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+                    /* Stall the endpoint.  */
+                    status =  dcd -> ux_slave_dcd_function(dcd, UX_DCD_STALL_ENDPOINT, endpoint);
+                    break;
+                }
+
                 /* Copy the device descriptor into the transfer request memory.  */
                 _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
-                                            device_framework, length);
+                                            device_framework, length); /* Use case of memcpy is verified. */
 
                 /* We can return the configuration descriptor.  */
                 status =  _ux_device_stack_transfer_request(transfer_request, length, host_length);
@@ -189,7 +208,7 @@ ULONG                           length;
 
         /* Copy the device descriptor into the transfer request memory.  */
         _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
-                                    hid -> ux_device_class_hid_report_address, length);
+                                    hid -> ux_device_class_hid_report_address, length); /* Use case of memcpy is verified. */
 
         /* We can return the report descriptor.  */
         status =  _ux_device_stack_transfer_request(transfer_request, length, host_length);

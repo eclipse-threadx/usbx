@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_device_prop_desc_get          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_device_prop_desc_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -132,7 +136,7 @@ UCHAR                               *device_property_desc_dataset;
         }
         
         /* Copy the property dataset into the local buffer.  */
-        _ux_utility_memory_copy(pima_data_buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE, device_property_desc_dataset, device_property_desc_dataset_length);
+        _ux_utility_memory_copy(pima_data_buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE, device_property_desc_dataset, device_property_desc_dataset_length); /* Use case of memcpy is verified. */
 
         /* Add the header size to the payload.  */
         device_property_desc_dataset_length += UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE;

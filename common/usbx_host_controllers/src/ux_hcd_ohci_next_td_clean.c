@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_next_td_clean                          PORTABLE C      */ 
-/*                                                           6.0.2        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,10 +67,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed physical and virtual  */
 /*                                            address conversion,         */
-/*                                            resulting in version 6.0.2  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_next_td_clean(UX_OHCI_TD *td)

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_main_item_parse                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_main_item_parse(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_ITEM *item, UCHAR *descriptor)
@@ -175,7 +179,7 @@ ULONG                           collection_type;
     }  
                                                  
     /* We have a new main item, so the local instances have to be cleaned.  */
-    _ux_utility_memory_set(&hid_parser -> ux_host_class_hid_parser_local, 0, sizeof(UX_HOST_CLASS_HID_LOCAL_ITEM));
+    _ux_utility_memory_set(&hid_parser -> ux_host_class_hid_parser_local, 0, sizeof(UX_HOST_CLASS_HID_LOCAL_ITEM)); /* Use case of memset is verified. */
 
     /* Return completion status.  */
     return(status);

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_cdc_ecm.h                             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -220,14 +225,14 @@ typedef struct UX_HOST_CLASS_CDC_ECM_STRUCT
     UX_INTERFACE    *ux_host_class_cdc_ecm_interface_control;
     UCHAR           ux_host_class_cdc_ecm_bulk_in_transfer_check_and_arm_in_process;
     UCHAR           ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish;
-    TX_SEMAPHORE    ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore;
+    UX_SEMAPHORE    ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore;
     UCHAR           ux_host_class_cdc_ecm_bulk_out_transfer_check_and_arm_in_process;
     UCHAR           ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish;
-    TX_SEMAPHORE    ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore;
+    UX_SEMAPHORE    ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore;
     UINT            ux_host_class_cdc_ecm_instance_status;
     UINT            ux_host_class_cdc_ecm_state;
-    TX_SEMAPHORE    ux_host_class_cdc_ecm_interrupt_notification_semaphore;
-    TX_THREAD       ux_host_class_cdc_ecm_thread;
+    UX_SEMAPHORE    ux_host_class_cdc_ecm_interrupt_notification_semaphore;
+    UX_THREAD       ux_host_class_cdc_ecm_thread;
     UCHAR           *ux_host_class_cdc_ecm_thread_stack;
     ULONG           ux_host_class_cdc_ecm_notification_count;
     ULONG           ux_host_class_cdc_ecm_primary_phy_id;

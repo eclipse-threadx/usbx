@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_object_info_get                 PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_object_info_get(UX_HOST_CLASS_PIMA *pima, 
@@ -146,7 +150,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the object description field.  */
-            _ux_utility_memory_copy(object -> ux_host_class_pima_object_filename, object_pointer, unicode_string_length);
+            _ux_utility_memory_copy(object -> ux_host_class_pima_object_filename, object_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             object_pointer += unicode_string_length;
@@ -166,7 +170,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the capture date field.  */
-            _ux_utility_memory_copy(object -> ux_host_class_pima_object_capture_date, object_pointer, unicode_string_length);
+            _ux_utility_memory_copy(object -> ux_host_class_pima_object_capture_date, object_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             object_pointer += unicode_string_length;
@@ -186,7 +190,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the modification date field.  */
-            _ux_utility_memory_copy(object -> ux_host_class_pima_object_modification_date, object_pointer, unicode_string_length);
+            _ux_utility_memory_copy(object -> ux_host_class_pima_object_modification_date, object_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             object_pointer += unicode_string_length;
@@ -206,7 +210,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the keywords field.  */
-            _ux_utility_memory_copy(object -> ux_host_class_pima_object_keywords, object_pointer, unicode_string_length);
+            _ux_utility_memory_copy(object -> ux_host_class_pima_object_keywords, object_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Make the object closed.  */
             object -> ux_host_class_pima_object_state = UX_HOST_CLASS_PIMA_OBJECT_STATE_CLOSED;        

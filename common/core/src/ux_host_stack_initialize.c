@@ -87,7 +87,7 @@ UCHAR _ux_system_host_hcd_simulator_name[] =                                "ux_
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_initialize                           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -124,6 +124,13 @@ UCHAR _ux_system_host_hcd_simulator_name[] =                                "ux_
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions, used UX prefix */
+/*                                            to refer to TX symbols      */
+/*                                            instead of using them       */
+/*                                            directly,                   */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_initialize(UINT (*ux_system_host_change_function)(ULONG, UX_HOST_CLASS *, VOID *))
@@ -137,12 +144,12 @@ UCHAR       *memory;
 
     /* Initialize some of the global so that we don't have to recompile the
        core code when one item is adjusted.  */
-    _ux_system_host -> ux_system_host_max_class =     UX_MAX_CLASS_DRIVER;
-    _ux_system_host -> ux_system_host_max_hcd =       UX_MAX_HCD;
-    _ux_system_host -> ux_system_host_max_devices =   UX_MAX_DEVICES;
     _ux_system_host -> ux_system_host_max_ed =        UX_MAX_ED;
     _ux_system_host -> ux_system_host_max_td =        UX_MAX_TD;
     _ux_system_host -> ux_system_host_max_iso_td =    UX_MAX_ISO_TD;
+    UX_SYSTEM_HOST_MAX_CLASS_SET(UX_MAX_CLASS_DRIVER);
+    UX_SYSTEM_HOST_MAX_HCD_SET(UX_MAX_HCD);
+    UX_SYSTEM_HOST_MAX_DEVICES_SET(UX_MAX_DEVICES);
     
     /* Set the change device function address.  */
     _ux_system_host -> ux_system_host_change_function =  ux_system_host_change_function;
@@ -235,7 +242,7 @@ UCHAR       *memory;
         status =  _ux_utility_thread_create(&_ux_system_host -> ux_system_host_enum_thread, "ux_system_host_enum_thread", _ux_host_stack_enum_thread_entry,
                             0, _ux_system_host -> ux_system_host_enum_thread_stack,
                             UX_HOST_ENUM_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_ENUM,
-                            UX_THREAD_PRIORITY_ENUM, UX_NO_TIME_SLICE, TX_AUTO_START);
+                            UX_THREAD_PRIORITY_ENUM, UX_NO_TIME_SLICE, UX_AUTO_START);
                             
         /* Check the completion status.  */
         if(status != UX_SUCCESS)
@@ -248,7 +255,7 @@ UCHAR       *memory;
         status =  _ux_utility_thread_create(&_ux_system_host -> ux_system_host_hcd_thread, "ux_host_stack_hcd_thread", _ux_host_stack_hcd_thread_entry,
                             0, _ux_system_host -> ux_system_host_hcd_thread_stack,
                             UX_HOST_HCD_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_HCD,
-                            UX_THREAD_PRIORITY_HCD, UX_NO_TIME_SLICE,TX_AUTO_START);
+                            UX_THREAD_PRIORITY_HCD, UX_NO_TIME_SLICE,UX_AUTO_START);
 
         /* Check the completion status.  */
         if(status != UX_SUCCESS)
@@ -273,7 +280,7 @@ UCHAR       *memory;
         status =  _ux_utility_thread_create(&_ux_system_host -> ux_system_host_hnp_polling_thread, "ux_host_stack_hnp_polling_thread", _ux_host_stack_hnp_polling_thread_entry,
                             0, _ux_system_host -> ux_system_host_hnp_polling_thread_stack,
                             UX_HOST_HNP_POLLING_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_ENUM,
-                            UX_THREAD_PRIORITY_ENUM, UX_NO_TIME_SLICE, TX_AUTO_START);
+                            UX_THREAD_PRIORITY_ENUM, UX_NO_TIME_SLICE, UX_AUTO_START);
 
         /* Check the completion status.  */
         if (status != UX_SUCCESS)

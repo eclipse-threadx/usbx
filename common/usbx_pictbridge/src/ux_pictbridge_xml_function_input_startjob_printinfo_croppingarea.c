@@ -33,8 +33,9 @@
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
-/*    _ux_pictbridge_xml_function_input_                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*    _ux_pictbridge_xml_function_input_startjob_printinfo_croppingarea   */ 
+/*                                                        PORTABLE C      */ 
+/*                                                           6.1          */
 /*                                                                        */ 
 /*                                                                        */ 
 /*  AUTHOR                                                                */
@@ -68,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_croppingarea(UX_PICTBRIDGE *pictbridge, 
@@ -101,7 +106,7 @@ ULONG   hexa_value;
     index = 0;
 
     /* Reset the element area.  */
-   _ux_utility_memory_set(element_string, 0, UX_PICTBRIDGE_MAX_ELEMENT_SIZE);
+   _ux_utility_memory_set(element_string, 0, UX_PICTBRIDGE_MAX_ELEMENT_SIZE); /* Use case of memset is verified. */
    
    /* And its length.  */
    element_length = 0;
@@ -165,7 +170,7 @@ ULONG   hexa_value;
                 index++;
 
                 /* Reset the element area.  */
-               _ux_utility_memory_set(element_string, 0, UX_PICTBRIDGE_MAX_ELEMENT_SIZE);
+               _ux_utility_memory_set(element_string, 0, UX_PICTBRIDGE_MAX_ELEMENT_SIZE); /* Use case of memset is verified. */
    
                /* And its length.  */
                element_length = 0;

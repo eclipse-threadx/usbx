@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_sim_host.h                                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -42,6 +42,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added controller disable,   */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -105,7 +111,7 @@ typedef struct UX_HCD_SIM_HOST_STRUCT
     UINT            ux_hcd_sim_host_periodic_scheduler_active;
     UINT            ux_hcd_sim_host_interruptible;
     ULONG           ux_hcd_sim_host_interrupt_count;
-    TX_TIMER        ux_hcd_sim_host_timer;
+    UX_TIMER        ux_hcd_sim_host_timer;
 } UX_HCD_SIM_HOST;
 
 
@@ -141,7 +147,7 @@ typedef struct UX_HCD_SIM_HOST_ED_STRUCT
 typedef struct UX_HCD_SIM_HOST_TD_STRUCT
 {                                                
 
-    UCHAR *       ux_sim_host_td_buffer;
+    UCHAR *         ux_sim_host_td_buffer;
     ULONG           ux_sim_host_td_length;
     struct UX_HCD_SIM_HOST_TD_STRUCT        
                     *ux_sim_host_td_next_td;
@@ -174,7 +180,7 @@ typedef struct UX_HCD_SIM_HOST_TD_STRUCT
 typedef struct UX_HCD_SIM_HOST_ISO_TD_STRUCT
 {
 
-    UCHAR *       ux_sim_host_iso_td_buffer;
+    UCHAR *         ux_sim_host_iso_td_buffer;
     ULONG           ux_sim_host_iso_td_length;
     struct UX_HCD_SIM_HOST_ISO_TD_STRUCT    
                     *ux_sim_host_iso_td_next_td;
@@ -204,6 +210,7 @@ UINT    _ux_hcd_sim_host_entry(UX_HCD *hcd, UINT function, VOID *parameter);
 UINT    _ux_hcd_sim_host_frame_number_get(UX_HCD_SIM_HOST *hcd_sim_host, ULONG *frame_number);
 VOID    _ux_hcd_sim_host_frame_number_set(UX_HCD_SIM_HOST *hcd_sim_host, ULONG frame_number);
 UINT    _ux_hcd_sim_host_initialize(UX_HCD *hcd);
+UINT    _ux_hcd_sim_host_controller_disable(UX_HCD_SIM_HOST *hcd);
 UINT    _ux_hcd_sim_host_interrupt_endpoint_create(UX_HCD_SIM_HOST *hcd_sim_host, UX_ENDPOINT *endpoint);
 VOID    _ux_hcd_sim_host_iso_queue_process(UX_HCD_SIM_HOST *hcd_sim_host);
 VOID    _ux_hcd_sim_host_iso_schedule(UX_HCD_SIM_HOST *hcd_sim_host);

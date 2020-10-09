@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_event_get                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid, 
@@ -93,11 +97,15 @@ UX_SLAVE_DEVICE                 *device;
 
     /* There is an event to report, get the current pointer to the event.  */
     current_hid_event =  hid -> ux_device_class_hid_event_array_tail;
-    
+
+    /* Keep the event data length inside buffer area.  */
+    if (current_hid_event -> ux_device_class_hid_event_length > UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH)
+        current_hid_event -> ux_device_class_hid_event_length = UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH;
+
     /* fill in the event structure from the user.  */
     hid_event -> ux_device_class_hid_event_length =  current_hid_event -> ux_device_class_hid_event_length;
     _ux_utility_memory_copy(hid_event -> ux_device_class_hid_event_buffer, current_hid_event -> ux_device_class_hid_event_buffer,
-                                current_hid_event -> ux_device_class_hid_event_length);
+                                current_hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
 
     /* Adjust the tail pointer.  Check if we are at the end.  */
     if ((current_hid_event + 1) == hid -> ux_device_class_hid_event_array_end)

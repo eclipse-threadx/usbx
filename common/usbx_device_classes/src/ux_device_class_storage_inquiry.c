@@ -30,12 +30,16 @@
 #include "ux_device_stack.h"
 
 
+#if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < 24
+#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH is too small, please check
+#endif
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_inquiry                    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +77,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -83,7 +92,7 @@ UINT                    status;
 UX_SLAVE_TRANSFER       *transfer_request;
 UCHAR                   inquiry_page_code;
 UCHAR                   inquiry_length;
-UCHAR                   inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH];
+UCHAR                   *inquiry_buffer;
 
     UX_PARAMETER_NOT_USED(endpoint_out);
 
@@ -99,12 +108,18 @@ UCHAR                   inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_L
     /* Obtain the pointer to the transfer request.  */
     transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
 
+    /* Obtain inquiry buffer pointer.  */
+    inquiry_buffer = transfer_request -> ux_slave_transfer_request_data_pointer;
+
     /* Ensure the data buffer is cleaned.  */
-    _ux_utility_memory_set(inquiry_buffer, 0, UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH);
+    _ux_utility_memory_set(inquiry_buffer, 0, UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH); /* Use case of memset is verified. */
 
     /* Check for the maximum length to be returned. */
     if (inquiry_length > UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH)
         inquiry_length =  UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH;
+
+    /* Default CSW to passed.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
 
     /* Ensure we know about the page code.  */
     switch (inquiry_page_code)
@@ -132,29 +147,21 @@ UCHAR                   inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_L
 
         /* Fill in the storage vendor ID.  */
         _ux_utility_memory_copy(inquiry_buffer + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_VENDOR_INFORMATION,
-                                                                    storage -> ux_slave_class_storage_vendor_id, 8);
+                                                                    storage -> ux_slave_class_storage_vendor_id, 8); /* Use case of memcpy is verified. */
 
         /* Fill in the product vendor ID.  */
         _ux_utility_memory_copy(inquiry_buffer + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_ID,
-                                                                    storage -> ux_slave_class_storage_product_id, 16);
+                                                                    storage -> ux_slave_class_storage_product_id, 16); /* Use case of memcpy is verified. */
 
         /* Fill in the product revision number.  */
         _ux_utility_memory_copy(inquiry_buffer + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_REVISION,
-                                                                    storage -> ux_slave_class_storage_product_rev, 4);
-
-        /* Copy the Inquiry Buffer into the transfer request memory.  */
-        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, inquiry_buffer, inquiry_length);
+                                                                    storage -> ux_slave_class_storage_product_rev, 4); /* Use case of memcpy is verified. */
 
         /* Send a data payload with the inquiry response buffer.  */
         _ux_device_stack_transfer_request(transfer_request, inquiry_length, inquiry_length);
     
-        /* Now we return a CSW with success.  */
-        status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
-
-        /* And update the REQUEST_SENSE codes.  */
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x00;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x00;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x00;
+        /* Now success.  */
+        status = UX_SUCCESS;
 
         break;
 
@@ -167,18 +174,13 @@ UCHAR                   inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_L
         _ux_utility_short_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer + 2, 20);
 
         /* Copy the serial number buffer into the transfer request memory.  */
-        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + 4, storage -> ux_slave_class_storage_product_serial, 20);
+        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + 4, storage -> ux_slave_class_storage_product_serial, 20); /* Use case of memcpy is verified. */
 
         /* Send a data payload with the inquiry response buffer.  */
         _ux_device_stack_transfer_request(transfer_request, 24, 24);
     
-        /* Now we return a CSW with success.  */
-        status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
-
-        /* And update the REQUEST_SENSE codes.  */
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x00;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x00;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x00;
+        /* Now success.  */
+        status = UX_SUCCESS;
 
         break;
 
@@ -187,13 +189,12 @@ UCHAR                   inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_L
         /* The page code is not supported.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
 
-        /* Now we return a CSW with failure.  */
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
-
         /* And update the REQUEST_SENSE codes.  */
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x05;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x26;
-        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x01;
+        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+                                               UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(0x05,0x26,0x01);
+
+        /* Now we set the CSW with failure.  */
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
         /* Return error.  */
         status =  UX_ERROR;

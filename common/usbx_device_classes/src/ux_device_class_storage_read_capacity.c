@@ -30,12 +30,16 @@
 #include "ux_device_stack.h"
 
 
+#if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH
+#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH is too small, please check
+#endif
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_read_capacity              PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +77,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_read_capacity(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -83,7 +92,7 @@ UINT  _ux_device_class_storage_read_capacity(UX_SLAVE_CLASS_STORAGE *storage, UL
 UINT                    status;
 ULONG                   media_status;
 UX_SLAVE_TRANSFER       *transfer_request;
-UCHAR                   read_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH];
+UCHAR                   *read_capacity_buffer;
 
     UX_PARAMETER_NOT_USED(cbwcb);
     UX_PARAMETER_NOT_USED(endpoint_out);
@@ -96,9 +105,7 @@ UCHAR                   read_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_CAPACIT
                                 storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id, &media_status);
 
     /* Update the request sense.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  (UCHAR) (media_status & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  (UCHAR) ((media_status >> 8 ) & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  (UCHAR) ((media_status >> 16 ) & 0xff);
+    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status = media_status;
 
     /* Check the status for error.  */
     if (status != UX_SUCCESS)
@@ -107,17 +114,21 @@ UCHAR                   read_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_CAPACIT
         /* We need to STALL the IN endpoint.  The endpoint will be reset by the host.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
 
-        /* Now we return a CSW with Error.  */
-        status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
+        /* Now we set the CSW with Error.  */
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
+        status = UX_SUCCESS;
     }
     else
     {
     
         /* Obtain the pointer to the transfer request.  */
         transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
+
+        /* Obtain read capacity response buffer.  */
+        read_capacity_buffer = transfer_request -> ux_slave_transfer_request_data_pointer;
     
         /* Ensure it is cleaned.  */
-        _ux_utility_memory_set(read_capacity_buffer, 0, UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH);
+        _ux_utility_memory_set(read_capacity_buffer, 0, UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH); /* Use case of memcpy is verified. */
     
         /* Insert the last LBA address in the response.  */
         _ux_utility_long_put_big_endian(&read_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LAST_LBA],
@@ -127,17 +138,14 @@ UCHAR                   read_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_CAPACIT
         _ux_utility_long_put_big_endian(&read_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_BLOCK_SIZE],
                                         storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_block_length);
     
-        /* Copy the CSW into the transfer request memory.  */
-        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
-                                            read_capacity_buffer, UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH);
-    
         /* Send a data payload with the read_capacity response buffer.  */
         _ux_device_stack_transfer_request(transfer_request, 
                                       UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH,
                                       UX_SLAVE_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH);
     
-        /* Now we return a CSW with success.  */
-        status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
+        /* Now we set the CSW with success.  */
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+        status = UX_SUCCESS;
     }
         
     /* Return completion status.  */

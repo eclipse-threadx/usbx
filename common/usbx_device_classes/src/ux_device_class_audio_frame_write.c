@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_frame_write                  PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio_frame_write(UX_DEVICE_CLASS_AUDIO_STREAM *stream, UCHAR *frame, ULONG length)
@@ -116,7 +120,7 @@ ULONG                       frame_buffer_size;
         next_frame_buffer = stream -> ux_device_class_audio_stream_buffer;
 
     /* Copy frame.  */
-    _ux_utility_memory_copy(stream -> ux_device_class_audio_stream_access_pos -> ux_device_class_audio_frame_data, frame, length);
+    _ux_utility_memory_copy(stream -> ux_device_class_audio_stream_access_pos -> ux_device_class_audio_frame_data, frame, length); /* Use case of memcpy is verified. */
     stream -> ux_device_class_audio_stream_access_pos -> ux_device_class_audio_frame_length = length;
 
     /* Move frame position.  */

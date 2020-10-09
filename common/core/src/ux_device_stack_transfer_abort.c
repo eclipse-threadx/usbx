@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_transfer_abort                       PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_stack_transfer_abort                     PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,12 +71,17 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_transfer_abort(UX_SLAVE_TRANSFER *transfer_request, ULONG completion_code)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 UX_SLAVE_DCD    *dcd;
 
@@ -92,7 +97,7 @@ UX_SLAVE_DCD    *dcd;
     transfer_request -> ux_slave_transfer_request_completion_code =  UX_TRANSFER_BUS_RESET;
 
     /* Ensure we're not preempted by the transfer completion ISR.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* It's possible the transfer already completed. Ensure it hasn't before doing the abort.  */
     if (transfer_request -> ux_slave_transfer_request_status == UX_TRANSFER_STATUS_PENDING)
@@ -102,7 +107,7 @@ UX_SLAVE_DCD    *dcd;
         dcd -> ux_slave_dcd_function(dcd, UX_DCD_TRANSFER_ABORT, (VOID *) transfer_request);
 
         /* Restore interrupts. Note that the transfer request should not be modified now.  */
-        TX_RESTORE
+        UX_RESTORE
 
         /* We need to set the completion code for the transfer to aborted. Note
            that the transfer request function cannot simultaneously modify this 
@@ -117,7 +122,7 @@ UX_SLAVE_DCD    *dcd;
     {
 
         /* Restore interrupts.  */
-        TX_RESTORE
+        UX_RESTORE
     }
 
     /* This function never fails.  */

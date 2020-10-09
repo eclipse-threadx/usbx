@@ -60,7 +60,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_initialize                             PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -104,6 +104,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_initialize(UX_HCD *hcd)
@@ -120,9 +124,11 @@ UINT                    status = UX_SUCCESS;
     /* The controller initialized here is of EHCI type.  */
     hcd -> ux_hcd_controller_type =  UX_EHCI_CONTROLLER;
 
+#if UX_MAX_DEVICES > 1
     /* Initialize the max bandwidth for periodic endpoints. On EHCI,
        the spec says no more than 90% to be allocated for periodic.  */
     hcd -> ux_hcd_available_bandwidth =  UX_EHCI_AVAILABLE_BANDWIDTH;
+#endif
 
     /* Allocate memory for this EHCI HCD instance.  */
     hcd_ehci =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_HCD_EHCI));
@@ -241,8 +247,11 @@ UINT                    status = UX_SUCCESS;
     if (status == UX_SUCCESS)
     {
 
+#if UX_MAX_DEVICES > 1
+
         /* Since this is a USB 2.0 controller, we can safely hardwire the version.  */
         hcd -> ux_hcd_version =  0x200;
+#endif
 
         /* The EHCI Controller should not be running. */
         ehci_register =  _ux_hcd_ehci_register_read(hcd_ehci, EHCI_HCOR_USB_COMMAND);
@@ -305,7 +314,9 @@ UINT                    status = UX_SUCCESS;
         local ehci container.  */
         ehci_register =                         _ux_hcd_ehci_register_read(hcd_ehci, EHCI_HCCR_HCS_PARAMS);
         hcd -> ux_hcd_nb_root_hubs =            (UINT) (ehci_register & 0xf);
-        hcd_ehci -> ux_hcd_ehci_nb_root_hubs =  (UINT) (ehci_register & 0xf);
+        if (hcd -> ux_hcd_nb_root_hubs > UX_MAX_ROOTHUB_PORT)
+            hcd -> ux_hcd_nb_root_hubs = UX_MAX_ROOTHUB_PORT;
+        hcd_ehci -> ux_hcd_ehci_nb_root_hubs =  hcd -> ux_hcd_nb_root_hubs;
 
         /* The controller transceiver can now send the device connection/extraction
         signals to the EHCI controller.  */

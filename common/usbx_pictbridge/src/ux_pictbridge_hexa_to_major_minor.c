@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_hexa_to_major_minor                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_hexa_to_major_minor(ULONG hexa_value, UCHAR *output_buffer)
@@ -80,7 +84,7 @@ UINT                    status;
 
 
     /* Reset the output buffer.  */
-    _ux_utility_memory_set(output_buffer, 0, 5);
+    _ux_utility_memory_set(output_buffer, 0, 5); /* Use case of memset is verified. */
        
     /* Isolate the major.  */
     hexa_major = (UCHAR)(hexa_value >> 16);

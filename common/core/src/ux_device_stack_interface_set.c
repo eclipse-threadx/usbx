@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                RELEASE       */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_interface_set                       PORTABLE C     */
-/*                                                           6.0          */
+/*    _ux_device_stack_interface_set                      PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_interface_set(UCHAR * device_framework, ULONG device_framework_length,
@@ -82,13 +86,15 @@ UX_SLAVE_DCD            *dcd;
 UX_SLAVE_DEVICE         *device;
 UX_SLAVE_TRANSFER       *transfer_request;
 UX_SLAVE_INTERFACE      *interface;
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 UX_SLAVE_INTERFACE      *interface_link;
+ULONG                   interfaces_pool_number;
+#endif
 UX_SLAVE_ENDPOINT       *endpoint;
 UX_SLAVE_ENDPOINT       *endpoint_link;
 ULONG                   descriptor_length;
 UCHAR                   descriptor_type;
 ULONG                   endpoints_pool_number;
-ULONG                   interfaces_pool_number;
 UINT                    status;
 
     UX_PARAMETER_NOT_USED(alternate_setting_value);
@@ -105,16 +111,14 @@ UINT                    status;
     /* Find a free interface in the pool and hook it to the 
        existing interface.  */
     interface = device -> ux_slave_device_interfaces_pool;
+
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
     interfaces_pool_number = device -> ux_slave_device_interfaces_pool_number;
     while (interfaces_pool_number != 0)
     {
         /* Check if this interface is free.  */
         if (interface -> ux_slave_interface_status == UX_UNUSED)
-        {
-            /* Mark this interface as used now.  */
-            interface -> ux_slave_interface_status = UX_USED;
             break;
-        }
     
         /* Try the next interface.  */
         interface++;
@@ -126,6 +130,16 @@ UINT                    status;
     /* Did we find a free interface ?  */
     if (interfaces_pool_number == 0)
         return(UX_MEMORY_INSUFFICIENT);
+#else
+
+    /* Check if this interface is free.  */
+    if (interface -> ux_slave_interface_status != UX_UNUSED)
+        return(UX_MEMORY_INSUFFICIENT);
+    
+#endif
+
+    /* Mark this interface as used now.  */
+    interface -> ux_slave_interface_status = UX_USED;
 
     /* If trace is enabled, register this object.  */
     UX_TRACE_OBJECT_REGISTER(UX_TRACE_DEVICE_OBJECT_TYPE_INTERFACE, interface, 0, 0, 0)
@@ -135,6 +149,8 @@ UINT                    status;
                 _ux_system_interface_descriptor_structure,
                 UX_INTERFACE_DESCRIPTOR_ENTRIES,
                 (UCHAR *) &interface -> ux_slave_interface_descriptor);
+
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 
     /* Attach this interface to the end of the interface chain.  */
     if (device -> ux_slave_device_first_interface == UX_NULL)
@@ -150,6 +166,11 @@ UINT                    status;
             interface_link =  interface_link -> ux_slave_interface_next_interface;
         interface_link -> ux_slave_interface_next_interface =  interface;
     }
+#else
+
+    /* It must be very first one.  */
+    device -> ux_slave_device_first_interface = interface;
+#endif
 
     /* Point beyond the interface descriptor.  */
     device_framework_length -=  (ULONG) *device_framework;

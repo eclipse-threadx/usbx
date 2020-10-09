@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_cbw_initialize               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_storage_cbw_initialize(UX_HOST_CLASS_STORAGE *storage, UINT direction,
@@ -103,7 +107,7 @@ UCHAR   *cbw;
     *(cbw + UX_HOST_CLASS_STORAGE_CBW_CB_LENGTH) =  (UCHAR)command_length;
 
     /* Reset the SCSI command block.  */
-    _ux_utility_memory_set(cbw + UX_HOST_CLASS_STORAGE_CBW_CB, 0, (ULONG) command_length);
+    _ux_utility_memory_set(cbw + UX_HOST_CLASS_STORAGE_CBW_CB, 0, (ULONG) command_length); /* Use case of memset is verified. */
 
     /* Return to caller.  */
     return;

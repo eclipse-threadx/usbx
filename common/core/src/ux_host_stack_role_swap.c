@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_role_swap                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,10 +68,20 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_role_swap(UX_DEVICE *device)
 {
+
+#if !defined(UX_OTG_SUPPORT)
+
+    UX_PARAMETER_NOT_USED(device);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
@@ -111,5 +121,5 @@ UINT            status;
     _ux_system_otg -> ux_system_otg_change_mode_event = 0;
     
     return(UX_SUCCESS);
+#endif
 }
-

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_initialize                   PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,12 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -178,7 +184,7 @@ ULONG                                   i;
                     stream_parameter -> ux_device_class_audio_stream_parameter_thread_entry,
                     (ULONG)(ALIGN_TYPE)stream, (VOID *) stream -> ux_device_class_audio_stream_thread_stack,
                     memory_size, UX_THREAD_PRIORITY_CLASS,
-                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
 
         /* Check for successful allocation.  */
         if (status != UX_SUCCESS)
@@ -189,7 +195,7 @@ ULONG                                   i;
         /* Save callbacks.  */
         _ux_utility_memory_copy(&stream -> ux_device_class_audio_stream_callbacks,
                                 &stream_parameter -> ux_device_class_audio_stream_parameter_callbacks,
-                                sizeof(UX_DEVICE_CLASS_AUDIO_STREAM_CALLBACKS));
+                                sizeof(UX_DEVICE_CLASS_AUDIO_STREAM_CALLBACKS)); /* Use case of memcpy is verified. */
 
         /* Save audio instance.  */
         stream -> ux_device_class_audio_stream_audio = audio;
@@ -211,7 +217,7 @@ ULONG                                   i;
         /* Save callbacks.  */
         _ux_utility_memory_copy(&audio -> ux_device_class_audio_callbacks,
             &audio_parameter -> ux_device_class_audio_parameter_callbacks,
-            sizeof(UX_DEVICE_CLASS_AUDIO_CALLBACKS));
+            sizeof(UX_DEVICE_CLASS_AUDIO_CALLBACKS)); /* Use case of memcpy is verified. */
 
         /* Return completion status.  */
         return(UX_SUCCESS);

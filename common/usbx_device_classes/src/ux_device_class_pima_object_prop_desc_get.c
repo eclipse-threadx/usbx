@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_prop_desc_get          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_prop_desc_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -126,7 +130,7 @@ UCHAR                   *object_props_desc_end;
 
             /* Copy the object property array.  */
             _ux_utility_memory_copy(object_props_desc +  UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE,
-                                    object_prop_dataset, object_prop_dataset_length);
+                                    object_prop_dataset, object_prop_dataset_length); /* Use case of memcpy is verified. */
             
             /* Add the header size.  */
             object_prop_dataset_length += UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE;

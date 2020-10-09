@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_device_info_get                 PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima, 
@@ -144,7 +148,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the object description field.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_vendor_extension_desc, device_pointer, unicode_string_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_vendor_extension_desc, device_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += unicode_string_length + 1;
@@ -170,7 +174,7 @@ UINT                                 status;
         {
 
             /* Copy the array of supported operations.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_operations_supported, device_pointer, array_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_operations_supported, device_pointer, array_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += array_length;
@@ -190,7 +194,7 @@ UINT                                 status;
         {
 
             /* Copy the array of events supported.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_events_supported, device_pointer, array_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_events_supported, device_pointer, array_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += array_length;
@@ -210,7 +214,7 @@ UINT                                 status;
         {
 
             /* Copy the array of device properties.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_properties_supported, device_pointer, array_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_properties_supported, device_pointer, array_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += array_length;
@@ -230,7 +234,7 @@ UINT                                 status;
         {
 
             /* Copy the array of capture formats.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_capture_formats, device_pointer, array_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_capture_formats, device_pointer, array_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += array_length;
@@ -250,7 +254,7 @@ UINT                                 status;
         {
 
             /* Copy the array of supported operations.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_image_formats, device_pointer, array_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_image_formats, device_pointer, array_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += array_length;
@@ -270,7 +274,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the manufacturer field.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_manufacturer, device_pointer, unicode_string_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_manufacturer, device_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += unicode_string_length + 1;
@@ -290,7 +294,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the model date field.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_model, device_pointer, unicode_string_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_model, device_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += unicode_string_length + 1;
@@ -310,7 +314,7 @@ UINT                                 status;
         {
 
             /* Copy that string into the version field.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_version, device_pointer, unicode_string_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_version, device_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
             /* Point to the next field.  */
             device_pointer += unicode_string_length + 1;
@@ -329,7 +333,7 @@ UINT                                 status;
         if (status == UX_SUCCESS)
 
             /* Copy that string into the serial number field.  */
-            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_serial_number, device_pointer, unicode_string_length);
+            _ux_utility_memory_copy(pima_device -> ux_host_class_pima_device_serial_number, device_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
         else
         {

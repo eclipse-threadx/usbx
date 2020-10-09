@@ -78,7 +78,7 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_initialize                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -120,6 +120,12 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -161,14 +167,14 @@ UINT                                        status;
     
     /* Copy the local node ID.  */
     _ux_utility_memory_copy(rndis -> ux_slave_class_rndis_local_node_id, rndis_parameter -> ux_slave_class_rndis_parameter_local_node_id,
-                            UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH);
+                            UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH); /* Use case of memcpy is verified. */
 
     /* Copy the remote node ID.  */
     _ux_utility_memory_copy(rndis -> ux_slave_class_rndis_remote_node_id, rndis_parameter -> ux_slave_class_rndis_parameter_remote_node_id,
-                            UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH);
+                            UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH); /* Use case of memcpy is verified. */
 
     /* Store the rest of the parameters as they are in the local instance.  */
-    _ux_utility_memory_copy(&rndis -> ux_slave_class_rndis_parameter, rndis_parameter, sizeof (UX_SLAVE_CLASS_RNDIS_PARAMETER));
+    _ux_utility_memory_copy(&rndis -> ux_slave_class_rndis_parameter, rndis_parameter, sizeof (UX_SLAVE_CLASS_RNDIS_PARAMETER)); /* Use case of memcpy is verified. */
 
     /* Create a mutex to protect the RNDIS thread and the application messing up the transmit queue.  */
     status =  _ux_utility_mutex_create(&rndis -> ux_slave_class_rndis_mutex, "ux_slave_class_rndis_mutex");
@@ -197,7 +203,7 @@ UINT                                        status;
                     _ux_device_class_rndis_interrupt_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) rndis -> ux_slave_class_rndis_interrupt_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
                     
         /* Check the creation of this thread.  */
         if (status != UX_SUCCESS)
@@ -226,7 +232,7 @@ UINT                                        status;
                     _ux_device_class_rndis_bulkout_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) rndis -> ux_slave_class_rndis_bulkout_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
                     
         /* Check the creation of this thread.  */
         if (status != UX_SUCCESS)
@@ -255,7 +261,7 @@ UINT                                        status;
                     _ux_device_class_rndis_bulkin_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) rndis -> ux_slave_class_rndis_bulkin_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
 
         /* Check the creation of this thread.  */
         if (status != UX_SUCCESS)

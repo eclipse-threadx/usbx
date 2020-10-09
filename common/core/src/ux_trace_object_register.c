@@ -36,7 +36,7 @@ extern VOID _tx_trace_object_register(UCHAR , VOID *, CHAR *, ULONG , ULONG );
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_trace_object_register                           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,22 +70,27 @@ extern VOID _tx_trace_object_register(UCHAR , VOID *, CHAR *, ULONG , ULONG );
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_trace_object_register(UCHAR object_type, VOID *object_ptr, CHAR *object_name, ULONG parameter_1, ULONG parameter_2)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 
     /* Disable interrupts.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* Call actual object register function.  */
     _tx_trace_object_register(object_type, object_ptr, object_name, parameter_1, parameter_2);
 
     /* Restore interrupts.  */
-    TX_RESTORE
+    UX_RESTORE
 }
 #endif
 

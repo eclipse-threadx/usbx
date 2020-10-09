@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_transport_bo                 PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_transport_bo(UX_HOST_CLASS_STORAGE *storage, UCHAR *data_pointer)
@@ -113,7 +116,7 @@ UCHAR           *get_status_response;
             return(status);
 
         /* Wait for the completion of the transfer request.  */
-        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
+        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
 
         /* If the semaphore did not succeed we probably have a time out.  */
         if (status != UX_SUCCESS)
@@ -197,7 +200,7 @@ UCHAR           *get_status_response;
         if (status == UX_SUCCESS)
 
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
+            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
 
         /* If the semaphore did not succeed we may have a time out or if we had a problem during the preparation of the transaction
            we should abort the SCSI transaction.  */
@@ -269,7 +272,7 @@ UCHAR           *get_status_response;
             return(status);
 
         /* Wait for the completion of the transfer request.  */
-        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
+        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
 
         /* Check semaphore status.  */
         if (status != UX_SUCCESS)

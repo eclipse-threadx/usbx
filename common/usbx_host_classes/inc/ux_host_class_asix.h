@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_asix.h                                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -344,9 +349,9 @@ typedef struct UX_HOST_CLASS_ASIX_STRUCT
     UX_INTERFACE    *ux_host_class_asix_interface;
     UINT            ux_host_class_asix_instance_status;
     UINT            ux_host_class_asix_state;
-    TX_SEMAPHORE    ux_host_class_asix_semaphore;
-    TX_SEMAPHORE    ux_host_class_asix_interrupt_notification_semaphore;
-    TX_THREAD       ux_host_class_asix_thread;
+    UX_SEMAPHORE    ux_host_class_asix_semaphore;
+    UX_SEMAPHORE    ux_host_class_asix_interrupt_notification_semaphore;
+    UX_THREAD       ux_host_class_asix_thread;
     UCHAR           *ux_host_class_asix_thread_stack;
     ULONG           ux_host_class_asix_notification_count;
     ULONG           ux_host_class_asix_primary_phy_id;

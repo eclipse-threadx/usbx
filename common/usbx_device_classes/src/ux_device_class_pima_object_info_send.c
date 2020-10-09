@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_info_send              PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_info_send(UX_SLAVE_CLASS_PIMA *pima, ULONG storage_id, ULONG parent_object_handle)
@@ -145,7 +149,7 @@ ULONG                       object_handle;
     {
         
         /* Copy that string into the object description field.  */
-        _ux_utility_memory_copy(object -> ux_device_class_pima_object_filename, object_info_pointer, unicode_string_length);
+        _ux_utility_memory_copy(object -> ux_device_class_pima_object_filename, object_info_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
         /* Point to the next field.  */
         object_info_pointer += unicode_string_length;
@@ -165,7 +169,7 @@ ULONG                       object_handle;
     {
 
         /* Copy that string into the capture date field.  */
-        _ux_utility_memory_copy(object -> ux_device_class_pima_object_capture_date, object_info_pointer, unicode_string_length);
+        _ux_utility_memory_copy(object -> ux_device_class_pima_object_capture_date, object_info_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
         /* Point to the next field.  */
         object_info_pointer += unicode_string_length;
@@ -185,7 +189,7 @@ ULONG                       object_handle;
     {
 
         /* Copy that string into the modification date field.  */
-        _ux_utility_memory_copy(object -> ux_device_class_pima_object_modification_date, object_info_pointer, unicode_string_length);
+        _ux_utility_memory_copy(object -> ux_device_class_pima_object_modification_date, object_info_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
         /* Point to the next field.  */
         object_info_pointer += unicode_string_length;
@@ -205,7 +209,7 @@ ULONG                       object_handle;
     {
 
         /* Copy that string into the keywords field.  */
-        _ux_utility_memory_copy(object -> ux_device_class_pima_object_keywords, object_info_pointer, unicode_string_length);
+        _ux_utility_memory_copy(object -> ux_device_class_pima_object_keywords, object_info_pointer, unicode_string_length); /* Use case of memcpy is verified. */
         
         /* Reset the rest of the other parameters.  */
         object -> ux_device_class_pima_object_state            =  0;

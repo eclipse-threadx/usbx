@@ -98,7 +98,7 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_keyboard_activate                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -140,6 +140,11 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_keyboard_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -307,7 +312,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         status =  _ux_utility_thread_create(&keyboard_instance -> ux_host_class_hid_keyboard_thread, "ux_host_stack_keyboard_thread",_ux_host_class_hid_keyboard_thread,
                 (ULONG) (ALIGN_TYPE) keyboard_instance, keyboard_instance -> ux_host_class_hid_keyboard_thread_stack,
                 UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_KEYBOARD,
-                UX_THREAD_PRIORITY_KEYBOARD, UX_NO_TIME_SLICE, TX_AUTO_START);
+                UX_THREAD_PRIORITY_KEYBOARD, UX_NO_TIME_SLICE, UX_AUTO_START);
 
     /* If we are OK, go on.  */
     if (status == UX_SUCCESS)
@@ -398,7 +403,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         _ux_utility_memory_free(keyboard_instance -> ux_host_class_hid_keyboard_thread_stack);
 
     /* Delete semaphore.  */
-    if (keyboard_instance -> ux_host_class_hid_keyboard_semaphore.tx_semaphore_id != TX_EMPTY)
+    if (keyboard_instance -> ux_host_class_hid_keyboard_semaphore.tx_semaphore_id != UX_EMPTY)
         _ux_utility_semaphore_delete(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore);
     
     /* Free usage array.  */

@@ -30,6 +30,9 @@
 #include "ux_device_stack.h"
 
 #define USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH                    16
+#if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < (USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8)
+#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check
+#endif
 UCHAR usbx_device_class_storage_performance[] = { 
 
     0x08, 0x00, 0x00, 0x00, 0x00, 0x23, 0x12, 0x80, 
@@ -41,7 +44,7 @@ UCHAR usbx_device_class_storage_performance[] = {
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_get_performance            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +81,11 @@ UCHAR usbx_device_class_storage_performance[] = {
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_performance(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -91,6 +99,8 @@ UINT                    status;
 UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   performance_page;
 
+
+    UX_PARAMETER_NOT_USED(lun);
     UX_PARAMETER_NOT_USED(endpoint_out);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -100,7 +110,7 @@ ULONG                   performance_page;
     transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
 
     /* Ensure memory buffer cleaned.  */
-    _ux_utility_memory_set(transfer_request -> ux_slave_transfer_request_data_pointer, 0, 64);
+    _ux_utility_memory_set(transfer_request -> ux_slave_transfer_request_data_pointer, 0, 64); /* Use case of memset is verified. */
     
     /* Get the performance page code.  */
     performance_page =  (ULONG) *(cbwcb + UX_SLAVE_CLASS_STORAGE_GET_PERFORMANCE_PAGE);
@@ -131,20 +141,16 @@ ULONG                   performance_page;
 
             /* Copy the CSW into the transfer request memory.  */
             _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + 8, 
-                                        usbx_device_class_storage_performance, USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH);
+                                        usbx_device_class_storage_performance, USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH); /* Use case of memcpy is verified. */
 
             /* Send a data payload with the read_capacity response buffer.  */
             _ux_device_stack_transfer_request(transfer_request, USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8, USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8); 
             break;
     }
     
-    /* Now we return a CSW with success.  */
-    status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
-
-    /* And update the REQUEST_SENSE codes.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x00;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x00;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x00;
+    /* Now we set the CSW with success.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+    status = UX_SUCCESS;
 
     /* Return completion status.  */
     return(status);

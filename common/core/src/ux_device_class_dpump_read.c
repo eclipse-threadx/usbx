@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dpump_read                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_dpump_read(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
@@ -143,7 +147,7 @@ ULONG                       local_requested_length;
 
             /* We need to copy the buffer locally.  */
             _ux_utility_memory_copy(buffer, transfer_request -> ux_slave_transfer_request_data_pointer, 
-                            local_requested_length);
+                            local_requested_length); /* Use case of memcpy is verified. */
         
             /* Next buffer address.  */
             buffer += transfer_request -> ux_slave_transfer_request_actual_length;

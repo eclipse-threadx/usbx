@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 /**************************************************************************/
 /*                                                                        */
 /*       Copyright (c) Microsoft Corporation. All rights reserved.        */
@@ -42,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_device_configuration_select          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +74,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_select(UX_CONFIGURATION *configuration)
@@ -134,7 +130,7 @@ UINT                    status;
        with the amount of power the device is consuming before allowing
        it to be configured. Otherwise we may run the risk of an over
        current fault. */        
-    if (configuration -> ux_configuration_descriptor.MaxPower > device -> ux_device_max_power)
+    if (configuration -> ux_configuration_descriptor.MaxPower > UX_DEVICE_MAX_POWER_GET(device))
     {
     
         /* Error trap. */

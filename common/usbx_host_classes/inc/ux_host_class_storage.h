@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_storage.h                             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,17 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration, used UX_ */
+/*                                            things instead of FX_       */
+/*                                            things directly, used host  */
+/*                                            class extension pointer for */
+/*                                            class specific structured   */
+/*                                            data, used UX prefix to     */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -48,8 +59,48 @@
 #define UX_HOST_CLASS_STORAGE_H
 
 
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
 /* Include the FileX API.  */
 #include "fx_api.h"
+
+/* Refine media stubs.  */
+
+#ifndef UX_MEDIA
+#define UX_MEDIA                                            FX_MEDIA
+#endif
+
+#ifndef ux_media_id_get
+#define ux_media_id_get(m)                                  ((m)->fx_media_id)
+#endif
+
+#ifndef ux_media_id_set
+#define ux_media_id_set(m,id)                               ((m)->fx_media_id=(id))
+#endif
+
+#ifndef ux_media_driver_info_get
+#define ux_media_driver_info_get(m)                         ((m)->fx_media_driver_info)
+#endif
+
+#ifndef ux_media_driver_info_set
+#define ux_media_driver_info_set(m,i)                       ((m)->fx_media_driver_info=(VOID*)(i))
+#endif
+
+#ifndef ux_media_reserved_for_user_get
+#define ux_media_reserved_for_user_get(m)                   ((m)->fx_media_reserved_for_user)
+#endif
+
+#ifndef ux_media_reserved_for_user_set
+#define ux_media_reserved_for_user_set(m,u)                 ((m)->fx_media_reserved_for_user=(ALIGN_TYPE)(u))
+#endif
+
+#ifndef ux_media_open
+#define ux_media_open                                       fx_media_open
+#endif
+
+#ifndef ux_media_close
+#define ux_media_close                                      fx_media_close
+#endif
+#endif
 
 /* Define User configurable Storage Class constants.  */
 
@@ -356,8 +407,8 @@
 
 #define UX_HOST_CLASS_STORAGE_CBW_LENGTH                        31
 #define UX_HOST_CLASS_STORAGE_CSW_LENGTH                        13
-#define UX_HOST_CLASS_STORAGE_CBW_LENGTH_ALIGNED                64
-#define UX_HOST_CLASS_STORAGE_CSW_LENGTH_ALIGNED                64
+#define UX_HOST_CLASS_STORAGE_CBW_LENGTH_ALIGNED                32
+#define UX_HOST_CLASS_STORAGE_CSW_LENGTH_ALIGNED                16
 
 
 typedef struct UX_HOST_CLASS_STORAGE_STRUCT
@@ -381,13 +432,23 @@ typedef struct UX_HOST_CLASS_STORAGE_STRUCT
     UINT            ux_host_class_storage_max_lun;
     UINT            ux_host_class_storage_lun;
     UINT            ux_host_class_storage_lun_types[UX_MAX_HOST_LUN];
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+    ULONG           ux_host_class_storage_last_sector_number;
+#endif
     ULONG           ux_host_class_storage_sector_size;
     ULONG           ux_host_class_storage_data_phase_length;
     UINT            (*ux_host_class_storage_transport) (struct UX_HOST_CLASS_STORAGE_STRUCT *storage, UCHAR * data_pointer);
     ULONG           ux_host_class_storage_sense_code;
     UCHAR           *ux_host_class_storage_memory;
-    TX_SEMAPHORE    ux_host_class_storage_semaphore;
+    UX_SEMAPHORE    ux_host_class_storage_semaphore;
 } UX_HOST_CLASS_STORAGE;
+
+
+typedef struct UX_HOST_CLASS_STORAGE_EXT_STRUCT
+{
+    UX_THREAD       ux_host_class_thread;
+    CHAR            ux_host_class_thread_stack[UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE];
+} UX_HOST_CLASS_STORAGE_EXT;
 
 
 /* Define Host Storage Class Media structure.  */
@@ -395,12 +456,21 @@ typedef struct UX_HOST_CLASS_STORAGE_STRUCT
 typedef struct UX_HOST_CLASS_STORAGE_MEDIA_STRUCT
 {
 
-    FX_MEDIA        ux_host_class_storage_media;
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+    UX_MEDIA        ux_host_class_storage_media;
+    ULONG           ux_host_class_storage_media_partition_start;
+    VOID            *ux_host_class_storage_media_memory;
     ULONG           ux_host_class_storage_media_status;
     ULONG           ux_host_class_storage_media_lun;
-    ULONG           ux_host_class_storage_media_partition_start;
     ULONG           ux_host_class_storage_media_sector_size;
-    VOID            *ux_host_class_storage_media_memory;
+#else
+    struct UX_HOST_CLASS_STORAGE_STRUCT
+                    *ux_host_class_storage_media_storage;
+    ULONG           ux_host_class_storage_media_number_sectors;
+    USHORT          ux_host_class_storage_media_sector_size;
+    UCHAR           ux_host_class_storage_media_lun;
+    UCHAR           reserved;
+#endif
 
 } UX_HOST_CLASS_STORAGE_MEDIA;
 
@@ -415,7 +485,15 @@ UINT    _ux_host_class_storage_deactivate(UX_HOST_CLASS_COMMAND *command);
 UINT    _ux_host_class_storage_device_initialize(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_device_reset(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_device_support_check(UX_HOST_CLASS_STORAGE *storage);
-VOID    _ux_host_class_storage_driver_entry(FX_MEDIA *media);
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+VOID    _ux_host_class_storage_driver_entry(UX_MEDIA *media);
+#else
+#define _ux_host_class_storage_lock(s,w) _ux_utility_semaphore_get(&(s) -> ux_host_class_storage_semaphore, (w))
+#define _ux_host_class_storage_unlock(s) _ux_utility_semaphore_put(&(s) -> ux_host_class_storage_semaphore)
+UINT    _ux_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage, ULONG media_index, UX_HOST_CLASS_STORAGE_MEDIA **storage_media);
+UINT    _ux_host_class_storage_media_lock(UX_HOST_CLASS_STORAGE_MEDIA *storage_media, ULONG wait);
+#define _ux_host_class_storage_media_unlock(m) _ux_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage)
+#endif
 UINT    _ux_host_class_storage_endpoints_get(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_entry(UX_HOST_CLASS_COMMAND *command);
 UINT    _ux_host_class_storage_max_lun_get(UX_HOST_CLASS_STORAGE *storage);
@@ -447,5 +525,11 @@ UINT    _ux_host_class_storage_unit_ready_test(UX_HOST_CLASS_STORAGE *storage);
 #define  ux_host_class_storage_entry                           _ux_host_class_storage_entry
 #define  ux_host_class_storage_media_read                      _ux_host_class_storage_media_read
 #define  ux_host_class_storage_media_write                     _ux_host_class_storage_media_write
+
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+#define  ux_host_class_storage_media_get                       _ux_host_class_storage_media_get
+#define  ux_host_class_storage_media_lock                      _ux_host_class_storage_media_lock
+#define  ux_host_class_storage_media_unlock                    _ux_host_class_storage_media_unlock
+#endif
 
 #endif

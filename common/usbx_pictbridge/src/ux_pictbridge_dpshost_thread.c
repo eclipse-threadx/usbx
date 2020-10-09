@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_thread                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_pictbridge_dpshost_thread(ULONG parameter)
@@ -120,7 +125,7 @@ UINT                    status;
                         /* Wait for the host pending request to be completed.  */
                         status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, 
                                                 UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                                TX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
+                                                UX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
                         /* Reset the state machine to not Host Request pending.  */
                         pictbridge -> ux_pictbridge_host_client_state_machine &= (UINT)~UX_PICTBRIDGE_STATE_MACHINE_CLIENT_REQUEST_PENDING;
@@ -145,7 +150,7 @@ UINT                    status;
                         /* Yes, so we need to set the event that advertise the completion of the host request.  */
                         status =  _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, 
                                                 UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                                TX_AND);
+                                                UX_AND);
                         /* Check status.  */
                         if (status != UX_SUCCESS)
                             break;

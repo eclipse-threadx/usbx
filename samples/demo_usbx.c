@@ -290,7 +290,7 @@ UX_HOST_CLASS   *class;
         thread_0_counter++;
 
         /* Initialize the write buffer. */
-        _ux_utility_memory_set(host_out_buffer, current_char, UX_HOST_CLASS_DPUMP_PACKET_SIZE);
+        _ux_utility_memory_set(host_out_buffer, current_char, UX_HOST_CLASS_DPUMP_PACKET_SIZE); /* Use case of memset is verified. */
 
         /* Increment the character in buffer.  */
         current_char++;

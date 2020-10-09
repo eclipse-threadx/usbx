@@ -34,7 +34,7 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_ecm_initialize                 PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,12 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -164,7 +170,7 @@ UINT                                            status;
                     _ux_device_class_cdc_ecm_interrupt_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
         if (status != UX_SUCCESS)
             status = (UX_THREAD_ERROR);
     }
@@ -182,7 +188,7 @@ UINT                                            status;
                     _ux_device_class_cdc_ecm_bulkout_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                    UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
         if (status != UX_SUCCESS)
             status = (UX_THREAD_ERROR);
         else
@@ -197,7 +203,7 @@ UINT                                            status;
                         _ux_device_class_cdc_ecm_bulkin_thread,
                         (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack ,
                         UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_DONT_START);
+                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
             if (status != UX_SUCCESS)
                 status = (UX_THREAD_ERROR);
             else
@@ -224,14 +230,14 @@ UINT                                            status;
 
                     /* Copy the local node ID.  */
                     _ux_utility_memory_copy(cdc_ecm -> ux_slave_class_cdc_ecm_local_node_id, cdc_ecm_parameter -> ux_slave_class_cdc_ecm_parameter_local_node_id,
-                                            UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH);
+                                            UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH); /* Use case of memcpy is verified. */
 
                     /* Copy the remote node ID.  */
                     _ux_utility_memory_copy(cdc_ecm -> ux_slave_class_cdc_ecm_remote_node_id, cdc_ecm_parameter -> ux_slave_class_cdc_ecm_parameter_remote_node_id,
-                                            UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH);
+                                            UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH); /* Use case of memcpy is verified. */
 
                     /* Store the rest of the parameters as they are in the local instance.  */
-                    _ux_utility_memory_copy(&cdc_ecm -> ux_slave_class_cdc_ecm_parameter, cdc_ecm_parameter, sizeof (UX_SLAVE_CLASS_CDC_ECM_PARAMETER));
+                    _ux_utility_memory_copy(&cdc_ecm -> ux_slave_class_cdc_ecm_parameter, cdc_ecm_parameter, sizeof (UX_SLAVE_CLASS_CDC_ECM_PARAMETER)); /* Use case of memcpy is verified. */
 
                     return(UX_SUCCESS);
                 }

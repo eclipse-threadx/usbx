@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_bulkin_thread              PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,12 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_acm_bulkin_thread(ULONG cdc_acm_class)
@@ -116,7 +122,7 @@ ULONG                           sent_length;
 
             /* Wait until we have a event sent by the application. */
             status =  _ux_utility_event_flags_get(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group, UX_DEVICE_CLASS_CDC_ACM_WRITE_EVENT,
-                                                                                            TX_OR_CLEAR, &actual_flags, TX_WAIT_FOREVER);
+                                                                                            UX_OR_CLEAR, &actual_flags, UX_WAIT_FOREVER);
 
             /* Check the completion code. */
             if (status == UX_SUCCESS)
@@ -158,7 +164,7 @@ ULONG                           sent_length;
                         /* Copy the payload locally.  */
                         _ux_utility_memory_copy (transfer_request -> ux_slave_transfer_request_data_pointer,
                                                 cdc_acm -> ux_slave_class_cdc_acm_callback_current_data_pointer,
-                                                transfer_length);
+                                                transfer_length); /* Use case of memcpy is verified. */
 
                         /* Send the acm payload to the host.  */
                         status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, transfer_length);

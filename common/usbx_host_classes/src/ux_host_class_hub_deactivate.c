@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_deactivate                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -89,7 +93,7 @@ UINT                    port_index;
     hub =  (UX_HOST_CLASS_HUB *) command -> ux_host_class_command_instance;
 
     /* Get the HCD used by this instance.  */
-    hcd =  hub -> ux_host_class_hub_device -> ux_device_hcd;
+    hcd = UX_DEVICE_HCD_GET(hub -> ux_host_class_hub_device);
 
     /* The HUB is being shut down.  */
     hub -> ux_host_class_hub_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;

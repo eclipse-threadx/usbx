@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_thumb_get                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_thumb_get(UX_HOST_CLASS_PIMA *pima, 
@@ -172,7 +177,7 @@ UINT                                status;
         {
         
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
@@ -228,7 +233,7 @@ UINT                                status;
             {
                 
                 /* Wait for the completion of the transfer request.  */
-                status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+                status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
         
                 /* If the semaphore did not succeed we probably have a time out.  */
                 if (status != UX_SUCCESS)
@@ -271,7 +276,7 @@ UINT                                status;
         
             /* We need to skip the header.  Copying the necessary partial memory only.  */
             _ux_utility_memory_copy(thumb_buffer, ptp_payload + UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE, 
-                                    transfer_request -> ux_transfer_request_actual_length - UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE);
+                                    transfer_request -> ux_transfer_request_actual_length - UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE); /* Use case of memcpy is verified. */
 
             /* Update the actual length.  */
             *thumb_actual_length = transfer_request -> ux_transfer_request_actual_length - UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE;
@@ -319,7 +324,7 @@ UINT                                status;
             {
                     
                 /* Wait for the completion of the transfer request.  */
-                status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+                status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
             
                 /* If the semaphore did not succeed we probably have a time out.  */
                 if (status != UX_SUCCESS)

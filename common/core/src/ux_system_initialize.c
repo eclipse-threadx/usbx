@@ -65,7 +65,7 @@ UCHAR _ux_system_ecm_interface_descriptor_structure[] =                     {1,1
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_system_initialize                               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -101,6 +101,10 @@ UCHAR _ux_system_ecm_interface_descriptor_structure[] =                     {1,1
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
@@ -114,7 +118,7 @@ UINT                status;
 ULONG               memory_pool_offset;
 
     /* Reset memory block */
-    _ux_utility_memory_set(regular_memory_pool_start, 0, regular_memory_size);
+    _ux_utility_memory_set(regular_memory_pool_start, 0, regular_memory_size); /* Use case of memset is verified. */
 
     /* Set the _ux_system structure at the start of our regular memory */
     _ux_system =  (UX_SYSTEM *) regular_memory_pool_start;
@@ -207,13 +211,22 @@ ULONG               memory_pool_offset;
         _ux_system -> ux_system_cache_safe_memory_pool_start =    (UX_MEMORY_BLOCK *) int_memory_pool_start;
     
         /* Reset this memory block */
-        _ux_utility_memory_set(_ux_system -> ux_system_cache_safe_memory_pool_start, 0, _ux_system -> ux_system_cache_safe_memory_pool_size);
+        _ux_utility_memory_set(_ux_system -> ux_system_cache_safe_memory_pool_start, 0, _ux_system -> ux_system_cache_safe_memory_pool_size); /* Use case of memset is verified. */
     
         /* Build the first free memory block */
         memory_block =                             _ux_system -> ux_system_cache_safe_memory_pool_start;
         memory_block -> ux_memory_block_size =     _ux_system -> ux_system_cache_safe_memory_pool_size - (ULONG)sizeof(UX_MEMORY_BLOCK);
         memory_block -> ux_memory_block_status =   UX_MEMORY_UNUSED;
     }
+
+#ifdef UX_ENABLE_MEMORY_STATISTICS
+    _ux_system -> ux_system_regular_memory_pool_base = (UCHAR *) _ux_system -> ux_system_regular_memory_pool_start;
+    _ux_system -> ux_system_regular_memory_pool_min_free = _ux_system -> ux_system_regular_memory_pool_free;
+    _ux_system -> ux_system_cache_safe_memory_pool_base = (UCHAR *) _ux_system -> ux_system_cache_safe_memory_pool_start;
+    _ux_system -> ux_system_cache_safe_memory_pool_min_free = _ux_system -> ux_system_cache_safe_memory_pool_free;
+
+    /* Other fields are kept zero.  */
+#endif
 
 #ifdef UX_ENABLE_DEBUG_LOG
 

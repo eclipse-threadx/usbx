@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request                     PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,12 +78,19 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions, used UX prefix */
+/*                                            to refer to TX symbols      */
+/*                                            instead of using them       */
+/*                                            directly,                   */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_transfer_request(UX_TRANSFER *transfer_request)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 UX_ENDPOINT     *endpoint;  
 UX_DEVICE       *device;    
@@ -99,7 +106,7 @@ UINT            status;
 
     /* Ensure we are not preempted by the enum thread while we check the device 
        state and set the transfer status.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* We can only transfer when the device is ATTACHED, ADDRESSED OR CONFIGURED.  */
     if ((device -> ux_device_state == UX_DEVICE_ATTACHED) || (device -> ux_device_state == UX_DEVICE_ADDRESSED)
@@ -117,7 +124,7 @@ UINT            status;
     {
 
         /* The device is in an invalid state. Restore interrupts and return error.  */
-        TX_RESTORE
+        UX_RESTORE
 
         /* Check if this is endpoint 0.  */
         if ((endpoint -> ux_endpoint_descriptor.bEndpointAddress & (UINT)~UX_ENDPOINT_DIRECTION) == 0)
@@ -136,13 +143,13 @@ UINT            status;
     }
 
     /* Restore interrupts.  */
-    TX_RESTORE
+    UX_RESTORE
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_TRANSFER_REQUEST, device, endpoint, transfer_request, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
     
     /* With the device we have the pointer to the HCD.  */
-    hcd =  device -> ux_device_hcd;
+    hcd = UX_DEVICE_HCD_GET(device);
 
     /* If this is endpoint 0, we protect the endpoint from a possible re-entry.  */
     if ((endpoint -> ux_endpoint_descriptor.bEndpointAddress & (UINT)~UX_ENDPOINT_DIRECTION) == 0)

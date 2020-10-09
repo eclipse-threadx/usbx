@@ -30,12 +30,16 @@
 #include "ux_device_stack.h"
 
 
+#if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE
+#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check
+#endif
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_device_prop_value_get         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +76,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_device_prop_value_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -116,9 +124,23 @@ UCHAR                               *device_property_value;
 
     else
     {
-        
+
+        /* Ensure the application's data can fit in the endpoint's data buffer.  */
+        if (device_property_value_length > UX_SLAVE_REQUEST_DATA_MAX_LENGTH - UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE)
+        {
+
+            /* If trace is enabled, insert this event into the trace buffer.  */
+            UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+            /* We return an error.  */
+            _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_GENERAL_ERROR, 0, 0, 0, 0);
+
+            /* Return overflow error.  */
+            return(UX_MEMORY_INSUFFICIENT);
+        }
+
         /* Copy the property dataset into the local buffer.  */
-        _ux_utility_memory_copy(pima_data_buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE, device_property_value, device_property_value_length);
+        _ux_utility_memory_copy(pima_data_buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE, device_property_value, device_property_value_length); /* Use case of memcpy is verified. */
 
         /* Add the header size to the payload.  */
         device_property_value_length += UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE;

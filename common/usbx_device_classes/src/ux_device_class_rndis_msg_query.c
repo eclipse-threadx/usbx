@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_msg_query                    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_rndis_msg_query(UX_SLAVE_CLASS_RNDIS *rndis, UX_SLAVE_TRANSFER *transfer_request)
@@ -255,7 +259,7 @@ ULONG            status;
             rndis_response_length =  (ULONG) rndis_response_string_length;
 
             /* Copy the vendor description.  */
-            _ux_utility_memory_copy(rndis_response + UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER, rndis -> ux_slave_class_rndis_parameter.ux_slave_class_rndis_parameter_vendor_description, rndis_response_length);
+            _ux_utility_memory_copy(rndis_response + UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER, rndis -> ux_slave_class_rndis_parameter.ux_slave_class_rndis_parameter_vendor_description, rndis_response_length); /* Use case of memcpy is verified. */
 
             break;
         
@@ -314,7 +318,7 @@ ULONG            status;
             
             /* Save the Hardware address in the return message.   */
             _ux_utility_memory_copy(rndis_response + UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER, 
-                                    rndis -> ux_slave_class_rndis_remote_node_id, UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH);
+                                    rndis -> ux_slave_class_rndis_remote_node_id, UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH); /* Use case of memcpy is verified. */
 
             /* Set the total response length.  */
             rndis_response_length = UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH;

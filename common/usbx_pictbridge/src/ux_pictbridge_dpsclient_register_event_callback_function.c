@@ -35,8 +35,9 @@
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
-/*    _ux_pictbridge_dpsclient_register_                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*    _ux_pictbridge_dpsclient_register_event_callback_function           */ 
+/*                                                        PORTABLE C      */ 
+/*                                                           6.1          */
 /*                                                                        */ 
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -67,6 +68,8 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_register_event_callback_function(UX_PICTBRIDGE *pictbridge, UINT (*event_callback_function)(struct UX_PICTBRIDGE_STRUCT *pictbridge, UINT event_flag))

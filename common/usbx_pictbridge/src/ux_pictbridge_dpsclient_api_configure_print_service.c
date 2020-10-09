@@ -34,8 +34,9 @@
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
-/*    _ux_pictbridge_dpsclient_api_configure_print_service PORTABLE C     */ 
-/*                                                           6.0          */
+/*    _ux_pictbridge_dpsclient_api_configure_print_service                */
+/*                                                        PORTABLE C      */ 
+/*                                                           6.1          */
 /*                                                                        */ 
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -67,6 +68,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_pictbridge_dpsclient_api_configure_print_service(UX_PICTBRIDGE *pictbridge) 
@@ -86,7 +92,7 @@ ULONG                               actual_flags;
 
     /* We should wait for the host to send a script with the response.  */
     status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_CONFIGURE_PRINT_SERVICE, 
-                                        TX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
+                                        UX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
     /* Check status.  */
     if (status != UX_SUCCESS)

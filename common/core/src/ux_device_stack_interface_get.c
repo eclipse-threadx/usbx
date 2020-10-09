@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                RELEASE       */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_interface_get                       PORTABLE C     */
-/*                                                           6.0          */
+/*    _ux_device_stack_interface_get                      PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_interface_get(UINT interface_value)
@@ -98,10 +102,12 @@ UINT                    status;
 
         /* Get the pointer to the first interface.  */
         interface =  device -> ux_slave_device_first_interface;
-        
+
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         /* Parse the interfaces if any.  */
         while (interface != UX_NULL)
         {
+#endif
 
             /* Check if this is the interface we have an inquiry for.  */
             if (interface -> ux_slave_interface_descriptor.bInterfaceNumber == interface_value)
@@ -127,9 +133,12 @@ UINT                    status;
                 return(status);
             }
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Get the next interface.  */
             interface =  interface -> ux_slave_interface_next_interface;
         }
+#endif
+
     }
 
     /* The alternate setting value was not found, so we return a stall error.  */

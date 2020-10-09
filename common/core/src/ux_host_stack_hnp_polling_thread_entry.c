@@ -29,12 +29,13 @@
 #include "ux_host_stack.h"
 
 
+#if defined(UX_OTG_SUPPORT)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_hnp_polling_thread_entry             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_hnp_polling_thread_entry(ULONG argument)
@@ -134,7 +139,7 @@ UINT                        status;
                             container_index =  0;
                         
                             /* Search the list until the end.  */
-                            while (container_index++ < _ux_system_host -> ux_system_host_max_devices)
+                            while (container_index++ < UX_SYSTEM_HOST_MAX_DEVICES_GET())
                             {
                         
                                 /* Until we have found a used entry.  */
@@ -142,8 +147,8 @@ UINT                        status;
                                 {
                         
                                     /* Check for the parent device and the port location and the controller.  */
-                                    if((device -> ux_device_port_location == port_index) &&
-                                       (device -> ux_device_hcd == hcd))
+                                    if(UX_DEVICE_PORT_LOCATION_MATCH(device, port_index) &&
+                                       UX_DEVICE_HCD_MATCH(device, hcd))
                                     {
 
                                         /* We have a device on a OTG port. But is it a OTG HNP capable device ?  
@@ -229,4 +234,4 @@ UINT                        status;
         }
     }
 }
-
+#endif /* #if defined(UX_OTG_SUPPORT) */

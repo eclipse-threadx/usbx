@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkout_thread               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class)
@@ -107,7 +112,7 @@ ULONG                           packet_payload;
             
             /* We can accept new reception. Get a NX Packet.  */
             status =  nx_packet_allocate(&rndis -> ux_slave_class_rndis_packet_pool, &packet, 
-                                         NX_RECEIVE_PACKET, MS_TO_TICK(UX_DEVICE_CLASS_RNDIS_PACKET_POOL_WAIT));
+                                         NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_DEVICE_CLASS_RNDIS_PACKET_POOL_WAIT));
 
             if (status == NX_SUCCESS)
             {
@@ -161,7 +166,7 @@ ULONG                           packet_payload;
                                 
 
                                 /* Copy the received packet in the IP packet data area.  */
-                                _ux_utility_memory_copy(packet -> nx_packet_prepend_ptr, transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_BUFFER, packet_payload);
+                                _ux_utility_memory_copy(packet -> nx_packet_prepend_ptr, transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_BUFFER, packet_payload); /* Use case of memcpy is verified. */
                         
                                 /* Calculate the accurate packet length from ip header */ 
                                 if((*(packet -> nx_packet_prepend_ptr + 12) == 0x08) && 

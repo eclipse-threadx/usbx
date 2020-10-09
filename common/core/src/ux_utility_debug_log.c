@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_debug_log                               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_debug_log(UCHAR *debug_location, UCHAR *debug_message, ULONG debug_code,
@@ -88,7 +94,7 @@ ULONG   parameter_shift;
 UCHAR   parameter_hexa;
 ULONG   local_parameter_value;
 ULONG   current_time;
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
     /* Is USBX system completely initialized ?  */
     if (_ux_system -> ux_system_debug_log_size == 0)
@@ -97,7 +103,7 @@ TX_INTERRUPT_SAVE_AREA
         return;
 
     /* Entering critical area. Disable interrupts.  */
-    TX_DISABLE
+    UX_DISABLE
     
     /* Store the debug value as the last debug value recorded.  */
     _ux_system -> ux_system_debug_code = debug_code;
@@ -117,7 +123,10 @@ TX_INTERRUPT_SAVE_AREA
     total_debug_message_length = debug_location_string_length + debug_message_string_length + 10 + 10 + 10 + 10 + 5;
 
     /* Can we accommodate this debug value message at the current location ?  */
-    if (_ux_system -> ux_system_debug_log_head +  total_debug_message_length > _ux_system -> ux_system_debug_log_buffer + _ux_system -> ux_system_debug_log_size)
+    if (total_debug_message_length >= _ux_system -> ux_system_debug_log_size)
+        return;
+    if (_ux_system -> ux_system_debug_log_head +  total_debug_message_length > 
+        ux_system -> ux_system_debug_log_buffer + _ux_system -> ux_system_debug_log_size)
     {
 
         /* The debug value log to insert goes beyond the end of the log buffer, rewind to the beginning.  */
@@ -125,7 +134,7 @@ TX_INTERRUPT_SAVE_AREA
     }
 
     /* Copy the time strings and parameters in the log buffer.  */
-    _ux_utility_memory_copy(_ux_system -> ux_system_debug_log_head, "At time : ", 10);
+    _ux_utility_memory_copy(_ux_system -> ux_system_debug_log_head, "At time : ", 10); /* Use case of memcpy is verified. */
     _ux_system -> ux_system_debug_log_head += 10;
 
     /* Get the time value from TX.  */
@@ -173,11 +182,11 @@ TX_INTERRUPT_SAVE_AREA
     _ux_system -> ux_system_debug_log_head++;
 
     /* Copy the strings and parameters in the log buffer.  */
-    _ux_utility_memory_copy(_ux_system -> ux_system_debug_log_head, debug_location, debug_location_string_length);
+    _ux_utility_memory_copy(_ux_system -> ux_system_debug_log_head, debug_location, debug_location_string_length); /* Use case of memcpy is verified. */
     _ux_system -> ux_system_debug_log_head += debug_location_string_length;
     *_ux_system -> ux_system_debug_log_head = ',';
     _ux_system -> ux_system_debug_log_head++;
-    _ux_utility_memory_copy(_ux_system -> ux_system_debug_log_head, debug_message, debug_message_string_length);
+    _ux_utility_memory_copy(_ux_system -> ux_system_debug_log_head, debug_message, debug_message_string_length); /* Use case of memcpy is verified. */
     _ux_system -> ux_system_debug_log_head += debug_message_string_length;
     *_ux_system -> ux_system_debug_log_head = ',';
     _ux_system -> ux_system_debug_log_head++;
@@ -301,7 +310,7 @@ TX_INTERRUPT_SAVE_AREA
     }
 
     /* Restore interrupts.  */
-    TX_RESTORE
+    UX_RESTORE
 
     /* We are done here. No return codes.  */
     return;

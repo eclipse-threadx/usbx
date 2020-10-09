@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_transfer_request                   PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_transfer_request(UX_SLAVE_TRANSFER *transfer_request, 
@@ -78,7 +83,7 @@ UINT  _ux_device_stack_transfer_request(UX_SLAVE_TRANSFER *transfer_request,
                                             ULONG host_length)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 UX_SLAVE_DCD            *dcd;
 UINT                    status;
@@ -92,7 +97,7 @@ ULONG                   device_state;
 
     /* Disable interrupts to prevent the disconnection ISR from preempting us
        while we check the device state and set the transfer status.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* Get the device state.  */
     device_state =  _ux_system_slave -> ux_system_slave_device.ux_slave_device_state;
@@ -108,12 +113,12 @@ ULONG                   device_state;
     {
 
         /* The device is in an invalid state. Restore interrupts and return error.  */
-        TX_RESTORE
+        UX_RESTORE
         return(UX_TRANSFER_NOT_READY);
     }
 
     /* Restore interrupts.  */
-    TX_RESTORE
+    UX_RESTORE
                     
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_STACK_TRANSFER_REQUEST, transfer_request, 0, 0, 0, UX_TRACE_DEVICE_STACK_EVENTS, 0, 0)

@@ -291,13 +291,18 @@ UCHAR usbx_device_class_storage_configuration_active_profile[] = {
 
     };
 
+#if (UX_SLAVE_REQUEST_DATA_MAX_LENGTH < USBX_DEVICE_CLASS_STORAGE_CONFIGURATION_ACTIVE_PROFILE_LENGTH) ||\
+    (UX_SLAVE_REQUEST_DATA_MAX_LENGTH < USBX_DEVICE_CLASS_STORAGE_CONFIGURATION_PROFILE_LENGTH)
+#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check
+#endif
+
 
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_get_configuration          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -335,6 +340,11 @@ UCHAR usbx_device_class_storage_configuration_active_profile[] = {
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_configuration(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -371,6 +381,9 @@ ULONG                   feature;
     /* Get the allocation length.  */
     allocation_length =  _ux_utility_short_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_GET_CONFIGURATION_ALLOCATION_LENGTH);
 
+    /* Default CSW to success.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+
     /* Is the request demanding all the features ? */
     if (starting_feature == 0)
     {
@@ -390,7 +403,7 @@ ULONG                   feature;
             /* Copy the CSW into the transfer request memory.  */
             _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
                                                 usbx_device_class_storage_configuration_active_profile, 
-                                                allocation_length);
+                                                allocation_length); /* Use case of memcpy is verified. */
         }
         else
         {
@@ -406,7 +419,7 @@ ULONG                   feature;
             /* Copy the CSW into the transfer request memory.  */
             _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
                                                 usbx_device_class_storage_configuration_profile, 
-                                                allocation_length);
+                                                allocation_length); /* Use case of memcpy is verified. */
             
         }
 
@@ -415,8 +428,8 @@ ULONG                   feature;
                                   allocation_length,
                                   allocation_length);
 
-        /* Now we return a CSW with success.  */
-        status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
+        /* Now success.  */
+        status = UX_SUCCESS;
     }
     else
     {
@@ -451,15 +464,15 @@ ULONG                   feature;
                 /* Copy the CSW into the transfer request memory.  */
                 _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
                                                     profile_pointer, 
-                                                    allocation_length);
+                                                    allocation_length); /* Use case of memcpy is verified. */
             
                 /* Send a data payload with the read_capacity response buffer.  */
                 _ux_device_stack_transfer_request(transfer_request, 
                                           allocation_length,
                                           allocation_length);
         
-                /* Now we return a CSW with success.  */
-                status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
+                /* Now success.  */
+                status = UX_SUCCESS;
 
                 /* Get out of the loop.  */
                 break;                    
@@ -474,13 +487,12 @@ ULONG                   feature;
                     /* We are either at the end of the profile or the profile is corrupted.  */
                     _ux_device_stack_endpoint_stall(endpoint_in);
 
-                    /* Now we return a CSW with failure.  */
-                    _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
-
                     /* And update the REQUEST_SENSE codes.  */
-                    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ILLEGAL_REQUEST;
-                    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x26;
-                    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x02;
+                    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+                        UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ILLEGAL_REQUEST,0x26,0x02);
+
+                    /* Now we set the CSW with failure.  */
+                    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
                     /* Set status to error.  */
                     status = UX_ERROR;

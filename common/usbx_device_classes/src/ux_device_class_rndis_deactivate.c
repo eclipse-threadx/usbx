@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_deactivate                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_deactivate(UX_SLAVE_CLASS_COMMAND *command)
@@ -104,7 +109,7 @@ UX_SLAVE_CLASS              *class;
 
         /* We have 2 threads waiting for an event, interrupt and bulk in. We wake them up with 
            a DEVICE_STATE_CHANGE event. In turn they will release the NetX resources used and suspend.  */
-        _ux_utility_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_DEVICE_STATE_CHANGE_EVENT, TX_OR);                
+        _ux_utility_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);                
 
         /* If there is a deactivate function call it.  */
         if (rndis -> ux_slave_class_rndis_parameter.ux_slave_class_rndis_instance_deactivate != UX_NULL)

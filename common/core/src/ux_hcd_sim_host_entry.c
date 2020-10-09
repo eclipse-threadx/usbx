@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_entry                              PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added controller disable,   */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_entry(UX_HCD *hcd, UINT function, VOID *parameter)
@@ -113,7 +116,7 @@ UX_HCD_SIM_HOST     *hcd_sim_host;
 
     case UX_HCD_DISABLE_CONTROLLER:
 
-        status =  UX_SUCCESS;
+        status =  _ux_hcd_sim_host_controller_disable(hcd_sim_host);
         break;
 
 

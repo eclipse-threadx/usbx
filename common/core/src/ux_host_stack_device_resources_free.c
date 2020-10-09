@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_device_resources_free                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions, verified       */
+/*                                            memset and memcpy cases,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_resources_free(UX_DEVICE *device)
@@ -84,9 +89,11 @@ UX_ENDPOINT             *endpoint;
 VOID                    *container;
 ULONG                   current_alternate_setting;
 UX_HCD                  *hcd;
+#if UX_MAX_DEVICES > 1
 UINT                    device_address_byte_index;
 UINT                    device_address_bit_index;
 UCHAR                   device_address_byte;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_RESOURCE_FREE, device, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
@@ -161,7 +168,7 @@ UCHAR                   device_address_byte;
 
     /* We need the HCD address for the control endpoint removal and to free
        the device address.  */
-    hcd =  device -> ux_device_hcd;
+    hcd = UX_DEVICE_HCD_GET(device);
 
     /* Was the control endpoint already created ? */
     if (device -> ux_device_control_endpoint.ux_endpoint_state != 0)
@@ -181,6 +188,7 @@ UCHAR                   device_address_byte;
     /* The semaphore attached to the control endpoint must be destroyed.  */
     _ux_utility_semaphore_delete(&device -> ux_device_control_endpoint.ux_endpoint_transfer_request.ux_transfer_request_semaphore);
 
+#if UX_MAX_DEVICES > 1
     /* Check if the device had an assigned address.  */
     if (device -> ux_device_address != 0)    
     {
@@ -199,13 +207,14 @@ UCHAR                   device_address_byte;
 
         /* Free the address.  */
         hcd -> ux_hcd_address[device_address_byte_index] &=  (UCHAR)~device_address_byte;
-    }        
+    }
+#endif
 
     /* The semaphore for endpoint 0 protection must be destroyed.  */
     _ux_utility_semaphore_delete(&device -> ux_device_protection_semaphore);
 
     /* Now this device can be free and its container return to the pool.  */
-    _ux_utility_memory_set(device, 0, sizeof(UX_DEVICE));
+    _ux_utility_memory_set(device, 0, sizeof(UX_DEVICE)); /* Use case of memset is verified. */
 
     /* Mark the device handle as unused.  */
     device -> ux_device_handle =  UX_UNUSED;

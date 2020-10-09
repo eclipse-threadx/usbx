@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_initialize                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,13 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions, used UX prefix */
+/*                                            to refer to TX symbols      */
+/*                                            instead of using them       */
+/*                                            directly,                   */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_initialize(UX_HCD *hcd)
@@ -92,10 +99,12 @@ UINT                status;
 
     /* Initialize the function collector for this HCD.  */
     hcd -> ux_hcd_entry_function =  _ux_hcd_sim_host_entry;
-    
+
+#if UX_MAX_DEVICES > 1
     /* Initialize the max bandwidth for periodic endpoints. In simulation this is
        not very important.  */
     hcd -> ux_hcd_available_bandwidth =  UX_HCD_SIM_HOST_AVAILABLE_BANDWIDTH;
+#endif
 
     /* Set the state of the controller to HALTED first.  */
     hcd -> ux_hcd_status =  UX_HCD_STATUS_HALTED;
@@ -141,7 +150,7 @@ UINT                status;
         
         /* We start a timer that will invoke the simulator every timer tick.  */
         status = _ux_utility_timer_create(&hcd_sim_host -> ux_hcd_sim_host_timer, "USBX Simulation Timer",
-                        _ux_hcd_sim_host_timer_function, (ULONG) (ALIGN_TYPE) hcd_sim_host, 1, 1, TX_AUTO_ACTIVATE);
+                        _ux_hcd_sim_host_timer_function, (ULONG) (ALIGN_TYPE) hcd_sim_host, 1, 1, UX_AUTO_ACTIVATE);
     }
 
     UX_TIMER_EXTENSION_PTR_SET(&(hcd_sim_host -> ux_hcd_sim_host_timer), hcd_sim_host)

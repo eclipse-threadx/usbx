@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                RELEASE       */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_alternate_setting_set               PORTABLE C     */
-/*                                                           6.0          */
+/*    _ux_device_stack_alternate_setting_set              PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,11 +73,19 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions, verified       */
+/*                                            memset and memcpy cases,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_alternate_setting_set(ULONG interface_value, ULONG alternate_setting_value)
 {
 
+UX_SLAVE_DEVICE                 *device;
+UX_SLAVE_INTERFACE              *interface;
+#if !defined(UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE)
 UX_SLAVE_DCD                    *dcd;
 UX_SLAVE_TRANSFER               *transfer_request;
 UCHAR                           *device_framework;
@@ -86,36 +94,29 @@ ULONG                           descriptor_length;
 UCHAR                           descriptor_type;
 UX_CONFIGURATION_DESCRIPTOR     configuration_descriptor;
 UX_INTERFACE_DESCRIPTOR         interface_descriptor;
-UX_SLAVE_DEVICE                 *device;
 UX_SLAVE_ENDPOINT               *endpoint;
 UX_SLAVE_ENDPOINT               *next_endpoint;
-UX_SLAVE_INTERFACE              *interface;
 UX_SLAVE_ENDPOINT               *endpoint_link;
 ULONG                            endpoints_pool_number;
 UX_SLAVE_CLASS_COMMAND          class_command;
 UX_SLAVE_CLASS                  *class;
 UINT                            status;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_STACK_ALTERNATE_SETTING_SET, interface_value, alternate_setting_value, 0, 0, UX_TRACE_DEVICE_STACK_EVENTS, 0, 0)
-
-    /* Get the pointer to the DCD. */
-    dcd =  &_ux_system_slave->ux_system_slave_dcd;
-
-    /* We may have multiple configurations!  */
-    device_framework =  _ux_system_slave -> ux_system_slave_device_framework;
-    device_framework_length =  _ux_system_slave -> ux_system_slave_device_framework_length;
 
     /* Get the pointer to the device. */
     device =  &_ux_system_slave -> ux_system_slave_device;
 
     /* Protocol error must be reported when it's unconfigured */
     if (device -> ux_slave_device_state != UX_DEVICE_CONFIGURED)
-        return UX_FUNCTION_NOT_SUPPORTED;
+        return(UX_FUNCTION_NOT_SUPPORTED);
 
     /* Find the current interface.  */
     interface =  device -> ux_slave_device_first_interface;
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
     /* Scan all interfaces if any. */
     while (interface != UX_NULL)
     {
@@ -125,6 +126,10 @@ UINT                            status;
         else
             interface =  interface -> ux_slave_interface_next_interface;
     }
+#else
+    if (interface -> ux_slave_interface_descriptor.bInterfaceNumber != interface_value)
+        interface = UX_NULL;
+#endif
 
     /* We must have found the interface pointer for the interface value
        requested by the caller.  */
@@ -139,12 +144,30 @@ UINT                            status;
 
         return(UX_INTERFACE_HANDLE_UNKNOWN);
     }
-    
+
     /* If the host is requesting a change of alternate setting to the current one,
        we do not need to do any work.  */
     if (interface -> ux_slave_interface_descriptor.bAlternateSetting == alternate_setting_value)
         return(UX_SUCCESS);       
-        
+
+#if defined(UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE)
+
+    /* If alternate setting is disabled, do error trap.  */
+    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_FUNCTION_NOT_SUPPORTED);
+
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
+
+    /* Get the pointer to the DCD. */
+    dcd =  &_ux_system_slave->ux_system_slave_dcd;
+
+    /* We may have multiple configurations!  */
+    device_framework =  _ux_system_slave -> ux_system_slave_device_framework;
+    device_framework_length =  _ux_system_slave -> ux_system_slave_device_framework_length;
+
     /* Parse the device framework and locate a configuration descriptor. */
     while (device_framework_length != 0)
     {
@@ -352,7 +375,7 @@ UINT                            status;
                             }
 
                             /* The interface descriptor in the current class must be changed to the new alternate setting.  */
-                            _ux_utility_memory_copy(&interface -> ux_slave_interface_descriptor, &interface_descriptor, sizeof(UX_INTERFACE_DESCRIPTOR));
+                            _ux_utility_memory_copy(&interface -> ux_slave_interface_descriptor, &interface_descriptor, sizeof(UX_INTERFACE_DESCRIPTOR)); /* Use case of memcpy is verified. */
                             
                             /* Get the class for the interface.  */
                             class =  _ux_system_slave -> ux_system_slave_interface_class_array[interface -> ux_slave_interface_descriptor.bInterfaceNumber];
@@ -404,5 +427,6 @@ UINT                            status;
 
     /* Return error completion.  */
     return(UX_ERROR);
+#endif
 }
 

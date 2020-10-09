@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_thread                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -110,6 +110,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_pima_thread(ULONG pima_class)
@@ -163,7 +168,7 @@ UINT                        status;
                 _ux_device_class_pima_interrupt_thread,
                 (ULONG) (ALIGN_TYPE) pima, (VOID *) pima -> ux_device_class_pima_interrupt_thread_stack,
                 UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_AUTO_START);
+                UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_AUTO_START);
             
     /* Check the creation of this thread.  */
     if (status != UX_SUCCESS)

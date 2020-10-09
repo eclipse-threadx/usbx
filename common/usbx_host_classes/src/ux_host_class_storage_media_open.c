@@ -35,15 +35,16 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_open                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
-/*    This function will ask FileX to mount a new partition for this      */ 
-/*    device. This function has some FileX dependencies.                  */ 
+/*    This function will ask UX_MEDIA (default FileX) to mount a new      */
+/*    partition for this device. This function has some                   */
+/*    UX_MEDIA (default FileX) dependencies.                              */ 
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -56,7 +57,7 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    fx_media_open                         Media open                    */ 
+/*    ux_media_open                         Media open                    */ 
 /*    _ux_host_class_storage_media_protection_check                       */
 /*                                          Check for protection          */ 
 /*    _ux_utility_memory_allocate           Allocate memory block         */ 
@@ -71,37 +72,51 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration, used UX_ */
+/*                                            things instead of FX_       */
+/*                                            things directly, used host  */
+/*                                            class extension pointer for */
+/*                                            class specific structured   */
+/*                                            data,                       */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_open(UX_HOST_CLASS_STORAGE *storage, ULONG hidden_sectors)
 {
 
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+    UX_PARAMETER_NOT_USED(storage);
+    UX_PARAMETER_NOT_USED(hidden_sectors);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 UINT                                status;
 UINT                                media_index;
 UX_HOST_CLASS_STORAGE_MEDIA         *storage_media;
-FX_MEDIA                            *media;
-UX_HOST_CLASS                       *class;
+UX_MEDIA                            *media;
+UX_HOST_CLASS                       *class_inst;
     
 
     /* We need the class container.  */
-    class =  storage -> ux_host_class_storage_class;
+    class_inst =  storage -> ux_host_class_storage_class;
     
     /* Point the media structure to the first media in the container.  */
-    storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) class -> ux_host_class_media;
+    storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) class_inst -> ux_host_class_media;
 
     /* Locate a free partition in the storage instance.  */
     for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA; media_index++)
     {
 
-        /* Get the FileX media pointer for that media.  */
+        /* Get the USBX Integrated Media pointer for that media.  */
         media =  &storage_media -> ux_host_class_storage_media;
         
         /* Is the media valid?  */
-        if (media -> fx_media_id == 0)
+        if (ux_media_id_get(media) == 0)
         {
 
             /* Save the storage instance in the media instance.  */
-            media -> fx_media_driver_info =  (VOID *) storage;
+            ux_media_driver_info_set(media, storage);
                             
             /* Save the number of hidden sectors in this partition.  */
             storage_media -> ux_host_class_storage_media_partition_start =  hidden_sectors;
@@ -112,10 +127,10 @@ UX_HOST_CLASS                       *class;
             /* Save the Sector size in the storage media instance.  */
             storage_media -> ux_host_class_storage_media_sector_size =  storage -> ux_host_class_storage_sector_size;
 
-            /* Save the storage media instance in the user reserved area in the FX_MEDIA structure.  */
-            media -> fx_media_reserved_for_user =  (ALIGN_TYPE) storage_media;
+            /* Save the storage media instance in the user reserved area in the UX_MEDIA structure.  */
+            ux_media_reserved_for_user_set(media, storage_media);
 
-            /* We now need to allocate a block of memory for FileX to use when doing transfers 
+            /* We now need to allocate a block of memory for UX_MEDIA (default FileX) to use when doing transfers 
                The default buffer size is 8K. The value used for the definition is UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE. 
                This value can be changed to save on memory space but should not be smaller than 
                the media sector size (which should be 512 bytes). Because USB devices are SCSI 
@@ -128,8 +143,8 @@ UX_HOST_CLASS                       *class;
             /* If trace is enabled, insert this event into the trace buffer.  */
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_STORAGE_MEDIA_OPEN, storage, media, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
-            /* Ask FileX to mount the partition.  */
-            status =  fx_media_open(media, UX_HOST_CLASS_STORAGE_MEDIA_NAME, _ux_host_class_storage_driver_entry,
+            /* Ask UX_MEDIA (default FileX) to mount the partition.  */
+            status =  ux_media_open(media, UX_HOST_CLASS_STORAGE_MEDIA_NAME, _ux_host_class_storage_driver_entry,
                                         storage, storage_media -> ux_host_class_storage_media_memory, 
                                         UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE);
 
@@ -158,5 +173,5 @@ UX_HOST_CLASS                       *class;
 
     /* Return error.  */    
     return(UX_HOST_CLASS_MEMORY_ERROR);
+#endif /* !defined(UX_HOST_CLASS_STORAGE_NO_FILEX) */
 }
-

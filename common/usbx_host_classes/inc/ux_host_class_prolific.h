@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_prolific.h                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -191,7 +196,7 @@ typedef struct UX_HOST_CLASS_PROLIFIC_STRUCT
     UX_INTERFACE    *ux_host_class_prolific_interface;
     UINT            ux_host_class_prolific_instance_status;
     UINT            ux_host_class_prolific_state;
-    TX_SEMAPHORE    ux_host_class_prolific_semaphore;
+    UX_SEMAPHORE    ux_host_class_prolific_semaphore;
     ULONG           ux_host_class_prolific_notification_count;
     ULONG           ux_host_class_prolific_device_state;
     VOID            (*ux_host_class_prolific_device_status_change_callback)(struct UX_HOST_CLASS_PROLIFIC_STRUCT *prolific, 

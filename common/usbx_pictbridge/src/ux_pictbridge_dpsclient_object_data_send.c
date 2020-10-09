@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_data_send           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,6 +64,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_data_send(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, 
@@ -102,7 +108,7 @@ UCHAR                           *pima_object_buffer;
                 return(UX_MEMORY_INSUFFICIENT);
 
             /* Copy the demanded object data portion.  */
-            _ux_utility_memory_copy(pima_object_buffer + object_offset, object_buffer, object_length);
+            _ux_utility_memory_copy(pima_object_buffer + object_offset, object_buffer, object_length); /* Use case of memcpy is verified. */
         
             /* Save the length of this object.  */
             object_info -> ux_device_class_pima_object_length = object_length;
@@ -218,7 +224,7 @@ UCHAR                           *pima_object_buffer;
             }    
             
             /* Send event to the application. */
-            _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, event_flag, TX_OR);
+            _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, event_flag, UX_OR);
                         
 
         }
@@ -226,7 +232,7 @@ UCHAR                           *pima_object_buffer;
         {
 
             /* We have an error of some kind. Wake up the application with error event.  */
-            _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_ERROR, TX_OR);
+            _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_ERROR, UX_OR);
             
         }
         

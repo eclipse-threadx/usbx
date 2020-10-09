@@ -65,7 +65,7 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_mode_sense                 PORTABLE C      */ 
-/*                                                           6.0.2        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -104,11 +104,11 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used mode related macros,   */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
-/*                                            resulting in version 6.0.2  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -254,13 +254,9 @@ ULONG                   page_length;
     /* Send a payload with the response buffer.  */
     _ux_device_stack_transfer_request(transfer_request, mode_sense_reply_length, mode_sense_reply_length); 
 
-    /* Now we return a CSW with success.  */
-    status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
-
-    /* And update the REQUEST_SENSE codes.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x00;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x00;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x00;
+    /* Now we set the CSW with success.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+    status = UX_SUCCESS;
 
     /* Return completion status.  */
     return(status);

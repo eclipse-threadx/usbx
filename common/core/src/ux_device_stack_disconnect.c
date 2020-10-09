@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_disconnect                           PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_stack_disconnect                         PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_disconnect(VOID)
@@ -77,7 +81,9 @@ UINT  _ux_device_stack_disconnect(VOID)
 UX_SLAVE_DCD                *dcd;
 UX_SLAVE_DEVICE             *device;
 UX_SLAVE_INTERFACE          *interface; 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 UX_SLAVE_INTERFACE          *next_interface; 
+#endif
 UX_SLAVE_CLASS              *class;
 UX_SLAVE_CLASS_COMMAND      class_command;
 UINT                        status = UX_ERROR;
@@ -101,9 +107,11 @@ UINT                        status = UX_ERROR;
         /* Get the pointer to the first interface.  */
         interface =  device -> ux_slave_device_first_interface;
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         /* Parse all the interfaces if any.  */
         while (interface != UX_NULL)
         {
+#endif
 
             /* Build all the fields of the Class Command.  */
             class_command.ux_slave_class_command_request =   UX_SLAVE_CLASS_COMMAND_DEACTIVATE;
@@ -121,15 +129,19 @@ UINT                        status = UX_ERROR;
                 /* Call the class with the DEACTIVATE signal.  */
                 class -> ux_slave_class_entry_function(&class_command);
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Get the next interface.  */
             next_interface =  interface -> ux_slave_interface_next_interface;
+#endif
 
             /* Remove the interface and all endpoints associated with it.  */
             _ux_device_stack_interface_delete(interface);
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Now we refresh the interface pointer.  */
             interface =  next_interface;
         }
+#endif
 
         /* Mark the device as attached now.  */
         device -> ux_slave_device_state =  UX_DEVICE_ATTACHED;

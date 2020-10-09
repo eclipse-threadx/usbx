@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_entry                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,6 +58,7 @@
 /*                                                                        */ 
 /*    _ux_host_class_hid_activate           Activate HID class            */ 
 /*    _ux_host_class_hid_deactivate         Deactivate HID class          */ 
+/*    _ux_utility_memory_free               Free memory                   */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -69,12 +70,18 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added destroy command,      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_entry(UX_HOST_CLASS_COMMAND *command)
 {
 
-UINT        status;
+UINT                                status;
+INT                                 scan_index;
+UX_HOST_CLASS_HID_CLIENT            *client;
+UX_HOST_CLASS_HID_CLIENT_COMMAND    client_command;
 
 
     /* The command request will tell us we need to do here, either a enumeration
@@ -99,7 +106,6 @@ UINT        status;
            is ready to complete the enumeration.   */
 
         status =  _ux_host_class_hid_activate(command);
-
         return(status);
 
 
@@ -107,8 +113,36 @@ UINT        status;
 
         /* The deactivate command is used when the device has been extracted either      
            directly or when its parents has been extracted.  */
+
         status =  _ux_host_class_hid_deactivate(command);
         return(status);
+
+    case UX_HOST_CLASS_COMMAND_DESTROY:
+
+        /* The destroy command is used when the class is unregistered.  */
+
+        /* Free allocated resources for clients.  */
+        if (command -> ux_host_class_command_class_ptr -> ux_host_class_client != UX_NULL)
+        {
+
+            /* Get client.  */
+            client = command -> ux_host_class_command_class_ptr -> ux_host_class_client;
+
+            /* Inform clients for destroy.  */
+            for (scan_index = 0; scan_index < UX_HOST_CLASS_HID_MAX_CLIENTS; scan_index ++)
+            {
+
+                /* Inform client for destroy.  */
+                client_command.ux_host_class_hid_client_command_request = UX_HOST_CLASS_COMMAND_DESTROY;
+                client_command.ux_host_class_hid_client_command_container = (VOID *)command -> ux_host_class_command_class_ptr;
+                client -> ux_host_class_hid_client_handler(&client_command);
+            }
+
+            /* Free clients memory.  */
+            _ux_utility_memory_free(command -> ux_host_class_command_class_ptr -> ux_host_class_client);
+            command -> ux_host_class_command_class_ptr -> ux_host_class_client = UX_NULL;
+        }
+        return(UX_SUCCESS);
 
     default: 
 

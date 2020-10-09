@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -39,6 +39,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -161,9 +166,9 @@ typedef struct UX_SLAVE_CLASS_DFU_STRUCT
     UINT                    (*ux_slave_class_dfu_notify)(VOID *dfu, ULONG notification);
     ULONG                   ux_slave_class_dfu_download_block_count;
     ULONG                   ux_slave_class_dfu_upload_block_count;
-    TX_THREAD               ux_slave_class_dfu_thread;
+    UX_THREAD               ux_slave_class_dfu_thread;
     UCHAR                   *ux_slave_class_dfu_thread_stack;
-    TX_EVENT_FLAGS_GROUP    ux_slave_class_dfu_event_flags_group;
+    UX_EVENT_FLAGS_GROUP    ux_slave_class_dfu_event_flags_group;
     
 } UX_SLAVE_CLASS_DFU;
 

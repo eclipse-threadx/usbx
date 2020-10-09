@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_deactivate                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,7 +56,7 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    fx_media_close                        Close media                   */ 
+/*    ux_media_close                        Close media                   */ 
 /*    _ux_host_stack_endpoint_transfer_abort Abort transfer request       */ 
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
@@ -73,27 +73,38 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration, used UX_ */
+/*                                            things instead of FX_       */
+/*                                            things directly, used host  */
+/*                                            class extension pointer for */
+/*                                            class specific structured   */
+/*                                            data,                       */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_deactivate(UX_HOST_CLASS_COMMAND *command)
 {
 
 UX_HOST_CLASS_STORAGE           *storage;
-UINT                            media_index;
-FX_MEDIA                        *media;
 UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
-UX_HOST_CLASS                   *class;
+UX_HOST_CLASS                   *class_inst;
+UINT                            inst_index;
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+UX_MEDIA                        *media;
 VOID                            *memory;
+#endif
 
 
     /* Get the instance for this class.  */
     storage =  (UX_HOST_CLASS_STORAGE *) command -> ux_host_class_command_instance;
     
     /* We need the class container.  */
-    class =  storage -> ux_host_class_storage_class;
-    
+    class_inst =  storage -> ux_host_class_storage_class;
+
     /* Point the media structure to the first media in the container.  */
-    storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) class -> ux_host_class_media;
+    storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) class_inst -> ux_host_class_media;
 
     /* The storage device is being shut down.  */
     storage -> ux_host_class_storage_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
@@ -139,15 +150,17 @@ VOID                            *memory;
        endpoints to exit properly.  */
     _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
-    /* Inform FileX of the deactivation of all Media attached to this instance.  */
-    for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA; media_index++)
+
+    /* Inform UX_MEDIA (default FileX) of the deactivation of all Media attached to this instance.  */
+    for (inst_index = 0; inst_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA; inst_index++)
     {
 
-        /* Get the FileX Media attached to this media.  */
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+        /* Get the UX_MEDIA (default FileX) attached to this media.  */
         media = &storage_media -> ux_host_class_storage_media;
 
         /* Check if the media belongs to the device being removed.  */
-        if (((UX_HOST_CLASS_STORAGE *) media -> fx_media_driver_info) == storage)
+        if (((UX_HOST_CLASS_STORAGE *) ux_media_driver_info_get(media)) == storage)
         {
 
             /* Check if the media was properly opened.  */
@@ -157,19 +170,38 @@ VOID                            *memory;
                 /* We preserve the memory used by this media.  */
                 memory =  storage_media -> ux_host_class_storage_media_memory;
 
-                /* Ask FileX to unmount the partition.  */
-                fx_media_close(media);
+                /* Ask UX_MEDIA (default FileX) to unmount the partition.  */
+                ux_media_close(media);
 
                 /* This device is now unmounted.  */
                 storage_media -> ux_host_class_storage_media_status =  UX_HOST_CLASS_STORAGE_MEDIA_UNMOUNTED;
             
                 /* Reset the media ID.  */
-                media -> fx_media_id =  0;
+                ux_media_id_set(media, 0);
                                 
-                /* Free the memory block used for data transfer on behalf of FileX.  */
+                /* Free the memory block used for data transfer on behalf of UX_MEDIA (default FileX).  */
                 _ux_utility_memory_free(memory);
             }                
         }
+#else
+
+        /* Check if the media is for this storage.  */
+        if (storage_media -> ux_host_class_storage_media_storage == storage)
+        {
+
+            /* Invoke callback for media removal.  */
+            if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+            {
+
+                /* Call system change function.  */
+                _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_REMOVAL,
+                                    storage -> ux_host_class_storage_class, (VOID *) storage_media);
+            }
+
+            /* Free the storage media.  */
+            storage_media -> ux_host_class_storage_media_storage = UX_NULL;
+        }
+#endif
 
         /* Move to next entry in the media array.  */
         storage_media++;

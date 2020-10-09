@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_transmit_queue_clean         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,19 +66,24 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_transmit_queue_clean(UX_HOST_CLASS_CDC_ECM *cdc_ecm)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 NX_PACKET               *current_packet;
 NX_PACKET               *next_packet;
 
     /* Disable interrupts while we check the write in process flag and
        set our own state.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* Is there a write in process?  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_check_and_arm_in_process == UX_TRUE)
@@ -91,7 +96,7 @@ NX_PACKET               *next_packet;
         cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish =  UX_TRUE;
 
         /* Restore interrupts while we wait.  */
-        TX_RESTORE
+        UX_RESTORE
 
         /* Wait for write function to resume us.  */
         _ux_utility_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
@@ -104,7 +109,7 @@ NX_PACKET               *next_packet;
 
         /* No writes are in process. Restore interrupts and go on to free
            the xmit queue.  */
-        TX_RESTORE
+        UX_RESTORE
     }
 
     /* Abort transfers on the bulk out endpoint. Note we need to do this

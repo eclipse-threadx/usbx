@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_endpoint_instance_create             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,20 +69,22 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_endpoint_instance_create(UX_ENDPOINT *endpoint)
 {
 
 UX_HCD          *hcd;
-UX_DEVICE       *device;
 UINT            status;
 UCHAR           endpoint_type;
 
 
     /* Obtain the HCD for this endpoint.  */
-    device =  endpoint -> ux_endpoint_device;
-    hcd =  device -> ux_device_hcd;
+    hcd = UX_DEVICE_HCD_GET(endpoint -> ux_endpoint_device);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_ENDPOINT_INSTANCE_CREATE, device, endpoint, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)

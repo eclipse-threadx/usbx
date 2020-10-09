@@ -30,12 +30,16 @@
 #include "ux_host_stack.h"
 
 
+#if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < UX_HOST_CLASS_PIMA_CONTAINER_SIZE
+#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check
+#endif
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_read                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +82,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_read(UX_HOST_CLASS_PIMA *pima, UCHAR *data_pointer, 
@@ -117,7 +126,7 @@ ULONG            payload_length;
     {
         
         /* Wait for the completion of the transfer request.  */
-        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
 
         /* If the semaphore did not succeed we probably have a time out.  */
         if (status != UX_SUCCESS)
@@ -171,7 +180,7 @@ ULONG            payload_length;
     
     /* Copying the necessary partial memory.  */
     _ux_utility_memory_copy(data_pointer, ptp_payload + UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE, 
-                            transfer_request -> ux_transfer_request_actual_length - UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE);
+                            transfer_request -> ux_transfer_request_actual_length - UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE); /* Use case of memcpy is verified. */
 
     /* Adjust the data payload pointer.  */
     data_pointer += (transfer_request -> ux_transfer_request_actual_length - UX_HOST_CLASS_PIMA_DATA_HEADER_SIZE);
@@ -202,7 +211,7 @@ ULONG            payload_length;
         {
         
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
@@ -257,7 +266,7 @@ ULONG            payload_length;
         {
         
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)

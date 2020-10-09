@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_ehci.h                                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -347,9 +352,9 @@ typedef struct UX_HCD_EHCI_STRUCT
                     *ux_hcd_ehci_iso_done_transfer_tail;
     struct UX_EHCI_ED_STRUCT
                     *ux_hcd_ehci_interrupt_ed_list;
-    TX_MUTEX        ux_hcd_ehci_periodic_mutex;
-    TX_SEMAPHORE    ux_hcd_ehci_protect_semaphore;
-    TX_SEMAPHORE    ux_hcd_ehci_doorbell_semaphore;
+    UX_MUTEX        ux_hcd_ehci_periodic_mutex;
+    UX_SEMAPHORE    ux_hcd_ehci_protect_semaphore;
+    UX_SEMAPHORE    ux_hcd_ehci_doorbell_semaphore;
     ULONG           ux_hcd_ehci_frame_list_size;
     ULONG           ux_hcd_ehci_interrupt_count;
     ULONG           ux_hcd_ehci_embedded_tt;

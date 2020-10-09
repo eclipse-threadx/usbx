@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_keyboard_callback                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_keyboard_callback(UX_HOST_CLASS_HID_REPORT_CALLBACK *callback)
@@ -171,7 +175,7 @@ UCHAR                               *state_action;
     /* Get the current states of the lock keys and immediately initialize them to zero;
        if a lock key is not pressed in this report, it will remain zero (not pressed).  */
     current_lock_key_states = &keyboard_instance -> ux_host_class_hid_keyboard_key_state[3];
-    _ux_utility_memory_set(current_lock_key_states, 0, 3);
+    _ux_utility_memory_set(current_lock_key_states, 0, 3); /* Use case of memset is verified. */
 
     /* Scan the report buffer and decode it.  */
     while(report_buffer < report_buffer_end)
@@ -191,9 +195,9 @@ UCHAR                               *state_action;
     state_action = state_value  + keyboard_instance -> ux_host_class_hid_keyboard_key_count * 2;
 
     /* Reset state actions to DEL(not received).  */
-    _ux_utility_memory_set(state_usage + keyboard_instance -> ux_host_class_hid_keyboard_key_count, 0, keyboard_instance -> ux_host_class_hid_keyboard_key_count);
-    _ux_utility_memory_set(state_value + keyboard_instance -> ux_host_class_hid_keyboard_key_count, 0, keyboard_instance -> ux_host_class_hid_keyboard_key_count);
-    _ux_utility_memory_set(state_action, KEY_DEL, keyboard_instance -> ux_host_class_hid_keyboard_key_count * 2);
+    _ux_utility_memory_set(state_usage + keyboard_instance -> ux_host_class_hid_keyboard_key_count, 0, keyboard_instance -> ux_host_class_hid_keyboard_key_count); /* Use case of memset is verified. */
+    _ux_utility_memory_set(state_value + keyboard_instance -> ux_host_class_hid_keyboard_key_count, 0, keyboard_instance -> ux_host_class_hid_keyboard_key_count); /* Use case of memset is verified. */
+    _ux_utility_memory_set(state_action, KEY_DEL, keyboard_instance -> ux_host_class_hid_keyboard_key_count * 2); /* Use case of memset is verified. */
 
     new_count = keyboard_instance -> ux_host_class_hid_keyboard_key_count;
     while(report_buffer < report_buffer_end)
@@ -557,11 +561,11 @@ UCHAR                               *state_action;
     /* Copy the current lock key states to the previous states. Note that if
        a lock key wasn't down in this report, its current state would have 
        remained zero (not pressed).  */
-    _ux_utility_memory_copy(previous_lock_key_states, current_lock_key_states, 3);
+    _ux_utility_memory_copy(previous_lock_key_states, current_lock_key_states, 3); /* Use case of memcpy is verified. */
 #else
 
     /* Clear redundant data after last saved key.  */
-    _ux_utility_memory_set(state_usage + i_save, 0, keyboard_instance -> ux_host_class_hid_keyboard_key_count - i_save);
+    _ux_utility_memory_set(state_usage + i_save, 0, keyboard_instance -> ux_host_class_hid_keyboard_key_count - i_save); /* Use case of memset is verified. */
 #endif
 
     /* Return to caller.  */

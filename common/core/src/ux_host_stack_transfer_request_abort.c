@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request_abort               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,28 +73,24 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request)
 {
 
-UX_ENDPOINT     *endpoint;  
-UX_DEVICE       *device;    
 UX_HCD          *hcd;
 ULONG           completion_code;
 
 
-    /* Get the endpoint container from the transfer request.  */
-    endpoint =  transfer_request -> ux_transfer_request_endpoint;
-
-    /* Get the device container from the endpoint.  */
-    device =  endpoint -> ux_endpoint_device;
-    
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_TRANSFER_REQUEST_ABORT, device, endpoint, transfer_request, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
     
     /* With the device we have the pointer to the HCD.  */
-    hcd = device -> ux_device_hcd;
+    hcd = UX_DEVICE_HCD_GET(transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_device);
 
     /* Check pending transaction.  */
     if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_request_sense                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_request_sense(UX_HOST_CLASS_STORAGE *storage)
@@ -107,7 +111,7 @@ UINT            command_length;
                                                 
     /* Save the current command so that we can re-initiate it after the 
        REQUEST_SENSE command.  */
-    _ux_utility_memory_copy(storage -> ux_host_class_storage_saved_cbw, storage -> ux_host_class_storage_cbw, UX_HOST_CLASS_STORAGE_CBW_LENGTH);
+    _ux_utility_memory_copy(storage -> ux_host_class_storage_saved_cbw, storage -> ux_host_class_storage_cbw, UX_HOST_CLASS_STORAGE_CBW_LENGTH); /* Use case of memcpy is verified. */
 
     /* Initialize the CBW for this command.  */
     _ux_host_class_storage_cbw_initialize(storage, UX_HOST_CLASS_STORAGE_DATA_IN, UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH, command_length);
@@ -144,7 +148,7 @@ UINT            command_length;
     _ux_utility_memory_free(request_sense_response);
 
     /* Restore the current CBW command.  */
-    _ux_utility_memory_copy(storage -> ux_host_class_storage_cbw, storage -> ux_host_class_storage_saved_cbw, UX_HOST_CLASS_STORAGE_CBW_LENGTH);
+    _ux_utility_memory_copy(storage -> ux_host_class_storage_cbw, storage -> ux_host_class_storage_saved_cbw, UX_HOST_CLASS_STORAGE_CBW_LENGTH); /* Use case of memcpy is verified. */
 
     /* Return completion code.  */    
     return(status);                                            

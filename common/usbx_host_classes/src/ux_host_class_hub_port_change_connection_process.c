@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_port_change_connection_process   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_port_change_connection_process(UX_HOST_CLASS_HUB *hub, UINT port, UINT port_status)
@@ -90,7 +94,7 @@ USHORT      local_port_change;
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_HUB_PORT_CHANGE_CONNECTION_PROCESS, hub, port, port_status, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
     /* Get the HCD used by this instance.  */
-    hcd =  hub -> ux_host_class_hub_device -> ux_device_hcd;
+    hcd = UX_DEVICE_HCD_GET(hub -> ux_host_class_hub_device);
 
     /* If there is a device attached on this HUB, there is a new device and it should 
        be enumerated.  */
@@ -160,7 +164,7 @@ USHORT      local_port_change;
             _ux_utility_delay_ms(UX_HOST_CLASS_HUB_ENUMERATION_RESET_RECOVERY_DELAY);
 
             /* Perform the device creation.  */
-            status =  _ux_host_stack_new_device_create(hub -> ux_host_class_hub_device -> ux_device_hcd,
+            status =  _ux_host_stack_new_device_create(UX_DEVICE_HCD_GET(hub -> ux_host_class_hub_device),
                                             hub -> ux_host_class_hub_device,
                                             port, device_speed, port_power);
 

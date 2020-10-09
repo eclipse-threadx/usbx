@@ -39,12 +39,127 @@ UCHAR _ux_system_class_video_frame_descriptor_structure[] =                 {1,1
 
 UCHAR _ux_system_host_class_video_name[] =                                  "ux_host_class_video";
 
+typedef struct UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_STRUCT
+{
+    UX_HOST_CLASS_VIDEO         *video;
+    ULONG                        parsed_flags;
+} UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER;
+#define UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VC_HEADER       1
+#define UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VC_IT           2
+#define UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VC_PU           4
+#define UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VS_HEADER       8
+#define UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_DONE            (1|2|4|8)
+
+
+static UINT _ux_host_class_video_descriptors_parser(VOID  *arg,
+                              UCHAR *packed_interface_descriptor,
+                              UCHAR *packed_entity_descriptor) 
+{
+
+UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  *parser;
+UX_HOST_CLASS_VIDEO                     *video;
+UX_INTERFACE                            *streaming_interface;
+UCHAR                                   bInCollection;
+UCHAR                                   *baInterfaceNr;
+
+    /* Get parse data.  */
+    parser = (UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER *)arg;
+
+    /* Get video instance.  */
+    video = parser -> video;
+
+    if (packed_interface_descriptor[6] == UX_HOST_CLASS_VIDEO_SUBCLASS_CONTROL)
+    {
+
+        /* Parse VC descriptors.  */
+
+        /* Locate control interface.  */
+        if (video -> ux_host_class_video_control_interface_number == 0xFF)
+        {
+
+            /* Parse header.  */
+            if (packed_entity_descriptor[2] == UX_HOST_CLASS_VIDEO_VC_HEADER)
+            {
+
+                /* Get streaming interface.  */
+                streaming_interface = video -> ux_host_class_video_streaming_interface;
+
+                /* Check if this the VC interface is expected.  */
+                bInCollection = packed_entity_descriptor[11];
+                baInterfaceNr = packed_entity_descriptor + 12;
+                while(bInCollection)
+                {
+
+                    /* Streaming interface belongs to this control interface.  */
+                    if (*baInterfaceNr == streaming_interface -> ux_interface_descriptor.bInterfaceNumber)
+                    {
+                        video -> ux_host_class_video_control_interface_number = packed_interface_descriptor[2];
+                        parser -> parsed_flags |= UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VC_HEADER;
+                        return(0);
+                    }
+                }
+            }
+
+            /* Not expected interface, just try next descriptor.  */
+            return(0);
+        }
+        else if (packed_interface_descriptor[2] == video -> ux_host_class_video_control_interface_number)
+        {
+
+            /* It's the expected VC interface.  */
+
+            /* Parse UX_HOST_CLASS_VIDEO_VC_PROCESSING_UNIT as feature_unit_id.  */
+            if (packed_entity_descriptor[2] == UX_HOST_CLASS_VIDEO_VC_PROCESSING_UNIT &&
+                video -> ux_host_class_video_feature_unit_id == 0)
+            {
+                parser -> parsed_flags |= UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VC_PU;
+
+                /* Save as feature unit ID.  */
+                video -> ux_host_class_video_feature_unit_id = packed_entity_descriptor[3];
+            }
+
+            /* Parse UX_HOST_CLASS_VIDEO_VC_INPUT_TERMINAL and type (first only).  */
+            if (packed_entity_descriptor[2] == UX_HOST_CLASS_VIDEO_VC_INPUT_TERMINAL &&
+                video -> ux_host_class_video_terminal_id == 0)
+            {
+                parser -> parsed_flags |= UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VC_IT;
+
+                /* Save the video terminal ID.  */
+                video -> ux_host_class_video_terminal_id = packed_entity_descriptor[3];
+
+                /* Save the video terminal type.  */
+                video -> ux_host_class_video_terminal_type = _ux_utility_short_get(packed_entity_descriptor + 4);
+            }
+        }
+    }
+    else
+    {
+
+        /* Parse VS descriptors.  */
+        if (packed_entity_descriptor[2] == UX_HOST_CLASS_VIDEO_VS_INPUT_HEADER)
+        {
+            parser -> parsed_flags |= UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VS_HEADER;
+
+            /* Get the number of formats.  */
+            video -> ux_host_class_video_number_formats = packed_entity_descriptor[3];
+
+            /* Get the length of formats.  */
+            video -> ux_host_class_video_length_formats = _ux_utility_short_get(packed_entity_descriptor + 4);
+
+            /* Save the descriptor where the formats reside.  */
+            video -> ux_host_class_video_format_address = packed_entity_descriptor;
+        }
+    }
+    return(0);
+}
+
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_activate                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,14 +201,20 @@ UCHAR _ux_system_host_class_video_name[] =                                  "ux_
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used entities parsing API,  */
+/*                                            created new semaphore to    */
+/*                                            protect control requests,   */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_activate(UX_HOST_CLASS_COMMAND *command)
 {
 
-UX_INTERFACE            *interface;
-UX_HOST_CLASS_VIDEO     *video;
-UINT                    status;
+UX_INTERFACE                            *interface;
+UX_HOST_CLASS_VIDEO                     *video;
+UINT                                    status;
+UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
 
 
     /* The video is always activated by the interface descriptor and not the
@@ -134,23 +255,34 @@ UINT                    status;
     if (status == UX_SUCCESS)
         status =  _ux_host_class_video_descriptor_get(video);
 
-    /* Locate the video device streaming terminal.  */
+    /* Use parser to locate streaming terminal, formats and video controls.  */
     if (status == UX_SUCCESS)
-        status =  _ux_host_class_video_input_terminal_get(video);
+    {
+        parser.video = video;
+        parser.parsed_flags = 0;
+        video -> ux_host_class_video_control_interface_number = 0xFF;
+        status = _ux_host_class_video_entities_parse(video,
+                        _ux_host_class_video_descriptors_parser, (VOID *)&parser);
+        if (parser.parsed_flags != UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_DONE)
 
-    /* In the input terminal streaming interface get the number of formats supported.  */
-    if (status == UX_SUCCESS)
-        status =  _ux_host_class_video_input_format_get(video);
-
-    /* Get video controls.  */
-    if (status == UX_SUCCESS)
-        status =  _ux_host_class_video_control_list_get(video);
+            /* Some of expected descriptors not found.  */
+            status = UX_HOST_CLASS_VIDEO_WRONG_TYPE;
+    }
 
     /* Create the semaphore to protect multiple threads from accessing the same
        video instance.  */
     if (status == UX_SUCCESS)
     {
         status =  _ux_utility_semaphore_create(&video -> ux_host_class_video_semaphore, "ux_video_semaphore", 1);
+        if (status != UX_SUCCESS)
+            status = UX_SEMAPHORE_ERROR;
+    }
+
+    /* Create the semaphore to protect multiple threads from issuing the control
+       request at the same time.  */
+    if (status == UX_SUCCESS)
+    {
+        status = _ux_utility_semaphore_create(&video -> ux_host_class_video_semaphore_control_request, "ux_video_semaphore_control", 1);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }
@@ -182,8 +314,12 @@ UINT                    status;
 
     /* There was error, free resources.  */
 
-    /* The last resource, video -> ux_host_class_video_semaphore is not created or created error,
+    /* The last resource, video -> ux_host_class_video_semaphore_control_request is not created or created error,
        no need to free.  */
+
+    /* Destroy the semaphore.  */
+    if (video -> ux_host_class_video_semaphore.tx_semaphore_id != 0)
+        _ux_utility_semaphore_delete(&video -> ux_host_class_video_semaphore);
 
     /* Destroy the class instance.  */
     _ux_host_stack_class_instance_destroy(video -> ux_host_class_video_class, (VOID *) video);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_report_add                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_add(UX_HOST_CLASS_HID *hid, UCHAR *descriptor, UX_HOST_CLASS_HID_ITEM *item)
@@ -279,7 +283,7 @@ ULONG                       current_field_address;
         }
         
         /* Copy the current usages in the field structure.  */
-        _ux_utility_memory_copy(new_hid_field -> ux_host_class_hid_field_usages, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_usages, hid_field_count*4);
+        _ux_utility_memory_copy(new_hid_field -> ux_host_class_hid_field_usages, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_usages, hid_field_count*4); /* Use case of memcpy is verified. */
     }
 
     /* Save the number of usages.  */

@@ -47,10 +47,10 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_initialize                           PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_stack_initialize                         PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -93,6 +93,10 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,
@@ -107,14 +111,17 @@ UX_SLAVE_INTERFACE              *interfaces_pool;
 UX_SLAVE_TRANSFER               *transfer_request;
 UINT                            status;
 ULONG                           interfaces_found;
-ULONG                           local_interfaces_found;
 ULONG                           endpoints_found;
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE)
+ULONG                           max_interface_number;
+ULONG                           local_interfaces_found;
 ULONG                           local_endpoints_found;
 ULONG                           endpoints_in_interface_found;
 UCHAR                           *device_framework;
 ULONG                           device_framework_length;
 UCHAR                           descriptor_type;
 ULONG                           descriptor_length;
+#endif
 UCHAR                           *memory;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -140,7 +147,7 @@ UCHAR                           *memory;
     _ux_system_slave -> ux_system_slave_language_id_framework_length =          language_id_framework_length;
 
     /* Store the max number of slave class drivers in the project structure.  */
-    _ux_system_slave -> ux_system_slave_max_class =  UX_MAX_SLAVE_CLASS_DRIVER;
+    UX_SYSTEM_DEVICE_MAX_CLASS_SET(UX_MAX_SLAVE_CLASS_DRIVER);
     
     /* Store the device state change function callback.  */
     _ux_system_slave -> ux_system_slave_change_function =  ux_system_slave_change_function;
@@ -169,10 +176,18 @@ UCHAR                           *memory;
         status = UX_MEMORY_INSUFFICIENT;
     else
         status = UX_SUCCESS;
-    
+
+#if defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE)
+
+    /* No scan, just assign predefined value.  */
+    interfaces_found = UX_MAX_SLAVE_INTERFACES;
+    endpoints_found = UX_MAX_DEVICE_ENDPOINTS;
+#else
+
     /* Reset all values we are using during the scanning of the framework.  */
     interfaces_found                   =  0;
     endpoints_found                    =  0;
+    max_interface_number               =  0;
 
     /* Go on to scan interfaces if no error.  */
     if (status == UX_SUCCESS)
@@ -228,6 +243,10 @@ UCHAR                           *memory;
                         /* Adjust the number of maximum endpoints in this interface.  */
                         endpoints_in_interface_found = (ULONG) *(device_framework + 4);
                 }
+
+                /* Check and update max interface number.  */
+                if (*(device_framework + 2) > max_interface_number)
+                    max_interface_number = *(device_framework + 2);
 
                 break;
 
@@ -297,9 +316,24 @@ UCHAR                           *memory;
 
             status = UX_DESCRIPTOR_CORRUPTED;
         }
-    }
 
-    /* Go on to allocate endpoints pool if no error.  */
+        /* We do a sanity check on the finding. Max interface number should not exceed limit.  */
+        if (status == UX_SUCCESS &&
+            max_interface_number >= UX_MAX_SLAVE_INTERFACES)
+        {
+
+            /* Error trap. */
+            _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_INIT, UX_MEMORY_INSUFFICIENT);
+
+            /* If trace is enabled, insert this event into the trace buffer.  */
+            UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, device_framework, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+            status = UX_MEMORY_INSUFFICIENT;
+        }
+    }
+#endif
+
+    /* Go on to allocate interfaces pool if no error.  */
     if (status == UX_SUCCESS)
     {
 

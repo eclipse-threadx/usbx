@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_media_mount                  PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -45,13 +45,13 @@
 /*    This function tries to read the first sector on the media. It then  */
 /*    determines if this is a partition sector or a boot sector. If the   */
 /*    sector contains partition information, each partition is checked    */
-/*    for a DOS aware partition and mounted by FileX.                     */
+/*    for a DOS aware partition and mounted by UX_MEDIA (default FileX).  */
 /*                                                                        */
 /*    If there is no partition sector or boot sector, we simply inform    */
-/*    FileX that a device is present and that its boot sector should be   */
-/*    periodically read to see if the device is mounted. This mechanism   */
-/*    applies to storage where the media can be removed (floppy, ZIP,     */
-/*    flash/smart media readers).                                         */
+/*    UX_MEDIA (default FileX) that a device is present and that its boot */
+/*    sector  should be periodically read to see if the device is mounted.*/
+/*    This mechanism applies to storage where the media can be removed    */
+/*    (floppy, ZIP, flash/smart media readers).                           */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -84,11 +84,20 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration,          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_mount(UX_HOST_CLASS_STORAGE *storage, ULONG sector)
 {
 
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+    UX_PARAMETER_NOT_USED(storage);
+    UX_PARAMETER_NOT_USED(sector);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 UCHAR           *sector_memory;
 UINT            status;
 
@@ -186,5 +195,5 @@ UINT            status;
 
     /* Return completion status.  */
     return(status);
+#endif /* !defined(UX_HOST_CLASS_STORAGE_NO_FILEX) */
 }
-

@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_rndis.h                             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -39,6 +39,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -479,7 +484,7 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
 {
     UX_SLAVE_INTERFACE                      *ux_slave_class_rndis_interface;
     UX_SLAVE_CLASS_RNDIS_PARAMETER          ux_slave_class_rndis_parameter;
-    TX_SEMAPHORE                            ux_slave_class_rndis_semaphore;
+    UX_SEMAPHORE                            ux_slave_class_rndis_semaphore;
     UX_SLAVE_ENDPOINT                       *ux_slave_class_rndis_interrupt_endpoint;
     UX_SLAVE_ENDPOINT                       *ux_slave_class_rndis_bulkin_endpoint;
     UX_SLAVE_ENDPOINT                       *ux_slave_class_rndis_bulkout_endpoint;
@@ -498,7 +503,7 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
     ULONG                                   ux_slave_class_rndis_statistics_rcv_error_alignment;
     ULONG                                   ux_slave_class_rndis_statistics_xmit_one_collision;
     ULONG                                   ux_slave_class_rndis_statistics_xmit_more_collisions;
-    TX_EVENT_FLAGS_GROUP                    ux_slave_class_rndis_event_flags_group;
+    UX_EVENT_FLAGS_GROUP                    ux_slave_class_rndis_event_flags_group;
     UCHAR                                   ux_slave_class_rndis_local_node_id[UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH];
     UCHAR                                   ux_slave_class_rndis_remote_node_id[UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH];
     NX_IP                                   *ux_slave_class_rndis_nx_ip;
@@ -509,14 +514,14 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
     NX_PACKET                               *ux_slave_class_rndis_receive_queue;
     UCHAR                                   *ux_slave_class_rndis_pool_memory;
     NX_PACKET_POOL                          ux_slave_class_rndis_packet_pool;
-    TX_THREAD                               ux_slave_class_rndis_interrupt_thread;
-    TX_THREAD                               ux_slave_class_rndis_bulkin_thread;
-    TX_THREAD                               ux_slave_class_rndis_bulkout_thread;
+    UX_THREAD                               ux_slave_class_rndis_interrupt_thread;
+    UX_THREAD                               ux_slave_class_rndis_bulkin_thread;
+    UX_THREAD                               ux_slave_class_rndis_bulkout_thread;
     UCHAR                                   *ux_slave_class_rndis_interrupt_thread_stack;
     UCHAR                                   *ux_slave_class_rndis_bulkin_thread_stack;
     UCHAR                                   *ux_slave_class_rndis_bulkout_thread_stack;
     ULONG                                   ux_slave_class_rndis_link_state;
-    TX_MUTEX                                ux_slave_class_rndis_mutex;
+    UX_MUTEX                                ux_slave_class_rndis_mutex;
     VOID                                    *ux_slave_class_rndis_network_handle;
     
 } UX_SLAVE_CLASS_RNDIS;

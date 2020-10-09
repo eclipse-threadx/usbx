@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_semaphore_get                           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,21 +65,26 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_utility_semaphore_get(TX_SEMAPHORE *semaphore, ULONG semaphore_signal)
+UINT  _ux_utility_semaphore_get(UX_SEMAPHORE *semaphore, ULONG semaphore_signal)
 {
 
 UINT        status;
-TX_THREAD   *my_thread;
+UX_THREAD   *my_thread;
 CHAR        *name;
 UINT        state;
 ULONG       run_count;
 UINT        priority;
 UINT        preemption_threshold;
 ULONG       time_slice;
-TX_THREAD   *next_thread;
-TX_THREAD   *suspended_thread;
+UX_THREAD   *next_thread;
+UX_THREAD   *suspended_thread;
 
     /* Call TX to know my own tread.  */
     my_thread = tx_thread_identify();

@@ -49,6 +49,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_asynch_schedule.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_asynchronous_endpoint_create.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_asynchronous_endpoint_destroy.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_controller_disable.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_ed_obtain.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_ed_td_clean.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_endpoint_reset.c
@@ -96,6 +97,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_class_instance_verify.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_class_interface_scan.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_class_register.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_class_unregister.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_descriptor_parse.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_enumerate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_instance_create.c
@@ -119,6 +121,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_hcd_register.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_hcd_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_hcd_transfer_request.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_hcd_unregister.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_hnp_polling_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_interface_endpoint_get.c
@@ -138,6 +141,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_role_swap.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_transfer_request.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_transfer_request_abort.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_system_error_handler.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_system_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_system_uninitialize.c

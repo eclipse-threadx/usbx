@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio.h                             PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -333,7 +338,7 @@ typedef struct UX_DEVICE_CLASS_AUDIO_STREAM_STRUCT
     UX_DEVICE_CLASS_AUDIO_STREAM_CALLBACKS   ux_device_class_audio_stream_callbacks;
 
     UCHAR                                   *ux_device_class_audio_stream_thread_stack;
-    TX_THREAD                                ux_device_class_audio_stream_thread;
+    UX_THREAD                                ux_device_class_audio_stream_thread;
 
     UCHAR                                   *ux_device_class_audio_stream_buffer;
     ULONG                                    ux_device_class_audio_stream_buffer_size;

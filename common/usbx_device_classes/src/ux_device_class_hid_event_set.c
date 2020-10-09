@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_event_set                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid, 
@@ -132,7 +138,7 @@ UX_SLAVE_CLASS_HID_EVENT   *next_hid_event;
                 
         /* Store the data itself.  */
         _ux_utility_memory_copy(current_hid_event -> ux_device_class_hid_event_buffer + 1, hid_event -> ux_device_class_hid_event_buffer,
-                                hid_event -> ux_device_class_hid_event_length);
+                                hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
     
         /* fill in the event structure from the user.  */
         current_hid_event -> ux_device_class_hid_event_length =  hid_event -> ux_device_class_hid_event_length + 1;    
@@ -142,14 +148,14 @@ UX_SLAVE_CLASS_HID_EVENT   *next_hid_event;
     
         /* No report ID to consider.  */
         _ux_utility_memory_copy(current_hid_event -> ux_device_class_hid_event_buffer, hid_event -> ux_device_class_hid_event_buffer,
-                                hid_event -> ux_device_class_hid_event_length);
+                                hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
 
         /* fill in the event structure from the user.  */
         current_hid_event -> ux_device_class_hid_event_length = hid_event -> ux_device_class_hid_event_length;    
     }
     
     /* Set an event to wake up the interrupt thread.  */
-    _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_EVENT, TX_OR);                
+    _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_EVENT, UX_OR);                
 
     /* Return event status to the user.  */
     return(UX_SUCCESS);

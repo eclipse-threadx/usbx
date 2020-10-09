@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_gser.h                                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -155,7 +160,7 @@ typedef struct UX_HOST_CLASS_GSER_INTERFACE_STRUCT
     UX_INTERFACE                                *ux_host_class_gser_interface;
     UX_ENDPOINT                                 *ux_host_class_gser_bulk_out_endpoint;
     UX_ENDPOINT                                 *ux_host_class_gser_bulk_in_endpoint;
-    TX_SEMAPHORE                                ux_host_class_gser_semaphore;
+    UX_SEMAPHORE                                ux_host_class_gser_semaphore;
     struct UX_HOST_CLASS_GSER_RECEPTION_STRUCT  *ux_host_class_gser_reception;
     ULONG                                       ux_host_class_gser_notification_count;
 } UX_HOST_CLASS_GSER_INTERFACE;

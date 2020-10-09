@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_entry                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used query usage of device  */
+/*                                            ClassSubclassProtocol,      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_entry(UX_HOST_CLASS_COMMAND *command)
@@ -85,7 +89,7 @@ UINT    status;
 
         /* The query command is used to let the stack enumeration process know if we want to own
            this device or not.  */
-        if ((command -> ux_host_class_command_usage == UX_HOST_CLASS_COMMAND_USAGE_CSP) &&
+        if ((command -> ux_host_class_command_usage == UX_HOST_CLASS_COMMAND_USAGE_DCSP) &&
             (command -> ux_host_class_command_class == UX_HOST_CLASS_HUB_CLASS))
             return(UX_SUCCESS);                        
         else            

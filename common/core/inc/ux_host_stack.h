@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_stack.h                                     PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added uninitialize APIs,    */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -50,9 +55,16 @@
 
 /* Define Host Stack component function prototypes.  */
 
+#if UX_MAX_DEVICES > 1
 VOID    _ux_host_stack_bandwidth_release(UX_HCD *hcd, UX_ENDPOINT *endpoint);
 VOID    _ux_host_stack_bandwidth_claim(UX_HCD *hcd, UX_ENDPOINT *endpoint);
 UINT    _ux_host_stack_bandwidth_check(UX_HCD *hcd, UX_ENDPOINT *endpoint);
+#else
+#define _ux_host_stack_bandwidth_release(a,b)
+#define _ux_host_stack_bandwidth_claim(a,b)
+#define _ux_host_stack_bandwidth_check(a,b)                     (UX_SUCCESS)
+#endif
+
 UX_HOST_CLASS * _ux_host_stack_class_call(UX_HOST_CLASS_COMMAND *class_command);
 UINT    _ux_host_stack_class_device_scan(UX_DEVICE *device);
 UINT    _ux_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **class);
@@ -63,6 +75,7 @@ UINT    _ux_host_stack_class_instance_verify(UCHAR *class_name, VOID *class_inst
 UINT    _ux_host_stack_class_interface_scan(UX_DEVICE *device);
 UINT    _ux_host_stack_class_register(UCHAR *class_name,
                         UINT (*class_entry_function)(struct UX_HOST_CLASS_COMMAND_STRUCT *));
+UINT    _ux_host_stack_class_unregister(UINT (*class_entry_function)(struct UX_HOST_CLASS_COMMAND_STRUCT *));
 UINT    _ux_host_stack_configuration_descriptor_parse(UX_DEVICE *device, UX_CONFIGURATION *configuration, UINT configuration_index);
 UINT    _ux_host_stack_configuration_enumerate(UX_DEVICE *device);
 UINT    _ux_host_stack_configuration_instance_create(UX_CONFIGURATION *configuration);
@@ -88,9 +101,11 @@ UINT    _ux_host_stack_endpoint_transfer_abort(UX_ENDPOINT *endpoint);
 VOID    _ux_host_stack_enum_thread_entry(ULONG input);
 UINT    _ux_host_stack_hcd_register(UCHAR *hcd_name,
                                     UINT (*hcd_init_function)(struct UX_HCD_STRUCT *), ULONG hcd_param1, ULONG hcd_param2);
+UINT    _ux_host_stack_hcd_unregister(UCHAR *hcd_name, ULONG hcd_param1, ULONG hcd_param2);
 VOID    _ux_host_stack_hcd_thread_entry(ULONG input);
 UINT    _ux_host_stack_hcd_transfer_request(UX_TRANSFER *transfer_request);
 UINT    _ux_host_stack_initialize(UINT (*ux_system_host_change_function)(ULONG, UX_HOST_CLASS *, VOID *));
+UINT    _ux_host_stack_uninitialize(VOID);
 UINT    _ux_host_stack_interface_endpoint_get(UX_INTERFACE *interface, UINT endpoint_index, UX_ENDPOINT **endpoint);
 UINT    _ux_host_stack_interface_instance_create(UX_INTERFACE *interface);
 VOID    _ux_host_stack_interface_instance_delete(UX_INTERFACE *interface);
@@ -109,8 +124,12 @@ UINT    _ux_host_stack_rh_device_extraction(UX_HCD *hcd, UINT port_index);
 UINT    _ux_host_stack_rh_device_insertion(UX_HCD *hcd, UINT port_index);
 UINT    _ux_host_stack_transfer_request(UX_TRANSFER *transfer_request);
 UINT    _ux_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request);
-VOID    _ux_host_stack_hnp_polling_thread_entry(ULONG id);
 UINT    _ux_host_stack_role_swap(UX_DEVICE *device);
+
+#if defined(UX_OTG_SUPPORT)
+VOID    _ux_host_stack_hnp_polling_thread_entry(ULONG id);
+#endif
+
 
 #endif
 

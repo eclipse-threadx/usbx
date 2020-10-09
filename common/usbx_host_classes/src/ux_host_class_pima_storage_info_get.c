@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_storage_info_get                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima, 
@@ -135,7 +139,7 @@ ULONG                                unicode_string_length;
         unicode_string_length =  (ULONG) *storage_pointer ;
 
         /* Copy that string into the storage description field.  */
-        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_description, storage_pointer, unicode_string_length);
+        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_description, storage_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
         /* Point to the volume label.  */
         storage_pointer =  storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET + unicode_string_length;
@@ -144,7 +148,7 @@ ULONG                                unicode_string_length;
         unicode_string_length =  (ULONG) *storage_pointer ;
 
         /* Copy that string into the storage volume label field.  */
-        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_description, storage_pointer, unicode_string_length);
+        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_volume_label, storage_pointer, unicode_string_length); /* Use case of memcpy is verified. */
 
     }
 

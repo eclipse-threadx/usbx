@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_write                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,12 +69,17 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_write(VOID *cdc_ecm_class, NX_PACKET *packet)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 UX_TRANSFER             *transfer_request;
 UINT                    status;
@@ -94,14 +99,14 @@ UX_HOST_CLASS_CDC_ECM   *cdc_ecm;
        queue is non-null, it remains non-null until we have queued the packet.
        Note that we do not have to worry about the case where the queue is null,
        because we are the only ones that can change it from null to non-null.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* Ensure the instance is valid.  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_state !=  UX_HOST_CLASS_INSTANCE_LIVE)
     {        
 
         /* Restore interrupts.  */
-        TX_RESTORE
+        UX_RESTORE
 
         /* Error trap.  */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -128,7 +133,7 @@ UX_HOST_CLASS_CDC_ECM   *cdc_ecm;
             cdc_ecm -> ux_host_class_cdc_ecm_xmit_queue_tail =  packet;
 
             /* Restore interrupts.  */
-            TX_RESTORE
+            UX_RESTORE
 
             /* Now we need to arm the transfer.  */
 
@@ -180,7 +185,7 @@ UX_HOST_CLASS_CDC_ECM   *cdc_ecm;
             cdc_ecm -> ux_host_class_cdc_ecm_xmit_queue_tail =  packet;
 
             /* Restore interrupts.  */
-            TX_RESTORE
+            UX_RESTORE
 
             /* Successfully added to queue.  */
             status =  UX_SUCCESS;
@@ -192,7 +197,7 @@ UX_HOST_CLASS_CDC_ECM   *cdc_ecm;
         /* Link was down.  */
 
         /* Restore interrupts.  */
-        TX_RESTORE
+        UX_RESTORE
 
         /* Release the packet.  */
         packet -> nx_packet_prepend_ptr =  packet -> nx_packet_prepend_ptr + UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE; 

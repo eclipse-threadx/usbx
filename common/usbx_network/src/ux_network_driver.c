@@ -36,7 +36,7 @@ static USB_NETWORK_DEVICE_TYPE usb_network_devices[USB_NETWORK_DEVICE_MAX_INSTAN
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_init                                    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,10 @@ static USB_NETWORK_DEVICE_TYPE usb_network_devices[USB_NETWORK_DEVICE_MAX_INSTAN
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_network_driver_init(VOID)
@@ -80,7 +84,7 @@ UINT  status = NX_SUCCESS;
         usb_network_driver_initialized = 1;
 
         /* Reset the network device memory array.  */
-        _ux_utility_memory_set(&usb_network_devices[0], 0, sizeof(usb_network_devices));
+        _ux_utility_memory_set(&usb_network_devices[0], 0, sizeof(usb_network_devices)); /* Use case of memset is verified. */
     }
     
     return(status);
@@ -91,7 +95,7 @@ UINT  status = NX_SUCCESS;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_activate                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -136,6 +140,11 @@ UINT  status = NX_SUCCESS;
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -143,12 +152,12 @@ UINT _ux_network_driver_activate(VOID *ux_instance, UINT(*ux_network_device_writ
                                 VOID **ux_network_handle, ULONG physical_address_msw, ULONG physical_address_lsw)
 {
 
-TX_INTERRUPT_SAVE_AREA 
+UX_INTERRUPT_SAVE_AREA 
 
 UINT    i;
 
     /* Critical section.  */
-    TX_DISABLE
+    UX_DISABLE
     
     /* Find an available entry in the usb_network_devices table. */
     for (i = 0; i < USB_NETWORK_DEVICE_MAX_INSTANCES; i++)
@@ -166,7 +175,7 @@ UINT    i;
     }
 
     /* Unprotect the critical section.  */
-    TX_RESTORE
+    UX_RESTORE
 
     /* Did we reach the max number of instance ? */
     if (i == USB_NETWORK_DEVICE_MAX_INSTANCES)
@@ -236,7 +245,7 @@ UINT    i;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_deactivate                       PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -281,12 +290,17 @@ UINT    i;
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_network_driver_deactivate(VOID *ux_instance, VOID *ux_network_handle)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 USB_NETWORK_DEVICE_TYPE *usb_network_device;
 
@@ -300,13 +314,13 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
     usb_network_device = (USB_NETWORK_DEVICE_TYPE*) ux_network_handle;
     
     /* Critical section.  */
-    TX_DISABLE
+    UX_DISABLE
     
     /* The link is down.  */
     _ux_network_driver_link_down(ux_network_handle);
 
     /* Unprotect the critical section.  */
-    TX_RESTORE
+    UX_RESTORE
 
     /* Are the sync objects valid?  */
     if (usb_network_device -> ux_network_device_activated_by_thread)
@@ -365,7 +379,7 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_entry                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -397,13 +411,18 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
 VOID _ux_network_driver_entry(NX_IP_DRIVER *nx_ip_driver)
 {
     
-TX_INTERRUPT_SAVE_AREA 
+UX_INTERRUPT_SAVE_AREA 
 NX_IP                           *nx_ip;
 NX_PACKET                       *packet_ptr;
 ULONG                           *ethernet_frame_ptr;
@@ -425,7 +444,7 @@ UINT                            i;
     {
 
         /* Critical section.  */
-        TX_DISABLE
+        UX_DISABLE
 
         /* Find an available entry in the usb_network_devices table. */
         for (i = 0; i < USB_NETWORK_DEVICE_MAX_INSTANCES; i++)
@@ -460,7 +479,7 @@ UINT                            i;
         }
 
         /* Unprotect the critical section.  */
-        TX_RESTORE
+        UX_RESTORE
     }
     else
     {
@@ -702,7 +721,7 @@ UINT                            i;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_packet_received                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -735,6 +754,8 @@ UINT                            i;
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -830,7 +851,7 @@ NX_IP           *nx_ip;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_link_up                          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -861,6 +882,8 @@ NX_IP           *nx_ip;
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -890,7 +913,7 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device_ptr = (USB_NETWORK_DEVICE_TYPE*)ux_n
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_link_down                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -921,6 +944,8 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device_ptr = (USB_NETWORK_DEVICE_TYPE*)ux_n
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID _ux_network_driver_link_down(VOID *ux_network_handle)

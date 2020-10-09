@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_format                     PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_format(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -77,6 +80,7 @@ UINT  _ux_device_class_storage_format(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun
 {
 
     UX_PARAMETER_NOT_USED(cbwcb);
+    UX_PARAMETER_NOT_USED(endpoint_in);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_FORMAT, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
@@ -85,13 +89,12 @@ UINT  _ux_device_class_storage_format(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun
        OUT endpoint because we expect the host to send parameters.  */
     _ux_device_stack_endpoint_stall(endpoint_out);
 
-    /* Now we return a CSW with failure.  */
-    _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
-
     /* And update the REQUEST_SENSE codes.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x05;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x26;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x01;
+    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+                                               UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(0x05,0x26,0x01);
+
+    /* Now we set the CSW with failure.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)

@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_endpoint_stall                       PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_stack_endpoint_stall                     PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,12 +65,17 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_endpoint_stall(UX_SLAVE_ENDPOINT *endpoint)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 UX_SLAVE_DCD        *dcd;
 UINT                status;
@@ -87,7 +92,7 @@ UINT                status;
 
     /* Ensure we don't change the endpoint's state after disconnection routine
        resets it.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* Check if the device is in a valid state; as soon as the device is out 
        of the RESET state, transfers occur and thus endpoints may be stalled. */
@@ -102,7 +107,7 @@ UINT                status;
     }
 
     /* Restore interrupts.  */
-    TX_RESTORE
+    UX_RESTORE
 
     /* Return completion status.  */
     return(status);       

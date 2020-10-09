@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_ecm.h                           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -39,6 +39,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -269,7 +274,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
     ULONG                                   ux_slave_class_cdc_ecm_ethernet_multicast_filter;
     ULONG                                   ux_slave_class_cdc_ecm_ethernet_power_management_filter;
     ULONG                                   ux_slave_class_cdc_ecm_ethernet_packet_filter;
-    TX_EVENT_FLAGS_GROUP                    ux_slave_class_cdc_ecm_event_flags_group;
+    UX_EVENT_FLAGS_GROUP                    ux_slave_class_cdc_ecm_event_flags_group;
     UCHAR                                   ux_slave_class_cdc_ecm_local_node_id[UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH];
     UCHAR                                   ux_slave_class_cdc_ecm_remote_node_id[UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH];
     NX_IP                                   *ux_slave_class_cdc_ecm_nx_ip;
@@ -281,14 +286,14 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
     NX_PACKET                               *ux_slave_class_cdc_ecm_receive_queue;
     UCHAR                                   *ux_slave_class_cdc_ecm_pool_memory;
     NX_PACKET_POOL                          ux_slave_class_cdc_ecm_packet_pool;
-    TX_THREAD                               ux_slave_class_cdc_ecm_bulkin_thread;
-    TX_THREAD                               ux_slave_class_cdc_ecm_bulkout_thread;
-    TX_THREAD                               ux_slave_class_cdc_ecm_interrupt_thread;
+    UX_THREAD                               ux_slave_class_cdc_ecm_bulkin_thread;
+    UX_THREAD                               ux_slave_class_cdc_ecm_bulkout_thread;
+    UX_THREAD                               ux_slave_class_cdc_ecm_interrupt_thread;
     UCHAR                                   *ux_slave_class_cdc_ecm_bulkin_thread_stack;
     UCHAR                                   *ux_slave_class_cdc_ecm_bulkout_thread_stack;
     UCHAR                                   *ux_slave_class_cdc_ecm_interrupt_thread_stack;
     ULONG                                   ux_slave_class_cdc_ecm_link_state;
-    TX_MUTEX                                ux_slave_class_cdc_ecm_mutex;
+    UX_MUTEX                                ux_slave_class_cdc_ecm_mutex;
     VOID                                    *ux_slave_class_cdc_ecm_network_handle;
     
 } UX_SLAVE_CLASS_CDC_ECM;

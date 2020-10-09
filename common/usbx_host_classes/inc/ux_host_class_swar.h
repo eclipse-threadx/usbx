@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_swar.h                                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -86,7 +91,7 @@ typedef struct UX_HOST_CLASS_SWAR_STRUCT
     UX_ENDPOINT     *ux_host_class_swar_bulk_out_endpoint;
     UX_ENDPOINT     *ux_host_class_swar_bulk_in_endpoint;
     UINT            ux_host_class_swar_state;
-    TX_SEMAPHORE    ux_host_class_swar_semaphore;
+    UX_SEMAPHORE    ux_host_class_swar_semaphore;
 
     struct UX_HOST_CLASS_SWAR_RECEPTION_STRUCT  
                     *ux_host_class_swar_reception;

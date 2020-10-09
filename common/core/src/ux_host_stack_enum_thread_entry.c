@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_enum_thread_entry                    PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_enum_thread_entry(ULONG input)
@@ -92,6 +96,7 @@ VOID  _ux_host_stack_enum_thread_entry(ULONG input)
         /* Wait for the semaphore to be put by the root hub or a regular hub.  */
         _ux_utility_semaphore_get(&_ux_system_host -> ux_system_host_enum_semaphore, UX_WAIT_FOREVER);
 
+#if UX_MAX_DEVICES > 1
         /* We try the hub first. For this we look into the USBX project
            structure to see if there is at least one hub.  */
         if (_ux_system_host -> ux_system_host_enum_hub_function != UX_NULL)
@@ -100,6 +105,7 @@ VOID  _ux_host_stack_enum_thread_entry(ULONG input)
             /* Yes, there is a HUB function, call it!  */
             _ux_system_host -> ux_system_host_enum_hub_function();
         }
+#endif
 
         /* The signal may be also coming from the root hub, call the root hub handler.  */
         _ux_host_stack_rh_change_process();

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_interrupt_thread           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_interrupt_thread(ULONG cdc_ecm_class)
@@ -106,7 +111,7 @@ UCHAR                           *notification_buffer;
                on the interrupt pipe frequency or a change in the idle state forces us to send an empty report.  */
             _ux_utility_event_flags_get(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, 
                                         UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, 
-                                        TX_OR_CLEAR, &actual_flags, TX_WAIT_FOREVER);
+                                        UX_OR_CLEAR, &actual_flags, UX_WAIT_FOREVER);
 
             /* Build the Network Notification response.  */
             notification_buffer = transfer_request -> ux_slave_transfer_request_data_pointer;

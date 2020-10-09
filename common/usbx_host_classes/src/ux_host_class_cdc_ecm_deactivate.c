@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_deactivate                   PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,12 +72,17 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_deactivate(UX_HOST_CLASS_COMMAND *command)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 UX_HOST_CLASS_CDC_ECM       *cdc_ecm;
 UX_TRANSFER                 *transfer_request;
@@ -118,7 +123,7 @@ UX_TRANSFER                 *transfer_request;
        we should wait until after the transfer is armed. We must look at the CDC-ECM thread's state.  */
 
     /* Disable interrupts while we check the link state and possibly set our state.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* Is it in the process of checking the link state and arming the transfer?  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_check_and_arm_in_process == UX_TRUE)
@@ -130,7 +135,7 @@ UX_TRANSFER                 *transfer_request;
         cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish =  UX_TRUE;
 
         /* Restore interrupts.  */
-        TX_RESTORE
+        UX_RESTORE
 
         /* Wait for the transfer to be armed, or possibly an error. The CDC-ECM thread will wake us up.  */
         _ux_utility_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
@@ -142,7 +147,7 @@ UX_TRANSFER                 *transfer_request;
     {
 
         /* Restore interrupts.  */
-        TX_RESTORE
+        UX_RESTORE
     }
 
     /* Now we can abort the transfer.  */

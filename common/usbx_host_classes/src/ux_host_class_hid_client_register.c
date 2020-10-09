@@ -36,7 +36,7 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(UX_HOST_CLASS_HID_MAX_CLIEN
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_client_register                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,10 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(UX_HOST_CLASS_HID_MAX_CLIEN
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_client_register(UCHAR *hid_client_name,
@@ -138,7 +142,7 @@ UINT                        client_name_length =  0;
         {
 
             /* We have found a free container for the HID client. Copy the name (with null-terminator). */
-            _ux_utility_memory_copy(hid_client -> ux_host_class_hid_client_name, hid_client_name, client_name_length + 1);
+            _ux_utility_memory_copy(hid_client -> ux_host_class_hid_client_name, hid_client_name, client_name_length + 1); /* Use case of memcpy is verified. */
             
             /* Memorize the handler address of this client. */
             hid_client -> ux_host_class_hid_client_handler =  hid_client_handler;

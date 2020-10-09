@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_port.h                                         Cortex-A8/IAR     */ 
-/*                                                           6.0.1        */
+/*                                                           6.1          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -41,7 +41,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
-/*  06-30-2020     Chaoqiong Xiao           Initial Version 6.0.1         */
+/*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 
@@ -210,7 +210,7 @@ VOID    outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Cortex-A8/IAR Version 6.0.1 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Cortex-A8/IAR Version 6.1 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

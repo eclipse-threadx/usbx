@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_regular_td_obtain                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UX_HCD_SIM_HOST_TD  *_ux_hcd_sim_host_regular_td_obtain(UX_HCD_SIM_HOST *hcd_sim_host)
@@ -89,7 +93,7 @@ ULONG                   td_index;
         {
 
             /* The TD may have been used, so we reset all fields.  */
-            _ux_utility_memory_set(td, 0, sizeof(UX_HCD_SIM_HOST_TD));
+            _ux_utility_memory_set(td, 0, sizeof(UX_HCD_SIM_HOST_TD)); /* Use case of memset is verified. */
 
             /* This TD is now marked as USED.  */
             td -> ux_sim_host_td_status =  UX_USED;

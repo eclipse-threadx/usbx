@@ -36,7 +36,7 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAG
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_entry                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,7 +64,8 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAG
 /*    _ux_host_class_storage_deactivate     Deactivate storage class      */ 
 /*    _ux_utility_memory_allocate           Allocate memory block         */ 
 /*    _ux_utility_memory_free               Free memory block             */
-/*    _ux_utility_thread_create             Create storage class thread   */ 
+/*    _ux_utility_thread_create             Create storage class thread   */
+/*    _ux_utility_thread_delete             Delete storage class thread   */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -75,12 +76,24 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAG
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added destroy command,      */
+/*                                            used host class extension   */
+/*                                            pointer for class specific  */
+/*                                            structured data,            */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_entry(UX_HOST_CLASS_COMMAND *command)
-{
+{     
 
-UINT        status;
+UINT                        status;
+UX_HOST_CLASS               *class_inst;
+UX_HOST_CLASS_STORAGE_EXT   *class_ext;
+
 
     /* The command request will tell us we need to do here, either a enumeration
        query, an activation or a deactivation.  */
@@ -103,56 +116,66 @@ UINT        status;
            the storage class, we have to fire up one thread for the media insertion
            and acquire some memory for the media array.  */
 
-        /* Allocate some memory for the media structures used by FileX.  */
-        if (command -> ux_host_class_command_class_ptr -> ux_host_class_media == UX_NULL)
+        /* Get class.  */
+        class_inst = command -> ux_host_class_command_class_ptr;
+
+        /* Allocate UX_HOST_CLASS_STORAGE_EXT.  */
+        if (class_inst -> ux_host_class_ext == UX_NULL)
         {
 
-            /* UX_HOST_CLASS_STORAGE_MAX_MEDIA*sizeof(UX_HOST_CLASS_STORAGE_MEDIA) overflow
-             * is checked outside of function.
-             */
-            command -> ux_host_class_command_class_ptr -> ux_host_class_media =
-                        _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_HOST_CLASS_STORAGE_MAX_MEDIA*sizeof(UX_HOST_CLASS_STORAGE_MEDIA));
+            /* Need memory for extension fields.  */
+            class_ext = _ux_utility_memory_allocate(UX_NO_ALIGN,
+                                            UX_REGULAR_MEMORY,
+                                            sizeof(UX_HOST_CLASS_STORAGE_EXT));
 
-            /* Check the completion status.  */
-            if (command -> ux_host_class_command_class_ptr -> ux_host_class_media == UX_NULL)
+            /* Check completion status.  */
+            if (class_ext == UX_NULL)
                 return(UX_MEMORY_INSUFFICIENT);
-        }
 
-        /* Allocate a Thread stack and create the thread.  */
-        if (command -> ux_host_class_command_class_ptr -> ux_host_class_thread_stack == UX_NULL)
-        {
-
-            /* Allocate a Thread stack.  */
-            command -> ux_host_class_command_class_ptr -> ux_host_class_thread_stack =  
-                        _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE);
-
-            /* Check the completion status.  */
-            if (command -> ux_host_class_command_class_ptr -> ux_host_class_thread_stack == UX_NULL)
-                return(UX_MEMORY_INSUFFICIENT);
-            
             /* Create the storage class thread.  */
-            status =  _ux_utility_thread_create(&command -> ux_host_class_command_class_ptr -> ux_host_class_thread,
-                                    "ux_host_storage_thread", _ux_host_class_storage_thread_entry,
-                                    (ULONG) (ALIGN_TYPE) command -> ux_host_class_command_class_ptr, 
-                                    command -> ux_host_class_command_class_ptr -> ux_host_class_thread_stack,
+            status =  _ux_utility_thread_create(&class_ext -> ux_host_class_thread,
+                                    "ux_host_storage_thread",
+                                    _ux_host_class_storage_thread_entry,
+                                    (ULONG) (ALIGN_TYPE) class_inst, 
+                                    class_ext -> ux_host_class_thread_stack,
                                     UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE, 
                                     UX_HOST_CLASS_STORAGE_THREAD_PRIORITY_CLASS,
                                     UX_HOST_CLASS_STORAGE_THREAD_PRIORITY_CLASS,
-                                    TX_NO_TIME_SLICE, TX_DONT_START);
-                        
+                                    UX_NO_TIME_SLICE, UX_DONT_START);
+
             /* Check the completion status.  */
             if (status != UX_SUCCESS)
             {
-                _ux_utility_memory_free(command -> ux_host_class_command_class_ptr -> ux_host_class_thread_stack);
-                command -> ux_host_class_command_class_ptr -> ux_host_class_thread_stack = UX_NULL;
+                _ux_utility_memory_free(class_ext);
+                class_inst -> ux_host_class_ext = UX_NULL;
                 return(UX_THREAD_ERROR);
             }
 
-            UX_THREAD_EXTENSION_PTR_SET(&(command -> ux_host_class_command_class_ptr -> ux_host_class_thread), command -> ux_host_class_command_class_ptr)
+            /* Set thead ext ptr.  */
+            UX_THREAD_EXTENSION_PTR_SET(&(class_ext -> ux_host_class_thread), class_inst);
 
-            /* Now that the extension pointer has been set, resume the thread.  */
-            tx_thread_resume(&command -> ux_host_class_command_class_ptr -> ux_host_class_thread);
+            /* Save extension.  */
+            class_inst -> ux_host_class_ext = (VOID *)class_ext;
         }
+
+        /* Allocate some memory for the media structures used by UX_MEDIA (default FileX).  */
+        if (class_inst -> ux_host_class_media == UX_NULL)
+        {
+
+            /* UX_HOST_CLASS_STORAGE_MAX_MEDIA*sizeof(UX_HOST_CLASS_STORAGE_MEDIA) overflow
+            * is checked outside of function.
+            */
+            class_inst -> ux_host_class_media =
+                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY,
+                            UX_HOST_CLASS_STORAGE_MAX_MEDIA*sizeof(UX_HOST_CLASS_STORAGE_MEDIA));
+
+            /* Check the completion status.  */
+            if (class_inst -> ux_host_class_media == UX_NULL)
+                return(UX_MEMORY_INSUFFICIENT);
+        }
+
+        /* Now that the extension pointer has been set, resume the thread.  */
+        tx_thread_resume(&class_ext -> ux_host_class_thread);
 
         /* The activate command is used when the device inserted has found a parent and
            is ready to complete the enumeration.   */
@@ -169,6 +192,40 @@ UINT        status;
 
         /* Return the completion status.  */
         return(status);
+
+    case UX_HOST_CLASS_COMMAND_DESTROY:
+
+        /* The destroy command is used when the class is unregistered.  */
+
+        /* Get class.  */
+        class_inst = command -> ux_host_class_command_class_ptr;
+
+        /* Free allocated media structures.  */
+        if (class_inst -> ux_host_class_media)
+        {
+            _ux_utility_memory_free(class_inst -> ux_host_class_media);
+            class_inst -> ux_host_class_media = UX_NULL;
+        }
+
+        /* Free class extension resources.  */
+        if (class_inst -> ux_host_class_ext)
+        {
+
+            /* Get storage class extension.  */
+            class_ext = (UX_HOST_CLASS_STORAGE_EXT *)class_inst -> ux_host_class_ext;
+
+            /* Delete storage thread.  */
+            _ux_utility_thread_delete(&class_ext -> ux_host_class_thread);
+
+            /* Free class extension memory.  */
+            _ux_utility_memory_free(class_ext);
+
+            /* Set extension pointer to NULL.  */
+            class_inst -> ux_host_class_ext = UX_NULL;
+        }
+
+        /* Return success.  */
+        return(UX_SUCCESS);
 
     default: 
 

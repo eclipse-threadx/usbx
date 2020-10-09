@@ -32,10 +32,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_class_hid_report_set                       PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_class_hid_report_get                     PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_report_get(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type, 
@@ -141,12 +145,14 @@ UINT                            status =  UX_ERROR;
             hid_event_length =  host_length;
         else
             hid_event_length =  hid_event.ux_device_class_hid_event_length;
+        if (hid_event_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
+            hid_event_length = UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH;
 
         /* First reset it.  */
-        _ux_utility_memory_set(buffer, 0, hid_event_length);
+        _ux_utility_memory_set(buffer, 0, hid_event_length); /* Use case of memset is verified. */
 
         /* Copy the event buffer into the target buffer.  */
-        _ux_utility_memory_copy(buffer, hid_event.ux_device_class_hid_event_buffer, hid_event_length);
+        _ux_utility_memory_copy(buffer, hid_event.ux_device_class_hid_event_buffer, hid_event_length); /* Use case of memcpy is verified. */
     }
     else
     {
@@ -160,7 +166,7 @@ UINT                            status =  UX_ERROR;
             hid_event_length =  UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH;
 
         /* Reset it.  */
-        _ux_utility_memory_set(buffer, 0, hid_event_length);
+        _ux_utility_memory_set(buffer, 0, hid_event_length); /* Use case of memset is verified. */
     }
 
     /* We can send the report.  */

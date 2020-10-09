@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_dcd_sim_slave_initialize_complete                 PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_dcd_sim_slave_initialize_complete               PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            prefixed UX to MS_TO_TICK,  */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_initialize_complete(VOID)
@@ -102,7 +105,7 @@ UX_SLAVE_TRANSFER       *transfer_request;
     transfer_request =  &device -> ux_slave_device_control_endpoint.ux_slave_endpoint_transfer_request;
     
     /* Set the timeout to be for Control Endpoint.  */
-    transfer_request -> ux_slave_transfer_request_timeout =  MS_TO_TICK(UX_CONTROL_TRANSFER_TIMEOUT);
+    transfer_request -> ux_slave_transfer_request_timeout =  UX_MS_TO_TICK(UX_CONTROL_TRANSFER_TIMEOUT);
     
     /* Adjust the current data pointer as well.  */
     transfer_request -> ux_slave_transfer_request_current_data_pointer =  

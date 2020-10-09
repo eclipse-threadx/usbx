@@ -29,12 +29,17 @@
 #include "ux_device_class_storage.h"
 #include "ux_device_stack.h"
 
+
+#if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH
+#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check
+#endif
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_report_key                 PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +74,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -83,6 +93,8 @@ UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   allocation_length;
 ULONG                   key_format;
 
+
+    UX_PARAMETER_NOT_USED(lun);
     UX_PARAMETER_NOT_USED(endpoint_out);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -98,7 +110,7 @@ ULONG                   key_format;
     allocation_length =  _ux_utility_short_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ALLOCATION_LENGTH);
 
     /* Ensure memory buffer cleaned.  */
-    _ux_utility_memory_set(transfer_request -> ux_slave_transfer_request_data_pointer, 0, 64);
+    _ux_utility_memory_set(transfer_request -> ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH); /* Use case of memset is verified. */
     
     /* Filter page code. This is necessary to isolate the CD-ROM mode sense response.  */
     switch (key_format)
@@ -127,7 +139,7 @@ ULONG                   key_format;
                 allocation_length = UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH;                
 
             /* Send a data payload with the read_capacity response buffer.  */
-            _ux_device_stack_transfer_request(transfer_request, allocation_length, allocation_length); 
+            _ux_device_stack_transfer_request(transfer_request, allocation_length, allocation_length);  /* Use case of memset is verified. */
 
             break;
           
@@ -139,13 +151,8 @@ ULONG                   key_format;
                 
     }
 
-    /* Now we return a CSW with success.  */
-    status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
-
-    /* And update the REQUEST_SENSE codes.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  0x00;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  0x00;
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  0x00;
+    /* Now we set the CSW with success.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
 
     /* Return completion status.  */
     return(status);

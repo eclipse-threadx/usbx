@@ -33,8 +33,8 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_class_audio_write_thread                 PORTABLE C      */
-/*                                                           6.0          */
+/*    _ux_device_class_audio_write_thread_entry           PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID _ux_device_class_audio_write_thread_entry(ULONG audio_stream)
@@ -110,7 +114,7 @@ ULONG                           actual_length;
             transfer_length = stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_length;
             if (transfer_length)
                 _ux_utility_memory_copy(transfer -> ux_slave_transfer_request_data_pointer,
-                    stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_data, transfer_length);
+                    stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_data, transfer_length); /* Use case of memcpy is verified. */
 
             /* Issue transfer request, thread blocked until transfer done.  */
             status = _ux_device_stack_transfer_request(transfer, transfer_length, transfer_length);

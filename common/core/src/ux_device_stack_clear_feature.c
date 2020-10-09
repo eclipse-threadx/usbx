@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_clear_feature                      PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_clear_feature(ULONG request_type, ULONG request_value, ULONG request_index)
@@ -125,8 +129,10 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
            We need to find the endpoint through the interface(s). */
         interface =  device -> ux_slave_device_first_interface;
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         while (interface != UX_NULL)
         {
+#endif
 
             /* Get the first endpoint for this interface.  */
             endpoint_target =  interface -> ux_slave_interface_first_endpoint;
@@ -153,9 +159,12 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
                 endpoint_target =  endpoint_target -> ux_slave_endpoint_next_endpoint;
             }
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Next interface.  */
             interface =  interface -> ux_slave_interface_next_interface;
         }
+#endif
+
         /* Intentional fallthrough and go into the default case. */
         /* fall through */
 

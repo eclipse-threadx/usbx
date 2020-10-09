@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_pictbridge.h                                     PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -623,10 +628,10 @@ typedef struct UX_PICTBRIDGE_STRUCT
     UX_PICTBRIDGE_EVENT                                     *ux_pictbridge_event_array_head;
     UX_PICTBRIDGE_EVENT                                     *ux_pictbridge_event_array_tail;
     UX_PICTBRIDGE_EVENT                                     *ux_pictbridge_event_array_end;
-    TX_SEMAPHORE                                            ux_pictbridge_notification_semaphore;
+    UX_SEMAPHORE                                            ux_pictbridge_notification_semaphore;
     UCHAR                                                   *ux_pictbridge_thread_stack;
-    TX_THREAD                                               ux_pictbridge_thread;
-    TX_EVENT_FLAGS_GROUP                                    ux_pictbridge_event_flags_group;
+    UX_THREAD                                               ux_pictbridge_thread;
+    UX_EVENT_FLAGS_GROUP                                    ux_pictbridge_event_flags_group;
     ULONG                                                   ux_pictbridge_operation_result;
     ULONG                                                   ux_pictbridge_output_result;
     ULONG                                                   ux_pictbridge_xml_report_direction;

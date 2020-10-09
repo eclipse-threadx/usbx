@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_thread_entry                 PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -45,8 +45,8 @@
 /*    This function is awaken every 2 seconds to check if there was a     */
 /*    device insertion on a specific media. This is the only way we can   */
 /*    remount a media after the storage instance has opened the media to  */
-/*    FileX and the media is either not present or was removed and is     */
-/*    being re-)inserted.                                                 */
+/*    UX_MEDIA (default FileX) and the media is either not present        */
+/*    or was removed and is being re-inserted.                            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -58,7 +58,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    fx_media_close                        Close FileX media             */
+/*    ux_media_close                        Close media                   */
 /*    _ux_host_class_storage_device_reset   Reset device                  */
 /*    _ux_host_class_storage_media_mount    Mount the media               */
 /*    _ux_host_class_storage_unit_ready_test                              */
@@ -81,23 +81,34 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration, used UX_ */
+/*                                            things instead of FX_       */
+/*                                            things directly, used host  */
+/*                                            class extension pointer for */
+/*                                            class specific structured   */
+/*                                            data,                       */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_storage_thread_entry(ULONG class_address)
 {
 
-UX_HOST_CLASS                   *class;
+UX_HOST_CLASS                   *class_inst;
 UX_HOST_CLASS_STORAGE           *storage;
 UINT                            status;
 ULONG                           lun_index;
 UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
-FX_MEDIA                        *media;
-UCHAR                           *memory;
 UINT                            media_index;
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+UX_MEDIA                        *media;
+UCHAR                           *memory;
+#endif
 
 
     /* Setup pointer to class.  */
-    UX_THREAD_EXTENSION_PTR_GET(class, UX_HOST_CLASS, class_address)
+    UX_THREAD_EXTENSION_PTR_GET(class_inst, UX_HOST_CLASS, class_address)
 
     /* This thread goes on forever once started.  */
     while(1)
@@ -108,7 +119,7 @@ UINT                            media_index;
 
         /* We need to parse all the storage instances and check for a removable
            media flag.  */
-        storage =  (UX_HOST_CLASS_STORAGE *) class -> ux_host_class_first_instance;
+        storage =  (UX_HOST_CLASS_STORAGE *) class_inst -> ux_host_class_first_instance;
 
         while (storage != UX_NULL)
         {
@@ -162,46 +173,72 @@ UINT                            media_index;
                                To do so, we need to parse the existing media instance and find out
                                if this partition was already mounted.  */
 
-                            storage_media = (UX_HOST_CLASS_STORAGE_MEDIA *) class -> ux_host_class_media;
+                            storage_media = (UX_HOST_CLASS_STORAGE_MEDIA *) class_inst -> ux_host_class_media;
 
                             /* Scan all instances of media.  */
-                            for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA; media_index++)
+                            for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA;
+                                storage_media++, media_index++)
                             {
-
-                                /* Get the FileX Media attached to this media.  */
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+                                /* Get the UX_MEDIA (default FileX) Media attached to this media.  */
                                 media =  &storage_media -> ux_host_class_storage_media;
 
                                 /* Check for the storage instance and lun number.  */
-                                if ((media -> fx_media_id != 0) && (media -> fx_media_driver_info == (VOID *) storage) &&
+                                if ((ux_media_id_get(media) != 0) && (ux_media_driver_info_get(media) == (VOID *) storage) &&
                                     (storage_media -> ux_host_class_storage_media_lun == storage -> ux_host_class_storage_lun))
                                 {
 
                                     /* We preserve the memory used by this media.  */
                                     memory =  storage_media -> ux_host_class_storage_media_memory;
 
-                                    /* Let FileX use this instance.  */
+                                    /* Let UX_MEDIA (default FileX) use this instance.  */
                                     status =  _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
 
-                                    /* Ask FileX to unmount the partition.  */
-                                    fx_media_close(media);
+                                    /* Ask UX_MEDIA (default FileX) to unmount the partition.  */
+                                    ux_media_close(media);
 
                                     /* This device is now unmounted.  */
                                     storage_media -> ux_host_class_storage_media_status = UX_HOST_CLASS_STORAGE_MEDIA_UNMOUNTED;
 
                                     /* Reset the media ID.  */
-                                    media -> fx_media_id =  0;
+                                    ux_media_id_set(media, 0);
 
                                     /* Now, we protect the storage instance.  */
                                     status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                                     if (status != UX_SUCCESS)
                                         break;
 
-                                    /* Free the memory block used for data transfer on behalf of FileX.  */
+                                    /* Free the memory block used for data transfer on behalf of UX_MEDIA (default FileX).  */
                                     _ux_utility_memory_free(memory);
                                 }
+#else
 
-                                /* Next entry in the media array.  */
-                                storage_media++;
+                                /* Check storage instance and lun number.  */
+                                if (storage_media -> ux_host_class_storage_media_storage != storage)
+                                    continue;
+                                if (storage_media -> ux_host_class_storage_media_lun != storage -> ux_host_class_storage_lun)
+                                    continue;
+
+                                /* Release the instance.  */
+                                status = _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+
+                                /* Invoke callback for media removal.  */
+                                if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+                                {
+
+                                    /* Call system change function.  */
+                                    _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_REMOVAL,
+                                                        storage -> ux_host_class_storage_class, (VOID *) storage_media);
+                                }
+
+                                /* Free the storage media.  */
+                                storage_media -> ux_host_class_storage_media_storage = UX_NULL;
+
+                                /* Now, we protect the storage instance.  */
+                                status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                if (status != UX_SUCCESS)
+                                    break;
+#endif
                             }
                             break;
 
@@ -210,34 +247,36 @@ UINT                            media_index;
                                 /* We may need to unmount this partition if it was mounted before.
                                    To do so, we need to parse the existing media instance and find out
                                    if this partition was already mounted.  */
-                                storage_media = (UX_HOST_CLASS_STORAGE_MEDIA *) class -> ux_host_class_media;
+                                storage_media = (UX_HOST_CLASS_STORAGE_MEDIA *) class_inst -> ux_host_class_media;
 
                                 /* Scan all instances of media.   */
-                                for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA; media_index++)
+                                for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA;
+                                    storage_media++, media_index++)
                                 {
 
-                                    /* Get the FileX Media attached to this media.  */
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+                                    /* Get the UX_MEDIA (default FileX) Media attached to this media.  */
                                     media = &storage_media -> ux_host_class_storage_media;
 
                                     /* Check for the storage instance and lun number. */
-                                    if ((media -> fx_media_id != 0) && (media -> fx_media_driver_info == (VOID *) storage) &&
+                                    if ((ux_media_id_get(media) != 0) && (ux_media_driver_info_get(media) == (VOID *) storage) &&
                                             (storage_media -> ux_host_class_storage_media_lun == storage -> ux_host_class_storage_lun))
                                     {
 
                                         /* We preserve the memory used by this media.  */
                                         memory =  storage_media -> ux_host_class_storage_media_memory;
 
-                                        /* Let FileX use this instance.  */
+                                        /* Let UX_MEDIA (default FileX) use this instance.  */
                                         status =  _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
 
-                                        /* Ask FileX to unmount the partition.  */
-                                        fx_media_close(media);
+                                        /* Ask UX_MEDIA (default FileX) to unmount the partition.  */
+                                        ux_media_close(media);
 
                                         /* This device is now unmounted.  */
                                         storage_media -> ux_host_class_storage_media_status =  UX_HOST_CLASS_STORAGE_MEDIA_UNMOUNTED;
 
                                         /* Reset the media ID.  */
-                                        media -> fx_media_id =  0;
+                                        ux_media_id_set(media, 0);
 
                                         /* Now, we protect the storage instance.  */
                                         status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
@@ -247,9 +286,34 @@ UINT                            media_index;
                                         /* Free the memory block used for data transfer on behalf of FileX.  */
                                         _ux_utility_memory_free(memory);
                                     }
+#else
 
-                                    /* Next entry in the media array.  */
-                                    storage_media++;
+                                    /* Check storage instance and lun number.  */
+                                    if (storage_media -> ux_host_class_storage_media_storage != storage)
+                                        continue;
+                                    if (storage_media -> ux_host_class_storage_media_lun != storage -> ux_host_class_storage_lun)
+                                        continue;
+
+                                    /* Release the instance.  */
+                                    status = _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+
+                                    /* Invoke callback for media removal.  */
+                                    if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+                                    {
+
+                                        /* Call system change function.  */
+                                        _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_REMOVAL,
+                                                            storage -> ux_host_class_storage_class, (VOID *) storage_media);
+                                    }
+
+                                    /* Free the storage media.  */
+                                    storage_media -> ux_host_class_storage_media_storage = UX_NULL;
+
+                                    /* Now, we protect the storage instance.  */
+                                    status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                    if (status != UX_SUCCESS)
+                                        break;
+#endif
                                 }
 
                                 /* Now, we need to retest the media to see if it is there.  */
@@ -278,11 +342,43 @@ UINT                            media_index;
                                     if (status != UX_SUCCESS)
                                         break;
 
-                                    /* Let FileX use this instance.  */
+                                    /* Let UX_MEDIA (default FileX) use this instance.  */
                                     _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
 
                                     /* The device seems to have been inserted, try to mount it.  */
                                     _ux_host_class_storage_media_mount(storage, 0);
+#else
+
+                                    /* Find a free media slot for inserted media.  */
+                                    storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) class_inst -> ux_host_class_media;
+                                    for (media_index = 0; media_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA;
+                                        storage_media ++, media_index ++)
+                                    {
+
+                                        /* Skip used storage media slots.  */
+                                        if (storage_media -> ux_host_class_storage_media_storage != UX_NULL)
+                                            continue;
+
+                                        /* Use this free storage media slot.  */
+                                        storage_media -> ux_host_class_storage_media_storage = storage;
+
+                                        /* Save media information.  */
+                                        storage_media -> ux_host_class_storage_media_lun = (UCHAR)storage -> ux_host_class_storage_lun;
+                                        storage_media -> ux_host_class_storage_media_sector_size = (USHORT)storage -> ux_host_class_storage_sector_size;
+                                        storage_media -> ux_host_class_storage_media_number_sectors = storage -> ux_host_class_storage_last_sector_number + 1;
+
+                                        /* Invoke callback for media insertion.  */
+                                        if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+                                        {
+
+                                            /* Call system change function.  */
+                                            _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_INSERTION,
+                                                                storage -> ux_host_class_storage_class, (VOID *) storage_media);
+                                        }
+                                    }
+#endif
 
                                     /* Now, we protect the storage instance.  */
                                     _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);

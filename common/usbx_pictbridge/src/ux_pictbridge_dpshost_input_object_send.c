@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_input_object_send            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_input_object_send(UX_PICTBRIDGE *pictbridge, ULONG input_function)
@@ -89,7 +95,7 @@ ULONG                               actual_flags;
         /* Wait for the client event pending request to be completed.  */
         status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, 
                                         UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                        TX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
+                                        UX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
         /* Reset the state machine to not Host Request pending.  */
         pictbridge -> ux_pictbridge_host_client_state_machine &= (UINT)~UX_PICTBRIDGE_STATE_MACHINE_HOST_REQUEST_PENDING;
@@ -119,7 +125,7 @@ ULONG                               actual_flags;
     object_length =  0;
     
     /* Clear the object memory buffer.  */
-    _ux_utility_memory_set(pima_object_buffer, 0, UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER);
+    _ux_utility_memory_set(pima_object_buffer, 0, UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER); /* Use case of memset is verified. */
 
     /* Add the line <?xml version="1.0"?>  */
     status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_xmlversion, 
@@ -194,7 +200,7 @@ ULONG                               actual_flags;
             /* Yes, so we need to set the event that advertise the completion of the host request.  */
             _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group,
                                     UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                    TX_AND);
+                                    UX_AND);
 
         }
 
@@ -229,7 +235,7 @@ ULONG                               actual_flags;
             /* Yes, so we need to set the event that advertise the completion of the host request.  */
             status =  _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, 
                                     UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                    TX_AND);
+                                    UX_AND);
 
         }
         
@@ -257,7 +263,7 @@ ULONG                               actual_flags;
             /* Yes, so we need to set the event that advertise the completion of the host request.  */
             status =  _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, 
                                     UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                    TX_AND);
+                                    UX_AND);
 
         }
 
@@ -306,7 +312,7 @@ ULONG                               actual_flags;
                 /* Yes, so we need to set the event that advertise the completion of the host request.  */
                 status =  _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, 
                                         UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                        TX_AND);
+                                        UX_AND);
 
             }
 
@@ -336,7 +342,7 @@ ULONG                               actual_flags;
             /* Yes, so we need to set the event that advertise the completion of the host request.  */
             status =  _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, 
                                     UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                    TX_AND);
+                                    UX_AND);
 
         }
 
@@ -359,7 +365,7 @@ ULONG                               actual_flags;
         /* Yes, so we need to set the event that advertise the completion of the host request.  */
         status =  _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, 
                                 UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
-                                TX_AND);
+                                UX_AND);
 
     }
 

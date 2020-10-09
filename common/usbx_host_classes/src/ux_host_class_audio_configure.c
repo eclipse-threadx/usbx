@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_configure                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_configure(UX_HOST_CLASS_AUDIO *audio)
@@ -77,8 +81,10 @@ UINT  _ux_host_class_audio_configure(UX_HOST_CLASS_AUDIO *audio)
 UINT                    status;
 UX_CONFIGURATION        *configuration;
 UX_INTERFACE            *interface;
-UX_DEVICE               *parent_device;
 ULONG                   interface_number;
+#if UX_MAX_DEVICES > 1
+UX_DEVICE               *parent_device;
+#endif
 
 
     /* If the device has been configured already, we don't need to do it
@@ -100,7 +106,9 @@ ULONG                   interface_number;
     
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
      
-    }        
+    }
+
+#if UX_MAX_DEVICES > 1
     /* Check the audio power source and check the parent power source for 
        incompatible connections.  */
     if (audio -> ux_host_class_audio_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED)
@@ -123,7 +131,8 @@ ULONG                   interface_number;
             return(UX_CONNECTION_INCOMPATIBLE);
         }            
     }
-    
+#endif
+
     /* We have the valid configuration. Ask the USBX stack to set this configuration */        
     status =  _ux_host_stack_device_configuration_select(configuration);
 

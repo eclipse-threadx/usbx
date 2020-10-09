@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_memory_allocate                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  *_ux_utility_memory_allocate(ULONG memory_alignment, ULONG memory_cache_flag,
@@ -257,7 +261,7 @@ ALIGN_TYPE          int_memory_buffer;
         /* Update the current memory block.  */
         memory_block -> ux_memory_block_size =  memory_size_requested;
         memory_block -> ux_memory_block_next =  new_memory_block;
-        memory_block -> ux_memory_block_status =  UX_MEMORY_USED;
+        memory_block -> ux_memory_block_status =  UX_MEMORY_USED | memory_cache_flag;
 
         /* Declare how much memory we removed from the pool.  */
         memory_removed_from_pool =  memory_block -> ux_memory_block_size + (ULONG)sizeof(UX_MEMORY_BLOCK);
@@ -277,7 +281,7 @@ ALIGN_TYPE          int_memory_buffer;
         new_memory_block -> ux_memory_block_previous =  memory_block;
         new_memory_block -> ux_memory_block_next =  memory_block -> ux_memory_block_next;
         new_memory_block -> ux_memory_block_size =  memory_block -> ux_memory_block_size;
-        new_memory_block -> ux_memory_block_status =  UX_MEMORY_USED;
+        new_memory_block -> ux_memory_block_status =  UX_MEMORY_USED | memory_cache_flag;
 
         /* Update the current memory block.  */
         int_memory_buffer =  (ALIGN_TYPE) ((UCHAR *) memory_block + sizeof(UX_MEMORY_BLOCK));
@@ -317,7 +321,7 @@ ALIGN_TYPE          int_memory_buffer;
     memory_buffer =  ((UCHAR *) memory_block) + sizeof(UX_MEMORY_BLOCK);
 
     /* Clear the memory block.  */
-    _ux_utility_memory_set(memory_buffer, 0, memory_size_requested);
+    _ux_utility_memory_set(memory_buffer, 0, memory_size_requested); /* Use case of memset is verified. */
 
     /* Update the memory free in the pool.  */
     if (_ux_system -> ux_system_cache_safe_memory_pool_start == _ux_system -> ux_system_regular_memory_pool_start)
@@ -335,6 +339,7 @@ ALIGN_TYPE          int_memory_buffer;
             case UX_CACHE_SAFE_MEMORY:
                 /* Update the amount of free memory in the cache safe memory pool.  */
                 _ux_system -> ux_system_cache_safe_memory_pool_free -= memory_removed_from_pool;
+
             break;
 
             default:
@@ -344,6 +349,46 @@ ALIGN_TYPE          int_memory_buffer;
 
         }
     }
+
+#ifdef UX_ENABLE_MEMORY_STATISTICS
+
+    /* Update allocate count, total size.  */
+    if (memory_cache_flag == UX_REGULAR_MEMORY)
+    {
+        _ux_system -> ux_system_regular_memory_pool_alloc_count ++;
+        _ux_system -> ux_system_regular_memory_pool_alloc_total += memory_size_requested;
+        if (_ux_system -> ux_system_regular_memory_pool_alloc_max_count < _ux_system -> ux_system_regular_memory_pool_alloc_count)
+            _ux_system -> ux_system_regular_memory_pool_alloc_max_count = _ux_system -> ux_system_regular_memory_pool_alloc_count;
+        if (_ux_system -> ux_system_regular_memory_pool_alloc_max_total < _ux_system -> ux_system_regular_memory_pool_alloc_total)
+            _ux_system -> ux_system_regular_memory_pool_alloc_max_total = _ux_system -> ux_system_regular_memory_pool_alloc_total;
+    }
+    else
+    {
+        _ux_system -> ux_system_cache_safe_memory_pool_alloc_count ++;
+        _ux_system -> ux_system_cache_safe_memory_pool_alloc_total += memory_size_requested;
+        if (_ux_system -> ux_system_cache_safe_memory_pool_alloc_max_count < _ux_system -> ux_system_cache_safe_memory_pool_alloc_count)
+            _ux_system -> ux_system_cache_safe_memory_pool_alloc_max_count = _ux_system -> ux_system_cache_safe_memory_pool_alloc_count;
+        if (_ux_system -> ux_system_cache_safe_memory_pool_alloc_max_total < _ux_system -> ux_system_cache_safe_memory_pool_alloc_total)
+            _ux_system -> ux_system_cache_safe_memory_pool_alloc_max_total = _ux_system -> ux_system_cache_safe_memory_pool_alloc_total;
+    }
+
+    /* Log max usage of regular memory pool.  */
+    memory_removed_from_pool = (ALIGN_TYPE)_ux_system -> ux_system_regular_memory_pool_start -
+                               (ALIGN_TYPE)_ux_system -> ux_system_regular_memory_pool_base;
+    if (memory_removed_from_pool > _ux_system -> ux_system_regular_memory_pool_max_start_offset)
+        _ux_system -> ux_system_regular_memory_pool_max_start_offset = memory_removed_from_pool;
+    if (_ux_system -> ux_system_regular_memory_pool_min_free > _ux_system -> ux_system_regular_memory_pool_free)
+        _ux_system -> ux_system_regular_memory_pool_min_free = _ux_system -> ux_system_regular_memory_pool_free;
+
+    /* Log max usage of cache safe memory pool.  */
+    memory_removed_from_pool = (ALIGN_TYPE)_ux_system -> ux_system_cache_safe_memory_pool_start -
+                               (ALIGN_TYPE)_ux_system -> ux_system_cache_safe_memory_pool_base;
+    if (memory_removed_from_pool > _ux_system -> ux_system_cache_safe_memory_pool_max_start_offset)
+        _ux_system -> ux_system_cache_safe_memory_pool_max_start_offset = memory_removed_from_pool;
+    if (_ux_system -> ux_system_cache_safe_memory_pool_min_free > _ux_system -> ux_system_cache_safe_memory_pool_free)
+        _ux_system -> ux_system_cache_safe_memory_pool_min_free = _ux_system -> ux_system_cache_safe_memory_pool_free;
+
+#endif
 
     /* Release the protection.  */
     _ux_utility_mutex_off(&_ux_system -> ux_system_mutex);

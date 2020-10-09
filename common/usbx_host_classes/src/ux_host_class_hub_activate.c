@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_activate                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_activate(UX_HOST_CLASS_COMMAND *command)
@@ -87,11 +91,13 @@ UX_HOST_CLASS_HUB   *hub;
 UINT                status;
 
 
+#if UX_MAX_DEVICES > 1
     /* We need to make sure that the enumeration thread knows about at least
        one active HUB instance and the function to call when the thread
        is awaken.  */
     _ux_system_host -> ux_system_host_enum_hub_function =  _ux_host_class_hub_change_detect;
-    
+#endif
+
     /* The HUB is always activated by the device descriptor and not the
        instance descriptor.  */
     device =  (UX_DEVICE *) command -> ux_host_class_command_container;

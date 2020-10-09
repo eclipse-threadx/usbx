@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkin_thread                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkin_thread(ULONG rndis_class)
@@ -111,7 +117,7 @@ ULONG                           transfer_length;
                on the interrupt pipe frequency or a change in the idle state forces us to send an empty report.  */
             status =  _ux_utility_event_flags_get(&rndis -> ux_slave_class_rndis_event_flags_group, (UX_DEVICE_CLASS_RNDIS_NEW_BULKIN_EVENT |
                                                                                             UX_DEVICE_CLASS_RNDIS_NEW_DEVICE_STATE_CHANGE_EVENT), 
-                                                                                            TX_OR_CLEAR, &actual_flags, TX_WAIT_FOREVER);
+                                                                                            UX_OR_CLEAR, &actual_flags, UX_WAIT_FOREVER);
                                                                                             
             /* Check the completion code and the actual flags returned. */
             if (status == UX_SUCCESS && (actual_flags & UX_DEVICE_CLASS_RNDIS_NEW_DEVICE_STATE_CHANGE_EVENT) == 0)
@@ -148,7 +154,7 @@ ULONG                           transfer_length;
                         {
 
                             /* Copy the packet in the transfer descriptor buffer.  */
-                            _ux_utility_memory_copy (transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH, packet_header, current_packet -> nx_packet_length);
+                            _ux_utility_memory_copy (transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH, packet_header, current_packet -> nx_packet_length); /* Use case of memcpy is verified. */
                             
                             /* Add the RNDIS header to this packet.  */
                             _ux_utility_long_put(transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_TYPE, UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_MSG);

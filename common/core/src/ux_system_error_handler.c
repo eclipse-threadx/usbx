@@ -27,13 +27,13 @@
 #include "ux_api.h"
 
 
-
+#ifndef UX_DISABLE_ERROR_HANDLER
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_system_error_handler                            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,11 +66,13 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID   _ux_system_error_handler(UINT system_level, UINT system_context, UINT error_code)
 {
- 
+
     /* Save the last system error code.  */
     _ux_system -> ux_system_last_error =  error_code;
  
@@ -85,3 +87,4 @@ VOID   _ux_system_error_handler(UINT system_level, UINT system_context, UINT err
         _ux_system -> ux_system_error_callback_function(system_level, system_context, error_code);
     }
 }
+#endif

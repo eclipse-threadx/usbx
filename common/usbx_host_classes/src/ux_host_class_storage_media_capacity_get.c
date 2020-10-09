@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_media_capacity_get           PORTABLE C      */
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration,          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_capacity_get(UX_HOST_CLASS_STORAGE *storage)
@@ -159,6 +163,11 @@ ULONG           command_retry;
         /* Check the sense code */
         if (storage -> ux_host_class_storage_sense_code == UX_SUCCESS)
         {
+
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+            /* Save the number of sectors.  */
+            storage -> ux_host_class_storage_last_sector_number = _ux_utility_long_get_big_endian(capacity_response + UX_HOST_CLASS_STORAGE_READ_CAPACITY_DATA_LBA);
+#endif
 
             /* The data is valid, save the sector size.  */
             storage -> ux_host_class_storage_sector_size =  _ux_utility_long_get_big_endian(capacity_response + UX_HOST_CLASS_STORAGE_READ_CAPACITY_DATA_SECTOR_SIZE);

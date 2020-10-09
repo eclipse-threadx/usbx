@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid.h                                 PORTABLE C      */ 
-/*                                                           6.0.2        */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,10 +41,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  08-14-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed struct field          */
-/*                                            definition issues,          */
-/*                                            resulting in version 6.0.2  */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly, fixed struct */
+/*                                            field definition issues,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -936,7 +938,7 @@ typedef struct UX_HOST_CLASS_HID_STRUCT
                     ux_host_class_hid_parser;
     struct UX_HOST_CLASS_HID_CLIENT_STRUCT       
                     *ux_host_class_hid_client;
-    TX_SEMAPHORE    ux_host_class_hid_semaphore;
+    UX_SEMAPHORE    ux_host_class_hid_semaphore;
 } UX_HOST_CLASS_HID;
 
 

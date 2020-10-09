@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_tag_name_get                         PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_tag_name_get(UCHAR *input_buffer, ULONG input_length, 
@@ -103,19 +107,19 @@ UCHAR                   *xml_parameter_end;
     char_count = 0;
     
     /* Reset the tag name buffer.  */
-   _ux_utility_memory_set(tag_name, 0, UX_PICTBRIDGE_MAX_TAG_SIZE);
+   _ux_utility_memory_set(tag_name, 0, UX_PICTBRIDGE_MAX_TAG_SIZE); /* Use case of memset is verified. */
    tag_name_end = tag_name + UX_PICTBRIDGE_MAX_TAG_SIZE - 1;
 
     /* Reset the variable name buffer.  */
-   _ux_utility_memory_set(variable_name, 0, UX_PICTBRIDGE_MAX_VARIABLE_SIZE);
+   _ux_utility_memory_set(variable_name, 0, UX_PICTBRIDGE_MAX_VARIABLE_SIZE); /* Use case of memset is verified. */
    variable_name_end = variable_name + UX_PICTBRIDGE_MAX_VARIABLE_SIZE - 1;
 
     /* Reset the variable string buffer.  */
-   _ux_utility_memory_set(variable_string, 0, UX_PICTBRIDGE_MAX_STRING_SIZE);
+   _ux_utility_memory_set(variable_string, 0, UX_PICTBRIDGE_MAX_STRING_SIZE); /* Use case of memset is verified. */
    variable_string_end = variable_string + UX_PICTBRIDGE_MAX_STRING_SIZE - 1;
 
     /* Reset the xml parameter.  */
-   _ux_utility_memory_set(xml_parameter, 0, UX_PICTBRIDGE_MAX_STRING_SIZE);
+   _ux_utility_memory_set(xml_parameter, 0, UX_PICTBRIDGE_MAX_STRING_SIZE); /* Use case of memset is verified. */
    xml_parameter_end = xml_parameter + UX_PICTBRIDGE_MAX_STRING_SIZE - 1;
 
     /* We parse the current xml tag line. We are now positioned at the "<". */

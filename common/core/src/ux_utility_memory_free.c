@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_memory_free                             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,6 +64,8 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_memory_free(VOID *memory)
@@ -85,7 +87,8 @@ UCHAR               *memory_address;
     memory_size_returned = memory_block -> ux_memory_block_size + (ULONG)sizeof(UX_MEMORY_BLOCK);
 
     /* Check this memory block to see if it valid.  */
-    if (memory_block -> ux_memory_block_status != UX_MEMORY_USED)
+    if (memory_block -> ux_memory_block_status != (UX_MEMORY_USED | UX_REGULAR_MEMORY) &&
+        memory_block -> ux_memory_block_status != (UX_MEMORY_USED | UX_CACHE_SAFE_MEMORY))
     {
 
         /* Not valid. Release the protection.  */
@@ -100,6 +103,21 @@ UCHAR               *memory_address;
         /* Return to caller.  */
         return;
     }
+
+#ifdef UX_ENABLE_MEMORY_STATISTICS
+
+    /* Update allocate count, total size.  */
+    if (memory_block -> ux_memory_block_status == (UX_MEMORY_USED | UX_REGULAR_MEMORY))
+    {
+        _ux_system -> ux_system_regular_memory_pool_alloc_count --;
+        _ux_system -> ux_system_regular_memory_pool_alloc_total -= memory_block -> ux_memory_block_size;
+    }
+    else
+    {
+        _ux_system -> ux_system_cache_safe_memory_pool_alloc_count --;
+        _ux_system -> ux_system_cache_safe_memory_pool_alloc_total -= memory_block -> ux_memory_block_size;
+    }
+#endif
 
     /* We mark this memory block as being unused.  */
     memory_block -> ux_memory_block_status =  UX_MEMORY_UNUSED;
@@ -131,7 +149,7 @@ UCHAR               *memory_address;
     {
 
         /* Determine if the memory block is used.  */
-        if (next_block -> ux_memory_block_status == UX_MEMORY_USED)
+        if (next_block -> ux_memory_block_status != UX_MEMORY_UNUSED)
         {
 
             /* Yes, move to next block.  */

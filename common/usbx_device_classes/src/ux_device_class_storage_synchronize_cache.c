@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_synchronize_cache          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized command logic,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_synchronize_cache(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -92,14 +95,14 @@ UCHAR                   flags;
     UX_PARAMETER_NOT_USED(endpoint_out);
     UX_PARAMETER_NOT_USED(scsi_command);
 
+    /* By default status is passed.  */
+    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
+
     /* Is there not an implementation?  */
     if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_flush == UX_NULL)
     {
 
         /* This means the application is not using a cache.  */
-
-        /* Return a CSW with success.  */
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
 
         /* Return success.  */
         return(UX_SUCCESS);
@@ -119,9 +122,7 @@ UCHAR                   flags;
                             lun, storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id, &media_status);
 
     /* Update the request sense.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  (UCHAR) (media_status & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  (UCHAR) ((media_status >> 8 ) & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  (UCHAR) ((media_status >> 16 ) & 0xff);
+    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status = media_status;
 
     /* If there is a problem, return a failed command.  */
     if (status != UX_SUCCESS)
@@ -131,7 +132,7 @@ UCHAR                   flags;
            REQUEST_SENSE command.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
 
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
         /* We are done here.  */
         return(UX_ERROR);
@@ -145,13 +146,16 @@ UCHAR                   flags;
     status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_flush(storage, lun, number_blocks, lba, &media_status);
 
     /* Update the request sense.  */
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key         =  (UCHAR) (media_status & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code              =  (UCHAR) ((media_status >> 8 ) & 0xff);
-    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier    =  (UCHAR) ((media_status >> 16 ) & 0xff);
+    storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status = media_status;
 
     /* If the immediate bit is set, we are already done, no matter what local operation status is.  */
     if ((flags & UX_SLAVE_CLASS_STORAGE_SYNCHRONIZE_CACHE_FLAGS_IMMED) != 0)
+    {
+
+        /* CSW skipped since already sent in this function.  */
+        UX_DEVICE_CLASS_STORAGE_CSW_SKIP(&storage -> ux_slave_class_storage_csw_status) = UX_TRUE;
         return(status);
+    }
 
     /* If there is a problem, return a failed command.  */
     if (status != UX_SUCCESS)
@@ -161,13 +165,11 @@ UCHAR                   flags;
            REQUEST_SENSE command.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
 
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
         /* Return an error.  */
         return(UX_ERROR);
     }
-    else
-        _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
 
     /* Return completion status.  */
     return(status);

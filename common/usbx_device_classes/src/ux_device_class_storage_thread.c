@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_thread                     PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,7 @@
 /*    _ux_utility_long_get                  Get 32-bit value              */ 
 /*    _ux_utility_memory_allocate           Allocate memory               */ 
 /*    _ux_utility_semaphore_create          Create semaphore              */ 
+/*    _ux_utility_delay_ms                  Sleep thread for several ms   */
 /*    _ux_utility_thread_suspend            Suspend thread                */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -91,6 +92,14 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used sleep instead of       */
+/*                                            relinquish on error,        */
+/*                                            optimized command logic,    */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_storage_thread(ULONG storage_class)
@@ -158,7 +167,7 @@ UCHAR                       *scsi_command;
         
             /* Check state, they must be both RESET.  */
             if (endpoint_out -> ux_slave_endpoint_state == UX_ENDPOINT_RESET &&
-                !storage -> ux_slave_class_storage_phase_error)
+                (UCHAR)storage -> ux_slave_class_storage_csw_status != UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR)
             {
 
                 /* Send the request to the device controller.  */
@@ -344,9 +353,9 @@ UCHAR                       *scsi_command;
                                     _ux_device_stack_endpoint_stall(endpoint_in);
                                 
                                 /* Initialize the request sense keys.  */
-                                storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_key =       UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ILLEGAL_REQUEST;
-                                storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code =            UX_SLAVE_CLASS_STORAGE_ASC_KEY_INVALID_COMMAND;
-                                storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_code_qualifier =  0;
+                                storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+                                    UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ILLEGAL_REQUEST,
+                                                                         UX_SLAVE_CLASS_STORAGE_ASC_KEY_INVALID_COMMAND,0);
 
                                 /* This is the tricky part of the SCSI state machine. We must send the CSW BUT need to wait
                                    for the endpoint_in to be reset by the host.  */
@@ -357,15 +366,8 @@ UCHAR                       *scsi_command;
                                     if (endpoint_in -> ux_slave_endpoint_state == UX_ENDPOINT_RESET)
                                     {
 
-                                        /* Now we return a CSW with failure.  */
-                                        status =  _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_FAILED);
-            
-                                        /* Check error code. */
-                                        if (status != UX_SUCCESS)
-
-                                            /* Error trap. */
-                                            _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, status);
-            
+                                        /* Now we set the CSW with failure.  */
+                                        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
                                         break;
                                     }                                        
 
@@ -376,27 +378,36 @@ UCHAR                       *scsi_command;
                                 }
                                 break;
                             }
+
+                            /* Send CSW if not SYNC_CACHE.  */
+                            status = _ux_device_class_storage_csw_send(storage, lun, endpoint_in, 0 /* Don't care */);
+
+                            /* Check error code. */
+                            if (status != UX_SUCCESS)
+
+                                /* Error trap. */
+                                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, status);
                         }
                         else
 
                             /* Phase error!  */
-                            storage -> ux_slave_class_storage_phase_error = TX_TRUE;
+                            storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
                     }
                     
                     else
 
                         /* Phase error!  */
-                        storage -> ux_slave_class_storage_phase_error = TX_TRUE;
+                        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
                 }
                 else
 
                     /* Phase error!  */
-                    storage -> ux_slave_class_storage_phase_error = TX_TRUE;
+                    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
             }
             else
             {
 
-                if (storage -> ux_slave_class_storage_phase_error == TX_TRUE)
+                if ((UCHAR)storage -> ux_slave_class_storage_csw_status == UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR)
                 {
 
                     /* We should keep the endpoints stalled.  */
@@ -405,7 +416,7 @@ UCHAR                       *scsi_command;
                 }
 
                 /* We must therefore wait a while.  */
-                _ux_utility_thread_relinquish();
+                _ux_utility_delay_ms(2);
             }
         }
 

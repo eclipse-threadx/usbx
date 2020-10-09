@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_object_tag_line_add                  PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_pictbridge_object_tag_line_add(UCHAR *pima_object_buffer, 
@@ -114,7 +118,7 @@ UINT                                status;
         *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_START_BRACKET;
     
         /* Create the element string.  */
-       _ux_utility_memory_copy(pima_object_buffer, tag_element_string, element_length);
+       _ux_utility_memory_copy(pima_object_buffer, tag_element_string, element_length); /* Use case of memcpy is verified. */
 
         /* Update the object pointer position.  */
         pima_object_buffer += element_length;
@@ -156,7 +160,7 @@ UINT                                status;
             *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_SPACE;
     
             /* Create the variable string.  */
-            _ux_utility_memory_copy(pima_object_buffer, tag_variable, element_length);
+            _ux_utility_memory_copy(pima_object_buffer, tag_variable, element_length); /* Use case of memcpy is verified. */
 
             /* Update the object pointer position.  */
             pima_object_buffer += element_length;
@@ -297,7 +301,7 @@ UINT                                status;
                 return(UX_MEMORY_INSUFFICIENT);
 
             /* We have a string to insert.  */
-            _ux_utility_memory_copy(pima_object_buffer, (UCHAR *) tag_element, element_length);
+            _ux_utility_memory_copy(pima_object_buffer, (UCHAR *) tag_element, element_length); /* Use case of memcpy is verified. */
         }
 
         /* Update the object pointer position.  */
@@ -399,7 +403,7 @@ UINT                                status;
                     return(UX_MEMORY_INSUFFICIENT);
 
                 /* We have a string to insert.  */
-                _ux_utility_memory_copy(pima_object_buffer, (UCHAR *) (*((ALIGN_TYPE *)tag_element)), element_length);
+                _ux_utility_memory_copy(pima_object_buffer, (UCHAR *) (*((ALIGN_TYPE *)tag_element)), element_length); /* Use case of memcpy is verified. */
             }
     
             /* Update the object pointer position.  */
@@ -450,7 +454,7 @@ UINT                                status;
         *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_SLASH;
     
         /* Create the element string.  */
-       _ux_utility_memory_copy(pima_object_buffer, tag_element_string, element_length);
+       _ux_utility_memory_copy(pima_object_buffer, tag_element_string, element_length); /* Use case of memcpy is verified. */
 
         /* Update the object pointer position.  */
         pima_object_buffer += element_length;

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_initialize                             PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_initialize(UX_HCD *hcd)
@@ -88,10 +92,12 @@ UINT            status;
 
     /* The controller initialized here is of OHCI type.  */
     hcd -> ux_hcd_controller_type =  UX_OHCI_CONTROLLER;
-    
+
+#if UX_MAX_DEVICES > 1
     /* Initialize the max bandwidth for periodic endpoints. On OHCI, the spec says no 
        more than 90% to be allocated for periodic.  */
     hcd -> ux_hcd_available_bandwidth =  UX_OHCI_AVAILABLE_BANDWIDTH;
+#endif
 
     /* Allocate memory for this OHCI HCD instance.  */
     hcd_ohci =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_HCD_OHCI));
@@ -139,9 +145,12 @@ UINT            status;
     if (status != UX_SUCCESS)
         return(status);
 
+#if UX_MAX_DEVICES > 1
+
     /* Read the OHCI controller version, it is either USB 1.0 or 1.1. This is important for 
        filtering INT out endpoints on a 1.0 OHCI.  */
     hcd -> ux_hcd_version =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_REVISION);
+#endif
 
     /* Set the state of the OHCI controller to reset in the control register.
        This is not compulsory but some controllers demand to start in this state.  */
@@ -213,7 +222,9 @@ UINT            status;
        for the generic HCD container and the local OHCI container.  */
     ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_RH_DESCRIPTOR_A);
     hcd -> ux_hcd_nb_root_hubs =  (UINT) (ohci_register & 0xff);
-    hcd_ohci -> ux_hcd_ohci_nb_root_hubs =  (UINT) (ohci_register & 0xff);
+    if (hcd -> ux_hcd_nb_root_hubs > UX_MAX_ROOTHUB_PORT)
+        hcd -> ux_hcd_nb_root_hubs = UX_MAX_ROOTHUB_PORT;
+    hcd_ohci -> ux_hcd_ohci_nb_root_hubs =  hcd -> ux_hcd_nb_root_hubs;
 
     /* All ports must now be powered to pick up device insertion.  */
     _ux_hcd_ohci_power_root_hubs(hcd_ohci);

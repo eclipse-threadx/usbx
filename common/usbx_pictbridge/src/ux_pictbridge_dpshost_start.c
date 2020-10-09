@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_start                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,6 +64,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_start(UX_PICTBRIDGE *pictbridge, UX_HOST_CLASS_PIMA *pima)
@@ -170,7 +175,7 @@ UINT                                length, length1;
                                 UX_PICTBRIDGE_THREAD_STACK_SIZE, 
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
-                                TX_NO_TIME_SLICE, TX_AUTO_START);
+                                UX_NO_TIME_SLICE, UX_AUTO_START);
                     
         /* Check the completion status.  */
         if (status != UX_SUCCESS)
@@ -184,7 +189,7 @@ UINT                                length, length1;
     {
 
         /* Check and free pictbridge -> ux_pictbridge_thread.  */
-        if (pictbridge -> ux_pictbridge_thread.tx_thread_id != TX_EMPTY)
+        if (pictbridge -> ux_pictbridge_thread.tx_thread_id != UX_EMPTY)
             _ux_utility_thread_delete(&pictbridge -> ux_pictbridge_thread);
 
         /* Check and free pictbridge -> ux_pictbridge_thread_stack.  */
@@ -192,7 +197,7 @@ UINT                                length, length1;
             _ux_utility_memory_free(pictbridge -> ux_pictbridge_thread_stack);
 
         /* Check and free pictbridge -> ux_pictbridge_notification_semaphore.  */
-        if (pictbridge -> ux_pictbridge_notification_semaphore.tx_semaphore_id != TX_EMPTY)
+        if (pictbridge -> ux_pictbridge_notification_semaphore.tx_semaphore_id != UX_EMPTY)
             _ux_utility_semaphore_delete(&pictbridge -> ux_pictbridge_notification_semaphore);
 
         /* Check and free pictbridge -> ux_pictbridge_device.  */

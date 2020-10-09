@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_setup                           PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_setup(UX_HOST_CLASS_ASIX *asix)
@@ -283,7 +287,7 @@ UINT                        status;
 
 
     /* Copy the node id into the Asix instance.  */
-    _ux_utility_memory_copy(asix -> ux_host_class_asix_node_id, setup_buffer, UX_HOST_CLASS_ASIX_NODE_ID_LENGTH);
+    _ux_utility_memory_copy(asix -> ux_host_class_asix_node_id, setup_buffer, UX_HOST_CLASS_ASIX_NODE_ID_LENGTH); /* Use case of memcpy is verified. */
 
     /* Request ownership of Serial Management Interface.  */
     transfer_request -> ux_transfer_request_data_pointer        =  UX_NULL;

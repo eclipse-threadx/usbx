@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_thread                          PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_thread(ULONG parameter)
@@ -280,7 +284,7 @@ ULONG                        physical_address_lsw;
             transfer_request -> ux_transfer_request_index               =  0;
 
             /* Fill in the multicast filter.  */
-            _ux_utility_memory_set(setup_buffer, 0, 8);
+            _ux_utility_memory_set(setup_buffer, 0, 8); /* Use case of memset is verified. */
             *(setup_buffer +1) = 0x40;
         
             /* Send request to HCD layer.  */

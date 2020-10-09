@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*    FUNCTION                                              RELEASE       */
+/*    FUNCTION                                             RELEASE        */
 /*                                                                        */
-/*      _ux_device_stack_alternate_setting_get             PORTABLE C     */
-/*                                                           6.0          */
+/*      _ux_device_stack_alternate_setting_get            PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_alternate_setting_get(ULONG interface_value)
@@ -91,8 +95,12 @@ UINT                    status;
         /* Obtain the pointer to the first interface attached.  */
         interface =  device -> ux_slave_device_first_interface;
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         /* Start parsing each interface.  */
         while (interface != UX_NULL)
+#else
+        if (interface != UX_NULL)
+#endif
         {
 
             /* Check if this is the interface we have an inquiry for.  */
@@ -122,8 +130,10 @@ UINT                    status;
                 return(status);
             }
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Get the next interface.  */
             interface =  interface -> ux_slave_interface_next_interface;
+#endif
         }
     }
 

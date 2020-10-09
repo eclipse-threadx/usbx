@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_trace_event_insert                              PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 #ifdef UX_TRACE_INSERT_MACROS
@@ -80,14 +85,14 @@ VOID  _ux_trace_event_insert(ULONG event_id, ULONG info_field_1, ULONG info_fiel
                              ULONG filter, TX_TRACE_BUFFER_ENTRY **current_event, ULONG *current_timestamp)
 {
 
-TX_INTERRUPT_SAVE_AREA
+UX_INTERRUPT_SAVE_AREA
 
 TX_TRACE_BUFFER_ENTRY  *event;
 ULONG                   timestamp;
 
 
     /* Disable interrupts.  */
-    TX_DISABLE
+    UX_DISABLE
 
     /* Pickup the current event.  */
     event =  _tx_trace_buffer_current_ptr;
@@ -134,7 +139,7 @@ ULONG                   timestamp;
     }
 
     /* Restore interrupts.  */
-    TX_RESTORE
+    UX_RESTORE
 }
 #endif
 

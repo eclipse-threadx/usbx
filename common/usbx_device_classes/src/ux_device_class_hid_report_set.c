@@ -32,10 +32,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_class_hid_report_set                       PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_class_hid_report_set                     PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases,                      */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_report_set(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type, 
@@ -132,7 +136,7 @@ UCHAR                           *hid_buffer;
         
     /* Now we can safely copy the payload.  */
     _ux_utility_memory_copy(hid_event.ux_device_class_hid_event_buffer, hid_buffer, 
-                                hid_event.ux_device_class_hid_event_length);
+                                hid_event.ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
 
     /* If there is a callback defined by the application, send the hid event to it.  */
     if (hid -> ux_device_class_hid_callback != UX_NULL)

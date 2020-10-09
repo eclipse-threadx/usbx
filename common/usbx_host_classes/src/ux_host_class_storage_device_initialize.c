@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_device_initialize            PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,13 +75,23 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration,          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_device_initialize(UX_HOST_CLASS_STORAGE *storage)
 {
 
-UINT        status;
-ULONG       lun_index;
+UINT                            status;
+ULONG                           lun_index;
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
+UX_HOST_CLASS                   *class_inst;
+UINT                            inst_index;
+#endif
+
 
     /* Check the device protocol support and initialize the transport layer.  */
     status =  _ux_host_class_storage_device_support_check(storage);
@@ -105,6 +115,11 @@ ULONG       lun_index;
        The timing does not have to be precise so we use the thread sleep function.  
        The default sleep value is 2 seconds.  */
     _ux_utility_delay_ms(UX_HOST_CLASS_STORAGE_DEVICE_INIT_DELAY);
+
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+    /* We need the class container.  */
+    class_inst =  storage -> ux_host_class_storage_class;
+#endif
 
     /* Each LUN must be parsed and mounted.  */
     for (lun_index = 0; lun_index <= storage -> ux_host_class_storage_max_lun; lun_index++)
@@ -147,9 +162,11 @@ ULONG       lun_index;
         case UX_HOST_CLASS_STORAGE_MEDIA_OPTICAL_DISK:
         case UX_HOST_CLASS_STORAGE_MEDIA_IOMEGA_CLICK:
 
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
             /* Try to read the device media in search for a partition table or boot sector.
                We are at the root of the disk, so use sector 0 as the starting point.  */
             _ux_host_class_storage_media_mount(storage, 0);
+#endif
             break;
 
         case UX_HOST_CLASS_STORAGE_MEDIA_CDROM:
@@ -160,6 +177,37 @@ ULONG       lun_index;
 
             break;
         }
+
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+
+        /* Find a free media slot for inserted media.  */
+        storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) class_inst -> ux_host_class_media;
+        for (inst_index = 0; inst_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA;
+            storage_media ++, inst_index++)
+        {
+
+            /* Skip used storage media slots.  */
+            if (storage_media -> ux_host_class_storage_media_storage != UX_NULL)
+                continue;
+
+            /* Use this free storage media slot.  */
+            storage_media -> ux_host_class_storage_media_storage = storage;
+
+            /* Save media information.  */
+            storage_media -> ux_host_class_storage_media_lun = (UCHAR)storage -> ux_host_class_storage_lun;
+            storage_media -> ux_host_class_storage_media_sector_size = (USHORT)storage -> ux_host_class_storage_sector_size;
+            storage_media -> ux_host_class_storage_media_number_sectors = storage -> ux_host_class_storage_last_sector_number + 1;
+
+            /* Invoke callback for media insertion.  */
+            if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+            {
+
+                /* Call system change function.  */
+                _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_INSERTION,
+                                    storage -> ux_host_class_storage_class, (VOID *) storage_media);
+            }
+        }
+#endif
     }
 
     /* Some LUNs may succeed and some may fail. For simplicity's sake, we just

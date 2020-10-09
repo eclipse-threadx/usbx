@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_partition_read               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,11 +71,20 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable FX  */
+/*                                            media integration,          */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_partition_read(UX_HOST_CLASS_STORAGE *storage, UCHAR *sector_memory, ULONG sector)
 {
-
+#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+    UX_PARAMETER_NOT_USED(storage);
+    UX_PARAMETER_NOT_USED(sector_memory);
+    UX_PARAMETER_NOT_USED(sector);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 UINT        status =  UX_ERROR;
 UINT        partition_index;
     
@@ -123,5 +132,6 @@ UINT        partition_index;
 
     /* Return completion status.  */
     return(status);
+#endif
 }
 

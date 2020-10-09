@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_ioctl                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -286,7 +291,7 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
                         _ux_device_class_cdc_acm_bulkin_thread,
                         (ULONG) (ALIGN_TYPE) cdc_acm, (VOID *) cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack ,
                         UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_AUTO_START);
+                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_AUTO_START);
                         
             /* Check the creation of this thread.  */
             if (status != UX_SUCCESS)
@@ -311,7 +316,7 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
                         _ux_device_class_cdc_acm_bulkout_thread,
                         (ULONG) (ALIGN_TYPE) cdc_acm, (VOID *) cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack ,
                         UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, TX_AUTO_START);
+                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_AUTO_START);
                         
             /* Check the creation of this thread.  */
             if (status != UX_SUCCESS)

@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_start                      PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_start(UX_PICTBRIDGE *pictbridge)
@@ -166,7 +171,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
                                 UX_PICTBRIDGE_THREAD_STACK_SIZE, 
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
-                                TX_NO_TIME_SLICE, TX_AUTO_START);
+                                UX_NO_TIME_SLICE, UX_AUTO_START);
                     
         /* Check the completion status.  */
         if (status != UX_SUCCESS)
@@ -236,13 +241,13 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
     {
             
         /* Free resources allocated so far.  */
-        if (pictbridge -> ux_pictbridge_thread.tx_thread_id != TX_EMPTY)
+        if (pictbridge -> ux_pictbridge_thread.tx_thread_id != UX_EMPTY)
             _ux_utility_thread_delete(&pictbridge -> ux_pictbridge_thread);
         if (pictbridge -> ux_pictbridge_thread_stack)
             _ux_utility_memory_free(pictbridge -> ux_pictbridge_thread_stack);
-        if (pictbridge -> ux_pictbridge_notification_semaphore.tx_semaphore_id != TX_EMPTY)
+        if (pictbridge -> ux_pictbridge_notification_semaphore.tx_semaphore_id != UX_EMPTY)
             _ux_utility_semaphore_delete(&pictbridge -> ux_pictbridge_notification_semaphore);
-        if (pictbridge -> ux_pictbridge_event_flags_group.tx_event_flags_group_id != TX_EMPTY)
+        if (pictbridge -> ux_pictbridge_event_flags_group.tx_event_flags_group_id != UX_EMPTY)
             _ux_utility_event_flags_delete(&pictbridge -> ux_pictbridge_event_flags_group);
         if (pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object)
         {

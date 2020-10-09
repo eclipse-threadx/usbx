@@ -31,10 +31,10 @@
 
 /**************************************************************************/
 /*                                                                        */
-/*  FUNCTION                                                 RELEASE      */
+/*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_device_stack_configuration_set                    PORTABLE C    */
-/*                                                           6.0          */
+/*    _ux_device_stack_configuration_set                  PORTABLE C      */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_configuration_set(ULONG configuration_value)
@@ -85,15 +89,19 @@ UCHAR                           descriptor_type;
 UX_CONFIGURATION_DESCRIPTOR     configuration_descriptor = { 0 };
 UX_INTERFACE_DESCRIPTOR         interface_descriptor;
 UX_SLAVE_INTERFACE              *interface; 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 UX_SLAVE_INTERFACE              *next_interface; 
-UX_SLAVE_CLASS                  *class;
+#endif
+UX_SLAVE_CLASS                  *class_inst;
 UX_SLAVE_CLASS                  *current_class =  UX_NULL;
 UX_SLAVE_CLASS_COMMAND          class_command;
 UX_SLAVE_DEVICE                 *device;
 ULONG                           iad_flag;
 ULONG                           iad_first_interface =  0;
 ULONG                           iad_number_interfaces =  0;
+#if UX_MAX_SLAVE_CLASS_DRIVER > 1
 ULONG                           class_index;
+#endif
 
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -159,35 +167,41 @@ ULONG                           class_index;
         /* Get the pointer to the first interface.  */
         interface =  device -> ux_slave_device_first_interface;
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         /* Deactivate all the interfaces if any.  */
         while (interface != UX_NULL)
         {
-
+#endif
             /* Build all the fields of the Class Command.  */
             class_command.ux_slave_class_command_request =   UX_SLAVE_CLASS_COMMAND_DEACTIVATE;
             class_command.ux_slave_class_command_interface =  (VOID *) interface;
 
             /* Get the pointer to the class container of this interface.  */
-            class =  interface -> ux_slave_interface_class;
+            class_inst =  interface -> ux_slave_interface_class;
 
             /* Store the class container. */
-            class_command.ux_slave_class_command_class_ptr =  class;
+            class_command.ux_slave_class_command_class_ptr =  class_inst;
 
             /* If there is a class container for this instance, deactivate it.  */
-            if (class != UX_NULL)
+            if (class_inst != UX_NULL)
 
                 /* Call the class with the DEACTIVATE signal.  */
-                class -> ux_slave_class_entry_function(&class_command);
+                class_inst -> ux_slave_class_entry_function(&class_command);
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Get the next interface.  */
             next_interface =  interface -> ux_slave_interface_next_interface;
+#endif
 
             /* Remove the interface and all endpoints associated with it.  */
             _ux_device_stack_interface_delete(interface);
 
+#if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Now we refresh the interface pointer.  */
             interface =  next_interface;
         }
+#endif
+
     }
 
     /* No configuration is selected.  */
@@ -273,35 +287,41 @@ ULONG                           class_index;
                     {
 
                         /* First interface. Scan the list of classes to find a match.  */
-                        class =  _ux_system_slave -> ux_system_slave_class_array;
+                        class_inst =  _ux_system_slave -> ux_system_slave_class_array;
 
+#if UX_MAX_SLAVE_CLASS_DRIVER > 1
                         /* Parse all the class drivers.  */
                         for (class_index = 0; class_index < _ux_system_slave -> ux_system_slave_max_class; class_index++)
                         {
+#endif
 
                             /* Check if this class driver is used.  */
-                            if (class -> ux_slave_class_status == UX_USED)
+                            if (class_inst -> ux_slave_class_status == UX_USED)
                             {
 
                                 /* Check if this is the same interface for the same configuration. */
-                                if ((interface_descriptor.bInterfaceNumber == class -> ux_slave_class_interface_number) &&
-                                    (configuration_value == class -> ux_slave_class_configuration_number))
+                                if ((interface_descriptor.bInterfaceNumber == class_inst -> ux_slave_class_interface_number) &&
+                                    (configuration_value == class_inst -> ux_slave_class_configuration_number))
                                 {
 
                                     /* Memorize the class in the class/interface array.  */
-                                    _ux_system_slave -> ux_system_slave_interface_class_array[interface_descriptor.bInterfaceNumber] = class;
+                                    _ux_system_slave -> ux_system_slave_interface_class_array[interface_descriptor.bInterfaceNumber] = class_inst;
 
                                     /* And again as the current class.  */
-                                    current_class = class;
+                                    current_class = class_inst;
 
+#if UX_MAX_SLAVE_CLASS_DRIVER > 1
                                     /* We are done here.  */
                                     break;
+#endif
                                 }
                             }
 
+#if UX_MAX_SLAVE_CLASS_DRIVER > 1
                             /* Move to the next registered class.  */
-                            class++;
+                            class_inst ++;
                         }
+#endif
                     }
                     else
 
@@ -322,32 +342,38 @@ ULONG                           class_index;
                 {
 
                     /* First interface. Scan the list of classes to find a match.  */
-                    class =  _ux_system_slave -> ux_system_slave_class_array;
+                    class_inst =  _ux_system_slave -> ux_system_slave_class_array;
 
+#if UX_MAX_SLAVE_CLASS_DRIVER > 1
                     /* Parse all the class drivers.  */
                     for (class_index = 0; class_index < _ux_system_slave -> ux_system_slave_max_class; class_index++)
                     {
+#endif
 
                         /* Check if this class driver is used.  */
-                        if (class -> ux_slave_class_status == UX_USED)
+                        if (class_inst -> ux_slave_class_status == UX_USED)
                         {
 
                             /* Check if this is the same interface for the same configuration. */
-                            if ((interface_descriptor.bInterfaceNumber == class -> ux_slave_class_interface_number) &&
-                                    (configuration_value == class -> ux_slave_class_configuration_number))
+                            if ((interface_descriptor.bInterfaceNumber == class_inst -> ux_slave_class_interface_number) &&
+                                    (configuration_value == class_inst -> ux_slave_class_configuration_number))
                             {
 
                                 /* Memorize the class in the class/interface array.  */
-                                _ux_system_slave -> ux_system_slave_interface_class_array[interface_descriptor.bInterfaceNumber] = class;
+                                _ux_system_slave -> ux_system_slave_interface_class_array[interface_descriptor.bInterfaceNumber] = class_inst;
 
+#if UX_MAX_SLAVE_CLASS_DRIVER > 1
                                 /* We are done here.  */
                                 break;
+#endif
                             }
                         }
 
+#if UX_MAX_SLAVE_CLASS_DRIVER > 1
                         /* Move to the next registered class.  */
-                        class++;
+                        class_inst ++;
                     }
+#endif
                 }
 
                 /* Set the interface.  */

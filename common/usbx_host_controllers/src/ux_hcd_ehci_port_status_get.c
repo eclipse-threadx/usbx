@@ -57,8 +57,8 @@
 #elif defined(MIMXRT)
 #define UX_EHCI_USBPHY1                     (0x400D9000u)
 #define UX_EHCI_USBPHY2                     (0x400DA000u)
-#define UX_EHCI_BASE1                       (0x402E0000u)
-#define UX_EHCI_BASE2                       (0x402E0200u)
+#define UX_EHCI_BASE1                       (0x402E0100u)
+#define UX_EHCI_BASE2                       (0x402E0300u)
 #endif
 
 #define UX_EHCI_USBPHY_CTRL_SET_BIT1(base)                  ((*(volatile ULONG *) ( base + 0x34)) = 0x02)
@@ -70,7 +70,7 @@
     if ((ULONG)hcd_ehci -> ux_hcd_ehci_base == UX_EHCI_BASE1)                   \
         base = (UX_EHCI_USBPHY1);                                               \
     else                                                                        \
-        base = (UX_EHCI_USBPHY1);                                               \
+        base = (UX_EHCI_USBPHY2);                                               \
     if (on_off)                                                                 \
         UX_EHCI_USBPHY_CTRL_SET_BIT1(base);                                     \
     else                                                                        \
@@ -88,7 +88,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_port_status_get                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -144,6 +144,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed NXP register base,    */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _ux_hcd_ehci_port_status_get(UX_HCD_EHCI *hcd_ehci, ULONG port_index)

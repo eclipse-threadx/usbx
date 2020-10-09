@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_configure                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized based on compile  */
+/*                                            definitions,                */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_configure(UX_HOST_CLASS_HUB *hub)
@@ -83,10 +87,12 @@ UINT  _ux_host_class_hub_configure(UX_HOST_CLASS_HUB *hub)
 UINT                    status;
 UX_CONFIGURATION        *configuration;
 UX_DEVICE               *device;
-UX_DEVICE               *parent_device;
 UX_ENDPOINT             *control_endpoint;
 UCHAR                   *device_status_data;
 UX_TRANSFER             *transfer_request;
+#if UX_MAX_DEVICES > 1
+UX_DEVICE               *parent_device;
+#endif
 
 
     /* A HUB normally has one configuration. So retrieve the 1st configuration
@@ -96,9 +102,6 @@ UX_TRANSFER             *transfer_request;
     /* Get the device container for this configuration.  */
     device =  configuration -> ux_configuration_device;
     
-    /* Get the parent container for this device.  */
-    parent_device =  device -> ux_device_parent;
-
     /* To find the true source of the HUB power source, we need to do a GET_STATUS of 
        the device.  */
     control_endpoint =  &device -> ux_device_control_endpoint;
@@ -148,12 +151,16 @@ UX_TRANSFER             *transfer_request;
         /* Return an error.  */
         return(UX_CONNECTION_INCOMPATIBLE);
     }               
-    
+
+#if UX_MAX_DEVICES > 1
     /* Check the HUB power source and check the parent power source for 
        incompatible connections.  */
     if (hub -> ux_host_class_hub_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED)
     {
         
+        /* Get the parent container for this device.  */
+        parent_device =  device -> ux_device_parent;
+
         /* If the device is NULL, the parent is the root HUB and we don't have to worry 
            if the parent is not the root HUB, check for its power source.  */
         if ((parent_device != UX_NULL) && (parent_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED))
@@ -168,7 +175,8 @@ UX_TRANSFER             *transfer_request;
             return(UX_CONNECTION_INCOMPATIBLE);
         }            
     }
-    
+#endif
+
     /* We have the valid configuration. Ask the USBX stack to set this configuration.  */        
     status =  _ux_host_stack_device_configuration_select(configuration);
 

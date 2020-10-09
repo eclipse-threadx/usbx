@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_control_request                PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -120,14 +125,14 @@ ULONG                   media_status;
                     {
         
                         /* Wake up the DFU thread and send a detach request..  */
-                        _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT, TX_OR);                
+                        _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT, UX_OR);                
 
                     }
                     else
                     {
 
                         /* We expect the host to issue a reset.  Arm a timer in the DFU thread.  */
-                        _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_WAIT_RESET, TX_OR);                
+                        _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_WAIT_RESET, UX_OR);                
 
                     }
 
@@ -541,7 +546,7 @@ ULONG                   media_status;
                             {
         
                                 /* Wake up the DFU thread and send a detach request..  */
-                                _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT, TX_OR);                
+                                _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT, UX_OR);                
 
                             }
 

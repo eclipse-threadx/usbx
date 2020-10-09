@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_interrupt_thread               PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,12 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            verified memset and memcpy  */
+/*                                            cases, used UX prefix to    */
+/*                                            refer to TX symbols instead */
+/*                                            of using them directly,     */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_hid_interrupt_thread(ULONG hid_class)
@@ -107,11 +113,11 @@ ULONG                       actual_flags;
             /* Wait until we have a event sent by the application
                or a change in the idle state to send last or empty report.  */
             status =  _ux_utility_event_flags_get(&hid -> ux_device_class_hid_event_flags_group,
-                                                    UX_DEVICE_CLASS_HID_EVENTS_MASK, TX_OR_CLEAR, &actual_flags,
+                                                    UX_DEVICE_CLASS_HID_EVENTS_MASK, UX_OR_CLEAR, &actual_flags,
                                                     hid -> ux_device_class_hid_event_wait_timeout);
 
             /* If there is no event, check if we have timeout defined.  */
-            if (status == TX_NO_EVENTS)
+            if (status == UX_NO_EVENTS)
             {
 
                 /* There is no event exists on timeout, insert last.  */
@@ -122,14 +128,14 @@ ULONG                       actual_flags;
                     hid_event.ux_device_class_hid_event_length = transfer_request_in -> ux_slave_transfer_request_requested_length;
                     _ux_utility_memory_copy(hid_event.ux_device_class_hid_event_buffer,
                                             transfer_request_in -> ux_slave_transfer_request_data_pointer,
-                                            hid_event.ux_device_class_hid_event_length);
+                                            hid_event.ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
                 }
                 else
                 {
                     hid_event.ux_device_class_hid_event_report_id = 0;
                     hid_event.ux_device_class_hid_event_length = transfer_request_in -> ux_slave_transfer_request_endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize & 0x7FF;
                     _ux_utility_memory_set(hid_event.ux_device_class_hid_event_buffer, 0,
-                                            hid_event.ux_device_class_hid_event_length);
+                                            hid_event.ux_device_class_hid_event_length); /* Use case of memset is verified. */
                 }
                 _ux_device_class_hid_event_set(hid, &hid_event);
 
@@ -157,7 +163,7 @@ ULONG                       actual_flags;
                 buffer =  transfer_request_in -> ux_slave_transfer_request_data_pointer;
             
                 /* Copy the event buffer into the target buffer.  */
-                _ux_utility_memory_copy(buffer, hid_event.ux_device_class_hid_event_buffer, hid_event.ux_device_class_hid_event_length);
+                _ux_utility_memory_copy(buffer, hid_event.ux_device_class_hid_event_buffer, hid_event.ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
             
                 /* Send the request to the device controller.  */
                 status =  _ux_device_stack_transfer_request(transfer_request_in, hid_event.ux_device_class_hid_event_length, 

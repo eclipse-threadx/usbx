@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid_keyboard.h                        PORTABLE C      */ 
-/*                                                           6.0          */
+/*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,11 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
+/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
+/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -185,8 +190,8 @@ typedef struct UX_HOST_CLASS_HID_KEYBOARD_STRUCT
     ULONG           ux_host_class_hid_keyboard_key_count;
     UX_HOST_CLASS_HID   *ux_host_class_hid_keyboard_hid;
     USHORT          ux_host_class_hid_keyboard_id;    
-    TX_THREAD       ux_host_class_hid_keyboard_thread;
-    TX_SEMAPHORE    ux_host_class_hid_keyboard_semaphore;
+    UX_THREAD       ux_host_class_hid_keyboard_thread;
+    UX_SEMAPHORE    ux_host_class_hid_keyboard_semaphore;
     ULONG           ux_host_class_hid_keyboard_alternate_key_state;
     ULONG           ux_host_class_hid_keyboard_led_mask;
     VOID            *ux_host_class_hid_keyboard_thread_stack;
