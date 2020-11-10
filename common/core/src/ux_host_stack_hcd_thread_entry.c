@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_hcd_thread_entry                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed registered HCD scan,  */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_hcd_thread_entry(ULONG input)
@@ -95,7 +98,7 @@ UX_INTERRUPT_SAVE_AREA
 #if UX_MAX_HCD > 1
         /* This thread was awaken by one or more HCD controllers. Check each of the HCDs 
            to see who posted work to do. */  
-        for(hcd_index = 0; hcd_index < _ux_system_host -> ux_system_host_registered_hcd; hcd_index++)
+        for(hcd_index = 0; hcd_index < _ux_system_host -> ux_system_host_max_hcd; hcd_index++)
         {
 #else
             hcd_index = 0;

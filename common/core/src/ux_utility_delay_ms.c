@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_delay_ms                                PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings 64b, */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_delay_ms(ULONG ms_wait)
@@ -75,7 +78,7 @@ VOID  _ux_utility_delay_ms(ULONG ms_wait)
 ULONG   ticks;
 
     /* translate ms into ticks. */
-    ticks = (ms_wait * UX_PERIODIC_RATE) / 1000;
+    ticks = (ULONG)(ms_wait * UX_PERIODIC_RATE) / 1000;
     
     /* For safety add 1 to ticks.  */
     ticks++;

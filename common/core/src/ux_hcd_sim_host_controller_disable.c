@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_sim_host_controller_disable                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,8 +55,6 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _ux_utility_memory_free               Free memory block             */
-/*    _ux_utility_timer_delete              Delete timer                  */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -67,6 +65,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            did controller halt only,   */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_controller_disable(UX_HCD_SIM_HOST *hcd_sim_host)
@@ -75,23 +76,8 @@ UINT  _ux_hcd_sim_host_controller_disable(UX_HCD_SIM_HOST *hcd_sim_host)
 UX_HCD  *hcd = hcd_sim_host -> ux_hcd_sim_host_hcd_owner;
 
 
-    /* Set the state of the controller to HALTED first.  */
+    /* Set the state of the controller to HALTED.  */
     hcd -> ux_hcd_status =  UX_HCD_STATUS_HALTED;
-
-    /* Get simulated host controller.  */
-    hcd_sim_host = (UX_HCD_SIM_HOST *)hcd -> ux_hcd_controller_hardware;
-
-    /* Delete timer.  */
-    _ux_utility_timer_delete(&hcd_sim_host -> ux_hcd_sim_host_timer);
-
-    /* Free TD/ED memories.  */
-    _ux_utility_memory_free(hcd_sim_host -> ux_hcd_sim_host_iso_td_list);
-    _ux_utility_memory_free(hcd_sim_host -> ux_hcd_sim_host_td_list);
-    _ux_utility_memory_free(hcd_sim_host -> ux_hcd_sim_host_ed_list);
-
-    /* Free simulated host controller memory.  */
-    _ux_utility_memory_free(hcd_sim_host);
-    hcd -> ux_hcd_controller_hardware = UX_NULL;
 
     /* Return successful completion.  */
     return(UX_SUCCESS);

@@ -77,6 +77,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_timer_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_transaction_schedule.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_transfer_abort.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_dpump_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_dpump_configure.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_dpump_deactivate.c
@@ -201,6 +202,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_thread_sleep.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_thread_suspend.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_timer_create.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_timer_delete.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_unicode_to_string.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_virtual_address.c
 

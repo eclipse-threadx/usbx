@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_hcd_unregister                       PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,11 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed HCD devices scan,     */
+/*                                            used HCD uninit command,    */
+/*                                            fixed HCD status scan,      */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_hcd_unregister(UCHAR *hcd_name,
@@ -112,13 +117,13 @@ UINT        hcd_name_length =  0;
 #if UX_MAX_CLASS_DRIVER > 1
     /* We need to parse the controller driver table to find an empty spot.  */
     for (scan_index = 0;
-         scan_index < _ux_system_host -> ux_system_host_max_hcd;
+         scan_index < UX_SYSTEM_HOST_MAX_HCD_GET();
          scan_index++)
     {
 #endif
 
         /* Is this slot available and saved hcd_parameters match?  */
-        if (hcd -> ux_hcd_status == UX_USED &&
+        if (hcd -> ux_hcd_status != UX_UNUSED &&
             hcd -> ux_hcd_io == hcd_param1 &&
             hcd -> ux_hcd_irq == hcd_param2)
         {
@@ -146,7 +151,7 @@ UINT        hcd_name_length =  0;
         return(UX_ERROR);
 
     /* Now disable controller.  */
-    hcd -> ux_hcd_entry_function(hcd, UX_HCD_DISABLE_CONTROLLER, UX_NULL);
+    hcd -> ux_hcd_entry_function(hcd, UX_HCD_UNINITIALIZE, UX_NULL);
 
     /* Get first device.  */
     device = _ux_system_host -> ux_system_host_device_array;
@@ -179,6 +184,9 @@ UINT        hcd_name_length =  0;
         }
 
 #if UX_MAX_DEVICES > 1
+
+        /* Try the next device.  */
+        device ++;
     }
 #endif
 

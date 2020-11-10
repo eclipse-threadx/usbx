@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_partition_read               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*                                            added option to disable FX  */
 /*                                            media integration,          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added exFAT support,        */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_partition_read(UX_HOST_CLASS_STORAGE *storage, UCHAR *sector_memory, ULONG sector)
@@ -106,6 +109,7 @@ UINT        partition_index;
         case UX_HOST_CLASS_STORAGE_PARTITION_FAT_16_LBA_MAPPED: 
         case UX_HOST_CLASS_STORAGE_PARTITION_FAT_32_1:   
         case UX_HOST_CLASS_STORAGE_PARTITION_FAT_32_2:   
+        case UX_HOST_CLASS_STORAGE_PARTITION_EXFAT:
 
             /* We have found a legal partition entry pointing to a potential boot sector.  */
             status =  _ux_host_class_storage_media_open(storage, sector + _ux_utility_long_get(sector_memory + UX_HOST_CLASS_STORAGE_PARTITION_SECTORS_BEFORE));

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_power_root_hubs                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_power_root_hubs(UX_HCD_OHCI *hcd_ohci)
@@ -110,7 +113,7 @@ UINT        port_index;
         for (port_index = 0; port_index < hcd_ohci -> ux_hcd_ohci_nb_root_hubs; port_index++)
         {
 
-            if ((ohci_register_b & (0x20000 << port_index)) == 0)
+            if ((ohci_register_b & (0x20000u << port_index)) == 0)
             {
 
                 _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_RH_STATUS, OHCI_HC_RS_LPSC);
@@ -123,7 +126,7 @@ UINT        port_index;
         for (port_index = 0; port_index < hcd_ohci -> ux_hcd_ohci_nb_root_hubs; port_index++)
         {
 
-            if ((ohci_register_b & (0x20000 << port_index)) != 0)
+            if ((ohci_register_b & (0x20000u << port_index)) != 0)
             {
 
                 ohci_register_port_status =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index);

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_sim_host.h                                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -48,6 +48,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added HCD uninitialize,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -210,6 +213,7 @@ UINT    _ux_hcd_sim_host_entry(UX_HCD *hcd, UINT function, VOID *parameter);
 UINT    _ux_hcd_sim_host_frame_number_get(UX_HCD_SIM_HOST *hcd_sim_host, ULONG *frame_number);
 VOID    _ux_hcd_sim_host_frame_number_set(UX_HCD_SIM_HOST *hcd_sim_host, ULONG frame_number);
 UINT    _ux_hcd_sim_host_initialize(UX_HCD *hcd);
+UINT    _ux_hcd_sim_host_uninitialize(UX_HCD_SIM_HOST *hcd);
 UINT    _ux_hcd_sim_host_controller_disable(UX_HCD_SIM_HOST *hcd);
 UINT    _ux_hcd_sim_host_interrupt_endpoint_create(UX_HCD_SIM_HOST *hcd_sim_host, UX_ENDPOINT *endpoint);
 VOID    _ux_hcd_sim_host_iso_queue_process(UX_HCD_SIM_HOST *hcd_sim_host);

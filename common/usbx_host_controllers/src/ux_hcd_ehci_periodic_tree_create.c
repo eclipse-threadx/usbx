@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_periodic_tree_create                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_periodic_tree_create(UX_HCD_EHCI *hcd_ehci)
@@ -129,11 +132,11 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
                 previous_ed =                           ed_list[current_list_entry * 2];
                 previous_ed -> ux_ehci_ed_queue_head =  lp.ed_ptr;
                 previous_ed -> ux_ehci_ed_next_ed =     ed;
-                previous_ed -> ux_ehci_ed_next_anchor = ed;
+                previous_ed -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor = ed;
                 previous_ed =                           ed_list[(current_list_entry * 2) + 1];
                 previous_ed -> ux_ehci_ed_queue_head =  lp.ed_ptr;
                 previous_ed -> ux_ehci_ed_next_ed =     ed;
-                previous_ed -> ux_ehci_ed_next_anchor = ed;
+                previous_ed -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor = ed;
             }
 
             /* Memorize this ED in the local list. We do this operation now, otherwise

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_interrupt_endpoint_destroy             PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_interrupt_endpoint_destroy(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -154,7 +157,7 @@ ULONG                         max_packet_size;
             {
 
                 /* Decrement the start split count.  */
-                ed -> ux_ehci_ed_anchor -> ux_ehci_ed_microframe_ssplit_count[frindex] --;
+                ed -> REF_AS.INTR.ux_ehci_ed_anchor -> ux_ehci_ed_microframe_ssplit_count[frindex] --;
 
                 /* Check next endpoint if it's IN (load in C-Mask).  */
                 if (endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION)
@@ -162,7 +165,7 @@ ULONG                         max_packet_size;
             }
 #endif
             /* Decrement the microframe load.  */
-            ed -> ux_ehci_ed_anchor -> ux_ehci_ed_microframe_load[frindex] -= max_packet_size;
+            ed -> REF_AS.INTR.ux_ehci_ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] = (USHORT)(ed -> REF_AS.INTR.ux_ehci_ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] - max_packet_size);
 
             /* S-Mask found, no C-Mask at the same time, skip C-Mask check.  */
             continue;
@@ -177,7 +180,7 @@ ULONG                         max_packet_size;
         {
 
             /* Decrement the microframe load.  */
-            ed -> ux_ehci_ed_anchor -> ux_ehci_ed_microframe_load[frindex] -= max_packet_size;
+            ed -> REF_AS.INTR.ux_ehci_ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] = (USHORT)(ed -> REF_AS.INTR.ux_ehci_ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] - max_packet_size);
         }
 #endif
     }

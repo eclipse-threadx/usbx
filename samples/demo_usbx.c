@@ -10,9 +10,7 @@
 /* Define USBX demo constants.  */
 
 #define UX_DEMO_STACK_SIZE      4096
-#define UX_DEMO_BUFFER_SIZE     2048
-#define UX_DEMO_RUN             1
-#define UX_DEMO_MEMORY_SIZE     (64*1024)
+#define UX_DEMO_MEMORY_SIZE     (28*1024)
 
 
 /* Define the counters used in the demo application...  */
@@ -24,13 +22,15 @@ ULONG                           error_counter;
 
 /* Define USBX demo global variables.  */
 
+ULONG                           ux_demo_memory_buffer[(UX_DEMO_MEMORY_SIZE + UX_DEMO_STACK_SIZE * 2) / sizeof(ULONG)];
+
 unsigned char                   host_out_buffer[UX_HOST_CLASS_DPUMP_PACKET_SIZE];
 unsigned char                   host_in_buffer[UX_HOST_CLASS_DPUMP_PACKET_SIZE];
-unsigned char                   slave_buffer[UX_HOST_CLASS_DPUMP_PACKET_SIZE];
+unsigned char                   device_buffer[UX_HOST_CLASS_DPUMP_PACKET_SIZE];
 
 UX_HOST_CLASS                   *class_driver;
 UX_HOST_CLASS_DPUMP             *dpump;
-UX_SLAVE_CLASS_DPUMP            *dpump_slave;
+UX_SLAVE_CLASS_DPUMP            *dpump_device;
 
 
 #define DEVICE_FRAMEWORK_LENGTH_FULL_SPEED 50
@@ -134,9 +134,9 @@ UINT                _ux_host_class_dpump_read (UX_HOST_CLASS_DPUMP *dpump, UCHAR
                                     ULONG requested_length, ULONG *actual_length);
 
 TX_THREAD           tx_demo_thread_host_simulation;
-TX_THREAD           tx_demo_thread_slave_simulation;
+TX_THREAD           tx_demo_thread_device_simulation;
 void                tx_demo_thread_host_simulation_entry(ULONG);
-void                tx_demo_thread_slave_simulation_entry(ULONG);
+void                tx_demo_thread_device_simulation_entry(ULONG);
 VOID                error_handler(void);
 
 
@@ -161,10 +161,12 @@ CHAR                            *stack_pointer;
 CHAR                            *memory_pointer;
 UINT                            status;
 UX_SLAVE_CLASS_DPUMP_PARAMETER  parameter;
-    
+
+
+    UX_PARAMETER_NOT_USED(first_unused_memory);
 
     /* Initialize the free memory pointer.  */
-    stack_pointer = (CHAR *) first_unused_memory;
+    stack_pointer = (CHAR *) ux_demo_memory_buffer;
     memory_pointer = stack_pointer + (UX_DEMO_STACK_SIZE * 2);
     
     /* Initialize USBX Memory.  */
@@ -234,7 +236,7 @@ UX_SLAVE_CLASS_DPUMP_PARAMETER  parameter;
         error_handler();
             
     /* Create the main demo thread.  */
-    status =  tx_thread_create(&tx_demo_thread_slave_simulation, "tx demo slave simulation", tx_demo_thread_slave_simulation_entry, 0,  
+    status =  tx_thread_create(&tx_demo_thread_device_simulation, "tx demo slave simulation", tx_demo_thread_device_simulation_entry, 0,  
             stack_pointer + UX_DEMO_STACK_SIZE, UX_DEMO_STACK_SIZE, 
             20, 20, 1, TX_AUTO_START);
       
@@ -323,7 +325,7 @@ UX_HOST_CLASS   *class;
 }
 
 
-void  tx_demo_thread_slave_simulation_entry(ULONG arg)
+void  tx_demo_thread_device_simulation_entry(ULONG arg)
 {
 
 UINT    status;
@@ -336,21 +338,21 @@ ULONG   actual_length;
     {
 
         /* Ensure the dpump class on the device is still alive.  */
-        while (dpump_slave != UX_NULL)
+        while (dpump_device != UX_NULL)
         {
 
             /* Increment thread counter.  */
             thread_1_counter++;
 
             /* Read from the device data pump.  */
-            status =  _ux_device_class_dpump_read(dpump_slave, slave_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length); 
+            status =  _ux_device_class_dpump_read(dpump_device, device_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length); 
 
             /* Verify that the status and the amount of data is correct.  */
             if ((status != UX_SUCCESS) || actual_length != UX_HOST_CLASS_DPUMP_PACKET_SIZE)
                 error_handler();
 
             /* Now write to the device data pump.  */
-            status =  _ux_device_class_dpump_write(dpump_slave, slave_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length); 
+            status =  _ux_device_class_dpump_write(dpump_device, device_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length); 
 
             /* Verify that the status and the amount of data is correct.  */
             if ((status != UX_SUCCESS) || actual_length != UX_HOST_CLASS_DPUMP_PACKET_SIZE)
@@ -366,7 +368,7 @@ VOID  tx_demo_instance_activate(VOID *dpump_instance)
 {
 
     /* Save the DPUMP instance.  */
-    dpump_slave = (UX_SLAVE_CLASS_DPUMP *) dpump_instance;
+    dpump_device = (UX_SLAVE_CLASS_DPUMP *) dpump_instance;
 }           
 
 VOID  tx_demo_instance_deactivate(VOID *dpump_instance)
@@ -375,7 +377,7 @@ VOID  tx_demo_instance_deactivate(VOID *dpump_instance)
     UX_PARAMETER_NOT_USED(dpump_instance);
 
     /* Reset the DPUMP instance.  */
-    dpump_slave = UX_NULL;
+    dpump_device = UX_NULL;
 }
 
 

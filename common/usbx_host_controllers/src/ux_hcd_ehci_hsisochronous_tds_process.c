@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_hsisochronous_tds_process              PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_HSISO_TD* _ux_hcd_ehci_hsisochronous_tds_process(
@@ -124,15 +127,15 @@ UINT                            i;
     */
 
     /* Get number of frames (8,4,2 or 1).  */
-    n_fr = 8 >> ed -> ux_ehci_hsiso_ed_frinterval_shift;
+    n_fr = 8u >> ed -> ux_ehci_hsiso_ed_frinterval_shift;
 
     /* Process if there is requests loaded.  */
     if (ed -> ux_ehci_hsiso_ed_frload > 0)
     {
 
         /* Process count to target micro frames.  */
-        fr_hc = ed -> ux_ehci_hsiso_ed_fr_hc << ed -> ux_ehci_hsiso_ed_frinterval_shift;
-        fr_hc += ed -> ux_ehci_hsiso_ed_frstart;
+        fr_hc = (USHORT)(ed -> ux_ehci_hsiso_ed_fr_hc << ed -> ux_ehci_hsiso_ed_frinterval_shift);
+        fr_hc = (USHORT)(fr_hc + ed -> ux_ehci_hsiso_ed_frstart);
         fr_hc &= 0x7u;
 
         /* Process done iTDs.  */
@@ -211,8 +214,8 @@ UINT                            i;
             }
 
             /* Clear load map anyway.  */
-            fr_td -> ux_ehci_hsiso_td_frload &= ~(1u << frindex);
-            ed -> ux_ehci_hsiso_ed_frload &= ~(1u << frindex);
+            fr_td -> ux_ehci_hsiso_td_frload = (UCHAR)(fr_td -> ux_ehci_hsiso_td_frload & ~(1u << frindex));
+            ed -> ux_ehci_hsiso_ed_frload = (USHORT)(ed -> ux_ehci_hsiso_ed_frload & ~(1u << frindex));
 
             /* Handle the request.  */
             transfer = ed -> ux_ehci_hsiso_ed_transfer_head;
@@ -308,8 +311,8 @@ UINT                            i;
         } /* if (ed -> ux_ehci_hsiso_ed_fr_sw == 0xFE) */
 
         /* Process count to target micro frames.  */
-        fr_sw = ed -> ux_ehci_hsiso_ed_fr_sw << ed -> ux_ehci_hsiso_ed_frinterval_shift;
-        fr_sw += ed -> ux_ehci_hsiso_ed_frstart;
+        fr_sw = (USHORT)(ed -> ux_ehci_hsiso_ed_fr_sw << ed -> ux_ehci_hsiso_ed_frinterval_shift);
+        fr_sw = (USHORT)(fr_sw + ed -> ux_ehci_hsiso_ed_frstart);
         fr_sw &= 0x7u;
 
         /* Build requests.  */
@@ -379,8 +382,8 @@ UINT                            i;
                         transfer -> ux_transfer_request_next_transfer_request;
 
             /* Update load map.  */
-            fr_td -> ux_ehci_hsiso_td_frload |= (1u << frindex);
-            ed -> ux_ehci_hsiso_ed_frload |= (1u << frindex);
+            fr_td -> ux_ehci_hsiso_td_frload = (UCHAR)(fr_td -> ux_ehci_hsiso_td_frload | (1u << frindex));
+            ed -> ux_ehci_hsiso_ed_frload = (UCHAR)(ed -> ux_ehci_hsiso_ed_frload | (1u << frindex));
 
             /* Get transfer size.  */
             trans_bytes = transfer -> ux_transfer_request_requested_length;

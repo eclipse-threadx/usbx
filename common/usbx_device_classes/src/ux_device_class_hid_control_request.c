@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_control_request                PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings 64b, */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -166,7 +169,7 @@ UX_SLAVE_CLASS_HID          *hid;
                     {
 
                         /* Calculate the timeout value.  Weighted as 4ms.  */
-                        hid -> ux_device_class_hid_event_wait_timeout = UX_MS_TO_TICK((ULONG)duration << 2u);
+                        hid -> ux_device_class_hid_event_wait_timeout = (ULONG)UX_MS_TO_TICK((ULONG)duration << 2u);
 
                         /* Be sure to have a timeout that is not zero.  */
                         if (hid -> ux_device_class_hid_event_wait_timeout == 0)

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_rh_change_process                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used new interrupt macros,  */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed registered HCD scan,  */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_rh_change_process(VOID)
@@ -83,7 +86,7 @@ UX_INTERRUPT_SAVE_AREA
 
     /* This thread was maybe awaken by one or more HCD controllers. Check each 
        of the HCD to see where there has been a change of topology.  */
-    for(hcd_index = 0; hcd_index < _ux_system_host -> ux_system_host_registered_hcd; hcd_index++)
+    for(hcd_index = 0; hcd_index < UX_SYSTEM_HOST_MAX_HCD_GET(); hcd_index++)
     {
 
         /* Pickup HCD pointer.  */

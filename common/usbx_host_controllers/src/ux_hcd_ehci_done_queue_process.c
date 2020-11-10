@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_done_queue_process                     PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warning,      */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ehci_done_queue_process(UX_HCD_EHCI *hcd_ehci)
@@ -84,10 +87,10 @@ VOID  _ux_hcd_ehci_done_queue_process(UX_HCD_EHCI *hcd_ehci)
 UX_EHCI_TD                      *td;
 UX_EHCI_PERIODIC_LINK_POINTER   ed;
 UX_EHCI_ED                      *start_ed;
-UX_EHCI_PERIODIC_LINK_POINTER   lp;
 
 
 #if UX_MAX_ISO_TD
+UX_EHCI_PERIODIC_LINK_POINTER   lp;
 
     /* We scan the active isochronous list first.  */
     _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);

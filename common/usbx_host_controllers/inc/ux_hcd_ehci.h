@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_ehci.h                                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -46,6 +46,10 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used unsigned defines,      */
+/*                                            named unions and structs,   */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -95,18 +99,18 @@
 
 /* Define EHCI IO control register values.  */
 
-#define EHCI_HC_IO_RS                                       0x00000001
-#define EHCI_HC_IO_HCRESET                                  0x00000002
-#define EHCI_HC_IO_PSE                                      0x00000010
-#define EHCI_HC_IO_ASE                                      0x00000020
-#define EHCI_HC_IO_IAAD                                     0x00000040   
-#define EHCI_HC_IO_ITC                                      0x00010000   
-#define EHCI_HC_IO_FRAME_SIZE_1024                          0x00000000
-#define EHCI_HC_IO_FRAME_SIZE_512                           0x00000004
-#define EHCI_HC_IO_FRAME_SIZE_256                           0x00000008
-#define EHCI_HC_IO_FRAME_SIZE_128                           0x0000000C
-#define EHCI_HC_IO_FRAME_SIZE_64                            0x00008000
-#define EHCI_HC_IO_FRAME_SIZE_32                            0x00008004
+#define EHCI_HC_IO_RS                                       0x00000001u
+#define EHCI_HC_IO_HCRESET                                  0x00000002u
+#define EHCI_HC_IO_PSE                                      0x00000010u
+#define EHCI_HC_IO_ASE                                      0x00000020u
+#define EHCI_HC_IO_IAAD                                     0x00000040u
+#define EHCI_HC_IO_ITC                                      0x00010000u
+#define EHCI_HC_IO_FRAME_SIZE_1024                          0x00000000u
+#define EHCI_HC_IO_FRAME_SIZE_512                           0x00000004u
+#define EHCI_HC_IO_FRAME_SIZE_256                           0x00000008u
+#define EHCI_HC_IO_FRAME_SIZE_128                           0x0000000Cu
+#define EHCI_HC_IO_FRAME_SIZE_64                            0x00008000u
+#define EHCI_HC_IO_FRAME_SIZE_32                            0x00008004u
 
 /* The number if entries in the periodic tree can be changed to save space IF and only IF the PFLF flag in the HCCPARAMS register
    allows it. Setting values less than 1024 in controllers without the ability to change the Frame List Size leads to a EHCI crash.  */
@@ -118,46 +122,46 @@
 
 /* Define EHCI HCOR status register.  */
 
-#define EHCI_HC_STS_USB_INT                                 0x00000001
-#define EHCI_HC_STS_USB_ERR_INT                             0x00000002
-#define EHCI_HC_STS_PCD                                     0x00000004
-#define EHCI_HC_STS_FLR                                     0x00000008
-#define EHCI_HC_STS_HSE                                     0x00000010
-#define EHCI_HC_STS_IAA                                     0x00000020
-#define EHCI_HC_STS_HC_HALTED                               0x00001000
-#define EHCI_HC_STS_RECLAMATION                             0x00002000
-#define EHCI_HC_STS_PSS                                     0x00004000
-#define EHCI_HC_STS_ASS                                     0x00008000
+#define EHCI_HC_STS_USB_INT                                 0x00000001u
+#define EHCI_HC_STS_USB_ERR_INT                             0x00000002u
+#define EHCI_HC_STS_PCD                                     0x00000004u
+#define EHCI_HC_STS_FLR                                     0x00000008u
+#define EHCI_HC_STS_HSE                                     0x00000010u
+#define EHCI_HC_STS_IAA                                     0x00000020u
+#define EHCI_HC_STS_HC_HALTED                               0x00001000u
+#define EHCI_HC_STS_RECLAMATION                             0x00002000u
+#define EHCI_HC_STS_PSS                                     0x00004000u
+#define EHCI_HC_STS_ASS                                     0x00008000u
 
 #define EHCI_HC_INTERRUPT_ENABLE_NORMAL                     (EHCI_HC_STS_USB_INT|EHCI_HC_STS_USB_ERR_INT|EHCI_HC_STS_PCD|EHCI_HC_STS_HSE|EHCI_HC_STS_IAA)
 
 
 /* Define EHCI HCOR root HUB command/status.  */
 
-#define EHCI_HC_RH_PPC                                      0x00000010
-#define EHCI_HC_RH_PSM                                      0x00000100
-#define EHCI_HC_RH_NPS                                      0x00000200
-#define EHCI_HC_RH_DT                                       0x00000400
-#define EHCI_HC_RH_OCPM                                     0x00000800
-#define EHCI_HC_RH_NOCP                                     0x00001000
+#define EHCI_HC_RH_PPC                                      0x00000010u
+#define EHCI_HC_RH_PSM                                      0x00000100u
+#define EHCI_HC_RH_NPS                                      0x00000200u
+#define EHCI_HC_RH_DT                                       0x00000400u
+#define EHCI_HC_RH_OCPM                                     0x00000800u
+#define EHCI_HC_RH_NOCP                                     0x00001000u
 
-#define EHCI_HC_PS_CCS                                      0x00000001
-#define EHCI_HC_PS_CSC                                      0x00000002
-#define EHCI_HC_PS_PE                                       0x00000004
-#define EHCI_HC_PS_PEC                                      0x00000008
-#define EHCI_HC_PS_OCA                                      0x00000010
-#define EHCI_HC_PS_OCC                                      0x00000020
-#define EHCI_HC_PS_FPR                                      0x00000040
-#define EHCI_HC_PS_SUSPEND                                  0x00000080
-#define EHCI_HC_PS_PR                                       0x00000100
-#define EHCI_HC_PS_PP                                       0x00001000
-#define EHCI_HC_PS_SPEED_MASK                               0x00000c00
-#define EHCI_HC_PS_SPEED_LOW                                0x00000400
-#define EHCI_HC_PS_PO                                       0x00002000
-#define EHCI_HC_PS_EMBEDDED_TT_SPEED_MASK                   0x0c000000
-#define EHCI_HC_PS_EMBEDDED_TT_SPEED_FULL                   0x00000000
-#define EHCI_HC_PS_EMBEDDED_TT_SPEED_LOW                    0x04000000
-#define EHCI_HC_PS_EMBEDDED_TT_SPEED_HIGH                   0x08000000
+#define EHCI_HC_PS_CCS                                      0x00000001u
+#define EHCI_HC_PS_CSC                                      0x00000002u
+#define EHCI_HC_PS_PE                                       0x00000004u
+#define EHCI_HC_PS_PEC                                      0x00000008u
+#define EHCI_HC_PS_OCA                                      0x00000010u
+#define EHCI_HC_PS_OCC                                      0x00000020u
+#define EHCI_HC_PS_FPR                                      0x00000040u
+#define EHCI_HC_PS_SUSPEND                                  0x00000080u
+#define EHCI_HC_PS_PR                                       0x00000100u
+#define EHCI_HC_PS_PP                                       0x00001000u
+#define EHCI_HC_PS_SPEED_MASK                               0x00000c00u
+#define EHCI_HC_PS_SPEED_LOW                                0x00000400u
+#define EHCI_HC_PS_PO                                       0x00002000u
+#define EHCI_HC_PS_EMBEDDED_TT_SPEED_MASK                   0x0c000000u
+#define EHCI_HC_PS_EMBEDDED_TT_SPEED_FULL                   0x00000000u
+#define EHCI_HC_PS_EMBEDDED_TT_SPEED_LOW                    0x04000000u
+#define EHCI_HC_PS_EMBEDDED_TT_SPEED_HIGH                   0x08000000u
 
 #define EHCI_HC_RH_POWER_STABLE_DELAY                       25
 #define EHCI_HC_RH_RESET_DELAY                              50
@@ -166,12 +170,12 @@
 
 /* Define EHCI interrupt status register definitions.  */
 
-#define EHCI_HC_INT_IE                                      0x00000001
-#define EHCI_HC_INT_EIE                                     0x00000002
-#define EHCI_HC_INT_PCIE                                    0x00000004    
-#define EHCI_HC_INT_FLRE                                    0x00000008
-#define EHCI_HC_INT_HSER                                    0x00000010
-#define EHCI_HC_INT_IAAE                                    0x00000020
+#define EHCI_HC_INT_IE                                      0x00000001u
+#define EHCI_HC_INT_EIE                                     0x00000002u
+#define EHCI_HC_INT_PCIE                                    0x00000004u
+#define EHCI_HC_INT_FLRE                                    0x00000008u
+#define EHCI_HC_INT_HSER                                    0x00000010u
+#define EHCI_HC_INT_IAAE                                    0x00000020u
 
 
 /* Define EHCI frame interval definition.  */
@@ -399,58 +403,58 @@ typedef struct UX_EHCI_ED_STRUCT
                     *ux_ehci_ed_next_anchor;                /* + 1 DWord.   */
             USHORT  ux_ehci_ed_microframe_load[8];          /* + 4 DWords.  */
             UCHAR   ux_ehci_ed_microframe_ssplit_count[8];  /* + 2 DWords.  */
-        };
+        } ANCHOR;
         struct {                                            /* As interrupt ED.  */
             struct UX_EHCI_ED_STRUCT
                         *ux_ehci_ed_anchor;                 /* + 1 DWord.  */
             struct UX_ENDPOINT_STRUCT
                         *ux_ehci_ed_endpoint;               /* + 1 Dword.  */
-        };
+        } INTR;
         struct {                                            /* Space: 7 DWord.  */
             ULONG       ux_ehci_ed_reserved[7];
-        };
-    };
+        } RESERVED;
+    } REF_AS;
     /* 24 DWord aligned.  */
 } UX_EHCI_ED;
 
 
 /* Define EHCI ED bitmap.  */
 
-#define UX_EHCI_QH_TYP_ITD                                  0
-#define UX_EHCI_QH_TYP_QH                                   2
-#define UX_EHCI_QH_TYP_SITD                                 4
-#define UX_EHCI_QH_TYP_FSTN                                 6
+#define UX_EHCI_QH_TYP_ITD                                  0u
+#define UX_EHCI_QH_TYP_QH                                   2u
+#define UX_EHCI_QH_TYP_SITD                                 4u
+#define UX_EHCI_QH_TYP_FSTN                                 6u
 
-#define UX_EHCI_QH_T                                        1
+#define UX_EHCI_QH_T                                        1u
 
-#define UX_EHCI_QH_STATIC                                   0x80000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_7                        0x40000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_6                        0x20000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_5                        0x10000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_4                        0x08000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_3                        0x04000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_2                        0x02000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_1                        0x01000000
-#define UX_EHCI_QH_SSPLIT_SCH_FULL_0                        0x00800000
+#define UX_EHCI_QH_STATIC                                   0x80000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_7                        0x40000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_6                        0x20000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_5                        0x10000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_4                        0x08000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_3                        0x04000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_2                        0x02000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_1                        0x01000000u
+#define UX_EHCI_QH_SSPLIT_SCH_FULL_0                        0x00800000u
 
-#define UX_EHCI_QH_MPS_LOC                                  16
-#define UX_EHCI_QH_MPS_MASK                                 0x07ff0000
-#define UX_EHCI_QH_NCR                                      0xf0000000
-#define UX_EHCI_QH_CEF                                      0x08000000
-#define UX_EHCI_QH_ED_AD_LOC                                8 
-#define UX_EHCI_QH_HBPM                                     0x40000000
-#define UX_EHCI_QH_HBPM_LOC                                 30
-#define UX_EHCI_QH_HEAD                                     0x00008000
+#define UX_EHCI_QH_MPS_LOC                                  16u
+#define UX_EHCI_QH_MPS_MASK                                 0x07ff0000u
+#define UX_EHCI_QH_NCR                                      0xf0000000u
+#define UX_EHCI_QH_CEF                                      0x08000000u
+#define UX_EHCI_QH_ED_AD_LOC                                8u 
+#define UX_EHCI_QH_HBPM                                     0x40000000u
+#define UX_EHCI_QH_HBPM_LOC                                 30u
+#define UX_EHCI_QH_HEAD                                     0x00008000u
 
-#define UX_EHCI_QH_HIGH_SPEED                               0x00002000
-#define UX_EHCI_QH_LOW_SPEED                                0x00001000
+#define UX_EHCI_QH_HIGH_SPEED                               0x00002000u
+#define UX_EHCI_QH_LOW_SPEED                                0x00001000u
 
-#define UX_EHCI_QH_HUB_ADDR_LOC                             16
-#define UX_EHCI_QH_PORT_NUMBER_LOC                          23
-#define UX_EHCI_QH_MULT_LOC                                 30
-#define UX_EHCI_QH_MULT_MASK                                0xc0000000
-#define UX_EHCI_QH_C_MASK                                   0x00001c00
-#define UX_EHCI_QH_IS_MASK                                  0x00000001
+#define UX_EHCI_QH_HUB_ADDR_LOC                             16u
+#define UX_EHCI_QH_PORT_NUMBER_LOC                          23u
+#define UX_EHCI_QH_MULT_LOC                                 30u
+#define UX_EHCI_QH_MULT_MASK                                0xc0000000u
+#define UX_EHCI_QH_C_MASK                                   0x00001c00u
+#define UX_EHCI_QH_IS_MASK                                  0x00000001u
 
 #define UX_EHCI_QH_SMASK_MASK                               0x000000FFu
 #define UX_EHCI_QH_SMASK_0                                  0x00000001u
@@ -462,11 +466,11 @@ typedef struct UX_EHCI_ED_STRUCT
 #define UX_EHCI_QH_SMASK_6                                  0x00000040u
 #define UX_EHCI_QH_SMASK_7                                  0x00000080u
 
-#define UX_EHCI_QH_DTC                                      0x00004000
-#define UX_EHCI_QH_TOGGLE                                   0x80000000
-#define UX_EHCI_LINK_ADDRESS_MASK                           0xfffffff0
-#define UX_EHCI_TOGGLE_0                                    0
-#define UX_EHCI_TOGGLE_1                                    0x80000000
+#define UX_EHCI_QH_DTC                                      0x00004000u
+#define UX_EHCI_QH_TOGGLE                                   0x80000000u
+#define UX_EHCI_LINK_ADDRESS_MASK                           0xfffffff0u
+#define UX_EHCI_TOGGLE_0                                    0u
+#define UX_EHCI_TOGGLE_1                                    0x80000000u
 
 /* Define EHCI TD structure.  */
 
@@ -500,29 +504,29 @@ typedef struct UX_EHCI_TD_STRUCT
 
 /* Define EHCI TD bitmap.  */
 
-#define UX_EHCI_TD_T                                        1
-#define UX_EHCI_TD_LG_LOC                                   16
-#define UX_EHCI_TD_LG_MASK                                  0x7fff
-#define UX_EHCI_TD_IOC                                      0x00008000
-#define UX_EHCI_TD_CERR                                     0x00000c00
+#define UX_EHCI_TD_T                                        1u
+#define UX_EHCI_TD_LG_LOC                                   16u
+#define UX_EHCI_TD_LG_MASK                                  0x7fffu
+#define UX_EHCI_TD_IOC                                      0x00008000u
+#define UX_EHCI_TD_CERR                                     0x00000c00u
 
-#define UX_EHCI_TD_PING                                     1
-#define UX_EHCI_TD_DO_COMPLETE_SPLIT                        2
-#define UX_EHCI_TD_MISSED_MICRO_FRAMES                      4
-#define UX_EHCI_TD_TRANSACTION_ERROR                        8
-#define UX_EHCI_TD_BABBLE_DETECTED                          0x10
-#define UX_EHCI_TD_DATA_BUFFER_ERROR                        0x20
-#define UX_EHCI_TD_HALTED                                   0x40
-#define UX_EHCI_TD_ACTIVE                                   0x80
+#define UX_EHCI_TD_PING                                     1u
+#define UX_EHCI_TD_DO_COMPLETE_SPLIT                        2u
+#define UX_EHCI_TD_MISSED_MICRO_FRAMES                      4u
+#define UX_EHCI_TD_TRANSACTION_ERROR                        8u
+#define UX_EHCI_TD_BABBLE_DETECTED                          0x10u
+#define UX_EHCI_TD_DATA_BUFFER_ERROR                        0x20u
+#define UX_EHCI_TD_HALTED                                   0x40u
+#define UX_EHCI_TD_ACTIVE                                   0x80u
 
-#define UX_EHCI_PID_OUT                                     0x00000000
-#define UX_EHCI_PID_IN                                      0x00000100
-#define UX_EHCI_PID_SETUP                                   0x00000200
-#define UX_EHCI_PID_MASK                                    0x00000300
+#define UX_EHCI_PID_OUT                                     0x00000000u
+#define UX_EHCI_PID_IN                                      0x00000100u
+#define UX_EHCI_PID_SETUP                                   0x00000200u
+#define UX_EHCI_PID_MASK                                    0x00000300u
 
-#define  UX_EHCI_TD_SETUP_PHASE                             0x00010000 
-#define  UX_EHCI_TD_DATA_PHASE                              0x00020000 
-#define  UX_EHCI_TD_STATUS_PHASE                            0x00040000 
+#define  UX_EHCI_TD_SETUP_PHASE                             0x00010000u 
+#define  UX_EHCI_TD_DATA_PHASE                              0x00020000u 
+#define  UX_EHCI_TD_STATUS_PHASE                            0x00040000u 
 
 /* Define EHCI ISOCHRONOUS TD extension structure.  */
 

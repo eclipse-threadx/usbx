@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_entry                              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added controller disable,   */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added HCD uninitialize,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_entry(UX_HCD *hcd, UINT function, VOID *parameter)
@@ -113,6 +116,11 @@ UX_HCD_SIM_HOST     *hcd_sim_host;
     /* look at the function and route it.  */
     switch(function)
     {
+
+    case UX_HCD_UNINITIALIZE:
+        status =  _ux_hcd_sim_host_uninitialize(hcd_sim_host);
+        break;
+
 
     case UX_HCD_DISABLE_CONTROLLER:
 

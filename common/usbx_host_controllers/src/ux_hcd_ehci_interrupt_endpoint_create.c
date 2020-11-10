@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_interrupt_endpoint_create              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -93,6 +93,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_interrupt_endpoint_create(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -138,7 +141,7 @@ UINT                            i;
     endpoint -> ux_endpoint_ed =  (VOID *) ed;
     
     /* Now do the opposite, attach the ED container to the physical ED.  */
-    ed -> ux_ehci_ed_endpoint =  endpoint;
+    ed -> REF_AS.INTR.ux_ehci_ed_endpoint =  endpoint;
 
     /* Set the default MPS Capability info in the ED.  */
     max_packet_size = endpoint -> ux_endpoint_descriptor.wMaxPacketSize & UX_MAX_PACKET_SIZE_MASK;
@@ -244,7 +247,7 @@ UINT                            i;
     ed_anchor = _ux_hcd_ehci_poll_rate_entry_get(hcd_ehci, ed_list, poll_depth);
 
     /* Save anchor pointer for interrupt ED.  */
-    ed -> ux_ehci_ed_anchor = ed_anchor;
+    ed -> REF_AS.INTR.ux_ehci_ed_anchor = ed_anchor;
 
     /* Calculate packet size with num transactions.  */
     max_packet_size *= num_transaction;
@@ -335,18 +338,18 @@ UINT                            i;
             {
 
                 /* Reserve load for CSplit.  */
-                ed_anchor -> ux_ehci_ed_microframe_load[(i + 2)&7] += max_packet_size;
-                ed_anchor -> ux_ehci_ed_microframe_load[(i + 3)&7] += max_packet_size;
+                ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[(i + 2)&7] = (USHORT)(ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[(i + 2)&7] + max_packet_size);
+                ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[(i + 3)&7] = (USHORT)(ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[(i + 3)&7] + max_packet_size);
 
                 /* Need additional CSplit.  */
                 if (csplit_count > 2)
-                    ed_anchor -> ux_ehci_ed_microframe_load[(i + 4)&7] += max_packet_size;
+                    ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[(i + 4)&7] = (USHORT)(ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[(i + 4)&7] + max_packet_size);
             }
             else
             {
 
                 /* Reserve load for SSplit.  */
-                ed_anchor -> ux_ehci_ed_microframe_load[i] += max_packet_size;
+                ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] = (USHORT)(ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] + max_packet_size);
             }
 
             /* Update schedule masks.  */
@@ -356,7 +359,7 @@ UINT                            i;
 #endif
         {
             /* Update anchor micro-frame load.  */
-            ed_anchor -> ux_ehci_ed_microframe_load[i] += max_packet_size;
+            ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] = (USHORT)(ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] + max_packet_size);
         }
     }
     else
@@ -378,7 +381,7 @@ UINT                            i;
 
         /* Update anchor micro-frame loads.  */
         for (; i < 8; i += interval)
-            ed_anchor -> ux_ehci_ed_microframe_load[i] += max_packet_size;
+            ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] = (USHORT)(ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] + max_packet_size);
     }
 
     /* We found the node entry of the ED pointer that will be the anchor for this interrupt 

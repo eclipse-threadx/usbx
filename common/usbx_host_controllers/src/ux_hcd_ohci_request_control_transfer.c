@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_request_control_transfer               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_request_control_transfer(UX_HCD_OHCI *hcd_ohci, UX_TRANSFER *transfer_request)
@@ -115,11 +118,11 @@ UINT            status;
     if (setup_request == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
-    *setup_request =                            transfer_request -> ux_transfer_request_function;
-    *(setup_request + UX_SETUP_REQUEST_TYPE) =  transfer_request -> ux_transfer_request_type;
-    *(setup_request + UX_SETUP_REQUEST) =       transfer_request -> ux_transfer_request_function;
-    _ux_utility_short_put(setup_request + UX_SETUP_VALUE, transfer_request -> ux_transfer_request_value);
-    _ux_utility_short_put(setup_request + UX_SETUP_INDEX, transfer_request -> ux_transfer_request_index);
+    *setup_request =                            (UCHAR)transfer_request -> ux_transfer_request_function;
+    *(setup_request + UX_SETUP_REQUEST_TYPE) =  (UCHAR)transfer_request -> ux_transfer_request_type;
+    *(setup_request + UX_SETUP_REQUEST) =       (UCHAR)transfer_request -> ux_transfer_request_function;
+    _ux_utility_short_put(setup_request + UX_SETUP_VALUE, (USHORT)transfer_request -> ux_transfer_request_value);
+    _ux_utility_short_put(setup_request + UX_SETUP_INDEX, (USHORT)transfer_request -> ux_transfer_request_index);
     _ux_utility_short_put(setup_request + UX_SETUP_LENGTH, (USHORT) transfer_request -> ux_transfer_request_requested_length);
 
     /* Set the ED address and MPS values since they may have changed.

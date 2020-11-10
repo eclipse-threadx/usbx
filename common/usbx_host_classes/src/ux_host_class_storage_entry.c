@@ -36,7 +36,7 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAG
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_entry                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAG
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed class ext access,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_entry(UX_HOST_CLASS_COMMAND *command)
@@ -156,6 +159,12 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
 
             /* Save extension.  */
             class_inst -> ux_host_class_ext = (VOID *)class_ext;
+        }
+        else
+        {
+
+            /* Get storage class extension.  */
+            class_ext = (UX_HOST_CLASS_STORAGE_EXT *)class_inst -> ux_host_class_ext;
         }
 
         /* Allocate some memory for the media structures used by UX_MEDIA (default FileX).  */

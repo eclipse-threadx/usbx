@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_least_traffic_list_get                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_ED  *_ux_hcd_ehci_least_traffic_list_get(UX_HCD_EHCI *hcd_ehci,
@@ -83,9 +86,6 @@ UX_EHCI_ED                      *ed;
 UX_EHCI_PERIODIC_LINK_POINTER   anchor;
 UINT                            list_index;
 UINT                            frindex;
-#if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)
-UINT                            bfindex;
-#endif
 ULONG                           min_bandwidth_used;
 ULONG                           bandwidth_used;
 
@@ -126,18 +126,18 @@ ULONG                           bandwidth_used;
 
         /* Scan static anchors in the list.  */
         ed = anchor.ed_ptr;
-        while(ed -> ux_ehci_ed_next_anchor != UX_NULL)
+        while(ed -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor != UX_NULL)
         {
             for (frindex = 0; frindex < 8; frindex ++)
             {
-                microframe_load[frindex] += ed -> ux_ehci_ed_microframe_load[frindex];
+                microframe_load[frindex] += ed -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex];
 #if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)
                 microframe_ssplit_count[frindex] += ed -> ux_ehci_ed_microframe_ssplit_count[frindex];
 #endif
             }
 
             /* Next static anchor.  */
-            ed = ed -> ux_ehci_ed_next_anchor;
+            ed = ed -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor;
         }
 
         /* Summarize bandwidth from micro-frames.  */

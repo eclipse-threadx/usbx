@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_storage.h                             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -52,6 +52,9 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added exFAT type define,    */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -398,6 +401,7 @@
 #define UX_HOST_CLASS_STORAGE_PARTITION_FAT_16                          4
 #define UX_HOST_CLASS_STORAGE_PARTITION_EXTENDED                        5
 #define UX_HOST_CLASS_STORAGE_PARTITION_FAT_16L                         6
+#define UX_HOST_CLASS_STORAGE_PARTITION_EXFAT                           7
 #define UX_HOST_CLASS_STORAGE_PARTITION_FAT_32_1                        0x0b
 #define UX_HOST_CLASS_STORAGE_PARTITION_FAT_32_2                        0x0c
 #define UX_HOST_CLASS_STORAGE_PARTITION_FAT_16_LBA_MAPPED               0x0e

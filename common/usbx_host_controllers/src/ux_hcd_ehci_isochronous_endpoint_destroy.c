@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_isochronous_endpoint_destroy           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,11 +72,17 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_isochronous_endpoint_destroy(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
 {
 #if UX_MAX_ISO_TD == 0
+
+    UX_PARAMETER_NOT_USED(hcd_ehci);
+    UX_PARAMETER_NOT_USED(endpoint);
 
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HCD, UX_FUNCTION_NOT_SUPPORTED);
@@ -225,16 +231,19 @@ ULONG                           last_size;
                     last_size = max_packet_size % 188;
                     if (last_size == 0 &&
                         frindex == last_frindex)
-                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] -= last_size;
+                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] = (USHORT)
+                                (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] - last_size);
                     else
-                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] -= 188;
+                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] = (USHORT)
+                                (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] - 188u);
                 }
 
             }
 
             /* Update complete split related (IN only).  */
             if (ed_td.sitd_ptr -> ux_ehci_fsiso_td_cap1 & (UX_EHCI_CMASK_0 << frindex))
-                ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] -= 188;
+                ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] = (USHORT)
+                        (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] - 188u);
         }
     }
     else
@@ -251,7 +260,7 @@ ULONG                           last_size;
         {
 
             /* Decrement the microframes scheduled.  */
-            ed -> ux_ehci_hsiso_ed_anchor -> ux_ehci_ed_microframe_load[frindex] -= max_packet_size;
+            ed -> ux_ehci_hsiso_ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] = (USHORT)(ed -> ux_ehci_hsiso_ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] - max_packet_size);
         }
     }
 

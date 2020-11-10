@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_frame_interval_get             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings 64b, */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_frame_interval_get(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_PARAMETER_FRAME_INTERVAL *interval_parameter)
@@ -147,11 +150,11 @@ ULONG                                           i;
                         /* Check if we have enough space to copy.  */
                         if (intervals_to_copy * sizeof(ULONG) > interval_parameter -> ux_host_class_video_parameter_frame_interval_buffer_length)
                         {
-                            intervals_to_copy = interval_parameter -> ux_host_class_video_parameter_frame_interval_buffer_length / sizeof(ULONG);
+                            intervals_to_copy = (ULONG)(interval_parameter -> ux_host_class_video_parameter_frame_interval_buffer_length / sizeof(ULONG));
                         }
 
                         /* Return bytes copied.  */
-                        interval_parameter -> ux_host_class_video_parameter_frame_interval_buffer_length_written = intervals_to_copy * sizeof(ULONG);
+                        interval_parameter -> ux_host_class_video_parameter_frame_interval_buffer_length_written = (ULONG)(intervals_to_copy * sizeof(ULONG));
 
                         /* Loop to copy interval data.  */
                         for (i = 0; i < intervals_to_copy; i++)

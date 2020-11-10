@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_transfer_abort                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*                                            fixed physical and virtual  */
 /*                                            address conversion,         */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_transfer_abort(UX_HCD_OHCI *hcd_ohci, UX_TRANSFER *transfer_request)
@@ -84,7 +87,9 @@ UX_OHCI_TD      *head_td;
 UX_OHCI_TD      *tail_td;
 ULONG           value_td;
 ULONG           value_carry;
-    
+
+
+    UX_PARAMETER_NOT_USED(hcd_ohci);
 
     /* Get the pointer to the endpoint associated with the transfer request.  */
     endpoint =  (UX_ENDPOINT *) transfer_request -> ux_transfer_request_endpoint;

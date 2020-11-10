@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_endpoint_reset                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_endpoint_reset(UX_HCD_OHCI *hcd_ohci, UX_ENDPOINT *endpoint)
@@ -76,7 +79,9 @@ UINT  _ux_hcd_ohci_endpoint_reset(UX_HCD_OHCI *hcd_ohci, UX_ENDPOINT *endpoint)
 UX_OHCI_ED      *ed;
 ULONG           td_value;
 
-    
+
+    UX_PARAMETER_NOT_USED(hcd_ohci);
+
     /* From the endpoint container fetch the OHCI ED descriptor.  */
     ed =  (UX_OHCI_ED *) endpoint -> ux_endpoint_ed;
 

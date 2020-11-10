@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_transfer_abort                         PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_transfer_abort(UX_HCD_EHCI *hcd_ehci,UX_TRANSFER *transfer_request)
@@ -127,7 +130,7 @@ ULONG                           remain_count;
             list_head = &ied -> ux_ehci_hsiso_ed_transfer_head;
 
             /* Max load count (in 1 ms): 8, 4, 2, 1 ... */
-            max_load_count = 8 >> ied -> ux_ehci_hsiso_ed_frinterval_shift;
+            max_load_count = 8u >> ied -> ux_ehci_hsiso_ed_frinterval_shift;
         }
 
         /* The whole list is aborted.  */
