@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_activate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added Get/Set Protocol      */
+/*                                            request support,            */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -112,6 +116,9 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
     /* Check if we found right endpoint.  */
     if (endpoint_interrupt == UX_NULL)
         return (UX_ERROR);
+
+    /* Default HID protocol is report protocol.  */
+    hid -> ux_device_class_hid_protocol = UX_DEVICE_CLASS_HID_PROTOCOL_REPORT;
 
     /* Save the endpoint in the hid instance.  */
     hid -> ux_device_class_hid_interrupt_endpoint         = endpoint_interrupt;

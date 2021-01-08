@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_request_bulk_transfer              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed ZLP sending,          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_request_bulk_transfer(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request)
@@ -109,7 +112,7 @@ UCHAR *                 data_pointer;
     transfer_request_payload_length =  transfer_request -> ux_transfer_request_requested_length;
     data_pointer =  transfer_request -> ux_transfer_request_data_pointer;
     
-    while (transfer_request_payload_length != 0)
+    do
     {
 
         if (transfer_request_payload_length > UX_HCD_SIM_HOST_MAX_PAYLOAD)
@@ -181,7 +184,7 @@ UCHAR *                 data_pointer;
             previous_td -> ux_sim_host_td_next_td_transfer_request =  data_td;
             previous_td =  data_td;
         }
-    }
+    } while (transfer_request_payload_length != 0);
         
     /* At this stage, the Head and Tail in the ED are still the same and the host simulator 
        controller will skip this ED until we have hooked the new tail TD.  */

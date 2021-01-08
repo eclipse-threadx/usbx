@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_control_request                PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings 64b, */
 /*                                            resulting in version 6.1.2  */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added Get/Set Protocol      */
+/*                                            request support,            */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -183,9 +187,17 @@ UX_SLAVE_CLASS_HID          *hid;
             break;
 
         case UX_DEVICE_CLASS_HID_COMMAND_GET_PROTOCOL:
+
+            /* Send the protocol.  */
+            *transfer_request -> ux_slave_transfer_request_data_pointer = (UCHAR)hid -> ux_device_class_hid_protocol;
+            _ux_device_stack_transfer_request(transfer_request, 1, request_length);
+            break;
+
         case UX_DEVICE_CLASS_HID_COMMAND_SET_PROTOCOL:
 
-            /* Not supported now.  */
+            /* Accept the protocol.  */
+            hid -> ux_device_class_hid_protocol = request_value;
+            break;
 
         default:
 

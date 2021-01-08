@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_storage.h                           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized command logic,    */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed USB CV test issues,   */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -450,6 +453,11 @@ typedef struct UX_SLAVE_CLASS_STORAGE_STRUCT
     UX_SLAVE_INTERFACE          *ux_slave_class_storage_interface;
     ULONG                       ux_slave_class_storage_number_lun;
     UX_SLAVE_CLASS_STORAGE_LUN  ux_slave_class_storage_lun[UX_MAX_SLAVE_LUN];
+    ULONG                       ux_slave_class_storage_host_length;
+    UCHAR                       ux_slave_class_storage_cbw_flags;
+    UCHAR                       ux_slave_class_storage_cbw_lun;
+    UCHAR                       ux_slave_class_storage_reserved[2];
+    ULONG                       ux_slave_class_storage_csw_residue;
     ULONG                       ux_slave_class_storage_csw_status;
     VOID                        (*ux_slave_class_storage_instance_activate)(VOID *);
     VOID                        (*ux_slave_class_storage_instance_deactivate)(VOID *);

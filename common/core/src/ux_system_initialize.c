@@ -59,13 +59,17 @@ UCHAR _ux_system_class_pima_storage_structure[] =                           {2,2
 UCHAR _ux_system_class_pima_object_structure[] =                            {4,2,2,4,2,4,4,4,4,4,4,4,2,4,4};
 UCHAR _ux_system_ecm_interface_descriptor_structure[] =                     {1,1,1,1,4,2,2,1};
 
+UCHAR _ux_system_bos_descriptor_structure[] =                               {1,1,2,1};
+UCHAR _ux_system_usb_2_0_extension_descriptor_structure[] =                 {1,1,1,4};
+UCHAR _ux_system_container_id_descriptor_structure[] =                      {1,1,1,1,4,4,4,4};
+
 
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_system_initialize                               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -105,6 +109,9 @@ UCHAR _ux_system_ecm_interface_descriptor_structure[] =                     {1,1
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added BOS support,          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 

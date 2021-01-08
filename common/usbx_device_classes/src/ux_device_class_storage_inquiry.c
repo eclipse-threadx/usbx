@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_inquiry                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,16 +82,19 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed USB CV test issues,   */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb)
 {
 
-UINT                    status;
+UINT                    status = UX_SUCCESS;
 UX_SLAVE_TRANSFER       *transfer_request;
 UCHAR                   inquiry_page_code;
-UCHAR                   inquiry_length;
+ULONG                   inquiry_length;
 UCHAR                   *inquiry_buffer;
 
     UX_PARAMETER_NOT_USED(endpoint_out);
@@ -99,11 +102,20 @@ UCHAR                   *inquiry_buffer;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_INQUIRY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
+    /* Check direction.  */
+    if (storage -> ux_slave_class_storage_host_length &&
+        (storage -> ux_slave_class_storage_cbw_flags & 0x80) == 0)
+    {
+        _ux_device_stack_endpoint_stall(endpoint_out);
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
+        return(UX_ERROR);
+    }
+
     /* From the SCSI Inquiry payload, get the page code.  */
     inquiry_page_code =  *(cbwcb + UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE);
     
     /* And the length to be returned. */
-    inquiry_length =  *(cbwcb + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_ADDITIONAL_LENGTH);
+    inquiry_length =  storage -> ux_slave_class_storage_host_length;
 
     /* Obtain the pointer to the transfer request.  */
     transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
@@ -116,7 +128,7 @@ UCHAR                   *inquiry_buffer;
 
     /* Check for the maximum length to be returned. */
     if (inquiry_length > UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH)
-        inquiry_length =  UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH;
+        inquiry_length = UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH;
 
     /* Default CSW to passed.  */
     storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
@@ -157,12 +169,6 @@ UCHAR                   *inquiry_buffer;
         _ux_utility_memory_copy(inquiry_buffer + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_REVISION,
                                                                     storage -> ux_slave_class_storage_product_rev, 4); /* Use case of memcpy is verified. */
 
-        /* Send a data payload with the inquiry response buffer.  */
-        _ux_device_stack_transfer_request(transfer_request, inquiry_length, inquiry_length);
-    
-        /* Now success.  */
-        status = UX_SUCCESS;
-
         break;
 
     case UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE_SERIAL:
@@ -177,11 +183,9 @@ UCHAR                   *inquiry_buffer;
         _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + 4, storage -> ux_slave_class_storage_product_serial, 20); /* Use case of memcpy is verified. */
 
         /* Send a data payload with the inquiry response buffer.  */
-        _ux_device_stack_transfer_request(transfer_request, 24, 24);
+        if (inquiry_length > 24)
+            inquiry_length = 24;
     
-        /* Now success.  */
-        status = UX_SUCCESS;
-
         break;
 
     default:
@@ -201,6 +205,20 @@ UCHAR                   *inquiry_buffer;
 
         break;            
     }    
+
+    /* Error cases.  */
+    if (status != UX_SUCCESS)
+        return(status);
+
+    /* Send a data payload with the inquiry response buffer.  */
+    if (inquiry_length)
+        _ux_device_stack_transfer_request(transfer_request, inquiry_length, inquiry_length);
+
+    /* Check length.  */
+    if (storage -> ux_slave_class_storage_host_length != inquiry_length)
+    {
+        _ux_device_stack_endpoint_stall(endpoint_in);
+    }
 
     /* Return completion status.  */
     return(status);

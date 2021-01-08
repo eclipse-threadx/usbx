@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_report_key                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warning,      */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -88,7 +91,7 @@ UINT  _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage,
                       UCHAR               *cbwcb)
 {
 
-UINT                    status;
+UINT                    status = UX_SUCCESS;
 UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   allocation_length;
 ULONG                   key_format;

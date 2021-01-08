@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_system.h                                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,6 +43,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added BOS support,          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -85,6 +88,10 @@ extern UCHAR _ux_system_class_audio_streaming_endpoint_descriptor_structure[];
 extern UCHAR _ux_system_class_pima_storage_structure[];
 extern UCHAR _ux_system_class_pima_object_structure[];
 extern UCHAR _ux_system_ecm_interface_descriptor_structure[];
+
+extern UCHAR _ux_system_bos_descriptor_structure[];
+extern UCHAR _ux_system_usb_2_0_extension_descriptor_structure[];
+extern UCHAR _ux_system_container_id_descriptor_structure[];
 
 extern UINT  _ux_system_host_hcd_periodic_tree_entries[32]; 
 

@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_request_sense              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,16 +80,20 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed USB CV test issues,   */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_request_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb)
 {
 
-UINT                    status;
+UINT                    status = UX_SUCCESS;
 UX_SLAVE_TRANSFER       *transfer_request;
 UCHAR                   *sense_buffer;
 UCHAR                   key, code, qualifier;
+ULONG                   sense_length;
 
 
     UX_PARAMETER_NOT_USED(cbwcb);
@@ -98,11 +102,16 @@ UCHAR                   key, code, qualifier;
     /* Obtain the pointer to the transfer request.  */
     transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
 
+    /* Get length.  */
+    sense_length = storage -> ux_slave_class_storage_host_length;
+    if (sense_length > UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH)
+        sense_length = UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH;
+
     /* Obtain sense buffer.  */
     sense_buffer = transfer_request -> ux_slave_transfer_request_data_pointer;
 
     /* Ensure it is cleaned.  */
-    _ux_utility_memory_set(sense_buffer, 0, UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH); /* Use case of memset is verified. */
+    _ux_utility_memory_set(sense_buffer, 0, sense_length); /* Use case of memset is verified. */
     
     /* Initialize the response buffer with the error code.  */
     sense_buffer[UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_ERROR_CODE] = 
@@ -133,12 +142,15 @@ UCHAR                   key, code, qualifier;
     sense_buffer[UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_ADD_LENGTH] =  10;
 
     /* Send a data payload with the sense codes.  */
-    _ux_device_stack_transfer_request(transfer_request, UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH,
-                              UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH);
-    
-    /* Now we set the CSW with success.  */
-    storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
-    status = UX_SUCCESS;
+    if (sense_length)
+        _ux_device_stack_transfer_request(transfer_request, sense_length, sense_length);
+
+    /* Check length.  */
+    if (storage -> ux_slave_class_storage_host_length != sense_length)
+    {
+        _ux_device_stack_endpoint_stall(endpoint_in);
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
+    }
 
     /* Return completion status.  */    
     return(status);

@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_csw_send                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed USB CV test issues,   */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_csw_send(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -111,6 +114,9 @@ UCHAR                   *csw_buffer;
 
     /* Store the SCSI tag from the CBW.  */
     _ux_utility_long_put(&csw_buffer[UX_SLAVE_CLASS_STORAGE_CSW_TAG], storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_scsi_tag);
+
+    /* Store the dCSWDataResidue.  */
+    _ux_utility_long_put(&csw_buffer[UX_SLAVE_CLASS_STORAGE_CSW_DATA_RESIDUE], storage -> ux_slave_class_storage_csw_residue);
 
     /* Store the status of the previous operation.  */
     csw_buffer[UX_SLAVE_CLASS_STORAGE_CSW_STATUS] = (UCHAR)storage -> ux_slave_class_storage_csw_status;

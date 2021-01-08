@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_descriptor_send                    PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@
 /*                                            logic, verified memset and  */
 /*                                            memcpy cases,               */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added BOS support,          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_descriptor_send(ULONG descriptor_type, ULONG request_index, ULONG host_length)
@@ -93,12 +96,15 @@ ULONG                           descriptor_index;
 ULONG                           parsed_descriptor_index;
 UX_SLAVE_TRANSFER               *transfer_request;
 UX_CONFIGURATION_DESCRIPTOR     configuration_descriptor;
+#ifndef UX_BOS_SUPPORT_DISABLE
+UX_BOS_DESCRIPTOR               bos_descriptor;
+#endif
 UX_SLAVE_ENDPOINT               *endpoint;
 UCHAR                           *device_framework;
 UCHAR                           *device_framework_end;
 ULONG                           device_framework_length;
 ULONG                           descriptor_length;
-ULONG                           configuration_descriptor_length;
+ULONG                           target_descriptor_length;
 UINT                            status =  UX_ERROR;
 ULONG                           length;
 UCHAR                           *string_memory;
@@ -195,6 +201,10 @@ ULONG                           string_length;
         }
         break;
 
+#ifndef UX_BOS_SUPPORT_DISABLE
+    case UX_BOS_DESCRIPTOR_ITEM:
+        /* Fall through.  */
+#endif
     case UX_OTHER_SPEED_DESCRIPTOR_ITEM:
         /* Fall through.  */
     case UX_CONFIGURATION_DESCRIPTOR_ITEM:
@@ -226,64 +236,63 @@ ULONG                           string_length;
             /* Get descriptor length. */
             descriptor_length =  (ULONG) *device_framework;
 
-            /* Check if this is a configuration descriptor.  We are cheating here. Instead of creating
-               a OTHER SPEED descriptor, we simply scan the configuration descriptor for the Full Speed
-               framework and return this configuration after we manually changed the configuration descriptor
-               item into a Other Speed Descriptor. */
-            if (*(device_framework + 1) == UX_CONFIGURATION_DESCRIPTOR_ITEM)
-            {
+#ifndef UX_BOS_SUPPORT_DISABLE
 
-                /* Check the index. It must be the same as the one requested.  */
-                if (parsed_descriptor_index == descriptor_index)
+            /* Check if we are finding BOS descriptor.  */
+            if (descriptor_type == UX_BOS_DESCRIPTOR_ITEM)
+            {
+                if (*(device_framework + 1) == UX_BOS_DESCRIPTOR_ITEM)
                 {
 
-                    /* Parse the configuration descriptor. */
+                    /* Parse the BOS descriptor.  */
                     _ux_utility_descriptor_parse(device_framework,
-                                _ux_system_configuration_descriptor_structure,
-                                UX_CONFIGURATION_DESCRIPTOR_ENTRIES,
-                                (UCHAR *) &configuration_descriptor);
+                                _ux_system_bos_descriptor_structure,
+                                UX_BOS_DESCRIPTOR_ENTRIES,
+                                (UCHAR *) &bos_descriptor);
 
-                    /* Get the length of entire configuration descriptor.  */
-                    configuration_descriptor_length =  configuration_descriptor.wTotalLength;
+                    /* Get the length of entire BOS descriptor.  */
+                    target_descriptor_length = bos_descriptor.wTotalLength;
 
-                    /* Ensure the host does not demand a length beyond our descriptor (Windows does that)
-                       and do not return more than what is allowed.  */
-                    if (configuration_descriptor_length < host_length)
-                        length =  configuration_descriptor_length;
-                    else
-                        length =  host_length;
-
-                    /* Check buffer length, since total descriptors length may exceed buffer...  */
-                    if (length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
-                    {
-                        /* Error trap. */
-                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_DEVICE_STACK, UX_MEMORY_INSUFFICIENT);
-
-                        /* If trace is enabled, insert this event into the trace buffer.  */
-                        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, device, 0, 0, UX_TRACE_ERRORS, 0, 0)
-
-                        /* Stall the endpoint.  */
-                        status =  dcd -> ux_slave_dcd_function(dcd, UX_DCD_STALL_ENDPOINT, endpoint);
-                        break;
-                    }
-
-                    /* Copy the device descriptor into the transfer request memory.  */
-                    _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer,
-                                        device_framework, length); /* Use case of memcpy is verified. */
-
-                    /* Now we need to hack the found descriptor because this request expect a OTHER_SPEED
-                       descriptor instead of the regular CONFIGURATION descriptor.  */
-                    *(transfer_request -> ux_slave_transfer_request_data_pointer + 1) = (UCHAR)descriptor_type;
-
-                    /* We can return the configuration descriptor.  */
-                    status =  _ux_device_stack_transfer_request(transfer_request, length, host_length);
+                    /* Descriptor is found.  */
+                    status = UX_SUCCESS;
                     break;
                 }
-                else
+            }
+            else
+#endif
+
+            {
+
+                /* Check if this is a configuration descriptor.  We are cheating here. Instead of creating
+                a OTHER SPEED descriptor, we simply scan the configuration descriptor for the Full Speed
+                framework and return this configuration after we manually changed the configuration descriptor
+                item into a Other Speed Descriptor. */
+                if (*(device_framework + 1) == UX_CONFIGURATION_DESCRIPTOR_ITEM)
                 {
 
-                    /* There may be more configuration descriptors in this framework.  */
-                    parsed_descriptor_index++;
+                    /* Check the index. It must be the same as the one requested.  */
+                    if (parsed_descriptor_index == descriptor_index)
+                    {
+
+                        /* Parse the configuration descriptor. */
+                        _ux_utility_descriptor_parse(device_framework,
+                                    _ux_system_configuration_descriptor_structure,
+                                    UX_CONFIGURATION_DESCRIPTOR_ENTRIES,
+                                    (UCHAR *) &configuration_descriptor);
+
+                        /* Get the length of entire configuration descriptor.  */
+                        target_descriptor_length = configuration_descriptor.wTotalLength;
+
+                        /* Descriptor is found.  */
+                        status = UX_SUCCESS;
+                        break;
+                    }
+                    else
+                    {
+
+                        /* There may be more configuration descriptors in this framework.  */
+                        parsed_descriptor_index++;
+                    }
                 }
             }
 
@@ -292,6 +301,43 @@ ULONG                           string_length;
 
             /* Point to the next descriptor.  */
             device_framework +=  descriptor_length;
+        }
+
+        /* Send the descriptor.  */
+        if (status == UX_SUCCESS)
+        {
+
+            /* Ensure the host does not demand a length beyond our descriptor (Windows does that)
+                and do not return more than what is allowed.  */
+            if (target_descriptor_length < host_length)
+                length =  target_descriptor_length;
+            else
+                length =  host_length;
+
+            /* Check buffer length, since total descriptors length may exceed buffer...  */
+            if (length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
+            {
+                /* Error trap. */
+                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_DEVICE_STACK, UX_MEMORY_INSUFFICIENT);
+
+                /* If trace is enabled, insert this event into the trace buffer.  */
+                UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, device, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+                /* Stall the endpoint.  */
+                status =  dcd -> ux_slave_dcd_function(dcd, UX_DCD_STALL_ENDPOINT, endpoint);
+                break;
+            }
+
+            /* Copy the device descriptor into the transfer request memory.  */
+            _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer,
+                                device_framework, length); /* Use case of memcpy is verified. */
+
+            /* Now we need to hack the found descriptor because this request expect a requested
+                descriptor type instead of the regular descriptor.  */
+            *(transfer_request -> ux_slave_transfer_request_data_pointer + 1) = (UCHAR)descriptor_type;
+
+            /* We can return the configuration descriptor.  */
+            status =  _ux_device_stack_transfer_request(transfer_request, length, host_length);
         }
         break;
 

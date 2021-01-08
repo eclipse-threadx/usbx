@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_storage.h                             PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,6 +55,8 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added exFAT type define,    */
 /*                                            resulting in version 6.1.2  */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -482,7 +484,7 @@ typedef struct UX_HOST_CLASS_STORAGE_MEDIA_STRUCT
 /* Define Storage Class function prototypes.  */
 
 UINT    _ux_host_class_storage_activate(UX_HOST_CLASS_COMMAND *command);
-VOID    _ux_host_class_storage_cbw_initialize(UX_HOST_CLASS_STORAGE *storage, UINT direction,
+VOID    _ux_host_class_storage_cbw_initialize(UX_HOST_CLASS_STORAGE *storage, UINT flags,
                                        ULONG data_transfer_length, UINT command_length);
 UINT    _ux_host_class_storage_configure(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_deactivate(UX_HOST_CLASS_COMMAND *command);

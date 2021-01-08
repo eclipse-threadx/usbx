@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*                                            modified HCD status code,   */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added BOS support,          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -202,7 +205,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            1
-#define USBX_PATCH_VERSION            2
+#define USBX_PATCH_VERSION            3
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
@@ -945,9 +948,28 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_OTHER_SPEED_DESCRIPTOR_ITEM                                  7u
 #define UX_OTG_DESCRIPTOR_ITEM                                          9u
 #define UX_INTERFACE_ASSOCIATION_DESCRIPTOR_ITEM                        11u
+#define UX_BOS_DESCRIPTOR_ITEM                                          15u
+#define UX_DEVICE_CAPABILITY_DESCRIPTOR_ITEM                            16u
 #define UX_DFU_FUNCTIONAL_DESCRIPTOR_ITEM                               0x21u
 #define UX_HUB_DESCRIPTOR_ITEM                                          0x29u
                                                                         
+#define UX_CAPABILITY_WIRELESS_USB                                      0x01u
+#define UX_CAPABILITY_USB_2_0_EXTENSION                                 0x02u
+#define UX_CAPABILITY_SUPERSPEED_USB                                    0x03u
+#define UX_CAPABILITY_CONTAINER_ID                                      0x04u
+#define UX_CAPABILITY_PLATFORM                                          0x05u
+#define UX_CAPABILITY_POWER_DELIVERY                                    0x06u
+#define UX_CAPABILITY_BATTERY_INFO                                      0x07u
+#define UX_CAPABILITY_PD_CONSUMER_PORT                                  0x08u
+#define UX_CAPABILITY_PD_PROVIDER_PORT                                  0x09u
+#define UX_CAPABILITY_SUPERSPEED_PLUS                                   0x0Au
+#define UX_CAPABILITY_PRECISION_TIME_MEASUREMENT                        0x0Bu
+#define UX_CAPABILITY_WIRELESS_USB_EXT                                  0x0Cu
+#define UX_CAPABILITY_BILLBOARD                                         0x0Du
+#define UX_CAPABILITY_AUTHENTICATION                                    0x0Eu
+#define UX_CAPABILITY_BILLBOARD_EX                                      0x0Fu
+#define UX_CAPABILITY_CONFIGURATION_SUMMARY                             0x10u
+
 
 #define UX_CONTROL_TRANSFER_TIMEOUT                                     1000
 #define UX_NON_CONTROL_TRANSFER_TIMEOUT                                 5000
@@ -956,6 +978,15 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_HIGH_SPEED_DETECTION_HANDSHAKE_SUSPEND_WAIT                  200
 #define UX_ENUMERATION_THREAD_WAIT                                      200
 
+
+/* USB Billboard constants.  */
+
+#define UX_CLASS_BILLBOARD_CLASS                                        0x11
+#define UX_CLASS_BILLBOARD_SUBCLASS                                     0x00
+#define UX_CLASS_BILLBOARD_PROTOCOL                                     0x00
+#define UX_CLASS_BILLBOARD_DESCRIPTOR_BILLBOARD                         0x0D
+#define UX_CLASS_BILLBOARD_DESCRIPTOR_ALTERNATE_MODE                    0x0F
+#define UX_CLASS_BILLBOARD_MAX_NUM_ALT_MODE                             0x34
 
 /* USBX 5.8 BACKWARD COMPATIBILITY DEFINITIONS. THESE DEFINITIONS ARE NOW OBSOLETE
    BUT DEFINED HERE FOR COMPATIBILITY REASONS.  */
@@ -1715,6 +1746,49 @@ typedef struct UX_STRING_DESCRIPTOR_STRUCT
 
 #define UX_STRING_DESCRIPTOR_ENTRIES                                    3
 #define UX_STRING_DESCRIPTOR_LENGTH                                     4
+
+
+/* Define USBX BOS Descriptor structure.  */
+
+typedef struct UX_BOS_DESCRIPTOR_STRUCT
+{
+    ULONG           bLength;
+    ULONG           bDescriptorType;
+    ULONG           wTotalLength;
+    ULONG           bNumDeviceCaps;
+} UX_BOS_DESCRIPTOR;
+
+#define UX_BOS_DESCRIPTOR_ENTRIES                                       4
+#define UX_BOS_DESCRIPTOR_LENGTH                                        5
+
+
+/* Define USBX USB 2.0 Descriptor structure.  */
+
+typedef struct UX_USB_2_0_EXTENSION_DESCRIPTOR_STRUCT
+{
+    ULONG           bLength;
+    ULONG           bDescriptorType;
+    ULONG           bDevCapabilityType;
+    ULONG           bmAttributes;
+} UX_USB_2_0_EXTENSION_DESCRIPTOR;
+
+#define UX_USB_2_0_EXTENSION_DESCRIPTOR_ENTRIES                         4
+#define UX_USB_2_0_EXTENSION_DESCRIPTOR_LENGTH                          7
+
+
+/* Define USBX Container ID Descriptor structure.  */
+
+typedef struct UX_CONTAINER_ID_DESCRIPTOR_STRUCT
+{
+    ULONG           bLength;
+    ULONG           bDescriptorType;
+    ULONG           bDevCapabilityType;
+    ULONG           bReserved;
+    ULONG           ContainerID[4];
+} UX_CONTAINER_ID_DESCRIPTOR;
+
+#define UX_CONTAINER_ID_DESCRIPTOR_ENTRIES                              5
+#define UX_CONTAINER_ID_DESCRIPTOR_LENGTH                               20
 
 
 /* Define USBX DFU functional descriptor.  */

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_test_ready                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized command logic,    */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed USB CV test issues,   */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_test_ready(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -103,7 +106,14 @@ ULONG        media_status;
     storage -> ux_slave_class_storage_csw_status = (status == UX_SUCCESS) ?
                             UX_SLAVE_CLASS_STORAGE_CSW_PASSED : UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
     status = UX_SUCCESS;
-    
+
+    /* Case (9) Ho > Dn.  */
+    if (storage -> ux_slave_class_storage_host_length)
+    {
+        _ux_device_stack_endpoint_stall(endpoint_out);
+        storage -> ux_slave_class_storage_csw_residue = storage -> ux_slave_class_storage_host_length;
+    }
+
     /* Return completion status.  */
     return(status);
 }

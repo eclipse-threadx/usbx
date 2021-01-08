@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_cbw_initialize               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -49,7 +49,7 @@
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
 /*    storage                               Pointer to storage class      */ 
-/*    direction                             Direction of transfer         */ 
+/*    flags                                 Flags for transfer            */ 
 /*    data_transfer_length                  Length of data transfer       */ 
 /*    command_length                        Length of command             */ 
 /*                                                                        */ 
@@ -75,9 +75,11 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
-VOID  _ux_host_class_storage_cbw_initialize(UX_HOST_CLASS_STORAGE *storage, UINT direction,
+VOID  _ux_host_class_storage_cbw_initialize(UX_HOST_CLASS_STORAGE *storage, UINT flags,
                                             ULONG data_transfer_length, UINT command_length)
 {
 
@@ -97,8 +99,8 @@ UCHAR   *cbw;
     /* Store the Data Transfer Length expected for the data payload.  */
     _ux_utility_long_put(cbw + UX_HOST_CLASS_STORAGE_CBW_DATA_LENGTH, data_transfer_length);
 
-    /* Store the CBW Flag field that contains the transfer direction.  */
-    *(cbw + UX_HOST_CLASS_STORAGE_CBW_FLAGS) =  (UCHAR)direction;
+    /* Store the CBW Flag field that contains the transfer flags.  */
+    *(cbw + UX_HOST_CLASS_STORAGE_CBW_FLAGS) =  (UCHAR)flags;
     
     /* Store the LUN value.  */
     *(cbw + UX_HOST_CLASS_STORAGE_CBW_LUN) =  (UCHAR)storage -> ux_host_class_storage_lun;
