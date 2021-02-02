@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_device_configuration_reset           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used pointer for current    */
+/*                                            selected configuration,     */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_reset(UX_DEVICE *device)
@@ -92,19 +96,14 @@ UINT                    status;
     {
 
         /* The device is configured. Get the first configuration pointer.  */
-        current_configuration =  device -> ux_device_first_configuration;
-
-        /* Traverse the configuration list until we find the right one. */
-        while (current_configuration -> ux_configuration_descriptor.bConfigurationValue !=
-                device -> ux_device_current_configuration)
-        {
-
-            current_configuration =  current_configuration -> ux_configuration_next_configuration;
-        }
+        current_configuration =  device -> ux_device_current_configuration;
 
         /* Deselect this instance */
         _ux_host_stack_configuration_instance_delete(current_configuration);
     }
+
+    /* No configuration is selected now.  */
+    device -> ux_device_current_configuration = UX_NULL;
 
     /* Set state of device to ATTACHED.  */
     device -> ux_device_state = UX_DEVICE_ATTACHED;

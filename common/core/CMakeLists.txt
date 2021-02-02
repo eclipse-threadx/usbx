@@ -104,14 +104,18 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_instance_create.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_instance_delete.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_interface_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_interface_scan.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_configuration_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_delay_ms.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_address_set.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_configuration_activate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_configuration_deactivate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_configuration_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_configuration_reset.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_configuration_select.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_descriptor_read.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_string_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_remove.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_device_resources_free.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_endpoint_instance_create.c

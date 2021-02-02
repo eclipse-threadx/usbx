@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_rh_device_insertion                  PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,11 +73,20 @@
 /*                                            checked HCD status before   */
 /*                                            retrying enumeration,       */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            handled more fail cases,    */
+/*                                            updated internal call,      */
+/*                                            added notification for      */
+/*                                            device connection,          */
+/*                                            added disconnection check   */
+/*                                            in enumeration retries,     */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_rh_device_insertion(UX_HCD *hcd, UINT port_index)
 {
 
+UX_DEVICE   *device;
 UINT        index_loop;
 UINT        device_speed;
 ULONG       port_status;
@@ -125,12 +134,20 @@ UINT        status;
                 return(UX_DEVICE_ENUMERATION_FAILURE);
             }
 
+            /* Check if device is still connected.  */
+            if ((port_status & UX_PS_CCS) == 0)
+            {
+
+                /* Device disconnected during enumeration retries.  */
+                return(UX_DEVICE_ENUMERATION_FAILURE);
+            }
+
             /* Set the device speed.  */
             device_speed =  port_status >> UX_PS_DS;
 
             /* Ask the USB stack to enumerate this device. A root hub is considered self
                powered. */
-            status =  _ux_host_stack_new_device_create(hcd, UX_NULL, port_index, device_speed, UX_MAX_SELF_POWER);
+            status =  _ux_host_stack_new_device_create(hcd, UX_NULL, port_index, device_speed, UX_MAX_SELF_POWER, &device);
 
             /* Check return status.  */
             if (status == UX_SUCCESS)
@@ -143,6 +160,12 @@ UINT        status;
                    function again */
                 hcd -> ux_hcd_rh_device_connection |= (ULONG)(1 << port_index);
 
+                /* If the device instance is ready, notify application for connection.  */
+                if (_ux_system_host -> ux_system_host_change_function)
+                {
+                    _ux_system_host -> ux_system_host_change_function(UX_DEVICE_CONNECTION, UX_NULL, (VOID*)device);
+                }
+
                 /* Return success to the caller.  */
                 return(UX_SUCCESS);
             }
@@ -153,10 +176,18 @@ UINT        status;
                 if (hcd -> ux_hcd_status != UX_HCD_STATUS_OPERATIONAL)
                     return(UX_CONTROLLER_DEAD);
 
+                /* No retry if there are too many devices.  */
+                if (status == UX_TOO_MANY_DEVICES)
+                    break;
+
+                /* No retry if there is no class found.  */
+                if (status == UX_NO_CLASS_MATCH)
+                    break;
+
                 /* Simulate remove to free allocated resources if retry.  */
                 if (index_loop < UX_RH_ENUMERATION_RETRY - 1)
-                _ux_host_stack_device_remove(hcd, UX_NULL, port_index);
-        }
+                    _ux_host_stack_device_remove(hcd, UX_NULL, port_index);
+            }
         }
 
         /* We get here if something did not go well. Either the port did not respond
@@ -165,9 +196,18 @@ UINT        status;
         _ux_utility_delay_ms(UX_RH_ENUMERATION_RETRY_DELAY);
     }
 
-    /* If we get here, the device did not enumerate completely. The device is still attached to the root
-       hub and therefore there is a physical connection with a unenumerated device. */
+    /* If we get here, the device did not enumerate completely.
+       The device is still attached to the root hub and therefore
+       there could be a physical connection with a unconfigured device.  */
     hcd -> ux_hcd_rh_device_connection |= (ULONG)(1 << port_index);
+
+    /* Notify application for a physical connection failed to be enumed.
+       Device instance NULL indicates too many devices.
+       Device state unconfigured indicates enumeration fail.  */
+    if (_ux_system_host -> ux_system_host_change_function)
+    {
+        _ux_system_host -> ux_system_host_change_function(UX_DEVICE_CONNECTION, UX_NULL, (VOID*)device);
+    }
 
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ROOT_HUB, UX_DEVICE_ENUMERATION_FAILURE);

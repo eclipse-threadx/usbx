@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_configuration_set                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used pointer for current    */
+/*                                            selected configuration,     */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_configuration_set(UX_CONFIGURATION *configuration)
@@ -150,7 +154,7 @@ UX_HCD          *hcd;
         device -> ux_device_state =  UX_DEVICE_CONFIGURED;
     
         /* Store the new configuration value in the device container.  */
-        device -> ux_device_current_configuration =  configuration -> ux_configuration_descriptor.bConfigurationValue;
+        device -> ux_device_current_configuration =  configuration;
     }
 
     /* Return status to caller.  */

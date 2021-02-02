@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_soft_reset                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,12 +70,17 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported interface other   */
+/*                                            than number zero,           */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT   _ux_host_class_printer_soft_reset(UX_HOST_CLASS_PRINTER *printer)
 {
 
 
+UX_INTERFACE    *interface;
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 UINT            status;
@@ -103,9 +108,23 @@ UINT            status;
         /* Return error.  */
         return(status);
 
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
+       transfer request function.  */
+    status =  _ux_utility_semaphore_get(&printer -> ux_host_class_printer_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+
+    /* Check for status.  */
+    if (status != UX_SUCCESS)
+    {
+        _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+        return(status);
+    }
+
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &printer -> ux_host_class_printer_device -> ux_device_control_endpoint;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
+
+    /* Need interface for wIndex.  */
+    interface = printer -> ux_host_class_printer_interface;
 
     /* Create a transfer_request for the SOFT_RESET request.  */
     transfer_request -> ux_transfer_request_data_pointer =      UX_NULL;
@@ -113,13 +132,13 @@ UINT            status;
     transfer_request -> ux_transfer_request_function =          UX_HOST_CLASS_PRINTER_SOFT_RESET;
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_OUT | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_value =             0;
-    transfer_request -> ux_transfer_request_index =             0;
+    transfer_request -> ux_transfer_request_index =             interface -> ux_interface_descriptor.bInterfaceNumber;
 
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+    _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
 
     /* Return completion status.  */
     return(status);

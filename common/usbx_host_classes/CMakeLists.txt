@@ -167,6 +167,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_printer_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_printer_configure.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_printer_deactivate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_printer_device_id_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_printer_endpoints_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_printer_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_printer_name_get.c

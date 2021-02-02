@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_stack.h                                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -46,6 +46,13 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added configuration activate*/
+/*                                            and deactivate support,     */
+/*                                            added host device string    */
+/*                                            descriptor get support,     */
+/*                                            updated internal function,  */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -83,15 +90,19 @@ VOID    _ux_host_stack_configuration_instance_delete(UX_CONFIGURATION *configura
 UINT    _ux_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
                                                 UINT interface_index, UINT alternate_setting_index,
                                                 UX_INTERFACE **interface);
+UINT    _ux_host_stack_configuration_interface_scan(UX_CONFIGURATION *configuration);
 UINT    _ux_host_stack_configuration_set(UX_CONFIGURATION *configuration);
 VOID    _ux_host_stack_delay_ms(ULONG time);
 UINT    _ux_host_stack_device_address_set(UX_DEVICE *device);
+UINT    _ux_host_stack_device_configuration_activate(UX_CONFIGURATION *configuration);
+UINT    _ux_host_stack_device_configuration_deactivate(UX_DEVICE *device);
 UINT    _ux_host_stack_device_configuration_get(UX_DEVICE *device, UINT configuration_index,
                                                         UX_CONFIGURATION **configuration);
 UINT    _ux_host_stack_device_configuration_select(UX_CONFIGURATION *configuration);
 UINT    _ux_host_stack_device_configuration_reset(UX_DEVICE *device);
 UINT    _ux_host_stack_device_descriptor_read(UX_DEVICE *device);
 UINT    _ux_host_stack_device_get(ULONG device_index, UX_DEVICE **device);
+UINT    _ux_host_stack_device_string_get(UX_DEVICE *device, UCHAR *descriptor_buffer, ULONG length, ULONG language_id, ULONG string_index);
 UINT    _ux_host_stack_device_remove(UX_HCD *hcd, UX_DEVICE *parent, UINT port_index);
 UINT    _ux_host_stack_device_resources_free(UX_DEVICE *device);
 UINT    _ux_host_stack_endpoint_instance_create(UX_ENDPOINT *endpoint);
@@ -116,7 +127,8 @@ VOID    _ux_host_stack_new_configuration_create(UX_DEVICE *device, UX_CONFIGURAT
 UX_DEVICE  *_ux_host_stack_new_device_get(VOID);
 UINT    _ux_host_stack_new_device_create(UX_HCD *hcd, UX_DEVICE *device_owner, 
                                 UINT port_index, UINT device_speed,
-                                UINT port_max_power);
+                                UINT port_max_power,
+                                UX_DEVICE **created_device);
 UINT    _ux_host_stack_new_endpoint_create(UX_INTERFACE *interface, UCHAR * interface_endpoint);
 UINT    _ux_host_stack_new_interface_create(UX_CONFIGURATION *configuration, UCHAR * descriptor, ULONG length);
 VOID    _ux_host_stack_rh_change_process(VOID);

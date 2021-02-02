@@ -15,7 +15,7 @@
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   EHCI Controller Driver                                              */
+/**   Host Stack                                                          */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -26,7 +26,7 @@
 #define UX_SOURCE_CODE
 
 #include "ux_api.h"
-#include "ux_hcd_ehci.h"
+#include "ux_host_class_printer.h"
 #include "ux_host_stack.h"
 
 
@@ -34,75 +34,93 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_hcd_ehci_poll_rate_entry_get                    PORTABLE C      */
-/*                                                           6.1.2        */
+/*    _ux_host_stack_device_string_get                    PORTABLE C      */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function return a pointer to the first ED in the periodic tree */
-/*    that start specific poll rate.                                      */
-/*    Note that when poll rate is longer, poll depth is smaller and       */
-/*    endpoint period interval is larger.                                 */
-/*      PollInterval   Depth                                              */
-/*         1             M                                                */
-/*         2            M-1                                               */
-/*         4            M-2                                               */
-/*         8            M-3                                               */
-/*        ...           ...                                               */
-/*         N             0                                                */
+/*    This function obtains the device string descriptor.                 */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    hcd_ehci                              Pointer to EHCI controller    */
-/*    ed_list                               Pointer to ED list to scan    */
-/*    poll_depth                            Poll depth expected           */
+/*    device                                Pointer to device instance    */
+/*    descriptor_buffer                     Pointer to a buffer to fill   */
+/*                                          LANGID or STRING descriptor   */
+/*    length                                Length of buffer              */
+/*    language_id                           0 to obtain LANGID descriptor */
+/*                                          valid language ID to obtain   */
+/*                                          string descriptor             */
+/*    string_index                          Index of the string           */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    UX_EHCI_ED *                          Pointer to ED                 */
+/*    Completion Status                                                   */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_semaphore_get             Get Semaphore                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    EHCI Controller Driver                                              */
+/*    Application                                                         */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.1.2  */
+/*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
 /*                                                                        */
 /**************************************************************************/
-UX_EHCI_ED *_ux_hcd_ehci_poll_rate_entry_get(UX_HCD_EHCI *hcd_ehci,
-    UX_EHCI_ED *ed_list, ULONG poll_depth)
+UINT  _ux_host_stack_device_string_get(UX_DEVICE *device, UCHAR *descriptor_buffer, ULONG length, ULONG language_id, ULONG string_index)
 {
+UX_ENDPOINT     *control_endpoint;
+UX_TRANSFER     *transfer_request;
+UINT            status;
 
 
-    UX_PARAMETER_NOT_USED(hcd_ehci);
-
-    /* Scan the list of ED/iTD/siTDs from the poll rate lowest/interval longest
-       entry until appropriate poll rate node.
-       The depth index is the poll rate EHCI value and the first entry (anchor)
-       is pointed.  */
-
-    /* Obtain next link pointer including Typ and T.  */
-    while(poll_depth --)
+    /* Do a sanity check on the device handle.  */
+    if (device -> ux_device_handle != (ULONG) (ALIGN_TYPE) device)
     {
-        if (ed_list -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor == UX_NULL)
-            break;
-        ed_list = ed_list -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor;
+        
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_DEVICE_HANDLE_UNKNOWN);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DEVICE_HANDLE_UNKNOWN, device, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_DEVICE_HANDLE_UNKNOWN);
     }
 
-    /* Return the list entry.  */
-    return(ed_list);
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_STRING_GET, device, descriptor_buffer, length, (language_id << 16) | string_index, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
+
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
+       transfer request function.  */
+    status =  _ux_utility_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+
+    /* Check for status.  */
+    if (status != UX_SUCCESS)
+        return(UX_SEMAPHORE_ERROR);
+
+    /* We need to get the default control endpoint transfer request pointer.  */
+    control_endpoint =  &device -> ux_device_control_endpoint;
+    transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
+
+    /* Create a transfer request for the GET_DEVICE_ID request.  */
+    transfer_request -> ux_transfer_request_data_pointer =      descriptor_buffer;
+    transfer_request -> ux_transfer_request_requested_length =  length;
+    transfer_request -> ux_transfer_request_function =          UX_GET_DESCRIPTOR;
+    transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_STANDARD | UX_REQUEST_TARGET_DEVICE;
+    transfer_request -> ux_transfer_request_value =             (UX_STRING_DESCRIPTOR_ITEM << 8) | string_index;
+    transfer_request -> ux_transfer_request_index =             (language_id);
+
+    /* Send request to HCD layer.  */
+    status =  _ux_host_stack_transfer_request(transfer_request);
+
+    /* Return completion status.  */
+    return(status);
 }

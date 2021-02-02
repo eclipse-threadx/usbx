@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_new_device_create                    PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,6 +59,8 @@
 /*                                            without creating an         */
 /*                                            OVER_CURRENT condition on   */
 /*                                            the bus                     */
+/*    created_device                        Destination to fill created   */
+/*                                            device instance             */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -96,11 +98,16 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new parameter to    */
+/*                                            return created device,      */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_new_device_create(UX_HCD *hcd, UX_DEVICE *device_owner,
                                 UINT port_index, UINT device_speed,
-                                UINT port_max_power)
+                                UINT port_max_power,
+                                UX_DEVICE **created_device)
 {
 
 UX_DEVICE           *device;
@@ -137,6 +144,9 @@ UX_ENDPOINT         *control_endpoint;
 
         return(UX_TOO_MANY_DEVICES);
     }
+
+    /* Store the device instance.  */
+    *created_device = device;
 
     /* Increment the number of devices on this bus.  */
     hcd -> ux_hcd_nb_devices++;

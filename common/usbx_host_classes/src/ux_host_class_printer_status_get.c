@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_status_get                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,11 +75,16 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported interface other   */
+/*                                            than number zero,           */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_status_get(UX_HOST_CLASS_PRINTER *printer, ULONG *printer_status)
 {
 
+UX_INTERFACE    *interface;
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 UINT            status;
@@ -102,6 +107,17 @@ UCHAR *         printer_status_buffer;
         /* Return error.  */
         return(status);
 
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
+       transfer request function.  */
+    status =  _ux_utility_semaphore_get(&printer -> ux_host_class_printer_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+
+    /* Check for status.  */
+    if (status != UX_SUCCESS)
+    {
+        _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+        return(status);
+    }
+
     /* We need to get the default control endpoint transfer_request pointer.  */
     control_endpoint =  &printer -> ux_host_class_printer_device -> ux_device_control_endpoint;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
@@ -116,13 +132,16 @@ UCHAR *         printer_status_buffer;
         return(UX_MEMORY_INSUFFICIENT);
     }
 
+    /* Need interface for wIndex.  */
+    interface = printer -> ux_host_class_printer_interface;
+
     /* Create a transfer_request for the GET_STATUS request.  */
     transfer_request -> ux_transfer_request_data_pointer =      printer_status_buffer;
     transfer_request -> ux_transfer_request_requested_length =  UX_HOST_CLASS_PRINTER_STATUS_LENGTH;
     transfer_request -> ux_transfer_request_function =          UX_HOST_CLASS_PRINTER_GET_STATUS;
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_value =             0;
-    transfer_request -> ux_transfer_request_index =             0;
+    transfer_request -> ux_transfer_request_index =             interface -> ux_interface_descriptor.bInterfaceNumber;
 
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
@@ -156,7 +175,7 @@ UCHAR *         printer_status_buffer;
     _ux_utility_memory_free(printer_status_buffer);
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+    _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
 
     /* Return completion status.  */
     return(status);

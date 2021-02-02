@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -47,6 +47,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Xiuwen Cai               Modified comment(s), added    */
+/*                                            compile option for using    */
+/*                                            packet pool from NetX,      */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -258,6 +262,17 @@
 */
 
 /* #define UX_HOST_CLASS_CDC_ECM_PACKET_POOL_WAIT           10 */
+
+/* Defined, this value represents the number of milliseconds to wait for packet
+   pool availability checking loop.
+   The default is 100 milliseconds.
+*/
+
+/* #define UX_HOST_CLASS_CDC_ECM_PACKET_POOL_INSTANCE_WAIT  10 */
+
+/* Defined, this enables CDC ECM class to use the packet pool from NetX instance.  */
+
+/* #define UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX */
 
 /* Defined, this value represents the number of milliseconds to wait for packet
    allocation until invoking the application's error callback and retrying.

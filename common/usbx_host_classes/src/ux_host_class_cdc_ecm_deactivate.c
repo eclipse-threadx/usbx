@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_deactivate                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Xiuwen Cai               Modified comment(s), added    */
+/*                                            compile option for using    */
+/*                                            packet pool from NetX,      */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -179,13 +183,13 @@ UX_TRANSFER                 *transfer_request;
 
     /* Destroy the notification semaphore.  */
     _ux_utility_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
-
+#ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
     /* Delete the packet pool.  */
     nx_packet_pool_delete(&cdc_ecm -> ux_host_class_cdc_ecm_packet_pool);
 
     /* Free this pool of packets.  */
     _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_pool_memory);
-    
+#endif
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)

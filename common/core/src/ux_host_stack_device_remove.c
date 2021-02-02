@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_remove                        PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,12 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used pointer for current    */
+/*                                            selected configuration,     */
+/*                                            added notification for      */
+/*                                            device disconnection,       */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_remove(UX_HCD *hcd, UX_DEVICE *parent, UINT port_index)
@@ -160,44 +166,40 @@ UX_HOST_CLASS_COMMAND       command;
     {
 
         /* Search for the active configuration.  */
-        configuration =  device -> ux_device_first_configuration;
+        configuration =  device -> ux_device_current_configuration;
 
-        /* Parse the interface(s) for this device in search of the classes
-            who own this device.  */
-        while (configuration != UX_NULL)
+        /* If configuration is activated.  */
+        if (configuration != UX_NULL)
         {
 
-            /* Is this the correct configuration?  */
-            if (configuration -> ux_configuration_descriptor.bConfigurationValue ==
-                                                device -> ux_device_current_configuration)
+            /* We have the correct configuration, search the interface(s).  */
+            interface =  configuration -> ux_configuration_first_interface;
+
+            /* Loop to perform the search.  */
+            while (interface != UX_NULL)
             {
 
-                /* We have the correct configuration, search the interface(s).  */
-                interface =  configuration -> ux_configuration_first_interface;
-
-                /* Loop to perform the search.  */
-                while (interface != UX_NULL)
+                /* Check if an instance of the interface is present.  */
+                if (interface -> ux_interface_class_instance != UX_NULL)
                 {
 
-                    /* Check if an instance of the interface is present.  */
-                    if (interface -> ux_interface_class_instance != UX_NULL)
-                    {
+                    /* We need to stop the class instance for the device.  */
+                    command.ux_host_class_command_instance =  interface -> ux_interface_class_instance;
 
-                        /* We need to stop the class instance for the device.  */
-                        command.ux_host_class_command_instance =  interface -> ux_interface_class_instance;
-
-                        /* Call the class.  */
-                        interface -> ux_interface_class -> ux_host_class_entry_function(&command);
-                    }
-
-                    /* Move to next interface.  */
-                    interface =  interface -> ux_interface_next_interface;
+                    /* Call the class.  */
+                    interface -> ux_interface_class -> ux_host_class_entry_function(&command);
                 }
-            }
 
-            /* Move to next configuration in the list.  */
-            configuration =  configuration -> ux_configuration_next_configuration;
+                /* Move to next interface.  */
+                interface =  interface -> ux_interface_next_interface;
+            }
         }
+    }
+
+    /* Notify application for disconnection of existing physical device.  */
+    if (_ux_system_host -> ux_system_host_change_function)
+    {
+        _ux_system_host -> ux_system_host_change_function(UX_DEVICE_DISCONNECTION, UX_NULL, (VOID*)device);
     }
 
     /* Now all the resources for this device must be free.  */

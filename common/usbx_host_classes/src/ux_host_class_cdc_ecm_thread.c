@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_thread                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,10 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Xiuwen Cai               Modified comment(s), added    */
+/*                                            compile option for using    */
+/*                                            packet pool from NetX,      */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_thread(ULONG parameter)
@@ -92,6 +96,9 @@ UX_TRANSFER                 *transfer_request;
 NX_PACKET                   *packet;
 ULONG                       ip_given_length;
 UINT                        status;
+#ifdef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
+USB_NETWORK_DEVICE_TYPE     *usb_network_device_ptr;
+#endif
 
     /* Cast the parameter passed in the thread into the cdc_ecm pointer.  */
     UX_THREAD_EXTENSION_PTR_GET(cdc_ecm, UX_HOST_CLASS_CDC_ECM, parameter)
@@ -117,11 +124,41 @@ UINT                        status;
             while ((cdc_ecm -> ux_host_class_cdc_ecm_link_state == UX_HOST_CLASS_CDC_ECM_LINK_STATE_UP) &&
                    (cdc_ecm -> ux_host_class_cdc_ecm_device -> ux_device_state == UX_DEVICE_CONFIGURED))                             
             {
+#ifdef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
+
+                /* Check if we have packet pool available.  */
+                if (cdc_ecm -> ux_host_class_cdc_ecm_packet_pool == UX_NULL)
+                {
+
+                    /* Get the network device handle.  */
+                    usb_network_device_ptr = (USB_NETWORK_DEVICE_TYPE *)(cdc_ecm -> ux_host_class_cdc_ecm_network_handle);
+
+                    /* Check if IP instance is available.  */
+                    if (usb_network_device_ptr -> ux_network_device_ip_instance != UX_NULL)
+                    {
+
+                        /* Get the packet pool from IP instance.  */
+                        cdc_ecm -> ux_host_class_cdc_ecm_packet_pool = usb_network_device_ptr -> ux_network_device_ip_instance -> nx_ip_default_packet_pool;
+                    }
+                    else
+                    {
+
+                        /* IP instance is not available, wait for application to attach the interface.  */
+                        _ux_utility_delay_ms(UX_HOST_CLASS_CDC_ECM_PACKET_POOL_INSTANCE_WAIT);
+                    }
+                    continue;
+                }
+
+                /* We can accept reception. Get a NX Packet. */
+                status =  nx_packet_allocate(cdc_ecm -> ux_host_class_cdc_ecm_packet_pool, &packet,
+                                             NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_HOST_CLASS_CDC_ECM_PACKET_POOL_WAIT));
+#else
 
                 /* We can accept reception. Get a NX Packet. */
                 status =  nx_packet_allocate(&cdc_ecm -> ux_host_class_cdc_ecm_packet_pool, &packet, 
                                              NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_HOST_CLASS_CDC_ECM_PACKET_POOL_WAIT));
 
+#endif
                 if (status == NX_SUCCESS)
                 {
 

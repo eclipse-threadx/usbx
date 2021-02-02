@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_port_change_connection_process   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,11 +77,20 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            handled more fail cases,    */
+/*                                            updated internal call,      */
+/*                                            added notification for      */
+/*                                            device connection,          */
+/*                                            added disconnection check   */
+/*                                            in enumeration retries,     */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_port_change_connection_process(UX_HOST_CLASS_HUB *hub, UINT port, UINT port_status)
 {
 
+UX_DEVICE   *device = UX_NULL;
 UINT        device_speed;
 UINT        device_enumeration_retry;
 USHORT      port_power;
@@ -137,6 +146,10 @@ USHORT      local_port_change;
             if (status != UX_SUCCESS)
                 return;
 
+            /* Check if device is still connected.  */
+            if ((local_port_status & UX_HOST_CLASS_HUB_PORT_STATUS_CONNECTION) == 0)
+                return;
+
             /* Device connected. Get the device speed.  */
             if (local_port_status & UX_HOST_CLASS_HUB_PORT_STATUS_LOW_SPEED)
                 device_speed =  UX_LOW_SPEED_DEVICE;
@@ -166,28 +179,56 @@ USHORT      local_port_change;
             /* Perform the device creation.  */
             status =  _ux_host_stack_new_device_create(UX_DEVICE_HCD_GET(hub -> ux_host_class_hub_device),
                                             hub -> ux_host_class_hub_device,
-                                            port, device_speed, port_power);
+                                            port, device_speed, port_power,
+                                            &device);
 
             /* Check return status.  */
             if (status == UX_SUCCESS)
             {
 
                 /* Successful device creation.  */
+
+                /* If the device instance is ready, notify application for unconfigured device.  */
+                if (_ux_system_host -> ux_system_host_change_function)
+                {
+                    _ux_system_host -> ux_system_host_change_function(UX_DEVICE_CONNECTION, UX_NULL, (VOID*)device);
+                }
+
                 /* Just return.  */
                 return;
             }
-            else if (device_enumeration_retry < UX_HOST_CLASS_HUB_ENUMERATION_RETRY - 1)
+            else
             {
 
-                /* Simulate remove to free allocated resources before retry.  */
-                _ux_host_stack_device_remove(hcd, hub -> ux_host_class_hub_device, port);
+                /* No retry if there are too many devices.  */
+                if (status == UX_TOO_MANY_DEVICES)
+                    break;
 
-                /* Wait for a while.  */
-                _ux_utility_delay_ms(UX_HOST_CLASS_HUB_ENUMERATION_RETRY_DELAY);
+                /* No retry if there is no class found.  */
+                if (status == UX_NO_CLASS_MATCH)
+                    break;
+
+                if (device_enumeration_retry < UX_HOST_CLASS_HUB_ENUMERATION_RETRY - 1)
+                {
+
+                    /* Simulate remove to free allocated resources before retry.  */
+                    _ux_host_stack_device_remove(hcd, hub -> ux_host_class_hub_device, port);
+
+                    /* Wait for a while.  */
+                    _ux_utility_delay_ms(UX_HOST_CLASS_HUB_ENUMERATION_RETRY_DELAY);
+                }
             }
         }
 
-        /* If we get here, the device did not enumerate completely. */
+        /* If we get here, the device did not enumerate completely.
+           The device is still attached to the hub and therefore there is a
+           physical connection with a unenumerated device. */
+
+        /* If the device instance is ready, notify application for unconfigured device.  */
+        if (_ux_system_host -> ux_system_host_change_function)
+        {
+            _ux_system_host -> ux_system_host_change_function(UX_DEVICE_CONNECTION, UX_NULL, (VOID*)device);
+        }
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ROOT_HUB, UX_DEVICE_ENUMERATION_FAILURE);

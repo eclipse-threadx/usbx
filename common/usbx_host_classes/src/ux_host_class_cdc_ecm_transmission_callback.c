@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_transmission_callback        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  02-02-2021     Chaoqiong Xiao           Modified comment(s), fixed    */
+/*                                            ZLP issue for transmission, */
+/*                                            resulting in version 6.1.4  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_transmission_callback(UX_TRANSFER *transfer_request)
@@ -111,7 +114,22 @@ UCHAR                           *packet_header;
     /* Check the state of the transfer.  */
     if (transfer_request -> ux_transfer_request_completion_code == UX_SUCCESS)
     {
-        
+
+        /* Check if the transfer length is not zero and it is multiple of MPS.  */
+        if ((transfer_request -> ux_transfer_request_requested_length != 0) &&
+            (transfer_request -> ux_transfer_request_requested_length % (transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_descriptor.wMaxPacketSize & UX_MAX_PACKET_SIZE_MASK)) == 0)
+        {
+
+            /* Set transfer request length to zero.  */
+            transfer_request -> ux_transfer_request_requested_length =  0;
+
+            /* Send the transfer.  */
+            _ux_host_stack_transfer_request(transfer_request);
+
+            /* Finished processing.  */
+            return;
+        }
+
         /* Get the next packet associated with the first packet.  */
         next_packet =  current_packet -> nx_packet_queue_next;
 

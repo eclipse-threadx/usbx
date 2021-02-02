@@ -15,7 +15,7 @@
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   EHCI Controller Driver                                              */
+/**   Host Stack                                                          */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -26,7 +26,6 @@
 #define UX_SOURCE_CODE
 
 #include "ux_api.h"
-#include "ux_hcd_ehci.h"
 #include "ux_host_stack.h"
 
 
@@ -34,75 +33,105 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_hcd_ehci_poll_rate_entry_get                    PORTABLE C      */
-/*                                                           6.1.2        */
+/*    _ux_host_stack_device_configuration_activate        PORTABLE C      */
+/*                                                           6.1.4        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function return a pointer to the first ED in the periodic tree */
-/*    that start specific poll rate.                                      */
-/*    Note that when poll rate is longer, poll depth is smaller and       */
-/*    endpoint period interval is larger.                                 */
-/*      PollInterval   Depth                                              */
-/*         1             M                                                */
-/*         2            M-1                                               */
-/*         4            M-2                                               */
-/*         8            M-3                                               */
-/*        ...           ...                                               */
-/*         N             0                                                */
+/*    This function selects a specific configuration for a device.        */
+/*    When this configuration is set to the device, by default all the    */
+/*    device interface and their associated alternate setting 0 is        */
+/*    activated on the device.                                            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    hcd_ehci                              Pointer to EHCI controller    */
-/*    ed_list                               Pointer to ED list to scan    */
-/*    poll_depth                            Poll depth expected           */
+/*    configuration                          Pointer to configuration     */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    UX_EHCI_ED *                          Pointer to ED                 */
+/*    Completion Status                                                   */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
+/*    _ux_utility_semaphore_get                    Get semaphore          */
+/*    _ux_utility_semaphore_put                    Put semaphore          */
+/*    _ux_host_stack_configuration_interface_scan  Scan and activate      */
+/*                                                 interfaces             */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    EHCI Controller Driver                                              */
+/*    Application                                                         */
+/*    USBX Components                                                     */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.1.2  */
+/*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
 /*                                                                        */
 /**************************************************************************/
-UX_EHCI_ED *_ux_hcd_ehci_poll_rate_entry_get(UX_HCD_EHCI *hcd_ehci,
-    UX_EHCI_ED *ed_list, ULONG poll_depth)
+UINT  _ux_host_stack_device_configuration_activate(UX_CONFIGURATION *configuration)
 {
 
+UX_DEVICE               *device;
+UINT                    status;
 
-    UX_PARAMETER_NOT_USED(hcd_ehci);
 
-    /* Scan the list of ED/iTD/siTDs from the poll rate lowest/interval longest
-       entry until appropriate poll rate node.
-       The depth index is the poll rate EHCI value and the first entry (anchor)
-       is pointed.  */
-
-    /* Obtain next link pointer including Typ and T.  */
-    while(poll_depth --)
+    /* Check for validity of the configuration handle.  */
+    if (configuration -> ux_configuration_handle != (ULONG) (ALIGN_TYPE) configuration)
     {
-        if (ed_list -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor == UX_NULL)
-            break;
-        ed_list = ed_list -> REF_AS.ANCHOR.ux_ehci_ed_next_anchor;
+
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_CONFIGURATION_HANDLE_UNKNOWN);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONFIGURATION_HANDLE_UNKNOWN, configuration, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_CONFIGURATION_HANDLE_UNKNOWN);
     }
 
-    /* Return the list entry.  */
-    return(ed_list);
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_ACTIVATE, device, configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+
+    /* Get the device container for this configuration.  */
+    device =  configuration -> ux_configuration_device;
+
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
+       transfer request function.  */
+    status =  _ux_utility_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+
+    /* Check for status.  */
+    if (status != UX_SUCCESS)
+    {
+
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_SEMAPHORE_ERROR);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_SEMAPHORE_ERROR, configuration, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_SEMAPHORE_ERROR);
+    }
+
+    /* Check for the state of the device . If the device is already configured,
+       we need to cancel the existing configuration before enabling this one.   */
+    if (device -> ux_device_state == UX_DEVICE_CONFIGURED)
+    {
+
+        /* If this configuration is already activated, we are good,
+           otherwise report error.  */
+        status = (device -> ux_device_current_configuration == configuration) ?
+                    UX_SUCCESS : UX_ALREADY_ACTIVATED;
+        _ux_utility_semaphore_put(&device -> ux_device_protection_semaphore);
+        return(status);
+    }
+
+    /* Scan and activate the interfaces.  */
+    status =  _ux_host_stack_configuration_interface_scan(configuration);
+
+    /* Return completion status.  */
+    return(status);
 }
