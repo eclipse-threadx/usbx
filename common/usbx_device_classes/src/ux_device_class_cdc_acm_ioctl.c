@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_ioctl                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.5        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  03-02-2021     Xiuwen Cai               Modified comment(s), removed  */
+/*                                            unreachable statement,      */
+/*                                            resulting in version 6.1.5  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -348,8 +351,6 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
             
             /* We are done here.  */
             return(UX_SUCCESS);
-            
-            break;            
 
         case UX_SLAVE_CLASS_CDC_ACM_IOCTL_TRANSMISSION_STOP:
         
