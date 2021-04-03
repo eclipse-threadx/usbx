@@ -79,6 +79,12 @@
 /*  03-02-2021     Xiuwen Cai               Modified comment(s), removed  */
 /*                                            unreachable statement,      */
 /*                                            resulting in version 6.1.5  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added macro to disable      */
+/*                                            transmission support,       */
+/*                                            moved transmission resource */
+/*                                            management to init/uninit,  */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -230,8 +236,9 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
 
             break;
 
-        case UX_SLAVE_CLASS_CDC_ACM_IOCTL_TRANSMISSION_START:
+#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 
+        case UX_SLAVE_CLASS_CDC_ACM_IOCTL_TRANSMISSION_START:
 
             /* Check if we are in callback transmission already.  */
             if (cdc_acm -> ux_slave_class_cdc_acm_transmission_status == UX_TRUE)
@@ -244,107 +251,15 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
             /* Properly cast the parameter pointer.  */
             callback = (UX_SLAVE_CLASS_CDC_ACM_CALLBACK_PARAMETER *) parameter;
             
-            /* We need to start the 2 threads for sending and receiving.  */
-            /* Allocate some memory for the bulk out thread stack. */
-            cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack =  
-                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
-
-            /* Check for successful allocation.  */
-            if (cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack  == UX_NULL)
-            {
-        
-                /* Return the status to the caller.  */
-                return(UX_MEMORY_INSUFFICIENT);
-            }        
-        
-            /* Allocate some memory for the bulk in thread stack. */
-            cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack =  
-                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
-
-            /* Check for successful allocation.  */
-            if (cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack  == UX_NULL)
-            {
-        
-                /* Free resources.  */
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack );
-        
-                /* Return the status to the caller.  */
-                return(UX_MEMORY_INSUFFICIENT);
-            }        
-        
-            /* Create a event flag group for the cdc_acm class to synchronize with the application writing event .  */
-            status =  _ux_utility_event_flags_create(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group, "ux_device_class_cdc_acm_event_flag");
-        
-            /* Check status.  */
-            if (status != UX_SUCCESS)
-            {
-        
-                /* Free resources.  */
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack );
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack );
-        
-                /* Do not proceed.  */
-                return(UX_EVENT_ERROR);
-            }
-        
-            /* Bulk endpoint treatment needs to be running in a different thread. So start
-               a new thread. We pass a pointer to the cdc_acm instance to the new thread.  This thread
-               does not start until we have a instance of the class. */
-            status =  _ux_utility_thread_create(&cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread , "ux_slave_class_cdc_acm_bulkin_thread", 
-                        _ux_device_class_cdc_acm_bulkin_thread,
-                        (ULONG) (ALIGN_TYPE) cdc_acm, (VOID *) cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack ,
-                        UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_AUTO_START);
-                        
-            /* Check the creation of this thread.  */
-            if (status != UX_SUCCESS)
-            {
-
-                /* Delete the event flag group for the acm class.  */
-                _ux_utility_event_flags_delete(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group);
-                
-                /* Free some of the resource used. */
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack );
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack );
-        
-                return(UX_THREAD_ERROR);
-            }        
-
-            UX_THREAD_EXTENSION_PTR_SET(&(cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread), cdc_acm)
-        
-            /* Bulk endpoint treatment needs to be running in a different thread. So start
-               a new thread. We pass a pointer to the cdc_acm instance to the new thread.  This thread
-               does not start until we have a instance of the class. */
-            status =  _ux_utility_thread_create(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread , "ux_slave_class_cdc_acm_bulkout_thread", 
-                        _ux_device_class_cdc_acm_bulkout_thread,
-                        (ULONG) (ALIGN_TYPE) cdc_acm, (VOID *) cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack ,
-                        UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_AUTO_START);
-                        
-            /* Check the creation of this thread.  */
-            if (status != UX_SUCCESS)
-            {
-
-                /* Delete the event flag group for the acm class.  */
-                _ux_utility_event_flags_delete(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group);
-                
-                /* Delete bulk in thread.  */
-                _ux_utility_thread_delete(&cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread);
-
-                /* Free some of the resource used. */
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack );
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack );
-        
-                return(UX_THREAD_ERROR);
-            }        
-        
-            UX_THREAD_EXTENSION_PTR_SET(&(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread), cdc_acm)
-        
             /* Save the callback function for write.  */
             cdc_acm -> ux_device_class_cdc_acm_write_callback  = callback -> ux_device_class_cdc_acm_parameter_write_callback;
 
             /* Save the callback function for read.  */
             cdc_acm -> ux_device_class_cdc_acm_read_callback = callback -> ux_device_class_cdc_acm_parameter_read_callback;
+
+            /* Start transmission threads.  */
+            _ux_utility_thread_resume(&cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread);
+            _ux_utility_thread_resume(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread);
 
             /* Declare the transmission with callback on.  */
             cdc_acm -> ux_slave_class_cdc_acm_transmission_status = UX_TRUE;
@@ -367,14 +282,8 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
                     /* Get the transfer request associated with the endpoint.  */
                     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
                     
-                    /* Check the status of the transfer. */ 
-                    if (transfer_request -> ux_slave_transfer_request_status ==  UX_TRANSFER_STATUS_PENDING)
-                    {
-        
                         /* Abort the transfer.  */
                         _ux_device_stack_transfer_abort(transfer_request, UX_TRANSFER_STATUS_ABORT);
-        
-                    } 
         
                 /* Next endpoint.  */
                 endpoint =  endpoint -> ux_slave_endpoint_next_endpoint;
@@ -382,25 +291,12 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
                     /* Get the transfer request associated with the endpoint.  */
                     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
                     
-                    /* Check the status of the transfer. */ 
-                    if (transfer_request -> ux_slave_transfer_request_status ==  UX_TRANSFER_STATUS_PENDING)
-                    {
-        
                         /* Abort the transfer.  */
                         _ux_device_stack_transfer_abort(transfer_request, UX_TRANSFER_STATUS_ABORT);
         
-                    } 
-
-                /* Terminate threads.  */
-                _ux_utility_thread_delete(&cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread);
-                _ux_utility_thread_delete(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread);
-
-                /* Free resources.  */
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack );
-                _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack );
-
-                /* Delete the event flag group for the acm class.  */
-                _ux_utility_event_flags_delete(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group);
+                /* Suspend threads.  */
+                _ux_utility_thread_suspend(&cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread);
+                _ux_utility_thread_suspend(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread);
 
                 /* Clear scheduled write flag.  */
                 cdc_acm -> ux_slave_class_cdc_acm_scheduled_write = UX_FALSE;
@@ -414,6 +310,7 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
                 return(UX_ERROR);                
 
             break;                
+#endif
     
         default: 
 

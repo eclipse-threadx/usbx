@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_thread                     PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -103,6 +103,10 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issues with   */
+/*                                            some macro options,         */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_storage_thread(ULONG storage_class)
@@ -351,9 +355,9 @@ UCHAR                       *cbw_cb;
                                 /* Special treatment of TOC command. If error, default to Stall endpoint.  */
                                 if (status == UX_SUCCESS)
                                     break;
-                                /* fall through */
 #endif
 
+                            /* fall through */
                             default:
     
                                 /* The command is unknown or unsupported, so we stall the endpoint.  */

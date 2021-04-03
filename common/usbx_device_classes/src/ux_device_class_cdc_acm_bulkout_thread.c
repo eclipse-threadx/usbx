@@ -28,12 +28,14 @@
 #include "ux_device_class_cdc_acm.h"
 #include "ux_device_stack.h"
 
+
+#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_bulkout_thread             PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +70,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added macro to disable      */
+/*                                            transmission support,       */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_acm_bulkout_thread(ULONG cdc_acm_class)
@@ -148,4 +154,4 @@ UINT                            status;
     _ux_utility_thread_suspend(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread);
     }
 }
-
+#endif

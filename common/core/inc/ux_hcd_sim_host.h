@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_sim_host.h                                   PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -51,6 +51,9 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added HCD uninitialize,     */
 /*                                            resulting in version 6.1.2  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added port status variable, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -96,6 +99,7 @@ typedef struct UX_HCD_SIM_HOST_STRUCT
                     *ux_hcd_sim_host_hcd_owner;
     ULONG           ux_hcd_sim_host_hcor;
     UINT            ux_hcd_sim_host_nb_root_hubs;
+    ULONG           ux_hcd_sim_host_port_status[1];
     struct UX_HCD_SIM_HOST_ED_STRUCT         
                     *ux_hcd_sim_host_ed_list;
     struct UX_HCD_SIM_HOST_TD_STRUCT         

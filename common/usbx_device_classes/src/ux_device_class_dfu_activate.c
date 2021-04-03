@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_activate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed block count (it's   */
+/*                                            from host request wValue),  */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -115,10 +119,6 @@ UX_SLAVE_CLASS                          *class;
         
             /* In the system, state the DFU state machine to DFU idle.  */
             _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_IDLE;
-
-            /* Reset the download/upload parameters.  */
-            dfu -> ux_slave_class_dfu_download_block_count = 0;
-            dfu -> ux_slave_class_dfu_upload_block_count = 0;
 
             /* Set the mode to DFU mode.  */
             _ux_system_slave -> ux_system_slave_device_dfu_mode =  UX_DEVICE_CLASS_DFU_MODE_DFU ;

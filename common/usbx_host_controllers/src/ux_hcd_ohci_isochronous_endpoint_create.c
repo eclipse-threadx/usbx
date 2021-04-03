@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_isochronous_endpoint_create            PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            filled max transfer length, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_isochronous_endpoint_create(UX_HCD_OHCI *hcd_ohci, UX_ENDPOINT *endpoint)
@@ -102,9 +105,13 @@ UX_OHCI_ISO_TD          *td;
 
     /* Attach the ED to the endpoint container.  */
     endpoint -> ux_endpoint_ed =  (VOID *) ed;
-    
-    /* Program the ED for subsequent transfers we need to set the following things:
 
+    /* We need to take into account the nature of the HCD to define the max size
+       of any transfer in the transfer request.  */
+    endpoint -> ux_endpoint_transfer_request.ux_transfer_request_maximum_length =
+                            endpoint -> ux_endpoint_descriptor.wMaxPacketSize;
+
+    /* Program the ED for subsequent transfers we need to set the following things:
         1) Address of the device 
         2) endpoint number 
         3) speed (always full speed for iso)

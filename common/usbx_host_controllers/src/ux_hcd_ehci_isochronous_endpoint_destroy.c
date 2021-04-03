@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_isochronous_endpoint_destroy           PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issues with   */
+/*                                            some macro options,         */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_isochronous_endpoint_destroy(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -221,7 +225,7 @@ ULONG                           last_size;
             {
 
                 /* Update start split count.  */
-                ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_ssplit_count[frindex] --;
+                ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[frindex] --;
 
                 /* Update load for OUT.  */
                 if ((endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == 0)
@@ -231,19 +235,19 @@ ULONG                           last_size;
                     last_size = max_packet_size % 188;
                     if (last_size == 0 &&
                         frindex == last_frindex)
-                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] = (USHORT)
-                                (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] - last_size);
+                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] = (USHORT)
+                                (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] - last_size);
                     else
-                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] = (USHORT)
-                                (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] - 188u);
+                        ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] = (USHORT)
+                                (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] - 188u);
                 }
 
             }
 
             /* Update complete split related (IN only).  */
             if (ed_td.sitd_ptr -> ux_ehci_fsiso_td_cap1 & (UX_EHCI_CMASK_0 << frindex))
-                ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] = (USHORT)
-                        (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> ux_ehci_ed_microframe_load[frindex] - 188u);
+                ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] = (USHORT)
+                        (ed_td.sitd_ptr -> ux_ehci_fsiso_td_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex] - 188u);
         }
     }
     else

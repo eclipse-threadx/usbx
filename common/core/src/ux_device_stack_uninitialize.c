@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_uninitialize                       PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed uninitialize in case  */
+/*                                            there is no EP except EP0,  */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_uninitialize(VOID)
@@ -110,7 +114,8 @@ ULONG                           endpoints_found;
     }
 
     /* Free the endpoint pool address in the device container.  */
-    _ux_utility_memory_free(device -> ux_slave_device_endpoints_pool);
+    if (device -> ux_slave_device_endpoints_pool)
+        _ux_utility_memory_free(device -> ux_slave_device_endpoints_pool);
 
     /* Free memory for interface pool.  */
     _ux_utility_memory_free(device -> ux_slave_device_interfaces_pool);

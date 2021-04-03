@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_deactivate                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,10 @@
 /*                                            class specific structured   */
 /*                                            data,                       */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issues with   */
+/*                                            some macro options,         */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -132,9 +136,6 @@ VOID                            *memory;
         /* Was there an interrupt endpoint?  */
         if (storage -> ux_host_class_storage_interrupt_endpoint != UX_NULL)
         {
-
-            /* Then interrupt endpoint.  */
-            transfer_request =  &storage -> ux_host_class_storage_interrupt_endpoint -> ux_endpoint_transfer_request;
 
             /* Abort the data transfer on the interrupt endpoint.  */
             _ux_host_stack_endpoint_transfer_abort(storage -> ux_host_class_storage_interrupt_endpoint);

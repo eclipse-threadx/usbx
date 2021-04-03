@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_sim_host_transaction_schedule               PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed control OUT transfer, */
+/*                                            supported bi-dir-endpoints, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_transaction_schedule(UX_HCD_SIM_HOST *hcd_sim_host, UX_HCD_SIM_HOST_ED *ed)
@@ -94,6 +98,7 @@ ULONG                   slave_transfer_remaining;
 UCHAR                   wake_host;
 UCHAR                   wake_slave;
 ULONG                   transaction_length;
+ULONG                   td_length;
 UX_SLAVE_TRANSFER       *slave_transfer_request;
 UX_TRANSFER             *transfer_request;
 ULONG                   endpoint_index;
@@ -124,7 +129,15 @@ UX_SLAVE_DCD            *dcd;
     dcd_sim_slave =  (UX_DCD_SIM_SLAVE *) dcd -> ux_slave_dcd_controller_hardware;
 
     /* Get the endpoint as seen from the device side.  */
+#ifdef UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
+    slave_ed = ((endpoint -> ux_endpoint_descriptor.bEndpointAddress == 0) ?
+            &dcd_sim_slave -> ux_dcd_sim_slave_ed[0] :
+            ((endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) ?
+                &dcd_sim_slave -> ux_dcd_sim_slave_ed_in[endpoint_index] :
+                &dcd_sim_slave -> ux_dcd_sim_slave_ed[endpoint_index]));
+#else
     slave_ed =  &dcd_sim_slave -> ux_dcd_sim_slave_ed[endpoint_index];
+#endif
 
     /* Is this ED used?  */
     if ((slave_ed -> ux_sim_slave_ed_status & UX_DCD_SIM_SLAVE_ED_STATUS_USED) == 0)
@@ -155,7 +168,8 @@ UX_SLAVE_DCD            *dcd;
         slave_transfer_request -> ux_slave_transfer_request_actual_length =  td -> ux_sim_host_td_length;
 
         /* Move the buffer from the host TD to the device TD.  */
-        _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_setup, td -> ux_sim_host_td_buffer,
+        _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_setup,
+                                td -> ux_sim_host_td_buffer,
                                 td -> ux_sim_host_td_length); /* Use case of memcpy is verified. */
 
         /* The setup phase never fails. We acknowledge the transfer code here by taking the TD out of the endpoint.  */
@@ -202,20 +216,22 @@ UX_SLAVE_DCD            *dcd;
                 {
 
                     /* Copy the amount of data in the td into the slave transaction buffer.  */
-                    _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_current_data_pointer, data_td -> ux_sim_host_td_buffer,
-                                    data_td -> ux_sim_host_td_length); /* Use case of memcpy is verified. */
+                    td_length = UX_MIN(data_td -> ux_sim_host_td_length, transaction_length);
+                    _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_current_data_pointer,
+                                            data_td -> ux_sim_host_td_buffer,
+                                            td_length); /* Use case of memcpy is verified. */
 
                     /* Add to the actual payload length.  */
-                    slave_transfer_request -> ux_slave_transfer_request_actual_length += data_td -> ux_sim_host_td_length;
+                    slave_transfer_request -> ux_slave_transfer_request_actual_length += td_length;
 
                     /* Update the host transfer's actual length. */
                     transfer_request -> ux_transfer_request_actual_length +=  transaction_length;
 
                     /* Decrement the total length.  */
-                    transaction_length -= data_td -> ux_sim_host_td_length;
+                    transaction_length -= td_length;
 
                     /* Update buffer pointer.  */
-                    slave_transfer_request -> ux_slave_transfer_request_current_data_pointer += data_td -> ux_sim_host_td_length;
+                    slave_transfer_request -> ux_slave_transfer_request_current_data_pointer += td_length;
 
                     /* Update the td in the head.  */
                     ed -> ux_sim_host_ed_head_td =  data_td;

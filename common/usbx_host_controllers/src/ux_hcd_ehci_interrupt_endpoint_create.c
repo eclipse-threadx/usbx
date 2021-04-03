@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_interrupt_endpoint_create              PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -96,6 +96,11 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issues with   */
+/*                                            some macro options,         */
+/*                                            filled max transfer length, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_interrupt_endpoint_create(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -130,6 +135,10 @@ UINT                            i;
     if (device -> ux_device_speed != UX_HIGH_SPEED_DEVICE)
         return(UX_FUNCTION_NOT_SUPPORTED);
 #endif
+
+    /* We need to take into account the nature of the HCD to define the max size
+       of any transfer in the transfer request.  */
+    endpoint -> ux_endpoint_transfer_request.ux_transfer_request_maximum_length =  UX_EHCI_MAX_PAYLOAD;
 
     /* Obtain a ED for this new endpoint. This ED will live as long as the endpoint is 
        active and will be the container for the tds.  */
@@ -331,7 +340,7 @@ UINT                            i;
             }
 
             /* Reserve count for SSplit (Max 16).  */
-            ed_anchor -> ux_ehci_ed_microframe_ssplit_count[i] ++;
+            ed_anchor ->REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[i] ++;
 
             /* Reserve packet bytes for microframe load.  */
             if (endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION)

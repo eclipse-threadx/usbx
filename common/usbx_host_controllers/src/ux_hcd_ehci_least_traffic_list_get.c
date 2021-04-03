@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_least_traffic_list_get                 PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issues with   */
+/*                                            some macro options,         */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_ED  *_ux_hcd_ehci_least_traffic_list_get(UX_HCD_EHCI *hcd_ehci,
@@ -132,7 +136,7 @@ ULONG                           bandwidth_used;
             {
                 microframe_load[frindex] += ed -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[frindex];
 #if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)
-                microframe_ssplit_count[frindex] += ed -> ux_ehci_ed_microframe_ssplit_count[frindex];
+                microframe_ssplit_count[frindex] += ed -> REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[frindex];
 #endif
             }
 

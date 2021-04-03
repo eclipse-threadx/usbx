@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,10 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added macro to disable      */
+/*                                            transmission support,       */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -150,6 +154,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
     UCHAR                               ux_slave_class_cdc_acm_data_bit;
     UCHAR                               ux_slave_class_cdc_acm_data_dtr_state;
     UCHAR                               ux_slave_class_cdc_acm_data_rts_state;
+#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
     UX_THREAD                           ux_slave_class_cdc_acm_bulkin_thread;
     UX_THREAD                           ux_slave_class_cdc_acm_bulkout_thread;
     UCHAR                               *ux_slave_class_cdc_acm_bulkin_thread_stack;
@@ -162,7 +167,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
     ULONG                               ux_slave_class_cdc_acm_callback_total_length;
     UCHAR                               *ux_slave_class_cdc_acm_callback_data_pointer;
     UCHAR                               *ux_slave_class_cdc_acm_callback_current_data_pointer;
-    
+#endif
 } UX_SLAVE_CLASS_CDC_ACM;
 
 /* Define some CDC Class structures */

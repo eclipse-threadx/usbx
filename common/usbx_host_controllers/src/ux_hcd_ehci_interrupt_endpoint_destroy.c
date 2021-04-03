@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_interrupt_endpoint_destroy             PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issues with   */
+/*                                            some macro options,         */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_interrupt_endpoint_destroy(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -157,7 +161,7 @@ ULONG                         max_packet_size;
             {
 
                 /* Decrement the start split count.  */
-                ed -> REF_AS.INTR.ux_ehci_ed_anchor -> ux_ehci_ed_microframe_ssplit_count[frindex] --;
+                ed -> REF_AS.INTR.ux_ehci_ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[frindex] --;
 
                 /* Check next endpoint if it's IN (load in C-Mask).  */
                 if (endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION)

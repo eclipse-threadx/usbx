@@ -27,6 +27,7 @@
 
 #include "ux_api.h"
 #include "ux_hcd_sim_host.h"
+#include "ux_dcd_sim_slave.h"
 
 
 /**************************************************************************/ 
@@ -34,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_initialize                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,11 +75,16 @@
 /*                                            instead of using them       */
 /*                                            directly,                   */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added link with DCD,        */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_initialize(UX_HCD *hcd)
 {
 
+UX_SLAVE_DCD        *dcd;
+UX_DCD_SIM_SLAVE    *dcd_sim_slave;
 UX_HCD_SIM_HOST     *hcd_sim_host;
 UINT                status;
 
@@ -176,11 +182,24 @@ UINT                status;
         return(status);
     }
 
+    /* Link the HCD to DCD driver.  */
+    if (_ux_system_slave)
+    {
+        dcd = &_ux_system_slave -> ux_system_slave_dcd;
+        if (dcd)
+        {
+            dcd_sim_slave = (UX_DCD_SIM_SLAVE *) dcd -> ux_slave_dcd_controller_hardware;
+            if (dcd_sim_slave)
+                dcd_sim_slave -> ux_dcd_sim_slave_hcd = (VOID *)hcd;
+        }
+    }
+
     /* Get the number of ports on the controller. The number of ports needs to be reflected both 
        for the generic HCD container and the local sim_host container. In the simulator,
        the number of ports is hardwired to 1 only.  */
     hcd -> ux_hcd_nb_root_hubs =  1;
     hcd_sim_host -> ux_hcd_sim_host_nb_root_hubs =  1;
+    hcd_sim_host -> ux_hcd_sim_host_port_status[0] = UX_PS_CCS | UX_PS_DS_FS;
 
     /* Something happened on this port. Signal it to the root hub thread.  */
     hcd -> ux_hcd_root_hub_signal[0] =  1;

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_initialize_complete               PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added framework init cases, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_initialize_complete(VOID)
@@ -86,9 +89,22 @@ UX_SLAVE_TRANSFER       *transfer_request;
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
 
-    /* Slave simulator is a Full speed controller.  */
-    _ux_system_slave -> ux_system_slave_device_framework =  _ux_system_slave -> ux_system_slave_device_framework_full_speed;
-    _ux_system_slave -> ux_system_slave_device_framework_length =  _ux_system_slave -> ux_system_slave_device_framework_length_full_speed;
+    /* Prepare according to speed.  */
+    if (_ux_system_slave -> ux_system_slave_speed == UX_HIGH_SPEED_DEVICE)
+    {
+        _ux_system_slave -> ux_system_slave_device_framework =
+            _ux_system_slave -> ux_system_slave_device_framework_high_speed;
+        _ux_system_slave -> ux_system_slave_device_framework_length =
+            _ux_system_slave -> ux_system_slave_device_framework_length_high_speed;
+    }
+    else
+    {
+        _ux_system_slave -> ux_system_slave_device_framework =
+            _ux_system_slave -> ux_system_slave_device_framework_full_speed;
+        _ux_system_slave -> ux_system_slave_device_framework_length =
+            _ux_system_slave -> ux_system_slave_device_framework_length_full_speed;
+
+    }
 
     /* Get the device framework pointer.  */
     device_framework =  _ux_system_slave -> ux_system_slave_device_framework;

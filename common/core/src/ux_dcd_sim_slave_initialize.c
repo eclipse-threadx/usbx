@@ -27,6 +27,7 @@
 
 #include "ux_api.h"
 #include "ux_dcd_sim_slave.h"
+#include "ux_hcd_sim_host.h"
 
 
 /**************************************************************************/
@@ -34,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_initialize                        PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +67,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added link with HCD,        */
+/*                                            set device to full speed,   */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_initialize(VOID)
@@ -73,6 +78,7 @@ UINT  _ux_dcd_sim_slave_initialize(VOID)
 
 UX_SLAVE_DCD            *dcd;
 UX_DCD_SIM_SLAVE        *dcd_sim_slave;
+UX_HCD                  *hcd;
 
                                                                             
     /* Get the pointer to the DCD.  */
@@ -96,6 +102,19 @@ UX_DCD_SIM_SLAVE        *dcd_sim_slave;
 
     /* Initialize the function collector for this DCD.  */
     dcd -> ux_slave_dcd_function =  _ux_dcd_sim_slave_function;
+
+    /* Link the HCD (always first registered one) to DCD driver.  */
+    if (_ux_system_host)
+    {
+        hcd = _ux_system_host -> ux_system_host_hcd_array;
+        if (hcd)
+        {
+            dcd_sim_slave -> ux_dcd_sim_slave_hcd = (VOID *)hcd;
+        }
+    }
+
+    /* Set system to full speed by default.  */
+    _ux_system_slave -> ux_system_slave_speed = UX_FULL_SPEED_DEVICE;
 
     /* Set the state of the controller to OPERATIONAL now.  */
     dcd -> ux_slave_dcd_status =  UX_DCD_STATUS_OPERATIONAL;

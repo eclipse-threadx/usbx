@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio20_control_process            PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added volume RES support,   */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio20_control_process(UX_DEVICE_CLASS_AUDIO *audio,
@@ -271,7 +274,7 @@ ULONG                               i;
                     _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer + 0, 1);
                     _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer + 2, (USHORT)control -> ux_device_class_audio20_control_volume_min[0]);
                     _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer + 4, (USHORT)control -> ux_device_class_audio20_control_volume_max[0]);
-                    _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer + 6, 1);
+                    _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer + 6, (USHORT)UX_MAX(1, control -> ux_device_class_audio20_control_volume_res[0]));
                     _ux_device_stack_transfer_request(transfer, 8, request_length);
 
                     /* Done success.  */

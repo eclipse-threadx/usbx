@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.1.5        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,10 @@
 /*                                            resulting in version 6.1.4  */
 /*  03-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.5  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added macros for Word/DWord */
+/*                                            to bytes extraction,        */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -217,7 +221,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            1
-#define USBX_PATCH_VERSION            5
+#define USBX_PATCH_VERSION            6
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
@@ -232,6 +236,14 @@ typedef signed char               SCHAR;
 
 #define UX_MIN(a, b)                  ((a) < (b) ? (a) : (b))
 #define UX_MAX(a, b)                  ((a) > (b) ? (a) : (b))
+
+#define UX_W0(word)                   ( (word)         & 0xFF)
+#define UX_W1(word)                   (((word)  >>  8) & 0xFF)
+
+#define UX_DW0(dword)                 ( (dword)        & 0xFF)
+#define UX_DW1(dword)                 (((dword) >>  8) & 0xFF)
+#define UX_DW2(dword)                 (((dword) >> 16) & 0xFF)
+#define UX_DW3(dword)                 (((dword) >> 24) & 0xFF)
 
 /* Safe arithmetic check macros.  */
 

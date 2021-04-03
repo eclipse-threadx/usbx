@@ -27,6 +27,7 @@
 
 #include "ux_api.h"
 #include "ux_dcd_sim_slave.h"
+#include "ux_hcd_sim_host.h"
 
 
 /**************************************************************************/
@@ -34,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_state_change                      PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,13 +69,34 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            simulate force disconnect,  */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_state_change(UX_DCD_SIM_SLAVE *dcd_sim_slave, ULONG state)
 {
 
-    UX_PARAMETER_NOT_USED(dcd_sim_slave);
+UX_HCD              *hcd;
+
+
     UX_PARAMETER_NOT_USED(state);
+
+    if (state == UX_DEVICE_FORCE_DISCONNECT)
+    {
+
+        /* Simulate port detach & attach on host side.  */
+
+        /* Get HCD.  */
+        hcd = (UX_HCD *)dcd_sim_slave -> ux_dcd_sim_slave_hcd;
+
+        /* Something happened on this port. Signal it to the root hub thread.  */
+        if (hcd)
+        {
+            hcd -> ux_hcd_root_hub_signal[0] = 2;
+            _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
+        }
+    }
 
     /* Nothing to do in simulation mode.  */
     return(UX_SUCCESS);         

@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,12 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added DFU_UPLOAD support,   */
+/*                                            refined dfu_read prototype, */
+/*                                            removed block count (it's   */
+/*                                            from host request wValue),  */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -115,14 +121,37 @@
 #define UX_SLAVE_CLASS_DFU_GET_STATUS_STRING                        5
 #define UX_SLAVE_CLASS_DFU_GET_STATUS_LENGTH                        6
 
+/* Status mode for DFU_GETSTATUS
+   0 - simple mode,
+       status is queried from application in dfuDNLOAD-SYNC and dfuMANIFEST-SYNC state,
+       no bwPollTimeout.
+   1 - status is queried from application once requested,
+       b0-3 : media status
+       b4-7 : bStatus
+       b8-31: bwPollTimeout
+       bwPollTimeout supported.
+*/
+#ifndef UX_DEVICE_CLASS_DFU_STATUS_MODE
+#define UX_DEVICE_CLASS_DFU_STATUS_MODE                             (0)
+#endif
+
+/* Status mode 0 bwPollTimeout (width: 3 bytes, ~0xFFFFFF).  */
+#ifndef UX_DEVICE_CLASS_DFU_STATUS_POLLTIMEOUT
+#define UX_DEVICE_CLASS_DFU_STATUS_POLLTIMEOUT                      (1)
+#endif
+
+
 /* Define DFU class GET_STATE command response.  */
 #define UX_SLAVE_CLASS_DFU_GET_STATE_STATE                          0
 #define UX_SLAVE_CLASS_DFU_GET_STATE_LENGTH                         1
 
 /* Define DFU application notification signals.  */
-#define UX_SLAVE_CLASS_DFU_NOTIFICATION_BEGIN_DOWNLOAD              1
-#define UX_SLAVE_CLASS_DFU_NOTIFICATION_END_DOWNLOAD                2
-#define UX_SLAVE_CLASS_DFU_NOTIFICATION_ABORT_DOWNLOAD              3        
+#define UX_SLAVE_CLASS_DFU_NOTIFICATION_BEGIN_DOWNLOAD              0x1u
+#define UX_SLAVE_CLASS_DFU_NOTIFICATION_END_DOWNLOAD                0x2u
+#define UX_SLAVE_CLASS_DFU_NOTIFICATION_ABORT_DOWNLOAD              0x3u
+#define UX_SLAVE_CLASS_DFU_NOTIFICATION_BEGIN_UPLOAD                0x5u
+#define UX_SLAVE_CLASS_DFU_NOTIFICATION_END_UPLOAD                  0x6u
+#define UX_SLAVE_CLASS_DFU_NOTIFICATION_ABORT_UPLOAD                0x7u
 
 /* Define DFU application notification signals.  */
 #define UX_SLAVE_CLASS_DFU_MEDIA_STATUS_OK                          0
@@ -142,10 +171,13 @@ typedef struct UX_SLAVE_CLASS_DFU_PARAMETER_STRUCT
     ULONG                   ux_slave_class_dfu_parameter_capabilities;
     VOID                    (*ux_slave_class_dfu_parameter_instance_activate)(VOID *);
     VOID                    (*ux_slave_class_dfu_parameter_instance_deactivate)(VOID *);
-    UINT                    (*ux_slave_class_dfu_parameter_read)(VOID *dfu, ULONG block_number, UCHAR * data_pointer, ULONG length, ULONG *media_status);
+    UINT                    (*ux_slave_class_dfu_parameter_read)(VOID *dfu, ULONG block_number, UCHAR * data_pointer, ULONG length, ULONG *actual_length);
     UINT                    (*ux_slave_class_dfu_parameter_write)(VOID *dfu, ULONG block_number, UCHAR * data_pointer, ULONG length, ULONG *media_status);
     UINT                    (*ux_slave_class_dfu_parameter_get_status)(VOID *dfu, ULONG *media_status);
     UINT                    (*ux_slave_class_dfu_parameter_notify)(VOID *dfu, ULONG notification);
+#ifdef UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE
+    UINT                    (*ux_device_class_dfu_parameter_custom_request)(VOID *dfu, UX_SLAVE_TRANSFER *transfer);
+#endif
     UCHAR                   *ux_slave_class_dfu_parameter_framework;
     ULONG                   ux_slave_class_dfu_parameter_framework_length;
 
@@ -157,15 +189,15 @@ typedef struct UX_SLAVE_CLASS_DFU_STRUCT
 {
     UX_SLAVE_INTERFACE      *ux_slave_class_dfu_interface;
     ULONG                   ux_slave_class_dfu_status;
-    ULONG                   ux_slave_class_dfu_state;
     VOID                    (*ux_slave_class_dfu_instance_activate)(VOID *);
     VOID                    (*ux_slave_class_dfu_instance_deactivate)(VOID *);
-    UINT                    (*ux_slave_class_dfu_read)(VOID *dfu, ULONG block_number, UCHAR * data_pointer, ULONG length, ULONG *media_status);
+    UINT                    (*ux_slave_class_dfu_read)(VOID *dfu, ULONG block_number, UCHAR * data_pointer, ULONG length, ULONG *actual_length);
     UINT                    (*ux_slave_class_dfu_write)(VOID *dfu, ULONG block_number, UCHAR * data_pointer, ULONG length, ULONG *media_status);
     UINT                    (*ux_slave_class_dfu_get_status)(VOID *dfu, ULONG *media_status);
     UINT                    (*ux_slave_class_dfu_notify)(VOID *dfu, ULONG notification);
-    ULONG                   ux_slave_class_dfu_download_block_count;
-    ULONG                   ux_slave_class_dfu_upload_block_count;
+#ifdef UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE
+    UINT                    (*ux_device_class_dfu_custom_request)(VOID *dfu, UX_SLAVE_TRANSFER *transfer);
+#endif
     UX_THREAD               ux_slave_class_dfu_thread;
     UCHAR                   *ux_slave_class_dfu_thread_stack;
     UX_EVENT_FLAGS_GROUP    ux_slave_class_dfu_event_flags_group;
@@ -181,8 +213,13 @@ UINT  _ux_device_class_dfu_entry(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command);
 VOID  _ux_device_class_dfu_thread(ULONG dfu_class);
 
+UCHAR _ux_device_class_dfu_state_get(UX_SLAVE_CLASS_DFU *dfu);
+VOID  _ux_device_class_dfu_state_sync(UX_SLAVE_CLASS_DFU *dfu);
+
 /* Define Device DFU Class API prototypes.  */
 
 #define ux_device_class_dfu_entry        _ux_device_class_dfu_entry   
+#define ux_device_class_dfu_state_get    _ux_device_class_dfu_state_get
+#define ux_device_class_dfu_state_sync   _ux_device_class_dfu_state_sync
 
 #endif /* UX_DEVICE_CLASS_DFU_H */

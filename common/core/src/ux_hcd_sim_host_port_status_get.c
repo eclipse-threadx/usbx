@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_port_status_get                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -93,6 +93,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used changeable status,     */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _ux_hcd_sim_host_port_status_get(UX_HCD_SIM_HOST *hcd_sim_host, ULONG port_index)
@@ -114,12 +117,8 @@ ULONG       port_status;
         return(UX_PORT_INDEX_UNKNOWN);
     }
     
-    /* The port is valid, build the status mask for this port. This function
-       returns always returned a device connected.  */
-    port_status =  UX_PS_CCS;
-                                    
-    /* And this is a Full speed device.  */
-    port_status |=  UX_PS_DS_FS;
+    /* Returns current port status.  */
+    port_status = hcd_sim_host -> ux_hcd_sim_host_port_status[port_index];
 
     /* Return port status.  */
     return(port_status);            

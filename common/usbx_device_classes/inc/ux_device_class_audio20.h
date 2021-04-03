@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio20.h                           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,6 +43,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added volume RES support,   */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -398,6 +401,7 @@ typedef struct UX_DEVICE_CLASS_AUDIO20_CONTROL_STRUCT
     USHORT          ux_device_class_audio20_control_mute[1];
     SHORT           ux_device_class_audio20_control_volume_min[1];
     SHORT           ux_device_class_audio20_control_volume_max[1];
+    USHORT          ux_device_class_audio20_control_volume_res[1];
     SHORT           ux_device_class_audio20_control_volume[1];
 } UX_DEVICE_CLASS_AUDIO20_CONTROL;
 

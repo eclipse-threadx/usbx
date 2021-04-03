@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_deactivate                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,49 +66,23 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed endpoints aborting, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_deactivate(UX_SLAVE_CLASS_COMMAND *command)
 {
                                           
-UX_SLAVE_INTERFACE          *interface;
 UX_SLAVE_CLASS_DFU          *dfu;
-UX_SLAVE_ENDPOINT           *endpoint_in;
-UX_SLAVE_ENDPOINT           *endpoint_out;
 UX_SLAVE_CLASS              *class;
+
 
     /* Get the class container.  */
     class =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
     dfu = (UX_SLAVE_CLASS_DFU *) class -> ux_slave_class_instance;
-
-    /* We need the interface to the class.  */
-    interface =  dfu -> ux_slave_class_dfu_interface;
-    
-    /* Locate the endpoints.  */
-    endpoint_in =  interface -> ux_slave_interface_first_endpoint;
-    
-    /* Check the endpoint direction, if IN we have the correct endpoint.  */
-    if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
-    {
-
-        /* Wrong direction, we found the OUT endpoint first.  */
-        endpoint_out =  endpoint_in;
-            
-        /* So the next endpoint has to be the IN endpoint.  */
-        endpoint_in =  endpoint_out -> ux_slave_endpoint_next_endpoint;
-    }
-    else
-    {
-
-        /* We found the endpoint IN first, so next endpoint is OUT.  */
-        endpoint_out =  endpoint_in -> ux_slave_endpoint_next_endpoint;
-    }
-        
-    /* Terminate the transactions pending on the endpoints.  */
-    _ux_device_stack_transfer_all_request_abort(endpoint_in, UX_TRANSFER_BUS_RESET);
-    _ux_device_stack_transfer_all_request_abort(endpoint_out, UX_TRANSFER_BUS_RESET);
 
     /* If there is a deactivate function call it.  */
     if (dfu -> ux_slave_class_dfu_instance_deactivate != UX_NULL)

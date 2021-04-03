@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_dcd_sim_slave.h                                  PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added HCD connected to,     */
+/*                                            supported bi-dir-endpoints, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -112,7 +116,12 @@ typedef struct UX_DCD_SIM_SLAVE_STRUCT
                     *ux_dcd_sim_slave_dcd_owner;
     struct UX_DCD_SIM_SLAVE_ED_STRUCT              
                     ux_dcd_sim_slave_ed[UX_DCD_SIM_SLAVE_MAX_ED];
+#ifdef UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
+    struct UX_DCD_SIM_SLAVE_ED_STRUCT              
+                    ux_dcd_sim_slave_ed_in[UX_DCD_SIM_SLAVE_MAX_ED];
+#endif
     UINT            (*ux_dcd_sim_slave_dcd_control_request_process_hub)(UX_SLAVE_TRANSFER *transfer_request);
+    VOID            *ux_dcd_sim_slave_hcd;
 } UX_DCD_SIM_SLAVE;
 
 

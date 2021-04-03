@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio10_control_process            PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added volume RES support,   */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio10_control_process(UX_DEVICE_CLASS_AUDIO *audio,
@@ -208,7 +211,7 @@ ULONG                               i;
                     _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer, (USHORT)
                                           (request == UX_DEVICE_CLASS_AUDIO10_GET_MIN ? control -> ux_device_class_audio10_control_volume_min[0] :
                                            (request == UX_DEVICE_CLASS_AUDIO10_GET_MAX ? control -> ux_device_class_audio10_control_volume_max[0] :
-                                            (request == UX_DEVICE_CLASS_AUDIO10_GET_RES ? 0x0001 :
+                                            (request == UX_DEVICE_CLASS_AUDIO10_GET_RES ? UX_MAX(1, control -> ux_device_class_audio10_control_volume_res[0]) :
                                               control -> ux_device_class_audio10_control_volume[0]))));
                     _ux_device_stack_transfer_request(transfer, 2, request_length);
 

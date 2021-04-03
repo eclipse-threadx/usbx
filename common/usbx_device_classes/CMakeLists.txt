@@ -52,6 +52,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_deactivate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_state_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_state_sync.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_control_request.c

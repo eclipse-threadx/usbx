@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.6        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -51,6 +51,13 @@
 /*                                            compile option for using    */
 /*                                            packet pool from NetX,      */
 /*                                            resulting in version 6.1.4  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added DFU_UPLOAD option,    */
+/*                                            added macro to enable       */
+/*                                            device bi-dir-endpoints,    */
+/*                                            added macro to disable CDC- */
+/*                                            ACM transmission support,   */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -291,6 +298,47 @@
  */
 
 /* #define UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE             8  */
+
+
+/* Defined, this macro will disable DFU_UPLOAD support.  */
+
+/* #define UX_DEVICE_CLASS_DFU_UPLOAD_DISABLE  */
+
+/* Defined, this macro will enable DFU_GETSTATUS and DFU_GETSTATE in dfuERROR.  */
+
+/* #define UX_DEVICE_CLASS_DFU_ERROR_GET_ENABLE  */
+
+/* Defined, this macro will change status mode.
+   0 - simple mode,
+       status is queried from application in dfuDNLOAD-SYNC and dfuMANIFEST-SYNC state,
+       no bwPollTimeout.
+   1 - status is queried from application once requested,
+       b0-3 : media status
+       b4-7 : bStatus
+       b8-31: bwPollTimeout
+       bwPollTimeout supported.
+*/
+
+/* #define UX_DEVICE_CLASS_DFU_STATUS_MODE                  (1)  */
+
+/* Defined, this value represents the default DFU status bwPollTimeout.
+   The value is 3 bytes long (max 0xFFFFFFu).
+   By default the bwPollTimeout is 1 (means 1ms).
+ */
+
+/* #define UX_DEVICE_CLASS_DFU_STATUS_POLLTIMEOUT           (1)  */
+
+/* Defined, this macro will enable custom request process callback.  */
+
+/* #define UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE   */
+
+/* Defined, this macro disables CDC ACM non-blocking transmission support.  */
+
+/* #define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE  */
+
+/* Defined, this macro enables device bi-directional-endpoint support.  */
+
+/* #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT  */
 
 /* Defined, this value will only enable the host side of usbx.  */
 /* #define UX_HOST_SIDE_ONLY   */

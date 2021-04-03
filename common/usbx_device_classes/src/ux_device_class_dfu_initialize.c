@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_initialize                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed max transfer size,    */
+/*                                            added max size limit check, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -111,7 +115,10 @@ ULONG                                   descriptor_length;
     dfu -> ux_slave_class_dfu_write                             =  dfu_parameter -> ux_slave_class_dfu_parameter_write;
     dfu -> ux_slave_class_dfu_get_status                        =  dfu_parameter -> ux_slave_class_dfu_parameter_get_status;
     dfu -> ux_slave_class_dfu_notify                            =  dfu_parameter -> ux_slave_class_dfu_parameter_notify;
-    
+#ifdef UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE
+    dfu -> ux_device_class_dfu_custom_request                   =  dfu_parameter -> ux_device_class_dfu_parameter_custom_request;
+#endif
+
     /* Store the device dfu in the project structure.  */
     _ux_system_slave -> ux_system_slave_dfu_framework           =  dfu_parameter -> ux_slave_class_dfu_parameter_framework;
     _ux_system_slave -> ux_system_slave_dfu_framework_length    =  dfu_parameter -> ux_slave_class_dfu_parameter_framework_length;
@@ -122,11 +129,17 @@ ULONG                                   descriptor_length;
     dfu_framework_length =  _ux_system_slave -> ux_system_slave_dfu_framework_length;
     
     /* Parse the device framework and locate interfaces and endpoint descriptor(s).  */
+    status = UX_DESCRIPTOR_CORRUPTED;
     while (dfu_framework_length != 0)
     {
 
         /* Get the length of this descriptor.  */
         descriptor_length =  (ULONG) *dfu_framework;
+
+        /* Length validation.  */
+        if (descriptor_length < 2 ||
+            descriptor_length > dfu_framework_length)
+            break;
 
         /* And its type.  */
         descriptor_type =  *(dfu_framework + 1);
@@ -141,6 +154,10 @@ ULONG                                   descriptor_length;
                         UX_DFU_FUNCTIONAL_DESCRIPTOR_ENTRIES,
                         (UCHAR *) &dfu_functional_descriptor);
 
+            /* Control transfer limit validation.  */
+            if (dfu_functional_descriptor.wTransferSize > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
+                break;
+
             /* Retrieve the DFU capabilities and store them in the system.  */
             _ux_system_slave -> ux_system_slave_device_dfu_capabilities = dfu_functional_descriptor.bmAttributes;
             
@@ -148,11 +165,14 @@ ULONG                                   descriptor_length;
             _ux_system_slave -> ux_system_slave_device_dfu_detach_timeout = dfu_functional_descriptor.wDetachTimeOut;
             
             /* Retrieve the DFU transfer size value. */
-            _ux_system_slave -> ux_system_slave_device_dfu_transfer_size = dfu_functional_descriptor.wDetachTimeOut;
-            
+            _ux_system_slave -> ux_system_slave_device_dfu_transfer_size = dfu_functional_descriptor.wTransferSize;
+
             /* In the system, state the DFU state machine.  */
             _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_APP_IDLE;
 
+            /* DFU descriptor parsed, done.  */
+            status = UX_SUCCESS;
+            break;
         }
 
         /* Adjust what is left of the device framework.  */

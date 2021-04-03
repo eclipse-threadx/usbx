@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_isochronous_endpoint_create            PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,11 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issues with   */
+/*                                            some macro options,         */
+/*                                            filled max transfer length, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_isochronous_endpoint_create(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -157,6 +162,10 @@ UINT                            status;
 
     /* Get max transfer size.  */
     max_trans_size = max_packet_size * mult;
+
+    /* We need to take into account the nature of the HCD to define the max size
+       of any transfer in the transfer request.  */
+    endpoint -> ux_endpoint_transfer_request.ux_transfer_request_maximum_length = max_trans_size;
 
     /* Get the Endpt, Device Address, I/O, Maximum Packet Size, Mult.  */
     endpt = (endpoint -> ux_endpoint_descriptor.bEndpointAddress << UX_EHCI_HSISO_ENDPT_SHIFT) & UX_EHCI_HSISO_ENDPT_MASK;
@@ -430,7 +439,7 @@ UINT                            status;
                     ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] = (USHORT)(ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_load[i] + 188u);
 
                 /* Increment SSplit count.  */
-                ed_anchor -> ux_ehci_ed_microframe_ssplit_count[i] ++;
+                ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[i] ++;
             }
         }
         else
@@ -481,7 +490,7 @@ UINT                            status;
             }
 
             /* Increment SSplit count.  */
-            ed_anchor -> ux_ehci_ed_microframe_ssplit_count[i] ++;
+            ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[i] ++;
         }
 
     }

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_get_status                         PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported bi-dir-endpoints, */
+/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_get_status(ULONG request_type, ULONG request_index, ULONG request_length)
@@ -143,9 +146,17 @@ ULONG                   data_length;
             
     case UX_REQUEST_TARGET_ENDPOINT:
 
+#ifndef UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
+
         /* This feature returns the halt state of a specific endpoint.  The endpoint index
            is used to retrieve the endpoint container.  */
         status =  dcd -> ux_slave_dcd_function(dcd, UX_DCD_ENDPOINT_STATUS, (VOID *)(ALIGN_TYPE)(request_index & (UINT)~UX_ENDPOINT_DIRECTION));
+#else
+
+        /* This feature returns the halt state of a specific endpoint.  The endpoint address
+           is used to retrieve the endpoint container.  */
+        status =  dcd -> ux_slave_dcd_function(dcd, UX_DCD_ENDPOINT_STATUS, (VOID *)(ALIGN_TYPE)(request_index));
+#endif
 
         /* Check the status. We may have a unknown endpoint.  */
         if (status != UX_ERROR)
