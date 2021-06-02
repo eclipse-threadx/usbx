@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_endpoint_instance_delete             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed trace enabled error,  */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_endpoint_instance_delete(UX_ENDPOINT *endpoint)
@@ -84,7 +87,7 @@ UX_HCD          *hcd;
     hcd = UX_DEVICE_HCD_GET(endpoint -> ux_endpoint_device);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_ENDPOINT_INSTANCE_DELETE, device, endpoint, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_ENDPOINT_INSTANCE_DELETE, endpoint -> ux_endpoint_device, endpoint, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
     
     /* Ensure the endpoint had its physical ED allocated.  */
     if (endpoint -> ux_endpoint_ed != UX_NULL)

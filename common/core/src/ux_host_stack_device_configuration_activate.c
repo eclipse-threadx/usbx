@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_configuration_activate        PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
+/*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed trace enabled error,  */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_activate(UX_CONFIGURATION *configuration)
@@ -93,11 +96,11 @@ UINT                    status;
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
     }
 
-    /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_ACTIVATE, device, configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
-
     /* Get the device container for this configuration.  */
     device =  configuration -> ux_configuration_device;
+
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_ACTIVATE, device, configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
     /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request_abort               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed trace enabled error,  */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request)
@@ -87,7 +90,10 @@ ULONG           completion_code;
 
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_TRANSFER_REQUEST_ABORT, device, endpoint, transfer_request, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_TRANSFER_REQUEST_ABORT,
+        transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_device,
+        transfer_request -> ux_transfer_request_endpoint,
+        transfer_request, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
     
     /* With the device we have the pointer to the HCD.  */
     hcd = UX_DEVICE_HCD_GET(transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_device);

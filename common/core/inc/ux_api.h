@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,6 +87,11 @@
 /*                                            added macros for Word/DWord */
 /*                                            to bytes extraction,        */
 /*                                            resulting in version 6.1.6  */
+/*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added trace dependency test,*/
+/*                                            changed transfer timeout    */
+/*                                            value,                      */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -221,7 +226,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            1
-#define USBX_PATCH_VERSION            6
+#define USBX_PATCH_VERSION            7
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
@@ -330,6 +335,9 @@ VOID _ux_utility_debug_log(UCHAR *debug_location, UCHAR *debug_message, ULONG de
 /* Determine if tracing is enabled.  */
 
 #ifdef TX_ENABLE_EVENT_TRACE
+#ifndef UX_TRACE_INSERT_MACROS
+#error UX_TRACE_INSERT_MACROS must be defined to support TX_ENABLE_EVENT_TRACE
+#endif
 
 /* Trace is enabled. Remap calls so that interrupts can be disabled around the actual event logging.  */
 
@@ -999,8 +1007,13 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_CAPABILITY_CONFIGURATION_SUMMARY                             0x10u
 
 
-#define UX_CONTROL_TRANSFER_TIMEOUT                                     1000
-#define UX_NON_CONTROL_TRANSFER_TIMEOUT                                 5000
+#ifndef UX_CONTROL_TRANSFER_TIMEOUT
+#define UX_CONTROL_TRANSFER_TIMEOUT                                     10000
+#endif
+
+#ifndef UX_NON_CONTROL_TRANSFER_TIMEOUT
+#define UX_NON_CONTROL_TRANSFER_TIMEOUT                                 50000
+#endif
 #define UX_PORT_ENABLE_WAIT                                             50 
 #define UX_DEVICE_ADDRESS_SET_WAIT                                      50
 #define UX_HIGH_SPEED_DETECTION_HANDSHAKE_SUSPEND_WAIT                  200

@@ -41,7 +41,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_class_device_scan                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*                                            used query usage of device  */
 /*                                            ClassSubclassProtocol,      */
 /*                                            resulting in version 6.1    */
+/*  06-02-2021     Bhupendra Naphade        Modified comment(s),          */
+/*                                            removed duplicate line,     */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_class_device_scan(UX_DEVICE *device)
@@ -94,7 +97,6 @@ UX_HOST_CLASS_COMMAND       class_command;
     class_command.ux_host_class_command_vid          =   device -> ux_device_descriptor.idVendor;
     class_command.ux_host_class_command_pid          =   device -> ux_device_descriptor.idProduct;
     class_command.ux_host_class_command_class        =   device -> ux_device_descriptor.bDeviceClass;
-    class_command.ux_host_class_command_subclass     =   device -> ux_device_descriptor.bDeviceSubClass;
     class_command.ux_host_class_command_subclass     =   device -> ux_device_descriptor.bDeviceSubClass;
     class_command.ux_host_class_command_protocol     =   device -> ux_device_descriptor.bDeviceProtocol;
     class_command.ux_host_class_command_iad_class    =   0;

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_thread                     PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -107,6 +107,10 @@
 /*                                            fixed compile issues with   */
 /*                                            some macro options,         */
 /*                                            resulting in version 6.1.6  */
+/*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            get interface and endpoints */
+/*                                            from configured device,     */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_storage_thread(ULONG storage_class)
@@ -140,39 +144,39 @@ UCHAR                       *cbw_cb;
         /* Get the pointer to the device.  */
         device =  &_ux_system_slave -> ux_system_slave_device;
         
-        /* This is the first time we are activated. We need the interface to the class.  */
-        interface =  storage -> ux_slave_class_storage_interface;
-        
-        /* Locate the endpoints.  */
-        endpoint_in =  interface -> ux_slave_interface_first_endpoint;
-        
-        /* Check the endpoint direction, if IN we have the correct endpoint.  */
-        if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
-        {
-
-            /* Wrong direction, we found the OUT endpoint first.  */
-            endpoint_out =  endpoint_in;
-                
-            /* So the next endpoint has to be the IN endpoint.  */
-            endpoint_in =  endpoint_out -> ux_slave_endpoint_next_endpoint;
-        }
-        else
-        {
-
-            /* We found the endpoint IN first, so next endpoint is OUT.  */
-            endpoint_out =  endpoint_in -> ux_slave_endpoint_next_endpoint;
-        }
-            
-        /* All SCSI commands are on the endpoint OUT, from the host.  */
-        transfer_request =  &endpoint_out -> ux_slave_endpoint_transfer_request;
-    
         /* As long as the device is in the CONFIGURED state.  */
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
         { 
 
             /* We assume the worst situation.  */
             status =  UX_ERROR;
-        
+
+            /* This is the first time we are activated. We need the interface to the class.  */
+            interface =  storage -> ux_slave_class_storage_interface;
+
+            /* Locate the endpoints.  */
+            endpoint_in =  interface -> ux_slave_interface_first_endpoint;
+
+            /* Check the endpoint direction, if IN we have the correct endpoint.  */
+            if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
+            {
+
+                /* Wrong direction, we found the OUT endpoint first.  */
+                endpoint_out =  endpoint_in;
+
+                /* So the next endpoint has to be the IN endpoint.  */
+                endpoint_in =  endpoint_out -> ux_slave_endpoint_next_endpoint;
+            }
+            else
+            {
+
+                /* We found the endpoint IN first, so next endpoint is OUT.  */
+                endpoint_out =  endpoint_in -> ux_slave_endpoint_next_endpoint;
+            }
+
+            /* All SCSI commands are on the endpoint OUT, from the host.  */
+            transfer_request =  &endpoint_out -> ux_slave_endpoint_transfer_request;
+
             /* Check state, they must be both RESET.  */
             if (endpoint_out -> ux_slave_endpoint_state == UX_ENDPOINT_RESET &&
                 (UCHAR)storage -> ux_slave_class_storage_csw_status != UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR)

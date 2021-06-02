@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_configuration_deactivate      PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
+/*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed trace enabled error,  */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_deactivate(UX_DEVICE *device)
@@ -92,6 +95,9 @@ UINT                        status;
         return(UX_DEVICE_HANDLE_UNKNOWN);
     }
 
+    /* Get the configuration.  */
+    configuration = device -> ux_device_current_configuration;
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_DEACTIVATE, device, configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
@@ -111,9 +117,6 @@ UINT                        status;
 
         return(UX_SEMAPHORE_ERROR);
     }
-
-    /* Get the configuration.  */
-    configuration = device -> ux_device_current_configuration;
 
     /* Check for the state of the device, if not configured, we are done.  */
     if (device -> ux_device_state != UX_DEVICE_CONFIGURED)

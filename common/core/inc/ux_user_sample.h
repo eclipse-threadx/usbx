@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.7        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -58,6 +58,10 @@
 /*                                            added macro to disable CDC- */
 /*                                            ACM transmission support,   */
 /*                                            resulting in version 6.1.6  */
+/*  06-02-2021     Xiuwen Cai               Modified comment(s), added    */
+/*                                            transfer timeout value      */
+/*                                            options,                    */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -95,6 +99,19 @@
 /* #define UX_PERIODIC_RATE 1000
 */
 #define UX_PERIODIC_RATE (TX_TIMER_TICKS_PER_SECOND)
+
+/* Define control transfer timeout value in millisecond.
+   The default is 10000 milliseconds.  */
+/*
+#define UX_CONTROL_TRANSFER_TIMEOUT                         10000
+*/
+
+/* Define non control transfer timeout value in millisecond.
+   The default is 50000 milliseconds.  */
+/*
+#define UX_NON_CONTROL_TRANSFER_TIMEOUT                     50000
+*/
+
 
 /* Defined, this value is the maximum number of classes that can be loaded by USBX. This value
    represents the class container and not the number of instances of a class. For instance, if a
