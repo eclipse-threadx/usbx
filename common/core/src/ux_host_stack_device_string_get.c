@@ -26,7 +26,6 @@
 #define UX_SOURCE_CODE
 
 #include "ux_api.h"
-#include "ux_host_class_printer.h"
 #include "ux_host_stack.h"
 
 
@@ -35,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_string_get                    PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.7        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +72,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
+/*  06-02-2021     Chaoqiong Xiao           Modified comment(s), and      */
+/*                                            removed unnecessary header, */
+/*                                            resulting in version 6.1.7  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_string_get(UX_DEVICE *device, UCHAR *descriptor_buffer, ULONG length, ULONG language_id, ULONG string_index)
