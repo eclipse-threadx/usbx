@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_storage.h                             PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,11 +57,25 @@
 /*                                            resulting in version 6.1.2  */
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.3  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_STORAGE_H
 #define UX_HOST_CLASS_STORAGE_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 #if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
@@ -537,5 +551,11 @@ UINT    _ux_host_class_storage_unit_ready_test(UX_HOST_CLASS_STORAGE *storage);
 #define  ux_host_class_storage_media_lock                      _ux_host_class_storage_media_lock
 #define  ux_host_class_storage_media_unlock                    _ux_host_class_storage_media_unlock
 #endif
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif

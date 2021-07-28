@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_dcd_sim_slave.h                                  PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -48,11 +48,25 @@
 /*                                            added HCD connected to,     */
 /*                                            supported bi-dir-endpoints, */
 /*                                            resulting in version 6.1.6  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DCD_SIM_SLAVE_H
 #define UX_DCD_SIM_SLAVE_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define USB slave simulator major equivalences.  */
@@ -144,5 +158,11 @@ UINT    _ux_dcd_sim_slave_transfer_abort(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLA
 /* Define Device Simulator Class API prototypes.  */
 
 #define ux_dcd_sim_slave_initialize                 _ux_dcd_sim_slave_initialize
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
+
 #endif
 

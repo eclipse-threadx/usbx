@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_descriptor_send                PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed HID descriptor search,*/
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_descriptor_send(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type, 
@@ -89,6 +92,7 @@ UCHAR *                         device_framework_end;
 ULONG                           descriptor_length;
 UINT                            status =  UX_ERROR;
 ULONG                           length;
+UCHAR                           interface_number = 0xFF;
 
     UX_PARAMETER_NOT_USED(request_index);
 
@@ -133,10 +137,16 @@ ULONG                           length;
 
             /* And its length.  */
             descriptor_length =  (ULONG) *device_framework;
-                
+
+            /* Save interface number for later check.  */
+            if (descriptor_type == UX_INTERFACE_DESCRIPTOR_ITEM)
+                interface_number = *(device_framework + 2);
+
             /* Check if this is a HID report descriptor.  */
-            if (descriptor_type == UX_DEVICE_CLASS_HID_DESCRIPTOR_HID)
+            if ((descriptor_type == UX_DEVICE_CLASS_HID_DESCRIPTOR_HID) &&
+                (interface_number == (UCHAR)request_index))
             {
+
                 /* Ensure the host does not demand a length beyond our descriptor (Windows does that)
                    and do not return more than what is allowed.  */
                 if (descriptor_length < host_length)

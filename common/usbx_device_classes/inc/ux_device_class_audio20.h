@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio20.h                           PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -46,11 +46,25 @@
 /*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added volume RES support,   */
 /*                                            resulting in version 6.1.6  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_AUDIO20_H
 #define UX_DEVICE_CLASS_AUDIO20_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define Audio Class function category codes.  */
@@ -420,5 +434,11 @@ UINT _ux_device_class_audio20_control_process(UX_DEVICE_CLASS_AUDIO *audio,
                                               UX_DEVICE_CLASS_AUDIO20_CONTROL_GROUP *group);
 
 #define ux_device_class_audio20_control_process _ux_device_class_audio20_control_process
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif /* ifndef UX_DEVICE_CLASS_AUDIO20_H */

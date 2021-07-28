@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid_remote_control.h                  PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,11 +43,25 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_HID_REMOTE_CONTROL_H
 #define UX_HOST_CLASS_HID_REMOTE_CONTROL_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define HID Remote Control Class constants.  */
@@ -84,6 +98,12 @@ UINT    _ux_host_class_hid_remote_control_usage_get(UX_HOST_CLASS_HID_REMOTE_CON
 
 #define ux_host_class_hid_remote_control_entry                   _ux_host_class_hid_remote_control_entry
 #define ux_host_class_hid_remote_control_usage_get               _ux_host_class_hid_remote_control_usage_get
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif
 

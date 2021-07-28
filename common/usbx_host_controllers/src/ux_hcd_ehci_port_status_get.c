@@ -30,7 +30,7 @@
 #include "ux_host_stack.h"
 
 
-/* EHCI HCD extention for host mode select.  */
+/* EHCI HCD extension for host mode select.  */
 #ifndef UX_HCD_EHCI_EXT_USBPHY_HIGHSPEED_MODE_SET
 
 #if defined(K66)
@@ -88,7 +88,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_port_status_get                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -147,6 +147,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed NXP register base,    */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _ux_hcd_ehci_port_status_get(UX_HCD_EHCI *hcd_ehci, ULONG port_index)

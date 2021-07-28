@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio.h                             PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -46,11 +46,25 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_AUDIO_H
-#define UX_DEVICE_CLASS_AUDIO_H
+#define UX_DEVICE_CLASS_AUDIO_H               
+ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 /* Define Audio Class function (AF) constants.  */
 
@@ -422,5 +436,11 @@ UINT    _ux_device_class_audio_write_frame_commit(UX_DEVICE_CLASS_AUDIO_STREAM *
 #define ux_device_class_audio_write_frame_commit      _ux_device_class_audio_write_frame_commit
 
 #define ux_device_class_audio_ioctl                   _ux_device_class_audio_ioctl
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif /* ifndef UX_DEVICE_CLASS_AUDIO_H */

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_ohci.h                                       PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -46,11 +46,25 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used unsigned defines,      */
 /*                                            resulting in version 6.1.2  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HCD_OHCI_H
 #define UX_HCD_OHCI_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define generic OHCI constants.  */
@@ -393,6 +407,12 @@ VOID    _ux_hcd_ohci_transfer_request_process(UX_TRANSFER *transfer_request);
 
 #define ux_hcd_ohci_initialize                      _ux_hcd_ohci_initialize
 #define ux_hcd_ohci_interrupt_handler               _ux_hcd_ohci_interrupt_handler
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif
 

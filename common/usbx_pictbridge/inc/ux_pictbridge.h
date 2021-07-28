@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_pictbridge.h                                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -46,11 +46,25 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_PICTBRIDGE_H
 #define UX_PICTBRIDGE_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 struct UX_PICTBRIDGE_STRUCT;
 
@@ -1037,6 +1051,12 @@ extern UCHAR _ux_pictbridge_xml_tag_line_printinfo[];
 extern UCHAR _ux_pictbridge_xml_tag_line_fileid[];
 extern UCHAR _ux_pictbridge_xml_tag_line_filename[];
 extern UCHAR _ux_pictbridge_xml_tag_line_date[];
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif
 

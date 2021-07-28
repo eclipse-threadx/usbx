@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,11 +50,25 @@
 /*                                            removed block count (it's   */
 /*                                            from host request wValue),  */
 /*                                            resulting in version 6.1.6  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_DFU_H
 #define UX_DEVICE_CLASS_DFU_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 /* Define DFU class descriptor capabilities.  */                    
 #define UX_SLAVE_CLASS_DFU_CAPABILITY_WILL_DETACH                   0x08
@@ -221,5 +235,11 @@ VOID  _ux_device_class_dfu_state_sync(UX_SLAVE_CLASS_DFU *dfu);
 #define ux_device_class_dfu_entry        _ux_device_class_dfu_entry   
 #define ux_device_class_dfu_state_get    _ux_device_class_dfu_state_get
 #define ux_device_class_dfu_state_sync   _ux_device_class_dfu_state_sync
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif /* UX_DEVICE_CLASS_DFU_H */

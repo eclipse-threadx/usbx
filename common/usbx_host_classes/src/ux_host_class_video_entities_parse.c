@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_entities_parse                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_host_class_video_entities_parse(UX_HOST_CLASS_VIDEO *video,
@@ -133,7 +136,7 @@ UINT                                            status;
                 if (descriptor[5] == UX_HOST_CLASS_VIDEO_CLASS)
                 {
 
-                    /* VideoControl Inteface.  */
+                    /* VideoControl Interface.  */
                     if (descriptor[6] == UX_HOST_CLASS_VIDEO_SUBCLASS_CONTROL)
 
                         /* Mark we have found it.  */

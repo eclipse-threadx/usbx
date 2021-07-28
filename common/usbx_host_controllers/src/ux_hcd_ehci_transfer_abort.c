@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_transfer_abort                         PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,7 +59,7 @@
 /*    _ux_utility_virtual_address           Get virtual address           */
 /*    _ux_utility_mutex_on                  Get mutex                     */
 /*    _ux_utility_mutex_off                 Put mutex                     */
-/*    _ux_utility_delay_ms                  Delay miliseconds             */
+/*    _ux_utility_delay_ms                  Delay milliseconds            */
 /*    _ux_hcd_ehci_ed_clean                 Clean TDs on ED               */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -76,6 +76,9 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_transfer_abort(UX_HCD_EHCI *hcd_ehci,UX_TRANSFER *transfer_request)

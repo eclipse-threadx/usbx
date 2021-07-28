@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_media_get                    PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT    _ux_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage,
@@ -89,10 +92,10 @@ UINT                            scan_index, found_index;
     /* Get storage class instance.  */
     class_inst = storage -> ux_host_class_storage_class;
 
-    /* Get shared storage medias array.  */
+    /* Get shared storage media array.  */
     storage_medias = (UX_HOST_CLASS_STORAGE_MEDIA *)class_inst -> ux_host_class_media;
 
-    /* Search medias to find the right one.  */
+    /* Search media to find the right one.  */
     for(scan_index = 0, found_index = 0;
         scan_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA;
         scan_index ++)

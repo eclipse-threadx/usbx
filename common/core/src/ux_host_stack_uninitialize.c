@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_uninitialize                         PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  08-02-2021     Xiuwen Cai               Modified comment(s),          */
+/*                                            fixed compile issue,        */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_uninitialize(VOID)
@@ -98,7 +101,7 @@ UINT  _ux_host_stack_uninitialize(VOID)
     /* Free HCD thread stack.  */
     _ux_utility_memory_free(_ux_system_host -> ux_system_host_hcd_thread_stack);
 
-#if UX_OTG_SUPPORT
+#if defined(UX_OTG_SUPPORT)
 
     /* Delete HNP thread.  */
     _ux_utility_thread_delete(&_ux_system_host -> ux_system_host_hnp_polling_thread);

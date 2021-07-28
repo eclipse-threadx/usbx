@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_stack.h                                     PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,11 +53,25 @@
 /*                                            descriptor get support,     */
 /*                                            updated internal function,  */
 /*                                            resulting in version 6.1.4  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_STACK_H
 #define UX_HOST_STACK_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define Host Stack component function prototypes.  */
@@ -142,6 +156,12 @@ UINT    _ux_host_stack_role_swap(UX_DEVICE *device);
 VOID    _ux_host_stack_hnp_polling_thread_entry(ULONG id);
 #endif
 
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif
 

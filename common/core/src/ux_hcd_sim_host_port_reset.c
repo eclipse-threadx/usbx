@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_port_reset                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_port_reset(UX_HCD_SIM_HOST *hcd_sim_host, ULONG port_index)
@@ -86,7 +89,7 @@ UX_SLAVE_DEVICE     *device;
     /* Is this a connection?  */
     if (device -> ux_slave_device_state == UX_DEVICE_RESET)
 
-        /* Complete the device initialization. Note that everytime the device
+        /* Complete the device initialization. Note that every time the device
            is disconnected, this must be called again for connection.  */
         _ux_dcd_sim_slave_initialize_complete();
 

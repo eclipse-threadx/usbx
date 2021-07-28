@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_rndis.h                             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,11 +44,26 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_RNDIS_H
 #define UX_DEVICE_CLASS_RNDIS_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 #include "nx_api.h"
 #include "ux_network_driver.h"
@@ -113,7 +128,7 @@
 #define UX_DEVICE_CLASS_RNDIS_VERSION_MAJOR                                     0x00000001
 #define UX_DEVICE_CLASS_RNDIS_VERSION_MINOR                                     0x00000000
 
-/* Define RNDIS Conection type supported. Set to conectionless.  */
+/* Define RNDIS Connection type supported. Set to conectionless.  */
 #define UX_DEVICE_CLASS_RNDIS_DF_CONNECTIONLESS                                 0x00000001
 #define UX_DEVICE_CLASS_RNDIS_DF_CONNECTION_ORIENTED                            0x00000002
 #define UX_DEVICE_CLASS_RNDIS_DF_CONNECTION_SUPPORTED                           UX_DEVICE_CLASS_RNDIS_DF_CONNECTIONLESS
@@ -444,7 +459,7 @@
 #define UX_DEVICE_CLASS_RNDIS_VENDOR_DESCRIPTION_MAX_RESPONSE_LENGTH    (UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER + UX_DEVICE_CLASS_RNDIS_VENDOR_DESCRIPTION_MAX_LENGTH)
 #define UX_DEVICE_CLASS_RNDIS_NODE_ID_RESPONSE_LENGTH                   (UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER + UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH)
 
-/* Decide maximun size of RNDIS response buffer (with 1 ~ 4 bytes as padding and aligned to 4 bytes).  */
+/* Decide maximum size of RNDIS response buffer (with 1 ~ 4 bytes as padding and aligned to 4 bytes).  */
 #define UX_DEVICE_CLASS_RNDIS_MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define UX_DEVICE_CLASS_RNDIS_MAX_CONTROL_RESPONSE_LENGTH               (((                         \
         UX_DEVICE_CLASS_RNDIS_MAX(UX_DEVICE_CLASS_RNDIS_CMPLT_INITIALIZE_RESPONSE_LENGTH,           \
@@ -571,5 +586,11 @@ VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class);
 
 /* Define OID supported List.  */
 extern ULONG ux_device_class_rndis_oid_supported_list[];
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif /* UX_DEVICE_CLASS_RNDIS_H */

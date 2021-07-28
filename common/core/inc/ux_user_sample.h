@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1.7        */
+/*                                                           6.1.8        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -62,6 +62,9 @@
 /*                                            transfer timeout value      */
 /*                                            options,                    */
 /*                                            resulting in version 6.1.7  */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -168,7 +171,7 @@
 
 
 /* Defined, this value represents the maximum number of bytes received on a control endpoint in
-   the device stack. The default is 256 bytes but can be reduced in memory constraint environments.  */
+   the device stack. The default is 256 bytes but can be reduced in memory constrained environments.  */
 
 /* #define UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH 256
 */
@@ -176,7 +179,7 @@
 
 /* Defined, this value represents the maximum number of bytes that can be received or transmitted
    on any endpoint. This value cannot be less than the maximum packet size of any endpoint. The default 
-   is 4096 bytes but can be reduced in memory constraint environments. For cd-rom support in the storage 
+   is 4096 bytes but can be reduced in memory constrained environments. For cd-rom support in the storage 
    class, this value cannot be less than 2048.  */
 
 #define UX_SLAVE_REQUEST_DATA_MAX_LENGTH    (1024 * 2)
@@ -189,7 +192,7 @@
 
 
 /* Defined, this value represents the maximum number of bytes that a storage payload can send/receive.
-   The default is 8K bytes but can be reduced in memory constraint environments.  */
+   The default is 8K bytes but can be reduced in memory constrained environments.  */
 #define UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE            (1024 * 8)
 
 /* Define USBX Mass Storage Thread Stack Size. The default is to use UX_THREAD_STACK_SIZE. */
@@ -198,7 +201,7 @@
  */
 
 /* Defined, this value represents the maximum number of Ed, regular TDs and Isochronous TDs. These values
-   depend on the type of host controller and can be reduced in memory constraint environments.  */
+   depend on the type of host controller and can be reduced in memory constrained environments.  */
 
 #define UX_MAX_ED                                           80
 #define UX_MAX_TD                                           128
@@ -250,7 +253,7 @@
 
 
 /* Defined, this value represents the maximum number of media for the host storage class. 
-   Default is 8 but for memory contrained resource systems this can ne reduced to 1. */
+   Default is 8 but for memory constrained resource systems this can ne reduced to 1. */
 
 #define UX_HOST_CLASS_STORAGE_MAX_MEDIA                     2
 
@@ -262,7 +265,7 @@
 
 /* #define UX_HOST_CLASS_STORAGE_INCLUDE_LEGACY_PROTOCOL_SUPPORT */
 
-/* Defined, this value forces the memory allocation scheme to enforce alignement
+/* Defined, this value forces the memory allocation scheme to enforce alignment
    of memory with the UX_SAFE_ALIGN field.
 */
 

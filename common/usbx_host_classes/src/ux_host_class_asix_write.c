@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_write                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_write(VOID *asix_class, NX_PACKET *packet)
@@ -105,7 +108,7 @@ UX_HOST_CLASS_ASIX  *asix;
     /* Load the address of the current packet header at the physical header.  */
     packet_header =  packet -> nx_packet_prepend_ptr;
     
-    /* Substract 2 USHORT to store length of the packet.  */
+    /* Subtract 2 USHORT to store length of the packet.  */
     packet_header -= sizeof(USHORT) * 2;
 
 #if defined(UX_HOST_CLASS_ASIX_HEADER_CHECK_ENABLE)

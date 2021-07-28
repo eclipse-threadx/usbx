@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_video.h                               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -49,11 +49,28 @@
 /*                                            symbols instead of using    */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
-/*                                                                        */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            added new definitions       */
+/*                                            according to UVC 1.5 Class  */
+/*                                            specification,              */
+/*                                            resulting in version 6.1.8  */
+/*                                                                        */ 
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_VIDEO_H
 #define UX_HOST_CLASS_VIDEO_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 /* Define external static data.  */
 extern UCHAR _ux_system_class_video_interface_descriptor_structure[];
@@ -86,6 +103,7 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_SUBCLASS_UNDEFINED                                              0
 #define UX_HOST_CLASS_VIDEO_SUBCLASS_CONTROL                                                1
 #define UX_HOST_CLASS_VIDEO_SUBCLASS_STREAMING                                              2
+#define UX_HOST_CLASS_VIDEO_SUBCLASS_INTERFACE_COLLECTION                                   3
 
 
 /* Define Video Class main descriptor types.  */
@@ -106,6 +124,7 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_VC_SELECTOR_UNIT                                                0x04
 #define UX_HOST_CLASS_VIDEO_VC_PROCESSING_UNIT                                              0x05
 #define UX_HOST_CLASS_VIDEO_VC_EXTENSION_UNIT                                               0x06
+#define UX_HOST_CLASS_VIDEO_VC_ENCODING_UNIT                                                0x07
 
 /* Define Video Class specific VS .  */
 
@@ -123,6 +142,12 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_VS_FORMAT_FRAME_BASED                                           0x10
 #define UX_HOST_CLASS_VIDEO_VS_FRAME_FRAME_BASED                                            0x11
 #define UX_HOST_CLASS_VIDEO_VS_FORMAT_STREAM_BASED                                          0x12
+#define UX_HOST_CLASS_VIDEO_VS_FORMAT_H264                                                  0x13
+#define UX_HOST_CLASS_VIDEO_VS_FRAME_H264                                                   0x14
+#define UX_HOST_CLASS_VIDEO_VS_FORMAT_H264_SIMULCAST                                        0x15
+#define UX_HOST_CLASS_VIDEO_VS_FORMAT_VP8                                                   0x16
+#define UX_HOST_CLASS_VIDEO_VS_FRAME_VP8                                                    0x17
+#define UX_HOST_CLASS_VIDEO_VS_FORMAT_VP8_SIMULCAST                                         0x18
 
 
 /* Define Video Class specific Control Selectors.  */
@@ -145,6 +170,10 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_CT_ROLL_ABSOLUTE_CONTROL                                        0x0F
 #define UX_HOST_CLASS_VIDEO_CT_ROLL_RELATIVE_CONTROL                                        0x10
 #define UX_HOST_CLASS_VIDEO_CT_PRIVACY_CONTROL                                              0x11
+#define UX_HOST_CLASS_VIDEO_CT_FOCUS_SIMPLE_CONTROL                                         0x12
+#define UX_HOST_CLASS_VIDEO_CT_WINDOW_CONTROL                                               0x13
+#define UX_HOST_CLASS_VIDEO_CT_REGION_OF_INTEREST_CONTROL                                   0x14
+
 
 #define UX_HOST_CLASS_VIDEO_PU_CONTROL_UNDEFINED                                            0x00
 #define UX_HOST_CLASS_VIDEO_PU_BACKLIGHT_COMPENSATION_CONTROL                               0x01
@@ -165,6 +194,7 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_PU_HUE_AUTO_CONTROL                                             0x10
 #define UX_HOST_CLASS_VIDEO_PU_ANALOG_VIDEO_STANDARD_CONTROL                                0x11
 #define UX_HOST_CLASS_VIDEO_PU_ANALOG_LOCK_STATUS_CONTROL                                   0x12
+#define UX_HOST_CLASS_VIDEO_PU_CONTRAST_AUTO_CONTROL                                        0x13
 
 
 #define UX_HOST_CLASS_VIDEO_VS_CONTROL_UNDEFINED                                            0x00
@@ -203,6 +233,7 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_REQUEST_ERROR_CODE_INVALID_INPUT                                0x05
 #define UX_HOST_CLASS_VIDEO_REQUEST_ERROR_CODE_INVALID_CONTROL                              0x06
 #define UX_HOST_CLASS_VIDEO_REQUEST_ERROR_CODE_INVALID_REQUEST                              0x07
+#define UX_HOST_CLASS_VIDEO_REQUEST_ERROR_CODE_INVALID_VALUE_WITHIN_RANGE                   0x08
 #define UX_HOST_CLASS_VIDEO_REQUEST_ERROR_CODE_UNKNOWN                                      0xFF
 
 
@@ -245,6 +276,11 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_GET_RES                                                         0x84
 #define UX_HOST_CLASS_VIDEO_GET_INFO                                                        0x86
 #define UX_HOST_CLASS_VIDEO_GET_DEF                                                         0x87
+#define UX_HOST_CLASS_VIDEO_GET_CUR_ALL                                                     0x91
+#define UX_HOST_CLASS_VIDEO_GET_MIN_ALL                                                     0x92
+#define UX_HOST_CLASS_VIDEO_GET_MAX_ALL                                                     0x93
+#define UX_HOST_CLASS_VIDEO_GET_RES_ALL                                                     0x94
+#define UX_HOST_CLASS_VIDEO_GET_GET_DEF_ALL                                                 0x97
 
 /* Define Video Class error codes.  */
 
@@ -302,6 +338,7 @@ extern UCHAR _ux_system_host_class_video_name[];
 #define UX_HOST_CLASS_VIDEO_TCS_PU_HUE_AUTO_CONTROL                                         0x10
 #define UX_HOST_CLASS_VIDEO_TCS_PU_ANALOG_VIDEO_STANDARD_CONTROL                            0x11
 #define UX_HOST_CLASS_VIDEO_TCS_PU_ANALOG_LOCK_STATUS_CONTROL                               0x12
+#define UX_HOST_CLASS_VIDEO_TCS_PU_CONTRAST_AUTO_CONTROL                                    0x13
 
 #define UX_HOST_CLASS_VIDEO_TCS_XU_CONTROL_UNDEFINED                                        0x00
 
@@ -649,6 +686,12 @@ UINT    _ux_host_class_video_control_request(UX_HOST_CLASS_VIDEO *video,
 #define ux_host_class_video_transfer_callback_set   _ux_host_class_video_transfer_callback_set
 #define ux_host_class_video_entities_parse          _ux_host_class_video_entities_parse
 #define ux_host_class_video_control_request         _ux_host_class_video_control_request
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif
 

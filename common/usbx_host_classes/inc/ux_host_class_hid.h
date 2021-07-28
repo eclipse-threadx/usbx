@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid.h                                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,11 +47,25 @@
 /*                                            them directly, fixed struct */
 /*                                            field definition issues,    */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_HID_H
 #define UX_HOST_CLASS_HID_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define HID Class constants.  */
@@ -1031,6 +1045,12 @@ VOID    _ux_host_class_hid_transfer_request_completed(UX_TRANSFER *transfer_requ
 #define ux_host_class_hid_report_get                        _ux_host_class_hid_report_get
 #define ux_host_class_hid_report_id_get                     _ux_host_class_hid_report_id_get
 #define ux_host_class_hid_report_set                        _ux_host_class_hid_report_set
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif
 

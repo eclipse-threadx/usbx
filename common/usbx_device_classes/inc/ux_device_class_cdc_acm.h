@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -48,11 +48,25 @@
 /*                                            added macro to disable      */
 /*                                            transmission support,       */
 /*                                            resulting in version 6.1.6  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_H
 #define UX_DEVICE_CLASS_CDC_ACM_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define CDC Class USB Class constants.  */
@@ -265,5 +279,11 @@ UINT  _ux_device_class_cdc_acm_write_with_callback(UX_SLAVE_CLASS_CDC_ACM *cdc_a
 #define ux_device_class_cdc_acm_write               _ux_device_class_cdc_acm_write
 #define ux_device_class_cdc_acm_ioctl               _ux_device_class_cdc_acm_ioctl
 #define ux_device_class_cdc_acm_write_with_callback _ux_device_class_cdc_acm_write_with_callback
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif /* UX_DEVICE_CLASS_CDC_ACM_H */

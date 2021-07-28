@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_report_add                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_add(UX_HOST_CLASS_HID *hid, UCHAR *descriptor, UX_HOST_CLASS_HID_ITEM *item)
@@ -164,7 +167,7 @@ ULONG                       current_field_address;
     if ((hid_report != UX_NULL) && (hid_report -> ux_host_class_hid_report_id == hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_id))
     {
 
-        /* So we did not need a new report afterall!  */
+        /* So we did not need a new report after all!  */
         _ux_utility_memory_free(new_hid_report);
         new_hid_report =  hid_report;
     }

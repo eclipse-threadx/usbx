@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_delete              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_delete(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle)
@@ -74,7 +77,7 @@ UINT  _ux_pictbridge_dpsclient_object_delete(UX_SLAVE_CLASS_PIMA *pima, ULONG ob
     UX_PARAMETER_NOT_USED(pima);
     UX_PARAMETER_NOT_USED(object_handle);
 
-    /* This function is not really usefull in PictBridge.  */
+    /* This function is not really useful in PictBridge.  */
     return(UX_SUCCESS);
 
 }

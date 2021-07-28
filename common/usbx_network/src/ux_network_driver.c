@@ -95,7 +95,7 @@ UINT  status = NX_SUCCESS;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_activate                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -104,7 +104,7 @@ UINT  status = NX_SUCCESS;
 /*                                                                        */ 
 /* The USB network driver activate function is called as the USB instance */
 /* is created. This API takes a pointer to the instance, and returns a    */
-/* ux_network_handle back to the instance. Everytime the instance receives*/
+/* ux_network_handle back to instance. Every time the instance receives   */
 /* a network packet, it should call ux_network_driver_packet_received with*/
 /* ux_network_handle.                                                     */
 /*                                                                        */
@@ -145,6 +145,9 @@ UINT  status = NX_SUCCESS;
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -245,7 +248,7 @@ UINT    i;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_deactivate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -254,7 +257,7 @@ UINT    i;
 /*                                                                        */ 
 /* The USB network driver activate function is called as the USB instance */
 /* is created. This API takes a pointer to the instance, and returns a    */
-/* ux_network_handle back to the instance. Everytime the instance receives*/
+/* ux_network_handle back to instance. Every time the instance receives   */
 /* a network packet, it should call ux_network_driver_packet_received with*/
 /* ux_network_handle.                                                     */
 /*                                                                        */
@@ -295,6 +298,9 @@ UINT    i;
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_network_driver_deactivate(VOID *ux_instance, VOID *ux_network_handle)

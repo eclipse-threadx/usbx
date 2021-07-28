@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_storage.h                           PORTABLE C      */
-/*                                                           6.1.3        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,11 +47,25 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_STORAGE_H
 #define UX_DEVICE_CLASS_STORAGE_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 /* Define User configurable Storage Class constants.  */
 
@@ -554,5 +568,11 @@ UINT    _ux_device_class_storage_read_dvd_structure(UX_SLAVE_CLASS_STORAGE *stor
 /* Define Device Storage Class API prototypes.  */
 
 #define ux_device_class_storage_entry        _ux_device_class_storage_entry
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif

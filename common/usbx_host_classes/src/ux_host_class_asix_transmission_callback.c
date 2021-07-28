@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_transmission_callback           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_transmission_callback (UX_TRANSFER *transfer_request)
@@ -115,7 +118,7 @@ UCHAR                           *packet_header;
         /* Load the address of the current packet header of the physical header.  */
         packet_header =  next_packet -> nx_packet_prepend_ptr;
     
-        /* Substract 2 USHORT to store length of the packet.  */
+        /* Subtract 2 USHORT to store length of the packet.  */
         packet_header -= sizeof(USHORT) * 2;
     
         /* Store the length of the payload in the first USHORT.  */

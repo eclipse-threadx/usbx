@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_deactivate                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_deactivate(UX_SLAVE_CLASS_COMMAND *command)
@@ -98,7 +101,7 @@ UX_SLAVE_CLASS              *class;
     if (interface -> ux_slave_interface_descriptor.bInterfaceClass == UX_DEVICE_CLASS_RNDIS_CLASS_COMMUNICATION_CONTROL)
     {
     
-        /* Declare the link to be down. That may nd to change later to make it dependant on the
+        /* Declare the link to be down. That may need to change later to make it dependant on the
            WAN/Wireless modem.  */
         rndis -> ux_slave_class_rndis_link_state = UX_DEVICE_CLASS_RNDIS_LINK_STATE_DOWN;
 

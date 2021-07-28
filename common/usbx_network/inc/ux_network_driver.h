@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_network_driver.h                                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,11 +43,26 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_NETWORK_DRIVER_H
 #define UX_NETWORK_DRIVER_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 #include "tx_api.h"
 #include "nx_api.h"
@@ -72,7 +87,7 @@ typedef struct USB_NETWORK_DEVICE_STRUCT
     /* interface_ptr is populated by NetX, as part of the interface attachment. */
     NX_INTERFACE    *ux_network_device_interface_ptr;
 
-    /* Define synchronization objecs for deactivation. Note that these are only
+    /* Define synchronization objects for deactivation. Note that these are only
        used if the activation/deactivation functions are not called under interrupt.  */
     UCHAR           ux_network_device_activated_by_thread;
     TX_MUTEX        ux_network_device_deactivate_mutex;
@@ -110,4 +125,10 @@ VOID  _ux_network_driver_link_up(VOID *ux_network_handle);
 VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 
 VOID  _ux_network_driver_packet_received(VOID *ux_network_handle, NX_PACKET *packet_ptr);
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
+
 #endif

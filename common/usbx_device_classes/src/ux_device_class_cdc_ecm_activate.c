@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_activate                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -193,7 +196,7 @@ ULONG                       physical_address_lsw;
                 /* Not all endpoints have been found. Major error, do not proceed.  */
                 return(UX_ERROR);
 
-            /* Declare the link to be up. That may need to change later to make it dependant on the
+            /* Declare the link to be up. That may need to change later to make it dependent on the
                WAN/Wireless modem.  */
             cdc_ecm -> ux_slave_class_cdc_ecm_link_state = UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_UP;
             

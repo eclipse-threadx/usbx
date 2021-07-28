@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_sim_host.h                                   PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,11 +54,25 @@
 /*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added port status variable, */
 /*                                            resulting in version 6.1.6  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HCD_SIM_HOST_H
 #define UX_HCD_SIM_HOST_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 
 /* Define simulator host generic definitions.  */
@@ -247,5 +261,11 @@ UINT    _ux_hcd_sim_host_port_reset(UX_HCD_SIM_HOST *hcd_sim_host, ULONG port_in
 /* Define Device Simulator Class API prototypes.  */
 
 #define ux_hcd_sim_host_initialize                 _ux_hcd_sim_host_initialize
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
+
 #endif
 

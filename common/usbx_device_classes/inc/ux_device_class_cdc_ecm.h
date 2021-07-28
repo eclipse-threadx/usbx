@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_ecm.h                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,11 +44,26 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_CDC_ECM_H
 #define UX_DEVICE_CLASS_CDC_ECM_H
+
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
+
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
 
 #include "nx_api.h"
 #include "ux_network_driver.h"
@@ -120,7 +135,7 @@
 #define UX_DEVICE_CLASS_CDC_ECM_VERSION_MAJOR                               0x00000001
 #define UX_DEVICE_CLASS_CDC_ECM_VERSION_MINOR                               0x00000000
 
-/* Define CDC_ECM Conection type supported. Set to conectionless.  */
+/* Define CDC_ECM Connection type supported. Set to conectionless.  */
 #define UX_DEVICE_CLASS_CDC_ECM_DF_CONNECTIONLESS                           0x00000001
 #define UX_DEVICE_CLASS_CDC_ECM_DF_CONNECTION_ORIENTED                      0x00000002
 #define UX_DEVICE_CLASS_CDC_ECM_DF_CONNECTION_SUPPORTED                     UX_DEVICE_CLASS_CDC_ECM_DF_CONNECTIONLESS
@@ -338,5 +353,11 @@ VOID  _ux_device_class_cdc_ecm_interrupt_thread(ULONG cdc_ecm_class);
 #define ux_device_class_cdc_ecm_entry    _ux_device_class_cdc_ecm_entry
 #define ux_device_class_cdc_ecm_read     _ux_device_class_cdc_ecm_read 
 #define ux_device_class_cdc_ecm_write    _ux_device_class_cdc_ecm_write
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif /* UX_DEVICE_CLASS_CDC_ECM_H */

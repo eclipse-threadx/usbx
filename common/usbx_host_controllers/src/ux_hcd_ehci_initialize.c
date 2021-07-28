@@ -30,7 +30,7 @@
 #include "ux_host_stack.h"
 
 
-/* EHCI HCD extention for host mode select.  */
+/* EHCI HCD extension for host mode select.  */
 #ifndef UX_HCD_EHCI_EXT_USB_HOST_MODE_ENABLE
 
 #if defined(K66) || defined(IMX6UL) || defined(XILINX_ZYNQ) || defined(MIMXRT)
@@ -60,7 +60,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_initialize                             PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -108,6 +108,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  08-02-2021     Wen Wang                 Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_initialize(UX_HCD *hcd)

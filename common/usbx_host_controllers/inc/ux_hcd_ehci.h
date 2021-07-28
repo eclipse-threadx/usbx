@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_ehci.h                                       PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,14 +50,29 @@
 /*                                            used unsigned defines,      */
 /*                                            named unions and structs,   */
 /*                                            resulting in version 6.1.2  */
+/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed spelling error,       */
+/*                                            added extern "C" keyword    */
+/*                                            for compatibility with C++, */
+/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HCD_EHCI_H
 #define UX_HCD_EHCI_H
 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard 
+   C is used to process the API information.  */ 
 
-/* Possible defined EHCI HCD extentions.  */
+#ifdef   __cplusplus 
+
+/* Yes, C++ compiler is present.  Use standard C.  */ 
+extern   "C" { 
+
+#endif  
+
+
+/* Possible defined EHCI HCD extensions.  */
 
 /* Extension for peripheral host mode select (function like).  */
 /* #define UX_HCD_EHCI_EXT_USB_HOST_MODE_ENABLE(hcd_ehci) */
@@ -826,6 +841,12 @@ VOID    _ux_hcd_ehci_transfer_request_process(UX_TRANSFER *transfer_request);
 
 #define ux_hcd_ehci_initialize                      _ux_hcd_ehci_initialize
 #define ux_hcd_ehci_interrupt_handler               _ux_hcd_ehci_interrupt_handler
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard 
+   C conditional started above.  */   
+#ifdef __cplusplus
+} 
+#endif 
 
 #endif
 
