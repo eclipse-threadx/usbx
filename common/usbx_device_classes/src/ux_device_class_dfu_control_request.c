@@ -40,7 +40,7 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_dfu_control_request                PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*                                            removed block count (it's   */
 /*                                            from host request wValue),  */
 /*                                            resulting in version 6.1.6  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warning,      */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -96,7 +99,9 @@ ULONG                   request;
 ULONG                   request_value;
 ULONG                   request_length;
 ULONG                   actual_length;
+#if defined(UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE) || (UX_DEVICE_CLASS_DFU_STATUS_MODE != 1)
 ULONG                   media_status;
+#endif
 
 
     /* Get the pointer to the device.  */

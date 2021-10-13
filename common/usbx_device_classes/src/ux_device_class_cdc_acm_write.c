@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_write                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issue,        */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
@@ -91,13 +94,15 @@ UINT                        status = 0;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ACM_WRITE, cdc_acm, buffer, requested_length, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
-  
+
+#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
     /* Check if current cdc-acm is using callback or not. We cannot use direct reads with callback on.  */
     if (cdc_acm -> ux_slave_class_cdc_acm_transmission_status == UX_TRUE)
     
         /* Not allowed. */
         return(UX_ERROR);
-            
+#endif
+
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
     

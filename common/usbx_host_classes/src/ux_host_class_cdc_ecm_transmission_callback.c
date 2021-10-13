@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_transmission_callback        PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*  02-02-2021     Chaoqiong Xiao           Modified comment(s), fixed    */
 /*                                            ZLP issue for transmission, */
 /*                                            resulting in version 6.1.4  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            use pre-calculated value    */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_transmission_callback(UX_TRANSFER *transfer_request)
@@ -115,9 +119,9 @@ UCHAR                           *packet_header;
     if (transfer_request -> ux_transfer_request_completion_code == UX_SUCCESS)
     {
 
-        /* Check if the transfer length is not zero and it is multiple of MPS.  */
+        /* Check if the transfer length is not zero and it is multiple of MPS (validated on device enum).  */
         if ((transfer_request -> ux_transfer_request_requested_length != 0) &&
-            (transfer_request -> ux_transfer_request_requested_length % (transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_descriptor.wMaxPacketSize & UX_MAX_PACKET_SIZE_MASK)) == 0)
+            (transfer_request -> ux_transfer_request_requested_length % transfer_request -> ux_transfer_request_packet_length) == 0)
         {
 
             /* Set transfer request length to zero.  */

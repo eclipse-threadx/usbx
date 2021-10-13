@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_printer.h                             PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added entry public define,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -127,6 +130,7 @@ UINT    _ux_host_class_printer_write(UX_HOST_CLASS_PRINTER *printer, UCHAR * dat
 
 /* Define Printer Class API prototypes.  */
 
+#define   ux_host_class_printer_entry                                  _ux_host_class_printer_entry
 #define   ux_host_class_printer_activate                               _ux_host_class_printer_activate
 #define   ux_host_class_printer_name_get                               _ux_host_class_printer_name_get
 #define   ux_host_class_printer_device_id_get                          _ux_host_class_printer_device_id_get

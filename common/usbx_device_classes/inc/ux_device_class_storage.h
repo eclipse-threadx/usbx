@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_storage.h                           PORTABLE C      */
-/*                                                           6.1.8        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -51,6 +51,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved TAG management,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -441,7 +444,6 @@ typedef struct UX_SLAVE_CLASS_STORAGE_LUN_STRUCT
     ULONG           ux_slave_class_storage_media_removable_flag;
     ULONG           ux_slave_class_storage_media_read_only_flag;
     ULONG           ux_slave_class_storage_media_id;
-    ULONG           ux_slave_class_storage_scsi_tag;
     ULONG           ux_slave_class_storage_request_sense_status;
     ULONG           ux_slave_class_storage_disk_status;
     ULONG           ux_slave_class_storage_last_session_state;
@@ -471,6 +473,7 @@ typedef struct UX_SLAVE_CLASS_STORAGE_STRUCT
     UCHAR                       ux_slave_class_storage_cbw_flags;
     UCHAR                       ux_slave_class_storage_cbw_lun;
     UCHAR                       ux_slave_class_storage_reserved[2];
+    ULONG                       ux_slave_class_storage_scsi_tag;
     ULONG                       ux_slave_class_storage_csw_residue;
     ULONG                       ux_slave_class_storage_csw_status;
     VOID                        (*ux_slave_class_storage_instance_activate)(VOID *);

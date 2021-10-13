@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_initialize_complete               PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added framework init cases, */
 /*                                            resulting in version 6.1.6  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            filled payload size,        */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_initialize_complete(VOID)
@@ -136,6 +139,8 @@ UX_SLAVE_TRANSFER       *transfer_request;
                                 
     /* On the control endpoint, always expect the maximum.  */
     transfer_request -> ux_slave_transfer_request_requested_length =  
+                                device -> ux_slave_device_descriptor.bMaxPacketSize0;
+    transfer_request -> ux_slave_transfer_request_transfer_length =
                                 device -> ux_slave_device_descriptor.bMaxPacketSize0;
                 
     /* Attach the control endpoint to the transfer request.  */

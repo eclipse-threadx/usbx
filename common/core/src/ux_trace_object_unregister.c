@@ -29,14 +29,14 @@
 
 #include "ux_api.h"
 
-#ifdef UX_TRACE_INSERT_MACROS
+#ifdef TX_ENABLE_EVENT_TRACE
 extern VOID _tx_trace_object_unregister(VOID *);
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_trace_object_unregister                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@ extern VOID _tx_trace_object_unregister(VOID *);
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved traceX support,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_trace_object_unregister(VOID *object_ptr)

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_interface_set                      PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            calculated payload size,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_interface_set(UCHAR * device_framework, ULONG device_framework_length,
@@ -96,6 +99,7 @@ ULONG                   descriptor_length;
 UCHAR                   descriptor_type;
 ULONG                   endpoints_pool_number;
 UINT                    status;
+ULONG                   max_transfer_length, n_trans;
 
     UX_PARAMETER_NOT_USED(alternate_setting_value);
 
@@ -226,6 +230,30 @@ UINT                    status;
             /* Now we create a transfer request to accept transfer on this endpoint.  */
             transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
                 
+            /* Validate endpoint descriptor wMaxPacketSize.  */
+            UX_ASSERT(endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize != 0);
+
+            /* Calculate endpoint transfer payload max size.  */
+            max_transfer_length =
+                    endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize &
+                                                        UX_MAX_PACKET_SIZE_MASK;
+            if ((_ux_system_slave -> ux_system_slave_speed == UX_HIGH_SPEED_DEVICE) &&
+                (endpoint -> ux_slave_endpoint_descriptor.bmAttributes & 0x1u))
+            {
+                n_trans = endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize &
+                                            UX_MAX_NUMBER_OF_TRANSACTIONS_MASK;
+                if (n_trans)
+                {
+                    n_trans >>= UX_MAX_NUMBER_OF_TRANSACTIONS_SHIFT;
+                    n_trans ++;
+                    max_transfer_length *= n_trans;
+                }
+            }
+
+            /* Validate max transfer size and save it.  */
+            UX_ASSERT(max_transfer_length <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
+            transfer_request -> ux_slave_transfer_request_transfer_length = max_transfer_length;
+
             /* We store the endpoint in the transfer request as well.  */
             transfer_request -> ux_slave_transfer_request_endpoint =  endpoint;
                 

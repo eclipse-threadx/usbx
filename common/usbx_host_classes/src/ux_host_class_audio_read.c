@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_read                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            use pre-calculated value    */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_read(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST *audio_transfer_request)
@@ -129,7 +133,8 @@ UINT        status;
     /* For audio in, we read packets at a time, so the transfer request size is the size of the
        endpoint.  */
     audio_transfer_request -> ux_host_class_audio_transfer_request_requested_length =  
-                            audio -> ux_host_class_audio_isochronous_endpoint -> ux_endpoint_descriptor.wMaxPacketSize;
+                    audio -> ux_host_class_audio_isochronous_endpoint ->
+                             ux_endpoint_transfer_request.ux_transfer_request_packet_length;
 
     /* Ask the stack to hook this transfer request to the iso ED.  */
     status =  _ux_host_class_audio_transfer_request(audio, audio_transfer_request);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_alternate_setting_locate       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            use pre-calculated value    */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_alternate_setting_locate(UX_HOST_CLASS_VIDEO *video, UINT max_payload_size, UINT *alternate_setting)
@@ -100,9 +104,7 @@ UINT                    alternate_setting_found;
             
             /* Get the max packet size of the endpoint.  */
             endpoint = interface -> ux_interface_first_endpoint;
-            payload_size = (endpoint -> ux_endpoint_descriptor.wMaxPacketSize & UX_MAX_PACKET_SIZE_MASK) *
-                    (((endpoint -> ux_endpoint_descriptor.wMaxPacketSize & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK) >>
-                      UX_MAX_NUMBER_OF_TRANSACTIONS_SHIFT) + 1);
+            payload_size = endpoint -> ux_endpoint_transfer_request.ux_transfer_request_packet_length;
 
             /* Check if the payload size is equal or greater than the required payload size.  */
             if (payload_size >= max_payload_size)

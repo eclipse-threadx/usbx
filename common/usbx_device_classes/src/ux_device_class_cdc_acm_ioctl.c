@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_ioctl                      PORTABLE C      */ 
-/*                                                           6.1.5        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*                                            moved transmission resource */
 /*                                            management to init/uninit,  */
 /*                                            resulting in version 6.1.6  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issue,        */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -94,7 +97,9 @@ UINT _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl
 UINT                                                status;
 UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_PARAMETER        *line_coding;
 UX_SLAVE_CLASS_CDC_ACM_LINE_STATE_PARAMETER         *line_state;
+#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 UX_SLAVE_CLASS_CDC_ACM_CALLBACK_PARAMETER           *callback;
+#endif
 UX_SLAVE_ENDPOINT                                   *endpoint;
 UX_SLAVE_INTERFACE                                  *interface;
 UX_SLAVE_TRANSFER                                   *transfer_request;

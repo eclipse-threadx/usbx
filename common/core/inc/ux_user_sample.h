@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -65,6 +65,9 @@
 /*  08-02-2021     Wen Wang                 Modified comment(s),          */
 /*                                            fixed spelling error,       */
 /*                                            resulting in version 6.1.8  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option for assert,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -385,6 +388,14 @@
 /* Defined, this value represents the size of the log pool.
 */
 #define UX_DEBUG_LOG_SIZE                                   (1024 * 16)
+
+
+/* Defined, this enables the assert checks inside usbx.  */
+#define UX_ENABLE_ASSERT
+
+/* Defined, this defines the assert action taken when failure detected. By default
+   it halts without any output.  */
+/* #define UX_ASSERT_FAIL  for (;;) {tx_thread_sleep(UX_WAIT_FOREVER); }  */
 
 
 /* DEBUG includes and macros for a specific platform go here.  */

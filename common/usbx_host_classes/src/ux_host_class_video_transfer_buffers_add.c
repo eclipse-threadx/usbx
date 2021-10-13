@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_transfer_buffers_add           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*                                                                        */
 /*    Note the maximum number of transfers could be buffered is           */
 /*    UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST_COUNT - 1.                     */
+/*                                                                        */
+/*    Note check ux_host_class_video_max_payload_get to see minimum       */
+/*    recommended buffer size.                                            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -81,6 +84,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            use pre-calculated value    */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_buffers_add(UX_HOST_CLASS_VIDEO *video, UCHAR** buffers, ULONG num_buffers)
@@ -152,9 +159,7 @@ UINT            i;
     }
 
     /* Calculate packet size.  */
-    packet_size = video -> ux_host_class_video_isochronous_endpoint -> ux_endpoint_descriptor.wMaxPacketSize;
-    if (packet_size & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK)
-        packet_size = (packet_size & UX_MAX_PACKET_SIZE_MASK) * (((packet_size & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK) >> UX_MAX_NUMBER_OF_TRANSACTIONS_SHIFT) + 1);
+    packet_size = video -> ux_host_class_video_current_max_payload_size;
 
     /* Add buffers one by one.  */
     for (i = 0,

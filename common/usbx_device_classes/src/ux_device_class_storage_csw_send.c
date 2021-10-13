@@ -38,7 +38,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_csw_send                   PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved TAG management,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_csw_send(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -95,6 +98,7 @@ UCHAR                   *csw_buffer;
 
 
     UX_PARAMETER_NOT_USED(csw_status);
+    UX_PARAMETER_NOT_USED(lun);
 
     /* If CSW skipped, just return.  */
     if (UX_DEVICE_CLASS_STORAGE_CSW_SKIP(&storage -> ux_slave_class_storage_csw_status))
@@ -113,7 +117,7 @@ UCHAR                   *csw_buffer;
     _ux_utility_long_put(&csw_buffer[UX_SLAVE_CLASS_STORAGE_CSW_SIGNATURE], UX_SLAVE_CLASS_STORAGE_CSW_SIGNATURE_MASK);
 
     /* Store the SCSI tag from the CBW.  */
-    _ux_utility_long_put(&csw_buffer[UX_SLAVE_CLASS_STORAGE_CSW_TAG], storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_scsi_tag);
+    _ux_utility_long_put(&csw_buffer[UX_SLAVE_CLASS_STORAGE_CSW_TAG], storage -> ux_slave_class_storage_scsi_tag);
 
     /* Store the dCSWDataResidue.  */
     _ux_utility_long_put(&csw_buffer[UX_SLAVE_CLASS_STORAGE_CSW_DATA_RESIDUE], storage -> ux_slave_class_storage_csw_residue);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_interrupt_endpoint_start         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            use pre-calculated value    */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_interrupt_endpoint_start(UX_HOST_CLASS_HUB *hub)
@@ -96,7 +100,7 @@ UX_TRANSFER     *transfer_request;
 
         /* The endpoint is correct, fill in the transfer_request with the length requested for this endpoint.  */
         transfer_request =  &hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_transfer_request;
-        transfer_request -> ux_transfer_request_requested_length =  hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_descriptor.wMaxPacketSize;
+        transfer_request -> ux_transfer_request_requested_length = transfer_request -> ux_transfer_request_packet_length;
         transfer_request -> ux_transfer_request_actual_length =  0;
 
         /* Since this transfer_request has a callback, we need the HUB instance to be stored in the transfer request.  */

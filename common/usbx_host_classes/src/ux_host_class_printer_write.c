@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_write                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed ZLP sending issue,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_write(UX_HOST_CLASS_PRINTER *printer, UCHAR * data_pointer, 
@@ -117,7 +120,7 @@ ULONG           transfer_request_length;
     
     /* Perform a transfer on the bulk out endpoint until either the transfer is
        completed or when there is an error.  */
-    while (requested_length)
+    do
     {
 
         /* Program the maximum authorized length for this transfer_request.  */
@@ -198,7 +201,7 @@ ULONG           transfer_request_length;
         
         /* Update what is left to send out.  */
         requested_length -=  transfer_request_length;          
-    }    
+    } while (requested_length);
 
     /* Unprotect thread reentry to this instance.  */
     status =  _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);

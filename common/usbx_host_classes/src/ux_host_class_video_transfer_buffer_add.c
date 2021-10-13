@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_transfer_buffer_add            PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,9 @@
 /*                                                                        */ 
 /*    This function adds a buffer for video transfer requests.            */
 /*                                                                        */ 
+/*    Note check ux_host_class_video_max_payload_get to see minimum       */
+/*    recommended buffer size.                                            */
+/*                                                                        */
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
 /*    video                                 Pointer to video class        */ 
@@ -72,6 +75,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            use pre-calculated value    */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_buffer_add(UX_HOST_CLASS_VIDEO *video, UCHAR* buffer)
@@ -137,9 +144,7 @@ ULONG           packet_size;
         ux_endpoint_descriptor.bEndpointAddress & UX_REQUEST_DIRECTION;
 
     /* Calculate packet size.  */
-    packet_size = video -> ux_host_class_video_isochronous_endpoint -> ux_endpoint_descriptor.wMaxPacketSize;
-    if (packet_size & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK)
-        packet_size = (packet_size & UX_MAX_PACKET_SIZE_MASK) * (((packet_size & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK) >> UX_MAX_NUMBER_OF_TRANSACTIONS_SHIFT) + 1);
+    packet_size = video -> ux_host_class_video_current_max_payload_size;
 
     /* Fill the transfer request with all the required fields.  */
     transfer_request -> ux_transfer_request_endpoint =             video -> ux_host_class_video_isochronous_endpoint;

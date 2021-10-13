@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_port.h                                           Linux/GNU       */ 
-/*                                                           6.x          */
+/*                                                           6.1.9        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -41,7 +41,7 @@
 /*                                                                        */ 
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-15-2021     Chaoqiong Xiao           Initial Version 6.1.9         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -212,7 +212,7 @@ ULONG   outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Linux/GNU Version 6.x *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Linux/GNU Version 6.1.9 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_thread                     PORTABLE C      */ 
-/*                                                           6.1.7        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -111,6 +111,9 @@
 /*                                            get interface and endpoints */
 /*                                            from configured device,     */
 /*                                            resulting in version 6.1.7  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved TAG management,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_storage_thread(ULONG storage_class)
@@ -203,7 +206,7 @@ UCHAR                       *cbw_cb;
                 storage -> ux_slave_class_storage_cbw_lun = (UCHAR)lun;
                 
                 /* We have to memorize the SCSI command tag for the CSW phase.  */
-                storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_scsi_tag =  _ux_utility_long_get(scsi_command + UX_SLAVE_CLASS_STORAGE_CBW_TAG);
+                storage -> ux_slave_class_storage_scsi_tag =  _ux_utility_long_get(scsi_command + UX_SLAVE_CLASS_STORAGE_CBW_TAG);
 
                 /* Get dCBWDataTransferLength: number of bytes to transfer.  */
                 storage -> ux_slave_class_storage_host_length = _ux_utility_long_get(scsi_command + UX_SLAVE_CLASS_STORAGE_CBW_DATA_LENGTH);

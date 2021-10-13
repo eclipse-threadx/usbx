@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -96,6 +96,11 @@
 /*                                            fixed spelling error,       */
 /*                                            fixed trace ID order error, */
 /*                                            resulting in version 6.1.8  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved assert macros,     */
+/*                                            added transfer size field,  */
+/*                                            improved traceX support,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -149,7 +154,11 @@ typedef signed char               SCHAR;
 /* This defines the ASSERT and process on ASSERT fail. */
 #ifdef UX_ENABLE_ASSERT
 #ifndef UX_ASSERT_FAIL
+#ifdef TX_API_H
 #define UX_ASSERT_FAIL                                      for (;;) {tx_thread_sleep(UX_WAIT_FOREVER); }
+#else
+#define UX_ASSERT_FAIL                                      for (;;) {}
+#endif
 #endif
 #define UX_ASSERT(s)                                        if (!(s)) {UX_ASSERT_FAIL}
 #else
@@ -230,7 +239,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            1
-#define USBX_PATCH_VERSION            8
+#define USBX_PATCH_VERSION            9
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
@@ -339,9 +348,6 @@ VOID _ux_utility_debug_log(UCHAR *debug_location, UCHAR *debug_message, ULONG de
 /* Determine if tracing is enabled.  */
 
 #ifdef TX_ENABLE_EVENT_TRACE
-#ifndef UX_TRACE_INSERT_MACROS
-#error UX_TRACE_INSERT_MACROS must be defined to support TX_ENABLE_EVENT_TRACE
-#endif
 
 /* Trace is enabled. Remap calls so that interrupts can be disabled around the actual event logging.  */
 
@@ -1912,6 +1918,7 @@ typedef struct UX_SLAVE_TRANSFER_STRUCT
     ULONG           ux_slave_transfer_request_requested_length;
     ULONG           ux_slave_transfer_request_actual_length;
     ULONG           ux_slave_transfer_request_in_transfer_length;
+    ULONG           ux_slave_transfer_request_transfer_length;
     ULONG           ux_slave_transfer_request_completion_code;
     ULONG           ux_slave_transfer_request_phase;
     VOID            (*ux_slave_transfer_request_completion_function) (struct UX_SLAVE_TRANSFER_STRUCT *);

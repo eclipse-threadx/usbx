@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_read                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +47,9 @@
 /*    Note if the transfer request is not linked (next pointer is NULL),  */
 /*    a single request is performed. If the transfer request links into a */
 /*    list, the whole list is added.                                      */
+/*                                                                        */
+/*    Note check ux_host_class_video_max_payload_get to see request       */
+/*    length limitation.                                                  */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -77,13 +80,16 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used input request length   */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_read(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST *video_transfer_request)
 {
 
 UINT                                    status;
-ULONG                                   packet_size;
 UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
 
 
@@ -120,26 +126,8 @@ UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
         return(UX_HOST_CLASS_VIDEO_WRONG_INTERFACE);
     }
 
-    /* Calculate max transfer size on the endpoint.  */
-    packet_size = video -> ux_host_class_video_isochronous_endpoint -> ux_endpoint_descriptor.wMaxPacketSize;
-    if (packet_size & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK)
-        packet_size = (packet_size & UX_MAX_PACKET_SIZE_MASK) * (((packet_size & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK) >> UX_MAX_NUMBER_OF_TRANSACTIONS_SHIFT) + 1);
-
     /* Save list head.  */
     transfer_list = video_transfer_request;
-
-    /* Handle the request (list).  */
-    while(video_transfer_request)
-    {
-
-        /* For video in, we read packets at a time, so the transfer request size is the size of the
-           endpoint.  */
-        video_transfer_request -> ux_host_class_video_transfer_request_requested_length = packet_size;
-
-        /* Next request.  */
-        video_transfer_request = video_transfer_request -> ux_host_class_video_transfer_request_next_video_transfer_request;
-
-    }
 
     /* Ask the stack to hook this transfer request to the iso ED.  */
     status =  _ux_host_class_video_transfer_request(video, transfer_list);

@@ -210,7 +210,7 @@ VOID    outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Generic Version 6.1.3 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Generic Version 6.1.9 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_media_mount                  PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,9 @@
 /*                                            added option to disable FX  */
 /*                                            media integration,          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed exFAT mounting,       */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_mount(UX_HOST_CLASS_STORAGE *storage, ULONG sector)
@@ -163,13 +166,16 @@ UINT            status;
            couple of bytes.
            BUT !!! The first boot sector of an iPod is actually a partition, so we need to
            look further and see if the number of sector per FAT and the first partition are
-           set to 0. This will indicate a partition sector.
+           set to 0. This will indicate a partition sector. Though exFAT has no BIOS parameters
+           block and should be excluded in this case.
            */
         if ((*sector_memory == 0xe9) || ((*sector_memory == 0xeb) && *(sector_memory + 2) == 0x90))
         {
 
             /* Check for fake boot sector.  */
-            if (_ux_utility_short_get(sector_memory + 0x16) != 0x0 ||  _ux_utility_long_get(sector_memory + 0x24) != 0x0)
+            if (_ux_utility_short_get(sector_memory + 0x16) != 0x0 ||
+                _ux_utility_long_get(sector_memory + 0x24) != 0x0 ||
+                (*(sector_memory + 1) == 0x76) /* exFAT volume  */)
             {
 
                 /* This is a boot sector signature.  */

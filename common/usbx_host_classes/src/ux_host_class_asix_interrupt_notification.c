@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_interrupt_notification          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            use pre-calculated value    */
+/*                                            instead of wMaxPacketSize,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_interrupt_notification(UX_TRANSFER *transfer_request)
@@ -96,7 +100,7 @@ UX_HOST_CLASS_ASIX                      *asix;
 
     /* Ensure the length of our interrupt pipe data is correct.  */
     if (transfer_request -> ux_transfer_request_actual_length == 
-            asix -> ux_host_class_asix_interrupt_endpoint -> ux_endpoint_descriptor.wMaxPacketSize)
+            transfer_request -> ux_transfer_request_requested_length)
     {
 
         /* Check if the first byte is a interrupt packet signature.  */

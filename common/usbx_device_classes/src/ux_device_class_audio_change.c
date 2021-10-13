@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_change                       PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            replaced wMaxPacketSize by  */
+/*                                            calculated payload size,    */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -128,7 +132,7 @@ ULONG                                    stream_index;
             {
 
                 /* We found the endpoint, check its size.  */
-                if (endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize > stream -> ux_device_class_audio_stream_frame_buffer_size - 8)
+                if (endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_transfer_length > stream -> ux_device_class_audio_stream_frame_buffer_size - 8)
                 {
 
                     /* Error trap!  */

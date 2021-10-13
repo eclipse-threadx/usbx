@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_control_request_process            PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed possible buffer issue */
+/*                                            for control vendor request, */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_control_request_process(UX_SLAVE_TRANSFER *transfer_request)
@@ -138,6 +142,7 @@ ULONG                       application_data_length;
 
                 /* This is a Microsoft extended function. It happens before the device is configured. 
                    The request is passed to the application directly.  */
+                application_data_length = UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH;
                 status = _ux_system_slave -> ux_system_slave_device_vendor_request_function(request, request_value, 
                                                                                             request_index, request_length, 
                                                                                             transfer_request -> ux_slave_transfer_request_data_pointer,
@@ -155,9 +160,9 @@ ULONG                       application_data_length;
     
                     /* Set the direction to OUT.  */
                     transfer_request -> ux_slave_transfer_request_phase =  UX_TRANSFER_PHASE_DATA_OUT;
-    
+
                     /* Perform the data transfer.  */
-                    _ux_device_stack_transfer_request(transfer_request, request_length, application_data_length);
+                    _ux_device_stack_transfer_request(transfer_request, application_data_length, request_length);
 
                     /* We are done here.  */
                     return(UX_SUCCESS);

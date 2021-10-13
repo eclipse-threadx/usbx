@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_activate                       PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*                                            added Get/Set Protocol      */
 /*                                            request support,            */
 /*                                            resulting in version 6.1.3  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added packet size assert,   */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -116,6 +119,11 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
     /* Check if we found right endpoint.  */
     if (endpoint_interrupt == UX_NULL)
         return (UX_ERROR);
+
+    /* Validate event buffer size (fits largest transfer payload size).  */
+    UX_ASSERT(UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH >=
+              endpoint_interrupt -> ux_slave_endpoint_transfer_request.
+                            ux_slave_transfer_request_transfer_length);
 
     /* Default HID protocol is report protocol.  */
     hid -> ux_device_class_hid_protocol = UX_DEVICE_CLASS_HID_PROTOCOL_REPORT;

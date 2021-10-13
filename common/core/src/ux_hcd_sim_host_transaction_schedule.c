@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_sim_host_transaction_schedule               PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,10 @@
 /*                                            fixed control OUT transfer, */
 /*                                            supported bi-dir-endpoints, */
 /*                                            resulting in version 6.1.6  */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved check for tests,   */
+/*                                            added error trap case,      */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_transaction_schedule(UX_HCD_SIM_HOST *hcd_sim_host, UX_HCD_SIM_HOST_ED *ed)
@@ -188,12 +192,16 @@ UX_SLAVE_DCD            *dcd;
                the data needs to be copied into the device buffer first before invoking the control
                dispatcher.  */
 
-            /* Get the length we expect from the SETUP packet.  */
+            /* Get the length we expect from the SETUP packet (target the entire available control buffer).  */
             slave_transfer_request -> ux_slave_transfer_request_requested_length = _ux_utility_short_get(slave_transfer_request -> ux_slave_transfer_request_setup + 6);
 
             /* Avoid buffer overflow.  */
             if (slave_transfer_request -> ux_slave_transfer_request_requested_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
+            {
+                /* Error trap.  */
+                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_DCD, UX_TRANSFER_BUFFER_OVERFLOW);
                 slave_transfer_request -> ux_slave_transfer_request_requested_length = UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH;
+            }
 
             /* Reset what we have received so far.  */
             slave_transfer_request -> ux_slave_transfer_request_actual_length =  0;
@@ -424,7 +432,16 @@ UX_SLAVE_DCD            *dcd;
             wake_slave =  UX_FALSE;
 
             /* Does the slave have absolutely no more data to send? */
-            if ((slave_transfer_request -> ux_slave_transfer_request_actual_length == slave_transfer_request -> ux_slave_transfer_request_requested_length &&
+            if (slave_endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize == 0) /* Special for tests (avoid DIV0/MOD0) */
+            {
+
+                /* This happens only if device descriptor bMaxPacketSize0 is zero, assume it's OK for the first control
+                   requests to let host check the descriptor.
+                   If wMaxPacketSize is zero, host reject the device and transfer never started to get here.  */
+                wake_host =  UX_TRUE;
+                wake_slave =  UX_TRUE;
+            }
+            else if ((slave_transfer_request -> ux_slave_transfer_request_actual_length == slave_transfer_request -> ux_slave_transfer_request_requested_length &&
                  slave_transfer_request -> ux_slave_transfer_request_force_zlp == UX_TRUE) ||
                 (transaction_length == 0) ||
                 (transaction_length % slave_endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize))

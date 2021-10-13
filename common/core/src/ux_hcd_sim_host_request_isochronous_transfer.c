@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_request_isochronous_transfer       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.9        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed payload calculation,  */
+/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_request_isochronous_transfer(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request)
@@ -84,6 +87,7 @@ ULONG                       transfer_request_payload_length;
 ULONG                       isoch_packet_payload_length;
 UCHAR *                     data_pointer;
 ULONG                       current_frame_number;
+ULONG                       n_trans, packet_size;
     
 
     /* Get the pointer to the Endpoint.  */
@@ -95,7 +99,23 @@ ULONG                       current_frame_number;
     /* If the transfer_request specifies a max packet length other than the endpoint
        size, we force the transfer request value into the endpoint.  */
     if (transfer_request -> ux_transfer_request_packet_length == 0)
-        transfer_request -> ux_transfer_request_packet_length =  (ULONG) endpoint -> ux_endpoint_descriptor.wMaxPacketSize;
+    {
+
+        /* For wMaxPacketSize, bits 10..0 specify the maximum packet size (max 1024),
+           bits 12..11 specify the number of additional transactions (max 2),
+           the calculation below will not cause overflow using 32-bit operation.
+           Note wMaxPacketSize validation has been done in ux_host_stack_new_endpoint_create.c,
+           before endpoint creation, so the value can be directly used here.  */
+        packet_size = endpoint -> ux_endpoint_descriptor.wMaxPacketSize & UX_MAX_PACKET_SIZE_MASK;
+        n_trans = endpoint -> ux_endpoint_descriptor.wMaxPacketSize & UX_MAX_NUMBER_OF_TRANSACTIONS_MASK;
+        if (n_trans)
+        {
+            n_trans >>= UX_MAX_NUMBER_OF_TRANSACTIONS_SHIFT;
+            n_trans ++;
+            packet_size *= n_trans;
+        }
+        transfer_request -> ux_transfer_request_packet_length = packet_size;
+    }
 
     /* Remember the packet length.  */
     isoch_packet_payload_length =  transfer_request -> ux_transfer_request_packet_length;
