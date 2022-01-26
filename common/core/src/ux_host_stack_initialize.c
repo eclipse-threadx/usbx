@@ -87,7 +87,7 @@ UCHAR _ux_system_host_hcd_simulator_name[] =                                "ux_
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_initialize                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -131,6 +131,9 @@ UCHAR _ux_system_host_hcd_simulator_name[] =                                "ux_
 /*                                            instead of using them       */
 /*                                            directly,                   */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_initialize(UINT (*ux_system_host_change_function)(ULONG, UX_HOST_CLASS *, VOID *))
@@ -138,6 +141,10 @@ UINT  _ux_host_stack_initialize(UINT (*ux_system_host_change_function)(ULONG, UX
 
 UINT        status;
 UCHAR       *memory;
+#if defined(UX_HOST_STANDALONE)
+UINT        i;
+UX_DEVICE   *device;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_INITIALIZE, 0, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
@@ -196,8 +203,33 @@ UCHAR       *memory;
 
             /* Store memory in system structure.  */
             _ux_system_host -> ux_system_host_device_array =  (UX_DEVICE *) memory;
+
+#if defined(UX_HOST_STANDALONE)
+
+        /* Add devices to the enumeration list, with ENUM flags cleared.  */
+        if (status == UX_SUCCESS)
+        {
+
+            /* Start from the last device instance.  */
+            device = &_ux_system_host -> ux_system_host_device_array[UX_MAX_DEVICES - 1];
+
+            /* Insert all devices to enumeration list head.  */
+            for (i = 0; i < UX_MAX_DEVICES; i ++)
+            {
+
+                /* Insert to head.  */
+                device -> ux_device_enum_next = _ux_system_host -> ux_system_host_enum_device;
+                _ux_system_host -> ux_system_host_enum_device = device;
+
+                /* Next device.  */
+                device --;
+            }
+        }
+#endif
+
     }
 
+#if !defined(UX_HOST_STANDALONE)
     /* Obtain enough stack for the two USBX host threads.  */
     if (status == UX_SUCCESS)
     {
@@ -261,8 +293,9 @@ UCHAR       *memory;
         if(status != UX_SUCCESS)
             status = UX_THREAD_ERROR;
     }
+#endif
 
-#ifdef UX_OTG_SUPPORT                        
+#if defined(UX_OTG_SUPPORT) && !defined(UX_OTG_STANDALONE)
     /* Allocate another stack area for the HNP polling thread.  */
     if (status == UX_SUCCESS)
     {
@@ -315,6 +348,7 @@ UCHAR       *memory;
      * no need to delete it.  */
 #endif
 
+#if !defined(UX_HOST_STANDALONE)
     /* Delete _ux_system_host -> ux_system_host_enum_thread.  */
     if (_ux_system_host -> ux_system_host_enum_thread.tx_thread_id != 0)
         _ux_utility_thread_delete(&_ux_system_host -> ux_system_host_enum_thread);
@@ -334,7 +368,8 @@ UCHAR       *memory;
     /* Free _ux_system_host -> ux_system_host_enum_thread_stack.  */
     if (_ux_system_host -> ux_system_host_enum_thread_stack)
         _ux_utility_memory_free(_ux_system_host -> ux_system_host_enum_thread_stack);
-    
+#endif
+
     /* Free _ux_system_host -> ux_system_host_device_array.  */
     if (_ux_system_host -> ux_system_host_device_array)
         _ux_utility_memory_free(_ux_system_host -> ux_system_host_device_array);

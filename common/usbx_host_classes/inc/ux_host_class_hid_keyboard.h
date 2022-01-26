@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid_keyboard.h                        PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -204,11 +207,19 @@ typedef struct UX_HOST_CLASS_HID_KEYBOARD_STRUCT
     ULONG           ux_host_class_hid_keyboard_key_count;
     UX_HOST_CLASS_HID   *ux_host_class_hid_keyboard_hid;
     USHORT          ux_host_class_hid_keyboard_id;    
+#if !defined(UX_HOST_STANDALONE)
+    VOID            *ux_host_class_hid_keyboard_thread_stack;
     UX_THREAD       ux_host_class_hid_keyboard_thread;
     UX_SEMAPHORE    ux_host_class_hid_keyboard_semaphore;
+#else
+    UINT            ux_host_class_hid_keyboard_status;
+    UCHAR           ux_host_class_hid_keyboard_enum_state;
+    UCHAR           ux_host_class_hid_keyboard_next_state;
+    UCHAR           ux_host_class_hid_keyboard_out_state;
+    UCHAR           reserved;
+#endif
     ULONG           ux_host_class_hid_keyboard_alternate_key_state;
     ULONG           ux_host_class_hid_keyboard_led_mask;
-    VOID            *ux_host_class_hid_keyboard_thread_stack;
     ULONG           *ux_host_class_hid_keyboard_usage_array;
     ULONG           *ux_host_class_hid_keyboard_usage_array_head;
     ULONG           *ux_host_class_hid_keyboard_usage_array_tail;
@@ -227,6 +238,8 @@ UINT    _ux_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard
                                             ULONG *keyboard_key, ULONG *keyboard_state);
 UINT    _ux_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
                                         ULONG ioctl_function, VOID *parameter);
+
+VOID    _ux_host_class_hid_keyboard_tasks_run(UX_HOST_CLASS_HID_CLIENT *client);
 
 /* Define HID Keyboard Class API prototypes.  */
 

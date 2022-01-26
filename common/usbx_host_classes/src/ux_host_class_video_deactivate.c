@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_deactivate                     PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,8 +59,8 @@
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort outstanding transfer    */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_delete          Delete semaphore              */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_delete             Delete semaphore              */ 
 /*    _ux_utility_memory_free               Release memory block          */ 
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
 /*                                                                        */ 
@@ -82,6 +82,9 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            freed descriptor memory,    */
 /*                                            resulting in version 6.1.2  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -97,7 +100,7 @@ UINT                    status;
     video -> ux_host_class_video_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
 
         /* Return error.  */
@@ -109,7 +112,7 @@ UINT                    status;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
     /* Free descriptor memory.  */
     if (video -> ux_host_class_video_configuration_descriptor)
@@ -119,8 +122,8 @@ UINT                    status;
     _ux_host_stack_class_instance_destroy(video -> ux_host_class_video_class, (VOID *) video);
 
     /* Destroy the semaphores.  */
-    _ux_utility_semaphore_delete(&video -> ux_host_class_video_semaphore);
-    _ux_utility_semaphore_delete(&video -> ux_host_class_video_semaphore_control_request);
+    _ux_host_semaphore_delete(&video -> ux_host_class_video_semaphore);
+    _ux_host_semaphore_delete(&video -> ux_host_class_video_semaphore_control_request);
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

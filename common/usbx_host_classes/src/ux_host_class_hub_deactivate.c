@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_deactivate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,8 +61,8 @@
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort transfer                */ 
 /*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_put             Release semaphore             */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_put                Release semaphore             */ 
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -78,6 +78,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -123,7 +126,7 @@ UINT                    port_index;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
     /* Then de allocate the memory.  */
     _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);

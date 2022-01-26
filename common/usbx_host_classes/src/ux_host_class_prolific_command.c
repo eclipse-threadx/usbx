@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_prolific_command                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,7 +66,7 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */
+/*    _ux_host_semaphore_get                Get semaphore                 */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -79,6 +79,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_prolific_command(UX_HOST_CLASS_PROLIFIC *prolific, ULONG command,
@@ -96,7 +99,7 @@ UINT            status;
 
     /* Protect the control endpoint semaphore here.  It will be unprotected in the 
        transfer request function.  */
-    status =  _ux_utility_semaphore_get(&prolific -> ux_host_class_prolific_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&prolific -> ux_host_class_prolific_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)

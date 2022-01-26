@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_deactivate                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,12 +67,14 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_deactivate(UX_SLAVE_CLASS_COMMAND *command)
 {
                                           
-UX_SLAVE_INTERFACE          *interface;
 UX_SLAVE_CLASS_STORAGE      *storage;
 UX_SLAVE_ENDPOINT           *endpoint_in;
 UX_SLAVE_ENDPOINT           *endpoint_out;
@@ -84,11 +86,20 @@ UX_SLAVE_CLASS              *class;
     /* Get the class instance in the container.  */
     storage = (UX_SLAVE_CLASS_STORAGE *)class -> ux_slave_class_instance;
 
-    /* We need the interface to the class.  */
-    interface =  storage -> ux_slave_class_storage_interface;
-    
+#if defined(UX_DEVICE_STANDALONE)
+
+    endpoint_in = storage -> ux_device_class_storage_ep_in;
+    endpoint_out = storage -> ux_device_class_storage_ep_out;
+    _ux_device_stack_transfer_all_request_abort(endpoint_in, UX_TRANSFER_BUS_RESET);
+    _ux_device_stack_transfer_all_request_abort(endpoint_out, UX_TRANSFER_BUS_RESET);
+    endpoint_out -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                storage -> ux_device_class_storage_buffer[0];
+    endpoint_in -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                storage -> ux_device_class_storage_buffer[1];
+#else
+
     /* Locate the endpoints.  */
-    endpoint_in =  interface -> ux_slave_interface_first_endpoint;
+    endpoint_in =  storage -> ux_slave_class_storage_interface -> ux_slave_interface_first_endpoint;
     
     /* Check the endpoint direction, if IN we have the correct endpoint.  */
     if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
@@ -110,6 +121,7 @@ UX_SLAVE_CLASS              *class;
     /* Terminate the transactions pending on the endpoints.  */
     _ux_device_stack_transfer_all_request_abort(endpoint_in, UX_TRANSFER_BUS_RESET);
     _ux_device_stack_transfer_all_request_abort(endpoint_out, UX_TRANSFER_BUS_RESET);
+#endif
 
     /* If there is a deactivate function call it.  */
     if (storage -> ux_slave_class_storage_instance_deactivate != UX_NULL)

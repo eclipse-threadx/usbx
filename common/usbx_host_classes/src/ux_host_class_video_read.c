@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_read                           PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,8 +64,8 @@
 /*                                                                        */ 
 /*    _ux_host_class_video_transfer_request Video transfer request        */ 
 /*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_put             Put semaphore                 */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_put                Put semaphore                 */ 
 /*    _ux_system_error_handler              System error log              */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -84,6 +84,9 @@
 /*                                            used input request length   */
 /*                                            instead of wMaxPacketSize,  */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_read(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST *video_transfer_request)
@@ -104,7 +107,7 @@ UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
 
@@ -117,7 +120,7 @@ UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+        status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_VIDEO_WRONG_INTERFACE);
@@ -133,7 +136,7 @@ UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
     status =  _ux_host_class_video_transfer_request(video, transfer_list);
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+    _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
     /* Return completion status.  */
     return(status);

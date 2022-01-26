@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_sim_host_transaction_schedule               PORTABLE C      */
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,12 @@
 /*                                            improved check for tests,   */
 /*                                            added error trap case,      */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            cleared transfer status     */
+/*                                            before semaphore wakeup to  */
+/*                                            avoid a race condition,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_transaction_schedule(UX_HCD_SIM_HOST *hcd_sim_host, UX_HCD_SIM_HOST_ED *ed)
@@ -175,6 +181,13 @@ UX_SLAVE_DCD            *dcd;
         _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_setup,
                                 td -> ux_sim_host_td_buffer,
                                 td -> ux_sim_host_td_length); /* Use case of memcpy is verified. */
+
+#if defined(UX_HOST_STANDALONE)
+
+        /* The setup buffer is allocated, release it since it's used.  */
+        _ux_utility_memory_free(td -> ux_sim_host_td_buffer);
+        td -> ux_sim_host_td_buffer = UX_NULL;
+#endif
 
         /* The setup phase never fails. We acknowledge the transfer code here by taking the TD out of the endpoint.  */
         ed -> ux_sim_host_ed_head_td =  td -> ux_sim_host_td_next_td;
@@ -334,7 +347,7 @@ UX_SLAVE_DCD            *dcd;
             td -> ux_sim_host_td_status =  UX_UNUSED;
 
             /* Then, we wake up the host.  */
-            _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+            _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
         }
     }
     else
@@ -356,7 +369,7 @@ UX_SLAVE_DCD            *dcd;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_STALLED, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             /* Wake up the host side.  */
-            _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+            _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
             /* Clean up this ED.  */
             head_td =  ed -> ux_sim_host_ed_head_td;
@@ -475,11 +488,14 @@ UX_SLAVE_DCD            *dcd;
                 if (slave_ed -> ux_sim_slave_ed_index != 0)
                 {
 
-                    /* Reset the ED to NO TRANSFER status.  */
+                    /* Clear pending flag.  */
                     slave_ed -> ux_sim_slave_ed_status &= ~(ULONG)UX_DCD_SIM_SLAVE_ED_STATUS_TRANSFER;
 
+                    /* Set done flag.  */
+                    slave_ed -> ux_sim_slave_ed_status |= UX_DCD_SIM_SLAVE_ED_STATUS_DONE;
+
                     /* Wake up the slave side.  */
-                    _ux_utility_semaphore_put(&slave_transfer_request -> ux_slave_transfer_request_semaphore);
+                    _ux_device_semaphore_put(&slave_transfer_request -> ux_slave_transfer_request_semaphore);
                 }
             }
 
@@ -525,7 +541,7 @@ UX_SLAVE_DCD            *dcd;
                     transfer_request -> ux_transfer_request_completion_function(transfer_request);
 
                 /* Wake up the host side.  */
-                _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
             }
         }
     }

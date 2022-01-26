@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_delay_ms                                PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,12 +70,25 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings 64b, */
 /*                                            resulting in version 6.1.2  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_delay_ms(ULONG ms_wait)
 {
 
 ULONG   ticks;
+
+#if defined(UX_STANDALONE)
+
+    /* Get current time.  */
+    ticks = _ux_utility_time_get();
+
+    /* Wait until timeout.  */
+    while(_ux_utility_time_elapsed(ticks, _ux_utility_time_get()) <
+            UX_MS_TO_TICK_NON_ZERO(ms_wait));
+#else
 
     /* translate ms into ticks. */
     ticks = (ULONG)(ms_wait * UX_PERIODIC_RATE) / 1000;
@@ -85,8 +98,8 @@ ULONG   ticks;
 
     /* Call ThreadX sleep function.  */
     tx_thread_sleep(ticks);
+#endif
 
     /* Return completion status.  */
     return;
 }
-                                

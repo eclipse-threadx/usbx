@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_device_configuration_reset           PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*                                            used pointer for current    */
 /*                                            selected configuration,     */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed device state support, */
+/*                                            reset device power source,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_reset(UX_DEVICE *device)
@@ -105,8 +109,11 @@ UINT                    status;
     /* No configuration is selected now.  */
     device -> ux_device_current_configuration = UX_NULL;
 
-    /* Set state of device to ATTACHED.  */
-    device -> ux_device_state = UX_DEVICE_ATTACHED;
+    /* Set state of device to ADDRESSED.  */
+    device -> ux_device_state = UX_DEVICE_ADDRESSED;
+
+    /* Reset power source.  */
+    device -> ux_device_power_source = UX_DEVICE_BUS_POWERED;
 
     /* Create a transfer_request for the SET_CONFIGURATION request. No data for this request.  */
     transfer_request -> ux_transfer_request_requested_length =  0;

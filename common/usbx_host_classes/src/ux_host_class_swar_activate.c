@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_swar_activate                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,7 +60,7 @@
 /*    _ux_host_stack_class_instance_destroy   Destroy the class instance  */ 
 /*    _ux_utility_memory_allocate             Allocate memory block       */ 
 /*    _ux_utility_memory_free                 Free memory block           */ 
-/*    _ux_utility_semaphore_create            Create swar semaphore       */ 
+/*    _ux_host_semaphore_create               Create swar semaphore       */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_activate(UX_HOST_CLASS_COMMAND *command)
@@ -114,7 +117,7 @@ UINT                                status;
     /* Create the semaphore to protect 2 threads from accessing the same swar instance.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&swar -> ux_host_class_swar_semaphore, "ux_host_class_swar_semaphore", 1);
+        status =  _ux_host_semaphore_create(&swar -> ux_host_class_swar_semaphore, "ux_host_class_swar_semaphore", 1);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }

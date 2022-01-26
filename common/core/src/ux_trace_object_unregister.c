@@ -29,7 +29,7 @@
 
 #include "ux_api.h"
 
-#ifdef TX_ENABLE_EVENT_TRACE
+#ifdef UX_ENABLE_EVENT_TRACE
 extern VOID _tx_trace_object_unregister(VOID *);
 /**************************************************************************/ 
 /*                                                                        */ 

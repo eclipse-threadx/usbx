@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_interrupt_thread           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,7 +57,7 @@
 /*    _ux_device_stack_transfer_request     Request transfer              */ 
 /*    _ux_utility_event_flags_get           Get event flags               */
 /*    _ux_utility_short_put                 Put 16-bit value to buffer    */
-/*    _ux_utility_thread_suspend            Suspend thread                */
+/*    _ux_device_thread_suspend             Suspend thread                */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -73,6 +73,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_interrupt_thread(ULONG cdc_ecm_class)
@@ -151,7 +154,7 @@ UCHAR                           *notification_buffer;
         }
 
         /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
-        _ux_utility_thread_suspend(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread);
+        _ux_device_thread_suspend(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread);
     }
 }
 

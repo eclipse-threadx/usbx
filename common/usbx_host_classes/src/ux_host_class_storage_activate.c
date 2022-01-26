@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_activate                     PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,7 +61,7 @@
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */
 /*    _ux_utility_memory_allocate           Allocate memory block         */
 /*    _ux_utility_memory_free               Free memory block             */
-/*    _ux_utility_semaphore_create          Create semaphore              */
+/*    _ux_host_semaphore_create             Create semaphore              */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -74,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support.   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_activate(UX_HOST_CLASS_COMMAND *command)
@@ -109,13 +112,42 @@ UINT                    status;
     /* This instance of the device must also be stored in the interface container.  */
     interface -> ux_interface_class_instance =  (VOID *) storage;
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Check class,sub class, protocol.  */
+    status =  _ux_host_class_storage_device_support_check(storage);
+    if (status != UX_SUCCESS)
+    {
+        _ux_utility_memory_free(storage);
+        return(status);
+    }
+
+    /* Search all the endpoints for the storage interface (Bulk Out, Bulk in,
+       and optional Interrupt endpoint).  */
+    status =  _ux_host_class_storage_endpoints_get(storage);
+    if (status != UX_SUCCESS)
+    {
+        _ux_utility_memory_free(storage);
+        return(status);
+    }
+
+    /* Activate storage class task function.  */
+    storage -> ux_host_class_storage_class -> ux_host_class_task_function = _ux_host_class_storage_tasks_run;
+
+    /* Mark the storage as live now (media mounts in task).  */
+    storage -> ux_host_class_storage_state = UX_HOST_CLASS_INSTANCE_MOUNTING;
+
+    /* Keep storage locked before it's initialized.  */
+    storage -> ux_host_class_storage_flags |= UX_HOST_CLASS_STORAGE_FLAG_LOCK;
+#else
+
     /* Configure the USB storage device.  */
     status =  _ux_host_class_storage_configure(storage);
 
     /* Create the semaphore to protect multiple threads from accessing the same storage instance.  */
     if (status == UX_SUCCESS)
     {
-        status = _ux_utility_semaphore_create(&storage -> ux_host_class_storage_semaphore, "ux_host_class_storage_semaphore", 1);
+        status = _ux_host_semaphore_create(&storage -> ux_host_class_storage_semaphore, "ux_host_class_storage_semaphore", 1);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }
@@ -148,6 +180,8 @@ UINT                    status;
 
     /* Mark the storage as live now.  */
     storage -> ux_host_class_storage_state =  UX_HOST_CLASS_INSTANCE_LIVE;
+
+#endif
 
     /* If all is fine and the device is mounted, we may need to inform the application
        if a function has been programmed in the system structure.  */

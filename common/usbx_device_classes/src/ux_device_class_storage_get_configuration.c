@@ -302,7 +302,7 @@ UCHAR usbx_device_class_storage_configuration_active_profile[] = {
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_get_configuration          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -345,6 +345,9 @@ UCHAR usbx_device_class_storage_configuration_active_profile[] = {
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_configuration(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -423,11 +426,6 @@ ULONG                   feature;
             
         }
 
-        /* Send a data payload with the configuration profile response buffer.  */
-        _ux_device_stack_transfer_request(transfer_request, 
-                                  allocation_length,
-                                  allocation_length);
-
         /* Now success.  */
         status = UX_SUCCESS;
     }
@@ -465,12 +463,7 @@ ULONG                   feature;
                 _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
                                                     profile_pointer, 
                                                     allocation_length); /* Use case of memcpy is verified. */
-            
-                /* Send a data payload with the read_capacity response buffer.  */
-                _ux_device_stack_transfer_request(transfer_request, 
-                                          allocation_length,
-                                          allocation_length);
-        
+
                 /* Now success.  */
                 status = UX_SUCCESS;
 
@@ -485,7 +478,6 @@ ULONG                   feature;
                 {
 
                     /* We are either at the end of the profile or the profile is corrupted.  */
-                    _ux_device_stack_endpoint_stall(endpoint_in);
 
                     /* And update the REQUEST_SENSE codes.  */
                     storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
@@ -512,6 +504,39 @@ ULONG                   feature;
                 }
             }
         }        
+    }
+
+    /* Success, send data.  */
+    if (status == UX_SUCCESS)
+    {
+
+#if defined(UX_DEVICE_STANDALONE)
+
+        /* Next: Transfer (DATA).  */
+        storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+        storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_READ;
+
+        storage -> ux_device_class_storage_transfer = transfer_request;
+        storage -> ux_device_class_storage_device_length = allocation_length;
+        storage -> ux_device_class_storage_data_length = allocation_length;
+        storage -> ux_device_class_storage_data_count = 0;
+        UX_SLAVE_TRANSFER_STATE_RESET(storage -> ux_device_class_storage_transfer);
+#else
+
+        /* Send a data payload with the read_capacity response buffer.  */
+        _ux_device_stack_transfer_request(transfer_request, 
+                                    allocation_length,
+                                    allocation_length);
+#endif
+
+    }
+    else
+    {
+
+        /* Error, stall.  */
+#if !defined(UX_DEVICE_STANDALONE)
+        _ux_device_stack_endpoint_stall(endpoint_in);
+#endif
     }
 
     /* Return completion status.  */

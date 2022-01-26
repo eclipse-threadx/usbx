@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_endpoints_get                  PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_endpoints_get(UX_HOST_CLASS_DPUMP *dpump)
@@ -97,6 +100,10 @@ UX_ENDPOINT     *endpoint;
 
                 /* This transfer_request always have the OUT direction.  */
                 endpoint -> ux_endpoint_transfer_request.ux_transfer_request_type =  UX_REQUEST_OUT;
+
+                /* Setup default timeout value.  */
+                endpoint -> ux_endpoint_transfer_request.ux_transfer_request_timeout_value =
+                                                        UX_HOST_CLASS_DPUMP_CLASS_TRANSFER_TIMEOUT;
 
                 /* We have found the bulk endpoint, save it.  */
                 dpump -> ux_host_class_dpump_bulk_out_endpoint =  endpoint;
@@ -138,6 +145,10 @@ UX_ENDPOINT     *endpoint;
 
                 /* This transfer_request always have the IN direction.  */
                 endpoint -> ux_endpoint_transfer_request.ux_transfer_request_type =  UX_REQUEST_IN;
+
+                /* Setup default timeout value.  */
+                endpoint -> ux_endpoint_transfer_request.ux_transfer_request_timeout_value =
+                                                        UX_HOST_CLASS_DPUMP_CLASS_TRANSFER_TIMEOUT;
 
                 /* We have found the bulk endpoint, save it.  */
                 dpump -> ux_host_class_dpump_bulk_in_endpoint =  endpoint;

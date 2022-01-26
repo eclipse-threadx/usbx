@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_rh_device_insertion                  PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,11 +81,41 @@
 /*                                            added disconnection check   */
 /*                                            in enumeration retries,     */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_rh_device_insertion(UX_HCD *hcd, UINT port_index)
 {
+#if defined(UX_HOST_STANDALONE)
+UX_DEVICE   *device;
+UINT        status;
 
+
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_RH_DEVICE_INSERTION, hcd, port_index, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+
+    /* Anyway there is device connected.  */
+    hcd -> ux_hcd_rh_device_connection |= (ULONG)(1 << port_index);
+
+    /* Create a new device slot for enumeration.  */
+    status =  _ux_host_stack_new_device_create(hcd, UX_NULL, port_index,
+                                        UX_FULL_SPEED_DEVICE, UX_MAX_SELF_POWER,
+                                        &device);
+
+    /* Link the device in enumeration list.  */
+    if (status == UX_SUCCESS)
+    {
+
+        /* Set enumeration flag to process enumeration sequence.  */
+        device -> ux_device_flags |= UX_DEVICE_FLAG_ENUM;
+
+        /* Done success.  */
+        return(UX_SUCCESS);
+    }
+
+#else
 UX_DEVICE   *device;
 UINT        index_loop;
 UINT        device_speed;
@@ -195,6 +225,7 @@ UINT        status;
            so we try again ! */
         _ux_utility_delay_ms(UX_RH_ENUMERATION_RETRY_DELAY);
     }
+#endif /* defined(UX_HOST_STANDALONE)  */
 
     /* If we get here, the device did not enumerate completely.
        The device is still attached to the root hub and therefore
@@ -218,4 +249,3 @@ UINT        status;
     /* Return a failed enumeration.  */
     return(UX_DEVICE_ENUMERATION_FAILURE);
 }
-

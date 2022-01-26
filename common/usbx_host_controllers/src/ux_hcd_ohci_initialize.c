@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_initialize                             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Xiuwen Cai               Modified comment(s),          */
+/*                                            fixed HcPeriodicStart value,*/
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_initialize(UX_HCD *hcd)
@@ -210,9 +213,9 @@ UINT            status;
     ohci_register |=  OHCI_HC_FM_INTERVAL_SET;
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_FM_INTERVAL, ohci_register);
     
-    /* Set the default Periodic Start value. In some controller, a reset will set the default value
-       but in some controller this value has to be set manually (like the LPC2468. ) */
-    _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_PERIODIC_START, UX_OHCI_HC_PERIODIC_START_DEFAULT);
+    /* Set HcPeriodicStart to a value that is 90% of the value in FrameInterval field of the HcFmInterval register.  */
+    ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_FM_INTERVAL) & OHCI_HC_FM_INTERVAL_FI_MASK;
+    _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_PERIODIC_START, ohci_register * 9 / 10);
 
     /* Reset all the OHCI interrupts and re-enable only the ones we will use.  */
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_INTERRUPT_DISABLE, OHCI_HC_INTERRUPT_DISABLE_ALL);

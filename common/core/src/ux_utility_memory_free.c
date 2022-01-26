@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_memory_free                             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_memory_free(VOID *memory)
@@ -75,9 +78,39 @@ UX_MEMORY_BLOCK     *memory_block;
 UX_MEMORY_BLOCK     *next_block;
 ULONG               memory_size_returned;
 UCHAR               *memory_address;
+#ifdef UX_ENABLE_MEMORY_POOL_SANITY_CHECK
+UCHAR               *regular_start, *regular_end;
+UCHAR               *cache_safe_start, *cache_safe_end;
+#endif
 
     /* Get the mutex as this is a critical section.  */
-    _ux_utility_mutex_on(&_ux_system -> ux_system_mutex);
+    _ux_system_mutex_on(&_ux_system -> ux_system_mutex);
+
+#ifdef UX_ENABLE_MEMORY_POOL_SANITY_CHECK
+
+    /* Sanity check, check if the memory is in memory pool.  */
+    regular_start = (UCHAR *)_ux_system -> ux_system_regular_memory_pool_start;
+    regular_end = regular_start + _ux_system -> ux_system_regular_memory_pool_size;
+    regular_start += sizeof(UX_MEMORY_BLOCK);
+    cache_safe_start = (UCHAR *)_ux_system -> ux_system_cache_safe_memory_pool_start;
+    cache_safe_end = cache_safe_start + _ux_system -> ux_system_cache_safe_memory_pool_size;
+    cache_safe_start += sizeof(UX_MEMORY_BLOCK);
+    memory_address = (UCHAR *)memory;
+    if (!((memory_address >= regular_start    && memory_address < regular_end) ||
+          (memory_address >= cache_safe_start && memory_address < cache_safe_end)))
+    {
+
+        /* Not valid. Release the protection.  */
+        _ux_system_mutex_off(&_ux_system -> ux_system_mutex);
+
+        /* Error trap.  */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD,
+                                UX_SYSTEM_CONTEXT_UTILITY, UX_MEMORY_CORRUPTED);
+
+        /* No action taken.  */
+        return;
+    }
+#endif
 
     /* The memory block for this memory pointer is located right before the
        memory.  */
@@ -92,7 +125,7 @@ UCHAR               *memory_address;
     {
 
         /* Not valid. Release the protection.  */
-        _ux_utility_mutex_off(&_ux_system -> ux_system_mutex);
+        _ux_system_mutex_off(&_ux_system -> ux_system_mutex);
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_UTILITY, UX_MEMORY_CORRUPTED);
@@ -192,7 +225,7 @@ UCHAR               *memory_address;
     }
 
     /* Release the protection.  */
-    _ux_utility_mutex_off(&_ux_system -> ux_system_mutex);
+    _ux_system_mutex_off(&_ux_system -> ux_system_mutex);
 
     /* Return to caller.  */
     return;

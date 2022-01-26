@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_uninitialize                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,7 +53,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _ux_utility_thread_delete             Delete thread used            */
+/*    _ux_device_thread_delete              Delete thread used            */
 /*    _ux_utility_memory_free               Free used local memory        */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -67,6 +67,11 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            added feedback support,     */
+/*                                            fixed stream uninitialize,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -92,9 +97,19 @@ ULONG                            i;
         stream = (UX_DEVICE_CLASS_AUDIO_STREAM *)((UCHAR *)audio + sizeof(UX_DEVICE_CLASS_AUDIO));
         for (i = 0; i < audio -> ux_device_class_audio_streams_nb; i ++)
         {
-            _ux_utility_thread_delete(&stream -> ux_device_class_audio_stream_thread);
+            _ux_device_thread_delete(&stream -> ux_device_class_audio_stream_thread);
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+            if (stream -> ux_device_class_audio_stream_feedback_thread_stack)
+            {
+                _ux_utility_thread_delete(&stream -> ux_device_class_audio_stream_feedback_thread);
+                _ux_utility_memory_free(stream -> ux_device_class_audio_stream_feedback_thread_stack);
+            }
+#endif
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_thread_stack);
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_buffer);
+
+            /* Next stream instance.  */
+            stream++;
         }
 
         /* Free the audio instance with controls and streams.  */

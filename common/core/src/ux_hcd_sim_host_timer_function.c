@@ -27,6 +27,8 @@
 
 #include "ux_api.h"
 #include "ux_hcd_sim_host.h"
+
+#if !defined(UX_HOST_STANDALONE)
 #include "tx_timer.h"
 
 
@@ -35,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_timer_function                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +46,8 @@
 /*                                                                        */ 
 /*     This function is the timer function of the simulator. It is        */
 /*     invoked on a timer every tick.                                     */ 
+/*                                                                        */
+/*     It's for RTOS mode.                                                */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -68,6 +72,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros to configure    */
+/*                                            for RTOS mode compile,      */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_sim_host_timer_function(ULONG hcd_sim_host_addr)
@@ -92,8 +100,7 @@ UX_HCD              *hcd;
 
         /* Wake up the thread for the controller transaction processing.  */
         hcd -> ux_hcd_thread_signal++;
-        _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
+        _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
     }
 }
-
-
+#endif

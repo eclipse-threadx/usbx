@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_fsisochronous_tds_process              PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,7 +60,7 @@
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    (ux_transfer_request_completion_function) Completion function       */
-/*    _ux_utility_semaphore_put             Put semaphore                 */
+/*    _ux_host_semaphore_put                Put semaphore                 */
 /*    _ux_utility_physical_address          Get physical address          */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -74,6 +74,8 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_FSISO_TD* _ux_hcd_ehci_fsisochronous_tds_process(

@@ -36,7 +36,7 @@ UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_activate                     PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -62,8 +62,8 @@ UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*    _ux_host_stack_class_instance_destroy    Destroy the class instance */ 
 /*    _ux_utility_memory_allocate              Allocate memory block      */ 
 /*    _ux_utility_memory_free                  Free memory block          */ 
-/*    _ux_utility_semaphore_create             Create semaphore           */
-/*    _ux_utility_semaphore_delete             Delete semaphore           */
+/*    _ux_host_semaphore_create                Create semaphore           */
+/*    _ux_host_semaphore_delete                Delete semaphore           */
 /*    _ux_utility_thread_create                Create thread              */
 /*    _ux_utility_thread_delete                Delete thread              */
 /*    _ux_utility_thread_resume                Resume thread              */
@@ -89,6 +89,9 @@ UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*                                            compile option for using    */
 /*                                            packet pool from NetX,      */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_activate(UX_HOST_CLASS_COMMAND *command)
@@ -214,19 +217,19 @@ UX_INTERFACE                        *cur_interface;
     {
 
         /* Create the semaphore for aborting bulk in transfers.  */
-        status =  _ux_utility_semaphore_create(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, 
+        status =  _ux_host_semaphore_create(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, 
                                                "host CDC-ECM bulk in wait semaphore", 0);
         if (status == UX_SUCCESS)
         {
 
             /* Create the semaphore for aborting bulk out transfers.  */
-            status =  _ux_utility_semaphore_create(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore, 
+            status =  _ux_host_semaphore_create(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore, 
                                                    "host CDC-ECM bulk out wait semaphore", 0);
             if (status == UX_SUCCESS)
             {
 
                 /* Create the semaphore to wake up the CDC ECM thread.  */
-                status =  _ux_utility_semaphore_create(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore, "host CDC-ECM interrupt notification semaphore", 0);
+                status =  _ux_host_semaphore_create(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore, "host CDC-ECM interrupt notification semaphore", 0);
                 if (status == UX_SUCCESS)
                 {
 #ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
@@ -350,15 +353,15 @@ UX_INTERFACE                        *cur_interface;
                     }
 #endif
                     /* Delete interrupt notification semaphore.  */
-                    _ux_utility_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
+                    _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
                 }
 
                 /* Delete class-level bulk out semaphore.  */
-                _ux_utility_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore);
+                _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore);
             }
 
             /* Delete class-level bulk in semaphore.  */
-            _ux_utility_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
+            _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
         }
     }
 

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_activate                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -52,7 +52,7 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    _ux_utility_thread_resume             Resume thread                 */ 
+/*    _ux_device_thread_resume              Resume thread                 */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -65,6 +65,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            added variables initialize, */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -126,8 +130,13 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
     pima -> ux_device_class_pima_bulk_out_endpoint          = endpoint_out;
     pima -> ux_device_class_pima_interrupt_endpoint         = endpoint_interrupt;
 
+    /* Initialize status code.  */
+    pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_IDLE;
+    pima -> ux_device_class_pima_session_id = 0;
+    pima -> ux_device_class_pima_device_status = UX_DEVICE_CLASS_PIMA_RC_OK;
+
     /* Resume thread.  */
-    status =  _ux_utility_thread_resume(&class -> ux_slave_class_thread); 
+    status =  _ux_device_thread_resume(&class -> ux_slave_class_thread); 
     
     /* If there is a activate function call it.  */
     if (pima -> ux_device_class_pima_instance_activate != UX_NULL)

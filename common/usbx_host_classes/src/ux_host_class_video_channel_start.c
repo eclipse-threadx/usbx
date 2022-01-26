@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_channel_start                  PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,8 +61,8 @@
 /*                                          Select alternate setting      */
 /*    _ux_host_stack_interface_endpoint_get Get interface endpoint        */
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_put             Release semaphore             */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_put                Release semaphore             */ 
 /*    _ux_utility_memory_allocate           Allocate memory block         */ 
 /*    _ux_utility_memory_free               Release memory block          */ 
 /*    _ux_utility_long_get                  Get 32-bit value              */
@@ -82,6 +82,9 @@
 /*                                            fixed bandwidth check,      */
 /*                                            saved max payload size,     */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_channel_start(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_PARAMETER_CHANNEL *video_parameter)
@@ -101,7 +104,7 @@ UINT                    max_payload_size;
 
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
 
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &video -> ux_host_class_video_device -> ux_device_control_endpoint;
@@ -116,7 +119,7 @@ UINT                    max_payload_size;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+        status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Return error.  */        
         return(UX_MEMORY_INSUFFICIENT);
@@ -252,7 +255,7 @@ UINT                    max_payload_size;
                                                 _ux_utility_memory_free(control_buffer);
 
                                                 /* Unprotect thread reentry to this instance.  */
-                                                status =  _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+                                                status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
                     
                                                 /* Return successful completion.  */
                                                 return(UX_SUCCESS);             
@@ -274,7 +277,7 @@ UINT                    max_payload_size;
     _ux_utility_memory_free(control_buffer);
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+    _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
     /* Return completion status.  */
     return(status);

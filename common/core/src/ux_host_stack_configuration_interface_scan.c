@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_configuration_interface_scan         PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_configuration_interface_scan(UX_CONFIGURATION *configuration)
@@ -124,6 +127,13 @@ UINT                    status;
         interface =  interface -> ux_interface_next_interface;
     }
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Activated later in state machine.  */
+    status = (nb_class_owners > 0) ? UX_SUCCESS : UX_NO_CLASS_MATCH;
+    return(status);
+#else
+
     /* Assume no classes.  */
     status = UX_NO_CLASS_MATCH;
 
@@ -175,5 +185,6 @@ UINT                    status;
 
     /* Return operation result.  */
     return(status);
+#endif
 }
 

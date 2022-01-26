@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_report_key                 PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warning,      */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -141,18 +144,31 @@ ULONG                   key_format;
                 /* Adjust the reply.  */
                 allocation_length = UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH;                
 
-            /* Send a data payload with the read_capacity response buffer.  */
-            _ux_device_stack_transfer_request(transfer_request, allocation_length, allocation_length);  /* Use case of memset is verified. */
-
             break;
           
         default :
-
-            /* Send a data payload with the read_capacity response buffer.  */
-            status =  _ux_device_stack_transfer_request(transfer_request, 0, 0); 
+            allocation_length = 0;
             break;
                 
     }
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Next: Transfer (DATA).  */
+    storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+    storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_READ;
+
+    storage -> ux_device_class_storage_transfer = transfer_request;
+    storage -> ux_device_class_storage_device_length = allocation_length;
+    storage -> ux_device_class_storage_data_length = allocation_length;
+    storage -> ux_device_class_storage_data_count = 0;
+    UX_SLAVE_TRANSFER_STATE_RESET(storage -> ux_device_class_storage_transfer);
+
+#else
+
+    /* Send a data payload with the read_capacity response buffer.  */
+    status = _ux_device_stack_transfer_request(transfer_request, allocation_length, allocation_length);  /* Use case of memset is verified. */
+#endif
 
     /* Now we set the CSW with success.  */
     storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;

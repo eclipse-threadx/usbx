@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_request_control_transfer               PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,7 +67,7 @@
 /*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
 /*    _ux_utility_memory_allocate           Allocate memory block         */ 
 /*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
 /*    _ux_utility_short_put                 Write a 16-bit value          */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -83,6 +83,7 @@
 /*                                            prefixed UX to MS_TO_TICK,  */
 /*                                            resulting in version 6.1    */
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
 /*                                                                        */
@@ -211,7 +212,7 @@ UINT            pid;
     ed -> ux_ehci_ed_queue_element =  (UX_EHCI_TD *) td_component;
 
     /* Wait for the completion of the transfer request.  */
-    status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_CONTROL_TRANSFER_TIMEOUT));
+    status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_CONTROL_TRANSFER_TIMEOUT));
 
     /* If the semaphore did not succeed we probably have a time out.  */
     if (status != UX_SUCCESS)

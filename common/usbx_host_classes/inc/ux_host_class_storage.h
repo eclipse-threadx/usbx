@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_storage.h                             PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,6 +61,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -78,7 +81,7 @@ extern   "C" {
 #endif  
 
 
-#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX) && !defined(UX_HOST_STANDALONE)
 /* Include the FileX API.  */
 #include "fx_api.h"
 
@@ -142,6 +145,11 @@ extern   "C" {
 #ifndef UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE
 #define UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE             UX_THREAD_STACK_SIZE
 #endif
+
+#if defined(UX_HOST_STANDALONE) && !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+#define UX_HOST_CLASS_STORAGE_NO_FILEX
+#endif
+
 
 /* Define Storage Class constants.  */
 
@@ -376,6 +384,21 @@ extern   "C" {
 #define UX_HOST_CLASS_STORAGE_SENSE_KEY_VOLUME_OVERFLOW                 0x0d
 #define UX_HOST_CLASS_STORAGE_SENSE_KEY_MISCOMPARE                      0x0e
 
+#define UX_HOST_CLASS_STORAGE_SENSE_CODE_NOT_READY                      0x04
+#define UX_HOST_CLASS_STORAGE_SENSE_CODE_WRITE_PROTECTED                0x27
+#define UX_HOST_CLASS_STORAGE_SENSE_CODE_NOT_READY_TO_READY             0x28
+#define UX_HOST_CLASS_STORAGE_SENSE_CODE_NOT_PRESENT                    0x3A
+
+/* Convertion between sense status and sense key, ASC, ASCQ.  */
+
+#define UX_HOST_CLASS_STORAGE_SENSE_STATUS(key,ascode,ascqualifier)     (((key) << 16) | ((ascode) << 8) | (ascqualifier))
+#define UX_HOST_CLASS_STORAGE_SENSE_QUALIFIER(status)                   ((status) & 0xFF)
+#define UX_HOST_CLASS_STORAGE_SENSE_CODE(status)                        (((status) >> 8) & 0xFF)
+#define UX_HOST_CLASS_STORAGE_SENSE_KEY(status)                         (((status) >> 16) & 0xFF)
+#define UX_HOST_CLASS_STORAGE_SENSE_ASCQ(status)                        UX_HOST_CLASS_STORAGE_SENSE_QUALIFIER(status)
+#define UX_HOST_CLASS_STORAGE_SENSE_ASC(status)                         UX_HOST_CLASS_STORAGE_SENSE_CODE(status)
+
+
 /* Define Mode Sense page codes. */
 #define UX_HOST_CLASS_STORAGE_MODE_SENSE_RWER_PAGE                      0x01
 #define UX_HOST_CLASS_STORAGE_MODE_SENSE_FD_PAGE                        0x05
@@ -457,17 +480,106 @@ typedef struct UX_HOST_CLASS_STORAGE_STRUCT
 #endif
     ULONG           ux_host_class_storage_sector_size;
     ULONG           ux_host_class_storage_data_phase_length;
-    UINT            (*ux_host_class_storage_transport) (struct UX_HOST_CLASS_STORAGE_STRUCT *storage, UCHAR * data_pointer);
     ULONG           ux_host_class_storage_sense_code;
     UCHAR           *ux_host_class_storage_memory;
+#if !defined(UX_HOST_STANDALONE)
+    UINT            (*ux_host_class_storage_transport) (struct UX_HOST_CLASS_STORAGE_STRUCT *storage, UCHAR * data_pointer);
     UX_SEMAPHORE    ux_host_class_storage_semaphore;
+#else
+    ULONG           ux_host_class_storage_flags;
+    UINT            ux_host_class_storage_status;
+    UCHAR           *ux_host_class_storage_sense_memory;
+
+    /* State info for transport state machine.  */
+    UX_TRANSFER     *ux_host_class_storage_trans;
+    UCHAR           *ux_host_class_storage_trans_data;
+    UCHAR           *ux_host_class_storage_trans_data_bak;
+    UCHAR           ux_host_class_storage_trans_state;
+    UCHAR           ux_host_class_storage_trans_stage;
+    UCHAR           ux_host_class_storage_trans_retry;
+    UCHAR           ux_host_class_storage_trans_status;
+
+    /* State info for media main state machine.  */
+    ULONG           ux_host_class_storage_delay_start;
+    ULONG           ux_host_class_storage_delay_ms;
+    UCHAR           ux_host_class_storage_state_state;
+    UCHAR           ux_host_class_storage_state_next;
+    UCHAR           ux_host_class_storage_check_lun;
+    UCHAR           ux_host_class_storage_op_state;
+    UCHAR           ux_host_class_storage_dbg_state;
+    UCHAR           ux_host_class_storage_dbg_rw_state;
+    UCHAR           ux_host_class_storage_dbg_trans_state;
+    UCHAR           ux_host_class_storage_dbg_trans_stage;
+    ULONG           ux_host_class_storage_dbg_state_count;
+    ULONG           ux_host_class_storage_dbg_rw_state_count;
+    ULONG           ux_host_class_storage_dbg_trans_state_count;
+
+#endif
 } UX_HOST_CLASS_STORAGE;
 
+#define UX_HOST_CLASS_STORAGE_FLAG_PROTECT              (1ul << 0)
+#define UX_HOST_CLASS_STORAGE_FLAG_LOCK                 (1ul << 1)
+#define UX_HOST_CLASS_STORAGE_FLAG_CHECK_CURRENT        (1ul << 2)
+
+/* Read/write states.  */
+
+#define UX_HOST_CLASS_STORAGE_RW_STATE_RESET(s)         ((s) -> ux_host_class_storage_op_state = UX_STATE_RESET)
+#define UX_HOST_CLASS_STORAGE_RW_STATE_IS_IDLE(s)       ((s) -> ux_host_class_storage_op_state == UX_STATE_IDLE)
+#define UX_HOST_CLASS_STORAGE_RW_STATE_IS_RESET(s)      ((s) -> ux_host_class_storage_op_state == UX_STATE_RESET)
+#define UX_HOST_CLASS_STORAGE_RW_IS_IDLE(s)             (UX_HOST_CLASS_STORAGE_RW_STATE_IS_IDLE(s) || UX_HOST_CLASS_STORAGE_RW_STATE_IS_RESET(s))
+
+/* Main states.  */
+
+#define UX_HOST_CLASS_STORAGE_STATE_MAX_LUN_GET         (UX_STATE_CLASS_STEP + 0)
+#define UX_HOST_CLASS_STORAGE_STATE_MAX_LUN_SAVE        (UX_STATE_CLASS_STEP + 1)
+#define UX_HOST_CLASS_STORAGE_STATE_CHECK_START         (UX_STATE_CLASS_STEP + 2)
+#define UX_HOST_CLASS_STORAGE_STATE_LOCK_WAIT           (UX_STATE_CLASS_STEP + 3)
+#define UX_HOST_CLASS_STORAGE_STATE_TEST_READY          (UX_STATE_CLASS_STEP + 4)
+#define UX_HOST_CLASS_STORAGE_STATE_TEST_CHECK          (UX_STATE_CLASS_STEP + 5)
+#define UX_HOST_CLASS_STORAGE_STATE_INQUIRY             (UX_STATE_CLASS_STEP + 6)
+#define UX_HOST_CLASS_STORAGE_STATE_INQUIRY_SAVE        (UX_STATE_CLASS_STEP + 7)
+#define UX_HOST_CLASS_STORAGE_STATE_FORMAT_CAP_GET      (UX_STATE_CLASS_STEP + 8)
+#define UX_HOST_CLASS_STORAGE_STATE_FORMAT_CAP_SAVE     (UX_STATE_CLASS_STEP + 9)
+#define UX_HOST_CLASS_STORAGE_STATE_CAP_GET             (UX_STATE_CLASS_STEP + 10)
+#define UX_HOST_CLASS_STORAGE_STATE_CAP_SAVE            (UX_STATE_CLASS_STEP + 11)
+#define UX_HOST_CLASS_STORAGE_STATE_NEXT_LUN            (UX_STATE_CLASS_STEP + 12)
+#define UX_HOST_CLASS_STORAGE_STATE_DELAY_WAIT          (UX_STATE_CLASS_STEP + 13)
+#define UX_HOST_CLASS_STORAGE_STATE_TRANSPORT           (UX_STATE_CLASS_STEP + 14)
+#define UX_HOST_CLASS_STORAGE_STATE_TRANSFER            (UX_STATE_CLASS_STEP + 15)
+#define UX_HOST_CLASS_STORAGE_STATE_CHECK_DONE          (UX_STATE_CLASS_STEP + 16)
+
+/* Transport states.  */
+
+#define UX_HOST_CLASS_STORAGE_TRANS_STATE_RESET(s)      do {                    \
+        (s) -> ux_host_class_storage_trans_state = UX_STATE_RESET;              \
+        (s) -> ux_host_class_storage_trans_data = UX_NULL;                      \
+    } while(0)                                                                  \
+
+#define UX_HOST_CLASS_STORAGE_TRANS_CBW                 (UX_STATE_CLASS_STEP + 0)
+#define UX_HOST_CLASS_STORAGE_TRANS_IN_NEXT             (UX_STATE_CLASS_STEP + 1)
+#define UX_HOST_CLASS_STORAGE_TRANS_OUT_NEXT            (UX_STATE_CLASS_STEP + 2)
+#define UX_HOST_CLASS_STORAGE_TRANS_CSW                 (UX_STATE_CLASS_STEP + 3)
+#define UX_HOST_CLASS_STORAGE_TRANS_REQ_SENSE           (UX_STATE_CLASS_STEP + 4)
+#define UX_HOST_CLASS_STORAGE_TRANS_WAIT                (UX_STATE_CLASS_STEP + 5)
+#define UX_HOST_CLASS_STORAGE_TRANS_STATUS              (UX_STATE_CLASS_STEP + 6)
+#define UX_HOST_CLASS_STORAGE_TRANS_MS_RESET            (UX_STATE_CLASS_STEP + 7)
+#define UX_HOST_CLASS_STORAGE_TRANS_EP_RESET            (UX_STATE_CLASS_STEP + 8)
+#define UX_HOST_CLASS_STORAGE_TRANS_RESET_NEXT          (UX_STATE_CLASS_STEP + 9)
+
+#define UX_HOST_CLASS_STORAGE_STAGE_CBW                 (0x00u)
+#define UX_HOST_CLASS_STORAGE_STAGE_DATA                (0x01u)
+#define UX_HOST_CLASS_STORAGE_STAGE_CSW                 (0x02u)
+#define UX_HOST_CLASS_STORAGE_STAGE_MS_RESET            (0x04u)
+#define UX_HOST_CLASS_STORAGE_STAGE_EP_RESET            (0x08u)
 
 typedef struct UX_HOST_CLASS_STORAGE_EXT_STRUCT
 {
+#if !defined(UX_HOST_STANDALONE)
     UX_THREAD       ux_host_class_thread;
     CHAR            ux_host_class_thread_stack[UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE];
+#else
+    ALIGN_TYPE      reserved;
+#endif
 } UX_HOST_CLASS_STORAGE_EXT;
 
 
@@ -489,7 +601,7 @@ typedef struct UX_HOST_CLASS_STORAGE_MEDIA_STRUCT
     ULONG           ux_host_class_storage_media_number_sectors;
     USHORT          ux_host_class_storage_media_sector_size;
     UCHAR           ux_host_class_storage_media_lun;
-    UCHAR           reserved;
+    UCHAR           ux_host_class_storage_media_status;
 #endif
 
 } UX_HOST_CLASS_STORAGE_MEDIA;
@@ -505,15 +617,11 @@ UINT    _ux_host_class_storage_deactivate(UX_HOST_CLASS_COMMAND *command);
 UINT    _ux_host_class_storage_device_initialize(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_device_reset(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_device_support_check(UX_HOST_CLASS_STORAGE *storage);
+
 #if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
 VOID    _ux_host_class_storage_driver_entry(UX_MEDIA *media);
-#else
-#define _ux_host_class_storage_lock(s,w) _ux_utility_semaphore_get(&(s) -> ux_host_class_storage_semaphore, (w))
-#define _ux_host_class_storage_unlock(s) _ux_utility_semaphore_put(&(s) -> ux_host_class_storage_semaphore)
-UINT    _ux_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage, ULONG media_index, UX_HOST_CLASS_STORAGE_MEDIA **storage_media);
-UINT    _ux_host_class_storage_media_lock(UX_HOST_CLASS_STORAGE_MEDIA *storage_media, ULONG wait);
-#define _ux_host_class_storage_media_unlock(m) _ux_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage)
 #endif
+
 UINT    _ux_host_class_storage_endpoints_get(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_entry(UX_HOST_CLASS_COMMAND *command);
 UINT    _ux_host_class_storage_max_lun_get(UX_HOST_CLASS_STORAGE *storage);
@@ -540,17 +648,49 @@ UINT    _ux_host_class_storage_transport_cb(UX_HOST_CLASS_STORAGE *storage, UCHA
 UINT    _ux_host_class_storage_transport_cbi(UX_HOST_CLASS_STORAGE *storage, UCHAR *data_pointer);
 UINT    _ux_host_class_storage_unit_ready_test(UX_HOST_CLASS_STORAGE *storage);
 
+UINT    _ux_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage, ULONG media_lun, UX_HOST_CLASS_STORAGE_MEDIA **storage_media);
+UINT    _ux_host_class_storage_media_lock(UX_HOST_CLASS_STORAGE_MEDIA *storage_media, ULONG wait);
+
+#if defined(UX_HOST_STANDALONE)
+UINT    _ux_host_class_storage_lock(UX_HOST_CLASS_STORAGE *storage, ULONG wait);
+#define _ux_host_class_storage_unlock(s) do { (s) -> ux_host_class_storage_flags &= ~UX_HOST_CLASS_STORAGE_FLAG_LOCK; } while(0)
+#define _ux_host_class_storage_media_unlock(m) _ux_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage)
+#else
+#define _ux_host_class_storage_lock(s,w) _ux_host_semaphore_get(&(s) -> ux_host_class_storage_semaphore, (w))
+#define _ux_host_class_storage_unlock(s) _ux_host_semaphore_put(&(s) -> ux_host_class_storage_semaphore)
+#define _ux_host_class_storage_media_unlock(m) _ux_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage)
+#endif
+#define _ux_host_class_storage_max_lun(s)           ((s) -> ux_host_class_storage_max_lun)
+#define _ux_host_class_storage_lun(s)               ((s) -> ux_host_class_storage_lun)
+#define _ux_host_class_storage_lun_select(s,l)      do { (s) -> ux_host_class_storage_lun = (l); } while(0)
+#define _ux_host_class_storage_sense_status(s)      ((s) -> ux_host_class_storage_sense_code)
+
+UINT    _ux_host_class_storage_media_check(UX_HOST_CLASS_STORAGE *storage);
+
+UINT    _ux_host_class_storage_tasks_run(UX_HOST_CLASS *storage_class);
+UINT    _ux_host_class_storage_transport_run(UX_HOST_CLASS_STORAGE *storage);
+UINT    _ux_host_class_storage_check_run(UX_HOST_CLASS_STORAGE *storage);
+UINT    _ux_host_class_storage_read_write_run(UX_HOST_CLASS_STORAGE *storage,
+                    ULONG read_write, ULONG sector_start, ULONG sector_count, UCHAR *data_pointer);
+
 /* Define Storage Class API prototypes.  */
 
 #define  ux_host_class_storage_entry                           _ux_host_class_storage_entry
+
+#define  ux_host_class_storage_lock                            _ux_host_class_storage_lock
+#define  ux_host_class_storage_unlock                          _ux_host_class_storage_unlock
+#define  ux_host_class_storage_lun_select                      _ux_host_class_storage_lun_select
+
 #define  ux_host_class_storage_media_read                      _ux_host_class_storage_media_read
 #define  ux_host_class_storage_media_write                     _ux_host_class_storage_media_write
 
-#if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
 #define  ux_host_class_storage_media_get                       _ux_host_class_storage_media_get
 #define  ux_host_class_storage_media_lock                      _ux_host_class_storage_media_lock
 #define  ux_host_class_storage_media_unlock                    _ux_host_class_storage_media_unlock
-#endif
+
+#define  ux_host_class_storage_media_check                     _ux_host_class_storage_media_check
+
+#define  ux_host_class_storage_sense_status                    _ux_host_class_storage_sense_status
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

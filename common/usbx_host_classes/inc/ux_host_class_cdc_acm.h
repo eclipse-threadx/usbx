@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_cdc_acm.h                             PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,11 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            used defined line coding    */
+/*                                            instead of magic number,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -92,6 +97,9 @@ extern   "C" {
 #define UX_HOST_CLASS_CDC_ACM_CALL_MANAGEMENT_CAPABILITIES      0x03
 #define UX_HOST_CLASS_CDC_ACM_CALL_MANAGEMENT_DCM               0x01
 #define UX_HOST_CLASS_CDC_ACM_CALL_MANAGEMENT_DCI               0x02
+
+/* Define CDC ACM Class union interface functional descriptors.  */
+#define UX_HOST_CLASS_CDC_ACM_UNION_FUNCTIONAL_MASTER           0x03
 
 /* Define CDC ACM command request values.  */
 
@@ -140,6 +148,8 @@ extern   "C" {
 /* Define CDC ACM default values.  */
 
 #define UX_HOST_CLASS_CDC_ACM_LINE_CODING_DEFAULT_RATE          9600
+#define UX_HOST_CLASS_CDC_ACM_LINE_CODING_DEFAULT_STOP_BIT      0
+#define UX_HOST_CLASS_CDC_ACM_LINE_CODING_DEFAULT_PARITY        0
 #define UX_HOST_CLASS_CDC_ACM_LINE_CODING_DEFAULT_DATA_BIT      8
 
 /* Define CDC ACM line coding definitions.  */
@@ -175,6 +185,8 @@ extern   "C" {
 #define UX_HOST_CLASS_CDC_ACM_IOCTL_ABORT_OUT_PIPE              6
 #define UX_HOST_CLASS_CDC_ACM_IOCTL_NOTIFICATION_CALLBACK       7
 #define UX_HOST_CLASS_CDC_ACM_IOCTL_GET_DEVICE_STATUS           8
+#define UX_HOST_CLASS_CDC_ACM_IOCTL_WRITE_CALLBACK              9
+#define UX_HOST_CLASS_CDC_ACM_IOCTL_GET_WRITE_STATUS            10
 
 /* Define CDC ACM Reception States. */
 
@@ -213,15 +225,33 @@ typedef struct UX_HOST_CLASS_CDC_ACM_STRUCT
     UX_INTERFACE   *ux_host_class_cdc_acm_interface;
     UINT           ux_host_class_cdc_acm_instance_status;
     UINT           ux_host_class_cdc_acm_state;
-    UX_SEMAPHORE   ux_host_class_cdc_acm_semaphore;
     ULONG          ux_host_class_cdc_acm_notification_count;
-    UCHAR          ux_host_class_cdc_acm_capabilities;
+    ULONG          ux_host_class_cdc_acm_capabilities;
     ULONG          ux_host_class_cdc_acm_device_state;
     struct UX_HOST_CLASS_CDC_ACM_RECEPTION_STRUCT  
                    *ux_host_class_cdc_acm_reception;
     
     VOID           (*ux_host_class_cdc_acm_device_status_change_callback)(struct UX_HOST_CLASS_CDC_ACM_STRUCT *cdc_acm, 
                                                                 ULONG  notification_type, ULONG notification_value);
+#if !defined(UX_HOST_STANDALONE)
+    UX_SEMAPHORE   ux_host_class_cdc_acm_semaphore;
+#else
+    UINT           ux_host_class_cdc_acm_status;
+    VOID           *ux_host_class_cdc_acm_allocated;
+    ULONG          ux_host_class_cdc_acm_interfaces_bitmap;
+    ULONG          ux_host_class_cdc_acm_tick;
+    struct UX_HOST_CLASS_CDC_ACM_STRUCT
+                   *ux_host_class_cdc_acm_control;
+    ULONG          ux_host_class_cdc_acm_write_length;
+    ULONG          ux_host_class_cdc_acm_write_count;
+    VOID           (*ux_host_class_cdc_acm_write_callback)(
+                                struct UX_HOST_CLASS_CDC_ACM_STRUCT *cdc_acm,
+                                UINT status, ULONG length);
+    UCHAR          ux_host_class_cdc_acm_cmd_state;
+    UCHAR          ux_host_class_cdc_acm_read_state;
+    UCHAR          ux_host_class_cdc_acm_write_state;
+    UCHAR          ux_host_class_cdc_acm_next_state;
+#endif
 } UX_HOST_CLASS_CDC_ACM;
 
 /* Define CDC DLC Class instance structure.  */
@@ -239,12 +269,26 @@ typedef struct UX_HOST_CLASS_CDC_DLC_STRUCT
     UX_INTERFACE   *ux_host_class_cdc_dlc_interface;
     UINT           ux_host_class_cdc_dlc_instance_status;
     UINT           ux_host_class_cdc_dlc_state;
-    UX_SEMAPHORE   ux_host_class_cdc_dlc_semaphore;
     ULONG          ux_host_class_cdc_dlc_notification_count;
-    UCHAR          ux_host_class_cdc_dlc_capabilities;
+    ULONG          ux_host_class_cdc_dlc_capabilities;
     struct UX_HOST_CLASS_CDC_DLC_RECEPTION_STRUCT  
                    *ux_host_class_cdc_dlc_reception;
-    
+#if !defined(UX_HOST_STANDALONE)
+    UX_SEMAPHORE   ux_host_class_cdc_dlc_semaphore;
+#else
+    ULONG          ux_host_class_cdc_dlc_interfaces_bitmap;
+    struct UX_HOST_CLASS_CDC_ACM_STRUCT
+                   *ux_host_class_cdc_dlc_control;
+    ULONG          ux_host_class_cdc_dlc_write_length;
+    ULONG          ux_host_class_cdc_dlc_write_count;
+    VOID           (*ux_host_class_cdc_dlc_write_callback)(
+                                struct UX_HOST_CLASS_CDC_ACM_STRUCT *cdc_acm,
+                                UINT status, ULONG length);
+    UCHAR          ux_host_class_cdc_dlc_cmd_state;
+    UCHAR          ux_host_class_cdc_dlc_read_state;
+    UCHAR          ux_host_class_cdc_dlc_write_state;
+    UCHAR          ux_host_class_cdc_dlc_next_state;
+#endif
 } UX_HOST_CLASS_CDC_DLC;
 
 /* Define CDC ACM reception structure. */
@@ -320,6 +364,9 @@ UINT  _ux_host_class_cdc_acm_reception_start (UX_HOST_CLASS_CDC_ACM *cdc_acm,
                                     
 VOID  _ux_host_class_cdc_acm_reception_callback (UX_TRANSFER *transfer_request);
 
+UINT  _ux_host_class_cdc_acm_write_with_callback(UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer, 
+                                  ULONG requested_length);
+VOID  _ux_host_class_cdc_acm_transmission_callback(UX_TRANSFER *transfer_request);
 
 /* Define CDC ACM Class API prototypes.  */
 
@@ -330,6 +377,7 @@ VOID  _ux_host_class_cdc_acm_reception_callback (UX_TRANSFER *transfer_request);
 #define ux_host_class_cdc_acm_reception_start           _ux_host_class_cdc_acm_reception_start
 #define ux_host_class_cdc_acm_reception_stop            _ux_host_class_cdc_acm_reception_stop
 
+#define ux_host_class_cdc_acm_write_with_callback       _ux_host_class_cdc_acm_write_with_callback
                                     
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

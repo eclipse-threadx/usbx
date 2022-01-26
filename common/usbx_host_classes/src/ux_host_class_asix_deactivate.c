@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_deactivate                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,8 +60,8 @@
 /*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
 /*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_delete          Delete protection semaphore   */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
 /*    _ux_utility_thread_delete             Delete thread                 */
 /*    _ux_network_driver_deactivate         Deactivate NetX USB interface */
 /*    nx_packet_transmit_release            Release NetX packet           */
@@ -77,6 +77,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -92,7 +95,7 @@ UINT                        status;
     asix =  (UX_HOST_CLASS_ASIX *) command -> ux_host_class_command_instance;
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&asix -> ux_host_class_asix_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&asix -> ux_host_class_asix_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
 
         /* Return error.  */
@@ -173,14 +176,14 @@ UINT                        status;
     
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(asix -> ux_host_class_asix_class, (VOID *) asix);
 
     /* Destroy the semaphores.  */
-    _ux_utility_semaphore_delete(&asix -> ux_host_class_asix_semaphore);
-    _ux_utility_semaphore_delete(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
+    _ux_host_semaphore_delete(&asix -> ux_host_class_asix_semaphore);
+    _ux_host_semaphore_delete(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
     
     /* Destroy the link monitoring thread.  */
     _ux_utility_thread_delete(&asix -> ux_host_class_asix_thread);

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request_abort               PORTABLE C      */ 
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed trace enabled error,  */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request)
@@ -124,13 +127,15 @@ ULONG           completion_code;
         /* Is a thread waiting on the semaphore?  */
         if (/* Is the transfer pending?  */
             completion_code == UX_TRANSFER_STATUS_PENDING &&
+#if !defined(UX_HOST_STANDALONE)
             /* Is the thread waiting not this one? (clearly we're not waiting!)  */
             transfer_request -> ux_transfer_request_thread_pending != _ux_utility_thread_identify() && 
+#endif
             /* Does the transfer request not have a completion function?  */
             transfer_request -> ux_transfer_request_completion_function == UX_NULL)
 
             /* Wake up the semaphore for this request.  */
-            _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+            _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
     }
     
     /* This function never fails!  */

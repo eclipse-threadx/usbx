@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_activate                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,7 +54,7 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    _ux_utility_thread_resume             Resume thread                 */ 
+/*    _ux_device_thread_resume              Resume thread                 */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -67,21 +67,28 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
                                           
-UINT                                    status;
+UINT                                    status = UX_SUCCESS;
 UX_SLAVE_INTERFACE                      *interface;
 UX_SLAVE_CLASS_STORAGE                  *storage;
-UX_SLAVE_CLASS                          *class;
+UX_SLAVE_CLASS                          *class_inst;
+#if defined(UX_DEVICE_STANDALONE)
+UX_SLAVE_ENDPOINT                       *endpoint;
+#endif
+
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_inst =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
-    storage = (UX_SLAVE_CLASS_STORAGE *)class -> ux_slave_class_instance;
+    storage = (UX_SLAVE_CLASS_STORAGE *)class_inst -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
     interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
@@ -92,8 +99,52 @@ UX_SLAVE_CLASS                          *class;
     /* Now the opposite, store the interface in the class instance.  */
     storage -> ux_slave_class_storage_interface =  interface;
 
+#if !defined(UX_DEVICE_STANDALONE)
+
     /* Resume thread.  */
-    status =  _ux_utility_thread_resume(&class -> ux_slave_class_thread); 
+    _ux_device_thread_resume(&class_inst -> ux_slave_class_thread); 
+
+#else
+
+    /* Locate the endpoints.  */
+    /* Check the first endpoint direction, if IN we have the correct endpoint.  */
+    endpoint = interface -> ux_slave_interface_first_endpoint;
+    if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
+    {
+
+        /* Wrong direction, we found the OUT endpoint first.  */
+        storage -> ux_device_class_storage_ep_out = endpoint;
+
+        /* So the next endpoint has to be the IN endpoint.  */
+        storage -> ux_device_class_storage_ep_in = endpoint -> ux_slave_endpoint_next_endpoint;
+    }
+    else
+    {
+
+        /* We found the IN endpoint first.  */
+        storage -> ux_device_class_storage_ep_in = endpoint;
+            
+        /* So the next endpoint has to be the OUT endpoint.  */
+        storage -> ux_device_class_storage_ep_out = endpoint -> ux_slave_endpoint_next_endpoint;
+    }
+
+    /* Reset states.  */
+    storage -> ux_device_class_storage_buffer[0] = storage -> ux_device_class_storage_ep_out ->
+                    ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer;
+    storage -> ux_device_class_storage_buffer[1] = storage -> ux_device_class_storage_ep_in ->
+                    ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer;
+    storage -> ux_device_class_storage_data_buffer = UX_NULL;
+    storage -> ux_device_class_storage_state = UX_STATE_RESET;
+    storage -> ux_device_class_storage_disk_state = UX_DEVICE_CLASS_STORAGE_DISK_IDLE;
+    storage -> ux_device_class_storage_buffer_state[0] = UX_DEVICE_CLASS_STORAGE_BUFFER_IDLE;
+    storage -> ux_device_class_storage_buffer_state[1] = UX_DEVICE_CLASS_STORAGE_BUFFER_IDLE;
+    storage -> ux_device_class_storage_buffer_usb = 0;
+    storage -> ux_device_class_storage_buffer_disk = 0;
+    UX_SLAVE_TRANSFER_STATE_RESET(&storage -> ux_device_class_storage_ep_out -> ux_slave_endpoint_transfer_request);
+    UX_SLAVE_TRANSFER_STATE_RESET(&storage -> ux_device_class_storage_ep_in -> ux_slave_endpoint_transfer_request);
+
+    status = UX_SUCCESS;
+#endif
 
     /* If there is a activate function call it.  */
     if (storage -> ux_slave_class_storage_instance_activate != UX_NULL)

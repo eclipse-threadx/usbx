@@ -37,7 +37,7 @@ VOID  _ux_device_class_dpump_thread(ULONG dpump_class);
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dpump_thread                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -45,6 +45,8 @@ VOID  _ux_device_class_dpump_thread(ULONG dpump_class);
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
 /*    This function is the thread of the dpump class.                     */ 
+/*                                                                        */
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -74,6 +76,9 @@ VOID  _ux_device_class_dpump_thread(ULONG dpump_class);
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_dpump_thread(ULONG dpump_class)
@@ -163,7 +168,7 @@ ULONG                       length;
 
         /* We need to suspend ourselves. We will be resumed by the 
            device enumeration module.  */
-        _ux_utility_thread_suspend(&class -> ux_slave_class_thread);
+        _ux_device_thread_suspend(&class -> ux_slave_class_thread);
     }
 }
 

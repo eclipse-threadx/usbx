@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_memory_allocate                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  *_ux_utility_memory_allocate(ULONG memory_alignment, ULONG memory_cache_flag,
@@ -88,7 +91,7 @@ ALIGN_TYPE          int_memory_buffer;
 
 
     /* Get the mutex as this is a critical section.  */
-    _ux_utility_mutex_on(&_ux_system -> ux_system_mutex);
+    _ux_system_mutex_on(&_ux_system -> ux_system_mutex);
 
 #ifdef UX_ENFORCE_SAFE_ALIGNMENT
 
@@ -232,7 +235,7 @@ ALIGN_TYPE          int_memory_buffer;
     {
 
         /* Release the protection.  */
-        _ux_utility_mutex_off(&_ux_system -> ux_system_mutex);
+        _ux_system_mutex_off(&_ux_system -> ux_system_mutex);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_MEMORY_INSUFFICIENT, memory_size_requested, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -391,7 +394,7 @@ ALIGN_TYPE          int_memory_buffer;
 #endif
 
     /* Release the protection.  */
-    _ux_utility_mutex_off(&_ux_system -> ux_system_mutex);
+    _ux_system_mutex_off(&_ux_system -> ux_system_mutex);
 
     /* The memory block pointer contains a memory area properly
        aligned.  */

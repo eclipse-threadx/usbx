@@ -30,12 +30,58 @@
 #include "ux_host_stack.h"
 
 
+#if defined(UX_HOST_STANDALONE)
+VOID _ux_host_class_storage_write_initialize(UX_HOST_CLASS_STORAGE *storage,
+                ULONG sector_start, ULONG sector_count);
+
+VOID
+#else
+static inline VOID
+#endif
+_ux_host_class_storage_write_initialize(UX_HOST_CLASS_STORAGE *storage,
+                ULONG sector_start, ULONG sector_count)
+{
+UCHAR       *cbw;
+UCHAR       *cbw_cb;
+ULONG       command_length;
+
+    /* Use a pointer for the cbw, easier to manipulate.  */
+    cbw = (UCHAR *)storage -> ux_host_class_storage_cbw;
+    cbw_cb = cbw + UX_HOST_CLASS_STORAGE_CBW_CB;
+
+    /* Get the Write Command Length.  */
+#ifdef UX_HOST_CLASS_STORAGE_INCLUDE_LEGACY_PROTOCOL_SUPPORT
+    if (storage -> ux_host_class_storage_interface -> ux_interface_descriptor.bInterfaceSubClass ==
+        UX_HOST_CLASS_STORAGE_SUBCLASS_UFI)
+        command_length =  UX_HOST_CLASS_STORAGE_WRITE_COMMAND_LENGTH_UFI;
+    else
+        command_length =  UX_HOST_CLASS_STORAGE_WRITE_COMMAND_LENGTH_SBC;
+#else
+    command_length =  UX_HOST_CLASS_STORAGE_WRITE_COMMAND_LENGTH_SBC;
+#endif
+
+    /* Initialize the CBW for this command.  */
+    _ux_host_class_storage_cbw_initialize(storage, UX_HOST_CLASS_STORAGE_DATA_OUT,
+                                    sector_count * storage -> ux_host_class_storage_sector_size,
+                                    command_length);
+
+    /* Prepare the MEDIA WRITE command block.  */
+    *(cbw_cb + UX_HOST_CLASS_STORAGE_WRITE_OPERATION) =  UX_HOST_CLASS_STORAGE_SCSI_WRITE16;
+
+    /* Store the sector start (LBA field).  */
+    _ux_utility_long_put_big_endian(cbw_cb + UX_HOST_CLASS_STORAGE_WRITE_LBA, sector_start);
+
+    /* Store the number of sectors to write.  */
+    _ux_utility_short_put_big_endian(cbw_cb + UX_HOST_CLASS_STORAGE_WRITE_TRANSFER_LENGTH, (USHORT) sector_count);
+}
+
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_write                  PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,45 +119,30 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_write(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
                                         ULONG sector_count, UCHAR *data_pointer)
 {
-
+#if defined(UX_HOST_STANDALONE)
 UINT            status;
-UCHAR           *cbw;
+    do {
+        status = _ux_host_class_storage_read_write_run(storage, UX_FALSE,
+                                    sector_start, sector_count, data_pointer);
+    } while(status == UX_STATE_WAIT);
+    return(storage -> ux_host_class_storage_status);
+#else
+UINT            status;
 UINT            media_retry;
-UINT            command_length;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_STORAGE_MEDIA_WRITE, storage, sector_start, sector_count, data_pointer, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
-    /* Use a pointer for the cbw, easier to manipulate.  */
-    cbw =  (UCHAR *) storage -> ux_host_class_storage_cbw;
-
-    /* Get the Write Command Length.  */
-#ifdef UX_HOST_CLASS_STORAGE_INCLUDE_LEGACY_PROTOCOL_SUPPORT
-    if (storage -> ux_host_class_storage_interface -> ux_interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_STORAGE_SUBCLASS_UFI)
-        command_length =  UX_HOST_CLASS_STORAGE_WRITE_COMMAND_LENGTH_UFI;
-    else
-        command_length =  UX_HOST_CLASS_STORAGE_WRITE_COMMAND_LENGTH_SBC;
-#else
-    command_length =  UX_HOST_CLASS_STORAGE_WRITE_COMMAND_LENGTH_SBC;
-#endif
-
-    /* Initialize the CBW for this command.  */
-    _ux_host_class_storage_cbw_initialize(storage, UX_HOST_CLASS_STORAGE_DATA_OUT, sector_count * storage -> ux_host_class_storage_sector_size,
-                                    command_length);
-    
-    /* Prepare the MEDIA WRITE command block.  */
-    *(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_WRITE_OPERATION) =  UX_HOST_CLASS_STORAGE_SCSI_WRITE16;
-
-    /* Store the sector start (LBA field).  */
-    _ux_utility_long_put_big_endian(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_WRITE_LBA, sector_start);
-
-    /* Store the number of sectors to write.  */
-    _ux_utility_short_put_big_endian(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_WRITE_TRANSFER_LENGTH, (USHORT) sector_count);
+    /* Initialize CBW.  */
+    _ux_host_class_storage_write_initialize(storage, sector_start, sector_count);
 
     /* Reset the retry count.  */
     media_retry =  UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RETRY;
@@ -132,5 +163,6 @@ UINT            command_length;
 
     /* Return sense error.  */
     return(UX_HOST_CLASS_STORAGE_SENSE_ERROR);                                            
+#endif
 }
 

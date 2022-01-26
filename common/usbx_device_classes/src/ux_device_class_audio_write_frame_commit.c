@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_write_frame_commit           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.X          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed frame length check,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio_write_frame_commit(UX_DEVICE_CLASS_AUDIO_STREAM *stream, ULONG length)
@@ -108,7 +111,7 @@ UCHAR                       *next_pos;
         return(UX_BUFFER_OVERFLOW);
 
     /* Check frame length.  */
-    if (stream -> ux_device_class_audio_stream_frame_buffer_size < length)
+    if ((stream -> ux_device_class_audio_stream_frame_buffer_size - 8) < length)
         return(UX_ERROR);
 
     /* Calculate next frame buffer.  */

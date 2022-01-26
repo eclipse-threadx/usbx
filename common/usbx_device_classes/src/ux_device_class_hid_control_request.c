@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_control_request                PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,9 @@
 /*                                            added Get/Set Protocol      */
 /*                                            request support,            */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -179,8 +182,16 @@ UX_SLAVE_CLASS_HID          *hid;
                         if (hid -> ux_device_class_hid_event_wait_timeout == 0)
                             hid -> ux_device_class_hid_event_wait_timeout ++;
 
+#if defined(UX_DEVICE_STANDALONE)
+
+                        /* Restart event checking if no transfer in progress.  */
+                        if (hid -> ux_device_class_hid_event_state != UX_STATE_WAIT)
+                            hid -> ux_device_class_hid_event_state = UX_STATE_RESET;
+#else
+
                         /* Set an event to wake up the interrupt thread.  */
                         _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_IDLE_RATE, UX_OR);
+#endif
                     }
                 }
             }

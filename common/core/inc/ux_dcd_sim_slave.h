@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_dcd_sim_slave.h                                  PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -52,6 +52,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -77,32 +80,33 @@ extern   "C" {
 
 /* Define USB slave simulator error code register bits.  */
 
-#define UX_DCD_SIM_SLAVE_ERROR_TRANSMISSION_OK                  0x00000001
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_MASK                        0x0000000e
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_SHIFT                       0x00000001
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_PID_ERROR                   0x00000001
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_PID_UNKNOWN                 0x00000002
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_UNEXPECTED_PACKET           0x00000003
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_TOKEN_CRC                   0x00000004
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_DATA_CRC                    0x00000005
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_TIME_OUT                    0x00000006
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_BABBLE                      0x00000007
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_UNEXPECTED_EOP              0x00000008
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_NAK                         0x00000009
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_STALLED                     0x0000000a
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_OVERFLOW                    0x0000000b
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_EMPTY_PACKET                0x0000000c
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_BIT_STUFFING                0x0000000d
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_SYNC_ERROR                  0x0000000e
-#define UX_DCD_SIM_SLAVE_ERROR_CODE_DATA_TOGGLE                 0x0000000f
+#define UX_DCD_SIM_SLAVE_ERROR_TRANSMISSION_OK                  0x00000001u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_MASK                        0x0000000eu
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_SHIFT                       0x00000001u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_PID_ERROR                   0x00000001u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_PID_UNKNOWN                 0x00000002u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_UNEXPECTED_PACKET           0x00000003u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_TOKEN_CRC                   0x00000004u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_DATA_CRC                    0x00000005u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_TIME_OUT                    0x00000006u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_BABBLE                      0x00000007u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_UNEXPECTED_EOP              0x00000008u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_NAK                         0x00000009u
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_STALLED                     0x0000000au
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_OVERFLOW                    0x0000000bu
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_EMPTY_PACKET                0x0000000cu
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_BIT_STUFFING                0x0000000du
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_SYNC_ERROR                  0x0000000eu
+#define UX_DCD_SIM_SLAVE_ERROR_CODE_DATA_TOGGLE                 0x0000000fu
 
 
 /* Define USB slave simulator physical endpoint status definition.  */
 
-#define UX_DCD_SIM_SLAVE_ED_STATUS_UNUSED                       0
-#define UX_DCD_SIM_SLAVE_ED_STATUS_USED                         1
-#define UX_DCD_SIM_SLAVE_ED_STATUS_TRANSFER                     2
-#define UX_DCD_SIM_SLAVE_ED_STATUS_STALLED                      4
+#define UX_DCD_SIM_SLAVE_ED_STATUS_UNUSED                       0u
+#define UX_DCD_SIM_SLAVE_ED_STATUS_USED                         1u
+#define UX_DCD_SIM_SLAVE_ED_STATUS_TRANSFER                     2u
+#define UX_DCD_SIM_SLAVE_ED_STATUS_STALLED                      4u
+#define UX_DCD_SIM_SLAVE_ED_STATUS_DONE                         8u
 
 
 /* Define USB slave simulator physical endpoint structure.  */
@@ -153,11 +157,13 @@ UINT    _ux_dcd_sim_slave_initialize(VOID);
 UINT    _ux_dcd_sim_slave_initialize_complete(VOID);
 UINT    _ux_dcd_sim_slave_state_change(UX_DCD_SIM_SLAVE *dcd_sim_slave, ULONG state);
 UINT    _ux_dcd_sim_slave_transfer_request(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_TRANSFER *transfer_request);
+UINT    _ux_dcd_sim_slave_transfer_run(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_TRANSFER *transfer_request);
 UINT    _ux_dcd_sim_slave_transfer_abort(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_TRANSFER *transfer_request);
 
 /* Define Device Simulator Class API prototypes.  */
 
 #define ux_dcd_sim_slave_initialize                 _ux_dcd_sim_slave_initialize
+
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   
 #ifdef __cplusplus

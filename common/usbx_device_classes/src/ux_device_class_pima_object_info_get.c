@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_info_get               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated status handling,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle)
@@ -101,7 +104,7 @@ ULONG                       keywords_length;
     if (status != UX_SUCCESS)
 
         /* We return an error.  */
-        _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_INVALID_OBJECT_HANDLE, 0, 0, 0, 0);
+        _ux_device_class_pima_response_send(pima, status, 0, 0, 0, 0);
     
     else
     {    
@@ -200,5 +203,3 @@ ULONG                       keywords_length;
     /* Return completion status.  */
     return(status);
 }
-
-

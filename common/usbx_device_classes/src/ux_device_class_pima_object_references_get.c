@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_references_get         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated status handling,    */
+/*                                            passed max length to app,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_references_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -115,13 +119,14 @@ ULONG                   object_references_length;
                             pima -> ux_device_class_pima_transaction_id);
 
     /* Ask the application to retrieve for us the object references.  */
+    object_references_length = UX_DEVICE_CLASS_PIMA_MAX_PAYLOAD;
     status =  pima -> ux_device_class_pima_object_references_get(pima, object_handle, &object_references, &object_references_length);
     
     /* Result should always be OK, but to be sure .... */
     if (status != UX_SUCCESS)
 
         /* We return an error.  */
-        _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_INVALID_PARAMETER, 0, 0, 0, 0);
+        _ux_device_class_pima_response_send(pima, status, 0, 0, 0, 0);
 
     else
     {

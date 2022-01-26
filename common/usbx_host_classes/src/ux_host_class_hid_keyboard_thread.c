@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_keyboard_thread                  PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -45,6 +45,8 @@
 /*                                                                        */ 
 /*    This file contains the keyboard thread used to process the changes  */
 /*    in the keyboard LEDs.                                               */ 
+/*                                                                        */
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -57,7 +59,7 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    _ux_utility_semaphore_get             Get signal semaphore          */ 
+/*    _ux_host_semaphore_get                Get signal semaphore          */ 
 /*    _ux_host_class_hid_report_id_get      Get report ID                 */
 /*    _ux_host_class_hid_report_set         Do SET_REPORT                 */
 /*                                                                        */ 
@@ -72,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_keyboard_thread(ULONG thread_input)
@@ -90,7 +95,7 @@ UX_HOST_CLASS_HID_KEYBOARD              *keyboard_instance;
     {   
 
         /* Wait for the semaphore to be put by the root hub or a regular hub.  */
-        status =  _ux_utility_semaphore_get(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore, UX_WAIT_FOREVER);
+        status =  _ux_host_semaphore_get(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore, UX_WAIT_FOREVER);
         
         /* The semaphore could be awaken because the semaphore was destroyed by the HID client
            when the keyboard is removed.  */

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_references_set         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated status handling,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_references_set(UX_SLAVE_CLASS_PIMA *pima,
@@ -128,7 +131,8 @@ ULONG                   object_references_length;
         status = pima -> ux_device_class_pima_object_references_set(pima, object_handle, object_references, object_references_length);
     
         /* Now we return a response with success.  */
-        _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 0, 0, 0, 0);
+        status = (status == UX_SUCCESS) ? UX_DEVICE_CLASS_PIMA_RC_OK : status;
+        _ux_device_class_pima_response_send(pima, status, 0, 0, 0, 0);
 
     }
     else

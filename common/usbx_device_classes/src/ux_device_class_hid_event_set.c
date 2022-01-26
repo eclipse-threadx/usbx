@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_event_set                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,11 +68,15 @@
 /*                                                                        */ 
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
 /*                                            verified memset and memcpy  */
 /*                                            cases, used UX prefix to    */
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid, 
@@ -153,9 +157,18 @@ UX_SLAVE_CLASS_HID_EVENT   *next_hid_event;
         /* fill in the event structure from the user.  */
         current_hid_event -> ux_device_class_hid_event_length = hid_event -> ux_device_class_hid_event_length;    
     }
-    
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Set state machine to start sending if no transfer on going.  */
+    if (hid -> ux_device_class_hid_event_state != UX_STATE_WAIT &&
+        hid -> ux_device_class_hid_event_state != UX_STATE_EXIT)
+        hid -> ux_device_class_hid_event_state = UX_STATE_RESET;
+#else
+
     /* Set an event to wake up the interrupt thread.  */
-    _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_EVENT, UX_OR);                
+    _ux_device_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_EVENT, UX_OR);                
+#endif
 
     /* Return event status to the user.  */
     return(UX_SUCCESS);

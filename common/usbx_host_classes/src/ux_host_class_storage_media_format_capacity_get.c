@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_format_capacity_get    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_format_capacity_get(UX_HOST_CLASS_STORAGE *storage)
@@ -111,7 +114,18 @@ UINT            command_length;
     read_format_capacity_response =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_STORAGE_READ_FORMAT_RESPONSE_LENGTH);
     if (read_format_capacity_response == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
-    
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* Initialize main states for GetFormatCapacity().  */
+    UX_HOST_CLASS_STORAGE_TRANS_STATE_RESET(storage);
+    storage -> ux_host_class_storage_memory = read_format_capacity_response;
+    storage -> ux_host_class_storage_state_state = UX_HOST_CLASS_STORAGE_STATE_TRANSPORT;
+    storage -> ux_host_class_storage_state_next = UX_HOST_CLASS_STORAGE_STATE_FORMAT_CAP_SAVE;
+    storage -> ux_host_class_storage_trans_data = read_format_capacity_response;
+    return(UX_SUCCESS);
+#else
+
     /* Send the command to transport layer.  */
     _ux_host_class_storage_transport(storage, read_format_capacity_response);
 
@@ -120,5 +134,6 @@ UINT            command_length;
 
     /* If we have a transport error, there is not much we can do, we do not fail.  */
     return(UX_SUCCESS);                                            
+#endif
 }
 

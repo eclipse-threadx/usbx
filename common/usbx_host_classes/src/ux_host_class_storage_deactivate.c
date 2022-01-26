@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_deactivate                   PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,8 +60,8 @@
 /*    _ux_host_stack_endpoint_transfer_abort Abort transfer request       */ 
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_delete          Delete protection semaphore   */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -86,11 +86,16 @@
 /*                                            fixed compile issues with   */
 /*                                            some macro options,         */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved media insert/eject */
+/*                                            management without FX,      */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_deactivate(UX_HOST_CLASS_COMMAND *command)
 {
 
+UINT                            status;
 UX_HOST_CLASS_STORAGE           *storage;
 UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
 UX_HOST_CLASS                   *class_inst;
@@ -149,7 +154,7 @@ VOID                            *memory;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
 
     /* Inform UX_MEDIA (default FileX) of the deactivation of all Media attached to this instance.  */
@@ -187,8 +192,12 @@ VOID                            *memory;
 #else
 
         /* Check if the media is for this storage.  */
-        if (storage_media -> ux_host_class_storage_media_storage == storage)
+        if (storage_media -> ux_host_class_storage_media_status == UX_USED &&
+            storage_media -> ux_host_class_storage_media_storage == storage)
         {
+
+            /* Free the storage media.  */
+            storage_media -> ux_host_class_storage_media_status = UX_UNUSED;
 
             /* Invoke callback for media removal.  */
             if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
@@ -198,9 +207,6 @@ VOID                            *memory;
                 _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_REMOVAL,
                                     storage -> ux_host_class_storage_class, (VOID *) storage_media);
             }
-
-            /* Free the storage media.  */
-            storage_media -> ux_host_class_storage_media_storage = UX_NULL;
         }
 #endif
 
@@ -209,13 +215,14 @@ VOID                            *memory;
     }
 
     /* Protect thread reentry to this instance.  */
-    _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+    status = _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+    UX_PARAMETER_NOT_USED(status);
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(storage -> ux_host_class_storage_class, (VOID *) storage);
 
     /* Destroy the protection semaphore.  */
-    _ux_utility_semaphore_delete(&storage -> ux_host_class_storage_semaphore);
+    _ux_host_semaphore_delete(&storage -> ux_host_class_storage_semaphore);
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

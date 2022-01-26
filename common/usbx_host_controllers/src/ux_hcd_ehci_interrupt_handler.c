@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_interrupt_handler                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,7 +66,7 @@
 /*    _ux_hcd_ehci_controller_disable       Disable controller            */ 
 /*    _ux_hcd_ehci_register_read            Read EHCI register            */ 
 /*    _ux_hcd_ehci_register_write           Write EHCI register           */ 
-/*    _ux_utility_semaphore_put             Put semaphore                 */ 
+/*    _ux_host_semaphore_put                Put semaphore                 */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -79,6 +79,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ehci_interrupt_handler(VOID)
@@ -127,7 +130,7 @@ ULONG           port_index;
                     /* We have some transactions done in the past frame/micro-frame.
                        The controller thread needs to wake up and process them.  */
                     hcd -> ux_hcd_thread_signal++;
-                    _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
+                    _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
                 }
                     
                 if (ehci_register & EHCI_HC_STS_HSE)
@@ -139,7 +142,7 @@ ULONG           port_index;
                     hcd -> ux_hcd_thread_signal++;
                     hcd -> ux_hcd_status =  UX_HCD_STATUS_DEAD;
                     hcd -> ux_hcd_thread_signal++;
-                    _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
+                    _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
 
                     /* Error trap. */
                     _ux_system_error_handler(UX_SYSTEM_LEVEL_INTERRUPT, UX_SYSTEM_CONTEXT_HCD, UX_CONTROLLER_DEAD);
@@ -174,7 +177,7 @@ ULONG           port_index;
 
                         /* The controller has issued a Root hub status change signal. 
                            We need to resume the thread in charge of the USB topology.  */
-                        _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
+                        _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
                 }
 
                 if (ehci_register & EHCI_HC_STS_IAA)
@@ -182,7 +185,7 @@ ULONG           port_index;
 
                     /* The controller has issued a Door Bell status change signal.  
                        We need to resume the thread who raised the doorbell.  */
-                    _ux_utility_semaphore_put(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore);
+                    _ux_host_semaphore_put(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore);
                 }
             }
         }

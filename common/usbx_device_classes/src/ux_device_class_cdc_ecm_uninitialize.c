@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_uninitialize               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,10 +56,10 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    _ux_utility_mutex_delete              Delete mutex                  */ 
-/*    _ux_utility_thread_delete             Delete thread                 */ 
+/*    _ux_device_thread_delete              Delete thread                 */ 
 /*    _ux_utility_memory_free               Free memory                   */ 
 /*    _ux_utility_event_flags_delete        Delete event flags            */ 
-/*    _ux_utility_semaphore_delete          Delete semaphore              */ 
+/*    _ux_device_semaphore_delete           Delete semaphore              */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -99,19 +102,19 @@ UX_SLAVE_CLASS                          *class;
         _ux_utility_mutex_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
         /* Delete bulk out thread .  */
-        _ux_utility_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread);
+        _ux_device_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread);
 
         /* Free bulk out thread stack.  */
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack);
 
         /* Delete interrupt thread.  */
-        _ux_utility_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread);
+        _ux_device_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread);
 
         /* Free interrupt thread stack.  */
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack);
 
         /* Delete bulk in thread.  */
-        _ux_utility_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread);
+        _ux_device_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread);
 
         /* Free bulk in thread stack.  */
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack);

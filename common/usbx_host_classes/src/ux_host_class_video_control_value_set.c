@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_control_value_set              PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,8 +57,8 @@
 /*                                                                        */ 
 /*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_put             Release semaphore             */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_put                Release semaphore             */ 
 /*    _ux_utility_memory_allocate           Allocate memory block         */ 
 /*    _ux_utility_memory_free               Release memory block          */ 
 /*    _ux_utility_short_put                 Put 16-bit value              */
@@ -75,6 +75,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_control_value_set(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_CONTROL *video_control)
@@ -100,7 +103,7 @@ UCHAR *         control_buffer;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
 
@@ -114,7 +117,7 @@ UCHAR *         control_buffer;
     {
     
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+        status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Return an error.  */
         return(UX_MEMORY_INSUFFICIENT);
@@ -125,7 +128,7 @@ UCHAR *         control_buffer;
 
     /* Protect the control endpoint semaphore here.  It will be unprotected in the 
        transfer request function.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)
@@ -152,7 +155,7 @@ UCHAR *         control_buffer;
         _ux_utility_memory_free(control_buffer);
 
         /* Unprotect thread reentry to this instance.  */
-        _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Return completion status.  */
         return(UX_TRANSFER_ERROR);
@@ -162,7 +165,7 @@ UCHAR *         control_buffer;
     _ux_utility_memory_free(control_buffer);
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+    status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
     /* Return completion status.  */
     return(status);

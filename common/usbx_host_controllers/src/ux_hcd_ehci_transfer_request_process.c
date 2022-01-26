@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_transfer_request_process               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,7 +60,7 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    (ux_transfer_request_completion_function) Transfer complete function*/ 
-/*    _ux_utility_semaphore_put               Put producer semaphore      */ 
+/*    _ux_host_semaphore_put                  Put producer semaphore      */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ehci_transfer_request_process(UX_TRANSFER *transfer_request)
@@ -86,7 +89,7 @@ VOID  _ux_hcd_ehci_transfer_request_process(UX_TRANSFER *transfer_request)
     else
 
         /* There is a semaphore so send the signal to the class.  */
-        _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+        _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
     /* Return to caller.  */
     return;

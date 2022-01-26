@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_delete                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,9 +69,12 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated status handling,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_pima_object_delete(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle)
+UINT  _ux_device_class_pima_object_delete(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, ULONG object_format)
 {
 
 UINT                        status;
@@ -79,22 +82,19 @@ UINT                        status;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_PIMA_OBJECT_DELETE, pima, object_handle, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
-    /* Invoke the application callback function.  */
-    status = pima -> ux_device_class_pima_object_delete(pima, object_handle);
-    
-    /* Check for error.  */
-    if (status != UX_SUCCESS)
+    if (object_format == 0)
 
-        /* We return an error.  */
-        _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_INVALID_OBJECT_HANDLE, 0, 0, 0, 0);
-    
+        /* Invoke the application callback function.  */
+        status = pima -> ux_device_class_pima_object_delete(pima, object_handle);
     else
 
-        /* We return a response with success.  */
-        _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 0, 0, 0, 0);
+        /* Not supported.  */
+        status = UX_DEVICE_CLASS_PIMA_RC_FORMAT_UNSUPPORTED;
+
+    /* Response status.  */
+    status = _ux_device_class_pima_response_send(pima, (status == UX_SUCCESS) ?
+                            UX_DEVICE_CLASS_PIMA_RC_OK : status, 0, 0, 0, 0);
 
     /* Return completion status.  */
     return(status);
 }
-
-

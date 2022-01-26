@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_write                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,7 +64,7 @@
 /*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
 /*    _ux_host_stack_endpoint_reset         Reset endpoint                */
 /*    _ux_utility_memory_copy               Copy memory                   */
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
 /*    _ux_utility_long_put                  Put a long 32 bit value       */
 /*    _ux_utility_short_put                 Put a short 16 bit value      */
 /*                                                                        */ 
@@ -82,6 +82,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_write(UX_HOST_CLASS_PIMA *pima, UCHAR *data_pointer, 
@@ -158,7 +161,7 @@ ULONG            payload_length;
     {
         
         /* Wait for the completion of the transfer request.  */
-        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+        status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
 
         /* If the semaphore did not succeed we probably have a time out.  */
         if (status != UX_SUCCESS)
@@ -217,7 +220,7 @@ ULONG            payload_length;
         {
         
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
@@ -272,7 +275,7 @@ ULONG            payload_length;
         {
         
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)

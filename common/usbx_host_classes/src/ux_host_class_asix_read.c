@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_read                            PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,7 +61,7 @@
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
 /*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -75,6 +75,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_read (UX_HOST_CLASS_ASIX *asix, UCHAR *data_pointer, 
@@ -130,7 +133,7 @@ ULONG           transfer_request_length;
         {
             
             /* Wait for the completion of the transfer_request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_ASIX_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_ASIX_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS)

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_entry                          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_entry(UX_HOST_CLASS_COMMAND *command)
@@ -101,6 +104,9 @@ UINT    status;
            is ready to complete the enumeration.  */
         status =  _ux_host_class_dpump_activate(command);
         return(status);
+
+    case UX_HOST_CLASS_COMMAND_ACTIVATE_WAIT:
+        return(UX_STATE_NEXT);
 
     case UX_HOST_CLASS_COMMAND_DEACTIVATE:
 

@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_request_sense              PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_request_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -141,6 +144,19 @@ ULONG                   sense_length;
     /* Initialize the response buffer with the additional length.  */
     sense_buffer[UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_ADD_LENGTH] =  10;
 
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Next: Transfer (DATA).  */
+    storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+    storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_READ;
+
+    storage -> ux_device_class_storage_transfer = transfer_request;
+    storage -> ux_device_class_storage_device_length = sense_length;
+    storage -> ux_device_class_storage_data_length = sense_length;
+    storage -> ux_device_class_storage_data_count = 0;
+
+#else
+
     /* Send a data payload with the sense codes.  */
     if (sense_length)
         _ux_device_stack_transfer_request(transfer_request, sense_length, sense_length);
@@ -151,6 +167,7 @@ ULONG                   sense_length;
         _ux_device_stack_endpoint_stall(endpoint_in);
         storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
     }
+#endif
 
     /* Return completion status.  */    
     return(status);

@@ -30,12 +30,59 @@
 #include "ux_host_stack.h"
 
 
+#if defined(UX_HOST_STANDALONE)
+VOID _ux_host_class_storage_read_initialize(UX_HOST_CLASS_STORAGE *storage,
+                ULONG sector_start, ULONG sector_count);
+
+VOID
+#else
+static inline VOID
+#endif
+_ux_host_class_storage_read_initialize(UX_HOST_CLASS_STORAGE *storage,
+                ULONG sector_start, ULONG sector_count)
+{
+UCHAR       *cbw;
+UCHAR       *cbw_cb;
+ULONG       command_length;
+
+    /* Use a pointer for the cbw, easier to manipulate.  */
+    cbw = (UCHAR *)storage -> ux_host_class_storage_cbw;
+    cbw_cb = cbw + UX_HOST_CLASS_STORAGE_CBW_CB;
+
+    /* Get the Read Command Length.  */
+#ifdef UX_HOST_CLASS_STORAGE_INCLUDE_LEGACY_PROTOCOL_SUPPORT
+    if (storage -> ux_host_class_storage_interface -> ux_interface_descriptor.bInterfaceSubClass ==
+        UX_HOST_CLASS_STORAGE_SUBCLASS_UFI)
+        command_length =  UX_HOST_CLASS_STORAGE_READ_COMMAND_LENGTH_UFI;
+    else
+        command_length =  UX_HOST_CLASS_STORAGE_READ_COMMAND_LENGTH_SBC;
+#else
+    command_length =  UX_HOST_CLASS_STORAGE_READ_COMMAND_LENGTH_SBC;
+#endif
+
+    /* Initialize the CBW for this command.  */
+    _ux_host_class_storage_cbw_initialize(storage,
+                    UX_HOST_CLASS_STORAGE_DATA_IN,
+                    sector_count * storage -> ux_host_class_storage_sector_size,
+                    command_length);
+    
+    /* Prepare the MEDIA READ command block.  */
+    *(cbw_cb + UX_HOST_CLASS_STORAGE_READ_OPERATION) =  UX_HOST_CLASS_STORAGE_SCSI_READ16;
+
+    /* Store the sector start (LBA field).  */
+    _ux_utility_long_put_big_endian(cbw_cb + UX_HOST_CLASS_STORAGE_READ_LBA, sector_start);
+
+    /* Store the number of sectors to read.  */
+    _ux_utility_short_put_big_endian(cbw_cb + UX_HOST_CLASS_STORAGE_READ_TRANSFER_LENGTH, (USHORT) sector_count);
+}
+
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_read                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,15 +120,23 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_read(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
                                     ULONG sector_count, UCHAR *data_pointer)
 {
-
+#if defined(UX_HOST_STANDALONE)
 UINT            status;
-UCHAR           *cbw;
-UINT            command_length;
+    do {
+        status = _ux_host_class_storage_read_write_run(storage, UX_TRUE,
+                                    sector_start, sector_count, data_pointer);
+    } while(status == UX_STATE_WAIT);
+    return(storage -> ux_host_class_storage_status);
+#else
+UINT            status;
 UINT            media_retry;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -94,30 +149,8 @@ UINT            media_retry;
     while (media_retry-- != 0)
     {
 
-        /* Use a pointer for the cbw, easier to manipulate.  */
-        cbw =  (UCHAR *) storage -> ux_host_class_storage_cbw;
-
-        /* Get the Read Command Length.  */
-#ifdef UX_HOST_CLASS_STORAGE_INCLUDE_LEGACY_PROTOCOL_SUPPORT
-        if (storage -> ux_host_class_storage_interface -> ux_interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_STORAGE_SUBCLASS_UFI)
-            command_length =  UX_HOST_CLASS_STORAGE_READ_COMMAND_LENGTH_UFI;
-        else
-            command_length =  UX_HOST_CLASS_STORAGE_READ_COMMAND_LENGTH_SBC;
-#else
-        command_length =  UX_HOST_CLASS_STORAGE_READ_COMMAND_LENGTH_SBC;
-#endif
-
-        /* Initialize the CBW for this command.  */
-        _ux_host_class_storage_cbw_initialize(storage, UX_HOST_CLASS_STORAGE_DATA_IN, sector_count * storage -> ux_host_class_storage_sector_size, command_length);
-    
-        /* Prepare the MEDIA READ command block.  */
-        *(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_READ_OPERATION) =  UX_HOST_CLASS_STORAGE_SCSI_READ16;
-
-        /* Store the sector start (LBA field).  */
-        _ux_utility_long_put_big_endian(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_READ_LBA, sector_start);
-    
-        /* Store the number of sectors to read.  */
-        _ux_utility_short_put_big_endian(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_READ_TRANSFER_LENGTH, (USHORT) sector_count);
+        /* Initialize CBW.  */
+        _ux_host_class_storage_read_initialize(storage, sector_start, sector_count);
 
         /* Send the command to transport layer.  */
         status =  _ux_host_class_storage_transport(storage, data_pointer);
@@ -153,5 +186,5 @@ UINT            media_retry;
     /* Check if the media in the device has been removed. If so
        we have to tell UX_MEDIA (default FileX) that the media is closed.  */
     return(UX_HOST_CLASS_STORAGE_SENSE_ERROR);                                            
+#endif
 }
-

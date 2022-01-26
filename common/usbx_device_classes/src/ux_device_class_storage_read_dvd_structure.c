@@ -162,7 +162,7 @@ UCHAR usbx_device_class_storage_dvd_structure[] = {
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_read_dvd_structure         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -203,6 +203,9 @@ UCHAR usbx_device_class_storage_dvd_structure[] = {
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_read_dvd_structure(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -213,8 +216,12 @@ UINT  _ux_device_class_storage_read_dvd_structure(UX_SLAVE_CLASS_STORAGE *storag
 UINT                    status;
 UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   allocation_length;
-ULONG                   transfer_length = 0;
 UCHAR                   *dvd_structure_pointer;
+
+#if !defined(UX_DEVICE_STANDALONE)
+ULONG                   transfer_length = 0;
+#endif
+
 
     UX_PARAMETER_NOT_USED(endpoint_out);
 
@@ -235,6 +242,21 @@ UCHAR                   *dvd_structure_pointer;
 
     /* Set dvd structure pointer.  */
     dvd_structure_pointer = usbx_device_class_storage_dvd_structure;
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Next: Transfer (DATA).  */
+    storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+    storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_READ;
+
+    storage -> ux_device_class_storage_transfer = transfer_request;
+    storage -> ux_device_class_storage_device_length = allocation_length;
+    storage -> ux_device_class_storage_data_buffer = dvd_structure_pointer;
+    storage -> ux_device_class_storage_data_length = allocation_length;
+    storage -> ux_device_class_storage_data_count = 0;
+    UX_SLAVE_TRANSFER_STATE_RESET(storage -> ux_device_class_storage_transfer);
+
+#else
 
     /* Send back everything in chunks.  */
     while (allocation_length)
@@ -271,7 +293,8 @@ UCHAR                   *dvd_structure_pointer;
         /* Subtract what is left to send out.  */
         allocation_length -= transfer_length;
     }
-    
+#endif
+
     /* Now we set the CSW with success.  */
     UX_PARAMETER_NOT_USED(lun);
     storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;

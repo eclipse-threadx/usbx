@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -101,6 +101,15 @@
 /*                                            added transfer size field,  */
 /*                                            improved traceX support,    */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added too many ports error, */
+/*                                            moved tx_api.h include and  */
+/*                                            typedefs to ux_port.h,      */
+/*                                            added standalone support,   */
+/*                                            added device HID trace IDs, */
+/*                                            added some general errors,  */
+/*                                            added printer trace IDs,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -117,15 +126,43 @@ extern   "C" {
 
 #endif
 
-
-/* Include ThreadX API include file.  */
-
-#include "tx_api.h"
-
-
 /* Include USBX port specific file.  */
 
 #include "ux_port.h"
+
+/* Process compile options:
+ *
+ * - UX_HOST_SIDE_ONLY/UX_HOST_STANDALONE: 
+ *   Must not be defined at the same time,
+ *   When defined, only host/device side APIs are available.
+ *
+ * - UX_STANDALONE:
+ *   Defined, whole RTOS dependencies are removed from USBX.
+ *
+ * - UX_DEVICE_STANDALONE/UX_HOST_STANDALONE
+ *   Internal definitions for different parts,
+ *   _DEVICE_STANDALONE removes RTOS dependencies of DCD, device stack and classes,
+ *   _HOST_STANDALONE removes RTOS dependencies of HCD, host stack and classes,
+ *   if UX_STANDALONE is not defined, RTOS is always enabled in system and utilities.
+ */
+#if defined(UX_STANDALONE)
+#if !defined(UX_DEVICE_STANDALONE)
+#define UX_DEVICE_STANDALONE
+#endif
+#if !defined(UX_HOST_STANDALONE)
+#define UX_HOST_STANDALONE
+#endif
+#if !defined(UX_OTG_STANDALONE)
+#define UX_OTG_STANDALONE
+#endif
+#else
+#if defined(UX_DEVICE_STANDALONE) && defined(UX_HOST_STANDALONE) && defined(UX_OTG_STANDALONE) ||\
+    defined(UX_DEVICE_STANDALONE) && defined(UX_DEVICE_SIDE_ONLY) ||\
+    defined(UX_HOST_STANDALONE) && defined(UX_HOST_SIDE_ONLY)
+#define UX_STANDALONE
+#endif
+#endif
+
 
 /* Define the maximum length for class names (exclude string null-terminator).  */
 #define UX_MAX_CLASS_NAME_LENGTH    63
@@ -168,6 +205,7 @@ typedef signed char               SCHAR;
 
 /* Convert from millisecond to ThreadX Tick value. */
 #define UX_MS_TO_TICK(ms)                                  ((ms) * (UX_PERIODIC_RATE) / 1000)
+#define UX_MS_TO_TICK_NON_ZERO(ms)                         UX_MAX(1, UX_MS_TO_TICK(ms))
 
 /* Deprecated, left to be compatible with apps already using MS_TO_TICK.  */
 #define MS_TO_TICK(ms)                                     UX_MS_TO_TICK(ms)
@@ -239,7 +277,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            1
-#define USBX_PATCH_VERSION            9
+#define USBX_PATCH_VERSION            10
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
@@ -347,7 +385,11 @@ VOID _ux_utility_debug_log(UCHAR *debug_location, UCHAR *debug_message, ULONG de
     
 /* Determine if tracing is enabled.  */
 
-#ifdef TX_ENABLE_EVENT_TRACE
+#if defined(TX_ENABLE_EVENT_TRACE) && !defined(UX_STANDALONE)
+#define UX_ENABLE_EVENT_TRACE
+#endif
+
+#ifdef UX_ENABLE_EVENT_TRACE
 
 /* Trace is enabled. Remap calls so that interrupts can be disabled around the actual event logging.  */
 
@@ -643,6 +685,9 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_TRACE_DEVICE_CLASS_HID_REPORT_GET                            (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 24)            /* I1 = class instance  , I2 = descriptor type , I3 = request index                                 */
 #define UX_TRACE_DEVICE_CLASS_HID_REPORT_SET                            (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 25)            /* I1 = class instance  , I2 = descriptor type , I3 = request index                                 */
 #define UX_TRACE_DEVICE_CLASS_HID_DESCRIPTOR_SEND                       (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 26)            /* I1 = class instance  , I2 = descriptor type , I3 = request index                                 */
+#define UX_TRACE_DEVICE_CLASS_HID_READ                                  (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 27)            /* I1 = class instance  , I2 = buffer          , I3 = requested_length                              */
+#define UX_TRACE_DEVICE_CLASS_HID_RECEIVER_EVENT_GET                    (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 28)            /* I1 = class instance  , I2 = receiver event  , I3 = wait_option                                   */
+#define UX_TRACE_DEVICE_CLASS_HID_RECEIVER_EVENT_FREE                   (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 29)            /* I1 = class instance  , I2 = receiver event                                                       */
                                                                                                                                                                                                                               
 #define UX_TRACE_DEVICE_CLASS_PIMA_ACTIVATE                             (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 30)            /* I1 = class instance                                                                              */       
 #define UX_TRACE_DEVICE_CLASS_PIMA_DEACTIVATE                           (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 31)            /* I1 = class instance                                                                              */       
@@ -714,6 +759,11 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_TRACE_DEVICE_CLASS_DFU_ACTIVATE                              (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 97)            /* I1 = class instance                                                                              */       
 #define UX_TRACE_DEVICE_CLASS_DFU_DEACTIVATE                            (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 98)            /* I1 = class instance                                                                              */       
 
+#define UX_TRACE_DEVICE_CLASS_PRINTER_ACTIVATE                          (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 100)           /* I1 = class instance                                                                              */       
+#define UX_TRACE_DEVICE_CLASS_PRINTER_DEACTIVATE                        (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 101)           /* I1 = class instance                                                                              */       
+#define UX_TRACE_DEVICE_CLASS_PRINTER_READ                              (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 102)           /* I1 = class instance  , I2 = buffer          , I3 = requested_length                              */
+#define UX_TRACE_DEVICE_CLASS_PRINTER_WRITE                             (UX_TRACE_DEVICE_CLASS_EVENTS_BASE + 103)           /* I1 = class instance  , I2 = buffer          , I3 = requested_length                              */
+
 /* Define the USBX Error Event.  */
 
 #define UX_TRACE_ERROR                                                  999
@@ -741,6 +791,7 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_SYSTEM_CONTEXT_CLASS                                         7
 #define UX_SYSTEM_CONTEXT_UTILITY                                       8
 #define UX_SYSTEM_CONTEXT_DEVICE_STACK                                  9
+#define UX_SYSTEM_CONTEXT_HOST_STACK                                    10
 
 
 /* Defines the number of ThreadX timer ticks per seconds. By default, the ThreadX timer tick is 10ms, 
@@ -760,46 +811,92 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
    under ISR in the device stack.  */
 
 #ifndef UX_INTERRUPT_SAVE_AREA
+#ifdef  TX_INTERRUPT_SAVE_AREA
 #define UX_INTERRUPT_SAVE_AREA                                          TX_INTERRUPT_SAVE_AREA
+#else
+#define UX_INTERRUPT_SAVE_AREA                                          ALIGN_TYPE saved_flags;
+#endif
 #endif
 
 #ifndef UX_DISABLE
+#ifdef  TX_DISABLE
 #define UX_DISABLE                                                      TX_DISABLE
+#else
+#define UX_DISABLE                                                      saved_flags = _ux_utility_interrupt_disable();
+#endif
 #endif
 
 #ifndef UX_RESTORE
+#ifdef  TX_RESTORE
 #define UX_RESTORE                                                      TX_RESTORE
+#else
+#define UX_RESTORE                                                      _ux_utility_interrupt_restore(saved_flags);
+#endif
+#endif
+
+#ifndef UX_INT_SAVE_AREA    /* Backword compatible.  */
+#define UX_INT_SAVE_AREA                                                UX_INTERRUPT_SAVE_AREA
+#endif
+#ifndef UX_DISABLE_INTS     /* Backword compatible.  */
+#define UX_DISABLE_INTS                                                 UX_DISABLE
+#endif
+#ifndef UX_RESTORE_INTS     /* Backword compatible.  */
+#define UX_RESTORE_INTS                                                 UX_RESTORE
 #endif
 
 
 /* Define thread/timer related things.  */
 
 #ifndef UX_EMPTY
+#ifdef  TX_EMPTY
 #define UX_EMPTY                                                        TX_EMPTY
+#else
+#define UX_EMPTY                                                        (0)
+#endif
 #endif
 
 #ifndef UX_TIMER
+#ifdef  TX_API_H
 #define UX_TIMER                                                        TX_TIMER
+#endif
 #endif
 
 #ifndef UX_THREAD
+#ifdef  TX_API_H
 #define UX_THREAD                                                       TX_THREAD
+#endif
 #endif
 
 #ifndef UX_AUTO_START
+#ifdef  TX_AUTO_START
 #define UX_AUTO_START                                                   TX_AUTO_START
+#else
+#define UX_AUTO_START                                                   (1ul)
+#endif
 #endif
 
 #ifndef UX_DONT_START
+#ifdef  TX_DONT_START
 #define UX_DONT_START                                                   TX_DONT_START
+#else
+#define UX_DONT_START                                                   (0ul)
+#endif
 #endif
 
 #ifndef UX_AUTO_ACTIVATE
+#ifdef  TX_AUTO_ACTIVATE
 #define UX_AUTO_ACTIVATE                                                TX_AUTO_ACTIVATE
+#else
+#define UX_AUTO_ACTIVATE                                                (1ul)
+#endif
 #endif
 
 #ifndef UX_NO_ACTIVATE
+#ifdef  TX_NO_ACTIVATE
 #define UX_NO_ACTIVATE                                                  TX_NO_ACTIVATE
+#else
+#define UX_NO_ACTIVATE                                                  (0ul)
+#endif
 #endif
 
 #ifndef UX_THREAD_GET_SYSTEM_STATE
@@ -807,62 +904,101 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #endif
 
 #ifndef UX_WAIT_FOREVER
+#ifdef  TX_WAIT_FOREVER
 #define UX_WAIT_FOREVER                                                 TX_WAIT_FOREVER
+#else
+#define UX_WAIT_FOREVER                                                 (0xFFFFFFFFul)
+#endif
 #endif
 
 #ifndef UX_NO_WAIT
+#ifdef  TX_NO_WAIT
 #define UX_NO_WAIT                                                      TX_NO_WAIT
+#else
+#define UX_NO_WAIT                                                      (0ul)
+#endif
 #endif
 
 #ifndef UX_NO_TIME_SLICE
+#ifdef  TX_NO_TIME_SLICE
 #define UX_NO_TIME_SLICE                                                TX_NO_TIME_SLICE
+#else
+#define UX_NO_TIME_SLICE                                                (0ul)
+#endif
 #endif
 
 
 /* Define semaphore related things.  */
 
 #ifndef UX_SEMAPHORE
+#ifdef  TX_API_H
 #define UX_SEMAPHORE                                                    TX_SEMAPHORE
+#endif
 #endif
 
 
 /* Define mutex related things.  */
 
 #ifndef UX_MUTEX
+#ifdef  TX_API_H
 #define UX_MUTEX                                                        TX_MUTEX
+#endif
 #endif
 
 
 /* Define event flags group related things.  */
 
 #ifndef UX_EVENT_FLAGS_GROUP
+#ifdef  TX_API_H
 #define UX_EVENT_FLAGS_GROUP                                            TX_EVENT_FLAGS_GROUP
+#endif
 #endif
 
 #ifndef UX_OR_CLEAR
+#ifdef  TX_OR_CLEAR
 #define UX_OR_CLEAR                                                     TX_OR_CLEAR
+#else
+#define UX_OR_CLEAR                                                     (1u)
+#endif
 #endif
 
 #ifndef UX_OR
+#ifdef  TX_OR
 #define UX_OR                                                           TX_OR
+#else
+#define UX_OR                                                           (0u)
+#endif
 #endif
 
 #ifndef UX_AND_CLEAR
+#ifdef  TX_AND_CLEAR
 #define UX_AND_CLEAR                                                    TX_AND_CLEAR
+#else
+#define UX_AND_CLEAR                                                    (3u)
+#endif
 #endif
 
 #ifndef UX_AND
+#ifdef  TX_AND
 #define UX_AND                                                          TX_AND
+#else
+#define UX_AND                                                          (2u)
+#endif
 #endif
 
 #ifndef UX_NO_EVENTS
+#ifdef  TX_NO_EVENTS
 #define UX_NO_EVENTS                                                    TX_NO_EVENTS
+#else
+#define UX_NO_EVENTS                                                    (7u)
+#endif
 #endif
 
 
 /* Define basic USBX constants.  */
 
 #define UX_NULL                                                         ((void*)0)
+#define UX_INVALID_PTR                                                  ((void*)(~((ALIGN_TYPE)0)))
 #define UX_TRUE                                                         1u
 #define UX_FALSE                                                        0u
 #define UX_TT_MASK                                                      0x1FFu
@@ -1085,7 +1221,11 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_DEVICE_CONNECTION                                            0x81u
 #define UX_DEVICE_DISCONNECTION                                         0x82u
                                                                         
+/* Host change callback events : _callback(event, NULL, NULL)  */
                                                                         
+#define UX_STANDALONE_WAIT_BACKGROUND_TASK                              0x00u
+
+
 /* Define USBX transfer request status constants.  */                   
                                                                         
 #define UX_TRANSFER_STATUS_NOT_PENDING                                  0
@@ -1167,9 +1307,34 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_PS_DS                                                        6u
 
 
+/* Define USBX generic state machine constants.  */
+
+#define UX_STATE_RESET                                                  0u
+#define UX_STATE_EXIT                                                   1u
+#define UX_STATE_IDLE                                                   2u
+#define UX_STATE_ERROR                                                  3u
+#define UX_STATE_NEXT                                                   4u
+#define UX_STATE_WAIT                                                   5u
+#define UX_STATE_LOCK                                                   6u
+#define UX_STATE_BUSY                                                   6u
+#define UX_STATE_STEP                                                   0x20u
+#define UX_STATE_STACK_STEP                                             0x20u
+#define UX_STATE_DRIVER_STEP                                            0x40u
+#define UX_STATE_CLASS_STEP                                             0x60u
+#define UX_STATE_APP_STEP                                               0x80u
+
+#define UX_STATE_IS_RESET(s)                            (!(s))                          /* Reset state  */
+#define UX_STATE_IS_FATAL(s)                            ((s) && (s) < UX_STATE_ERROR)   /* Fatal, break all pending loops.  */
+#define UX_STATE_IS_ERROR(s)                            ((s) == UX_STATE_ERROR)         /* General error  */
+#define UX_STATE_IS_BUSY(s)                             ((s) >= UX_STATE_WAIT)          /* Locked or pending  */
+#define UX_STATE_IS_LOCKED(s)                           ((s) >= UX_STATE_LOCK)          /* Locked but not pendint  */
+
+
 /* Define USBX Error Code constants. The following format describes 
    their meaning:
                                                                            
+        0x00    : Success                                        
+        0x0x    : State machine return codes                                        
         0x1x    : Configuration errors                                        
         0x2x    : USB transport errors                                      
         0x3x    : USB controller errors                                      
@@ -1179,10 +1344,20 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
         0x7x    : USB HID Class errors                                           
         0x8x    : USB Audio Class errors                                           
         0x9x    : USB CDC-ECM Class errors                                           
+        ...
+        0xfx    : General errors
 */ 
 
 #define UX_SUCCESS                                                      0
+
 #define UX_ERROR                                                        0xff
+#define UX_BUSY                                                         0xfe
+#define UX_TIMEOUT                                                      0xfd
+#define UX_REENTRY                                                      0xfc
+#define UX_INVALID_STATE                                                0xfb
+#define UX_INVALID_PARAMETER                                            0xfa
+#define UX_ABORTED                                                      0xf9
+
 #define UX_TOO_MANY_DEVICES                                             0x11
 #define UX_MEMORY_INSUFFICIENT                                          0x12
 #define UX_NO_TD_AVAILABLE                                              0x13
@@ -1214,6 +1389,7 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_DESCRIPTOR_CORRUPTED                                         0x42
 #define UX_OVER_CURRENT_CONDITION                                       0x43
 #define UX_DEVICE_ENUMERATION_FAILURE                                   0x44
+#define UX_TOO_MANY_HUB_PORTS                                           0x45
                                                                         
 #define UX_DEVICE_HANDLE_UNKNOWN                                        0x50
 #define UX_CONFIGURATION_HANDLE_UNKNOWN                                 0x51
@@ -1270,11 +1446,13 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_HCD_GET_FRAME_NUMBER                                         10
 #define UX_HCD_SET_FRAME_NUMBER                                         11
 #define UX_HCD_TRANSFER_REQUEST                                         12
+#define UX_HCD_TRANSFER_RUN                                             12
 #define UX_HCD_TRANSFER_ABORT                                           13
 #define UX_HCD_CREATE_ENDPOINT                                          14
 #define UX_HCD_DESTROY_ENDPOINT                                         15
 #define UX_HCD_RESET_ENDPOINT                                           16
 #define UX_HCD_PROCESS_DONE_QUEUE                                       17
+#define UX_HCD_TASKS_RUN                                                17
 #define UX_HCD_UNINITIALIZE                                             18
                                                                         
 /* Define USBX DCD API function constants.  */                          
@@ -1291,12 +1469,14 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_DCD_GET_FRAME_NUMBER                                         10
 #define UX_DCD_SET_FRAME_NUMBER                                         11
 #define UX_DCD_TRANSFER_REQUEST                                         12
+#define UX_DCD_TRANSFER_RUN                                             12
 #define UX_DCD_TRANSFER_ABORT                                           13
 #define UX_DCD_CREATE_ENDPOINT                                          14
 #define UX_DCD_DESTROY_ENDPOINT                                         15
 #define UX_DCD_RESET_ENDPOINT                                           16
 #define UX_DCD_SET_DEVICE_ADDRESS                                       17
 #define UX_DCD_ISR_PENDING                                              18
+#define UX_DCD_TASKS_RUN                                                18
 #define UX_DCD_CHANGE_STATE                                             19
 #define UX_DCD_STALL_ENDPOINT                                           20
 #define UX_DCD_ENDPOINT_STATUS                                          21
@@ -1326,6 +1506,8 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_HOST_CLASS_COMMAND_ACTIVATE                                  2
 #define UX_HOST_CLASS_COMMAND_DEACTIVATE                                3
 #define UX_HOST_CLASS_COMMAND_DESTROY                                   4
+#define UX_HOST_CLASS_COMMAND_ACTIVATE_START                            UX_HOST_CLASS_COMMAND_ACTIVATE
+#define UX_HOST_CLASS_COMMAND_ACTIVATE_WAIT                             5
                                                                         
 #define UX_SLAVE_CLASS_COMMAND_QUERY                                    1
 #define UX_SLAVE_CLASS_COMMAND_ACTIVATE                                 2
@@ -1465,12 +1647,17 @@ typedef struct UX_HOST_CLASS_STRUCT
     UCHAR           ux_host_class_name[UX_MAX_CLASS_NAME_LENGTH + 1]; /* "+1" for string null-terminator */
 #endif
 
+#if defined(UX_HOST_STANDALONE)
+    UINT            (*ux_host_class_task_function)(struct UX_HOST_CLASS_STRUCT *);
+#endif
+
     UINT            ux_host_class_status;
     UINT            (*ux_host_class_entry_function) (struct UX_HOST_CLASS_COMMAND_STRUCT *);
     VOID            *ux_host_class_first_instance;
     VOID            *ux_host_class_client;
     VOID            *ux_host_class_media;
     VOID            *ux_host_class_ext;
+
 } UX_HOST_CLASS;
 
 
@@ -1490,7 +1677,6 @@ typedef struct UX_TRANSFER_STRUCT
     UINT            ux_transfer_request_value;
     UINT            ux_transfer_request_index;
     VOID            (*ux_transfer_request_completion_function) (struct UX_TRANSFER_STRUCT *);
-    UX_SEMAPHORE    ux_transfer_request_semaphore;
     VOID            *ux_transfer_request_class_instance;
     ULONG           ux_transfer_request_maximum_length;
     ULONG           ux_transfer_request_timeout_value;
@@ -1499,8 +1685,29 @@ typedef struct UX_TRANSFER_STRUCT
     struct UX_TRANSFER_STRUCT               
                     *ux_transfer_request_next_transfer_request;
     VOID            *ux_transfer_request_user_specific;
+#if !defined(UX_HOST_STANDALONE)
+    UX_SEMAPHORE    ux_transfer_request_semaphore;
     UX_THREAD       *ux_transfer_request_thread_pending;
+#else
+    UINT            ux_transfer_request_state;
+    ULONG           ux_transfer_request_time_start;
+    ULONG           ux_transfer_request_flags;
+    struct UX_TRANSFER_STRUCT
+                    *ux_transfer_request_next_pending;
+#endif
 } UX_TRANSFER;
+
+#if defined(UX_HOST_STANDALONE)
+#define UX_TRANSFER_STATE_RESET(tr)             ((tr)->ux_transfer_request_state = UX_STATE_RESET)
+#define UX_TRANSFER_STATE_IDLE(tr)              ((tr)->ux_transfer_request_state = UX_STATE_IDLE)
+#define UX_TRANSFER_STATE_IS_BUSY(tr)           UX_STATE_IS_BUSY((tr)->ux_transfer_request_state)
+#define UX_TRANSFER_STATE_IS_IDLE(tr)           ((tr)->ux_transfer_request_state == UX_STATE_IDLE)
+
+#define UX_TRANSFER_FLAGS_RESET(tr)             ((tr)->ux_transfer_request_flags = 0)
+#define UX_TRANSFER_FLAG_LOCK                   (0x1u << 0)
+#define UX_TRANSFER_FLAG_AUTO_WAIT              (0x1u << 1) /* Wait until transfer done.  */
+#define UX_TRANSFER_FLAG_AUTO_DEVICE_UNLOCK     (0x1u << 2) /* In wait case, unlock device after transfer done.  */
+#endif
 
 
 /* Define USBX Endpoint Descriptor structure.  */
@@ -1650,7 +1857,9 @@ typedef struct UX_DEVICE_STRUCT
     ULONG           ux_device_power_source;
     struct UX_CONFIGURATION_STRUCT
                     *ux_device_current_configuration;
+#if !defined(UX_HOST_STANDALONE)
     UX_SEMAPHORE    ux_device_protection_semaphore;
+#endif
     struct UX_HOST_CLASS_STRUCT                       
                     *ux_device_class;
     VOID            *ux_device_class_instance;
@@ -1672,8 +1881,45 @@ typedef struct UX_DEVICE_STRUCT
     struct UX_HUB_TT_STRUCT                      
                     ux_device_hub_tt[UX_MAX_TT];
 #endif
+
+#if defined(UX_HOST_STANDALONE)
+    ULONG           ux_device_flags;
+
+    struct UX_DEVICE_STRUCT
+                    *ux_device_enum_next;
+    struct UX_TRANSFER_STRUCT
+                    *ux_device_enum_trans;
+    union {
+        struct UX_DEVICE_STRUCT
+                    *device;
+        struct UX_CONFIGURATION_STRUCT
+                    *configuration;
+        struct UX_INTERFACE_STRUCT
+                    *interface;
+        VOID        *ptr;
+    }               ux_device_enum_inst;
+
+    ULONG           ux_device_enum_wait_start;
+    ULONG           ux_device_enum_wait_ms;
+
+    UCHAR           ux_device_enum_state;
+    UCHAR           ux_device_dbg_state;
+    UCHAR           ux_device_enum_next_state;
+    UCHAR           ux_device_enum_retry;
+    UCHAR           ux_device_enum_port_status;
+    UCHAR           ux_device_enum_index;
+    UCHAR           reserved[2];
+    ULONG           ux_device_dbg_state_count;
+#endif
+
 } UX_DEVICE;
 
+#if defined(UX_HOST_STANDALONE)
+#define UX_DEVICE_FLAG_LOCK                     0x01u
+#define UX_DEVICE_FLAG_RESET                    0x02u
+#define UX_DEVICE_FLAG_ENUM                     0x04u
+#define UX_DEVICE_FLAG_PROTECT                  0x08u
+#endif
 
 #if UX_MAX_HCD > 1
 #define UX_DEVICE_HCD_GET(d)                    ((d)->ux_device_hcd)
@@ -1901,6 +2147,10 @@ typedef struct UX_HCD_STRUCT
     ULONG           ux_hcd_available_bandwidth;
     ULONG           ux_hcd_version;
 #endif
+
+#if defined(UX_HOST_STANDALONE)
+    ULONG           ux_hcd_flags;
+#endif
 } UX_HCD;
 
 
@@ -1922,12 +2172,20 @@ typedef struct UX_SLAVE_TRANSFER_STRUCT
     ULONG           ux_slave_transfer_request_completion_code;
     ULONG           ux_slave_transfer_request_phase;
     VOID            (*ux_slave_transfer_request_completion_function) (struct UX_SLAVE_TRANSFER_STRUCT *);
+#if defined(UX_DEVICE_STANDALONE)
+    ULONG           ux_slave_transfer_request_state;
+#else
     UX_SEMAPHORE    ux_slave_transfer_request_semaphore;
+#endif
     ULONG           ux_slave_transfer_request_timeout;
     ULONG           ux_slave_transfer_request_force_zlp;
     UCHAR           ux_slave_transfer_request_setup[UX_SETUP_SIZE];
     ULONG           ux_slave_transfer_request_status_phase_ignore;
 } UX_SLAVE_TRANSFER;
+
+#if defined(UX_DEVICE_STANDALONE)
+#define UX_SLAVE_TRANSFER_STATE_RESET(tr) ((tr)->ux_slave_transfer_request_state = UX_STATE_RESET)
+#endif
 
 
 /* Define USBX Device Controller Endpoint structure.  */
@@ -2008,6 +2266,11 @@ typedef struct UX_SLAVE_DCD_STRUCT
     ULONG           ux_slave_dcd_device_address;
     UINT            (*ux_slave_dcd_function) (struct UX_SLAVE_DCD_STRUCT *,UINT, VOID *);
     void            *ux_slave_dcd_controller_hardware;
+
+#if defined(UX_DEVICE_STANDALONE)
+    UINT            (*ux_device_dcd_task_function)(struct UX_SLAVE_DCD_STRUCT *);
+#endif
+
 } UX_SLAVE_DCD;
 
 /* Define USBX Device Class Command container structure.  */
@@ -2046,8 +2309,12 @@ typedef struct UX_SLAVE_CLASS_STRUCT
     UINT            (*ux_slave_class_entry_function) (struct UX_SLAVE_CLASS_COMMAND_STRUCT *);
     VOID            *ux_slave_class_instance;
     VOID            *ux_slave_class_client;
+#if !defined(UX_DEVICE_STANDALONE)
     UX_THREAD       ux_slave_class_thread;
     VOID            *ux_slave_class_thread_stack;
+#else
+    UINT            (*ux_slave_class_task_function)(VOID *class_instance);
+#endif
     VOID            *ux_slave_class_interface_parameter;                    
     ULONG           ux_slave_class_interface_number;                    
     ULONG           ux_slave_class_configuration_number;                    
@@ -2097,7 +2364,9 @@ typedef struct UX_SYSTEM_STRUCT
 #endif
 
     UINT            ux_system_thread_lowest_priority;
+#if !defined(UX_STANDALONE)
     UX_MUTEX        ux_system_mutex;
+#endif
 
 #ifndef UX_DISABLE_ERROR_HANDLER
     UINT            ux_system_last_error;
@@ -2142,21 +2411,38 @@ typedef struct UX_SYSTEM_HOST_STRUCT
     ULONG           ux_system_host_max_td;
     ULONG           ux_system_host_max_iso_td;
 
+#if !defined(UX_HOST_STANDALONE)
     UCHAR           *ux_system_host_enum_thread_stack;
     UX_THREAD       ux_system_host_enum_thread;
     UX_SEMAPHORE    ux_system_host_enum_semaphore;
+#endif
 
 #if UX_MAX_DEVICES > 1
     VOID            (*ux_system_host_enum_hub_function) (VOID);
 #endif
 
+#if !defined(UX_HOST_STANDALONE)
     UCHAR           *ux_system_host_hcd_thread_stack;
     UX_THREAD       ux_system_host_hcd_thread;
     UX_SEMAPHORE    ux_system_host_hcd_semaphore;
+#endif
 
-#if defined(UX_OTG_SUPPORT)
+#if defined(UX_OTG_SUPPORT) && !defined(UX_OTG_STANDALONE)
     UCHAR           *ux_system_host_hnp_polling_thread_stack;
     UX_THREAD       ux_system_host_hnp_polling_thread;
+#endif
+
+#if defined(UX_HOST_STANDALONE)
+    struct UX_DEVICE_STRUCT
+                    *ux_system_host_enum_device;
+    struct UX_DEVICE_STRUCT
+                    *ux_system_host_enum_lock;
+    struct UX_TRANSFER_STRUCT
+                    *ux_system_host_pending_transfers;
+#if UX_MAX_DEVICES > 1
+    struct UX_HOST_CLASS_HUB_STRUCT
+                    *ux_system_host_hub_list;
+#endif
 #endif
 
     UINT            (*ux_system_host_change_function) (ULONG, UX_HOST_CLASS *, VOID *);
@@ -2235,9 +2521,11 @@ typedef struct UX_SYSTEM_SLAVE_STRUCT
 typedef struct UX_SYSTEM_OTG_STRUCT
 {                                        
 
+#if !defined(UX_OTG_STANDALONE)
     UX_THREAD       ux_system_otg_thread;
     UCHAR           *ux_system_otg_thread_stack;
     UX_SEMAPHORE    ux_system_otg_semaphore;
+#endif
     UINT            (*ux_system_otg_function) (ULONG);
     ULONG           ux_system_otg_mode;
     ULONG           ux_system_otg_io;
@@ -2266,7 +2554,11 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
     UX_ENDPOINT     *ux_host_class_dpump_bulk_in_endpoint;
     UX_ENDPOINT     *ux_host_class_dpump_interrupt_endpoint;
     UINT            ux_host_class_dpump_state;
+#if !defined(UX_HOST_STANDALONE)
     UX_SEMAPHORE    ux_host_class_dpump_semaphore;
+#else
+    ULONG           ux_host_class_dpump_flags;
+#endif
 } UX_HOST_CLASS_DPUMP;
 
 
@@ -2282,6 +2574,7 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 
 #define ux_system_initialize                                    _ux_system_initialize
 #define ux_system_uninitialize                                  _ux_system_uninitialize
+#define ux_system_tasks_run                                     _ux_system_tasks_run
 
 #define ux_host_class_hub_entry                                 _ux_host_class_hub_entry
 
@@ -2313,6 +2606,9 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_host_stack_role_swap                                 _ux_host_stack_role_swap
 #define ux_host_stack_device_configuration_reset                _ux_host_stack_device_configuration_reset
 
+#define ux_host_stack_tasks_run                                 _ux_host_stack_tasks_run
+#define ux_host_stack_transfer_run                              _ux_host_stack_transfer_run
+
 #define ux_utility_pci_class_scan                               _ux_utility_pci_class_scan
 #define ux_utility_pci_read                                     _ux_utility_pci_read
 #define ux_utility_pci_write                                    _ux_utility_pci_write
@@ -2337,6 +2633,9 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_device_stack_transfer_request                        _ux_device_stack_transfer_request
 #define ux_device_stack_transfer_abort                          _ux_device_stack_transfer_abort
 
+#define ux_device_stack_tasks_run                               _ux_device_stack_tasks_run
+#define ux_device_stack_transfer_run                            _ux_device_stack_transfer_run
+
 #define ux_hcd_ehci_initialize                                  _ux_hcd_ehci_initialize
 #define ux_hcd_isp1161_initialize                               _ux_hcd_isp1161_initialize
 #define ux_hcd_ohci_initialize                                  _ux_hcd_ohci_initialize
@@ -2344,6 +2643,7 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_dcd_sim_slave_initialize                             _ux_dcd_sim_slave_initialize
 
 #define ux_network_driver_init                                  _ux_network_driver_init 
+
 #endif
 
 
@@ -2352,6 +2652,7 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 UINT    ux_system_initialize(VOID *non_cached_memory_pool_start, ULONG non_cached_memory_size, 
                                 VOID *cached_memory_pool_start, ULONG cached_memory_size);
 UINT    ux_system_uninitialize(VOID);
+UINT    ux_system_tasks_run(VOID);
 
 /* Define USBX Host API prototypes.  */
 
@@ -2387,6 +2688,8 @@ VOID    ux_host_stack_hnp_polling_thread_entry(ULONG id);
 UINT    ux_host_stack_role_swap(UX_DEVICE *device);
 UINT    ux_host_stack_device_configuration_reset(UX_DEVICE *device);
 
+UINT    ux_host_stack_tasks_run(VOID);
+UINT    ux_host_stack_transfer_run(UX_TRANSFER *transfer_request);
 
 /* Define USBX Device API prototypes.  */
 
@@ -2425,6 +2728,9 @@ UINT    ux_device_stack_interface_set(UCHAR * device_framework, ULONG device_fra
 UINT    ux_device_stack_interface_start(UX_SLAVE_INTERFACE *interface);
 UINT    ux_device_stack_transfer_request(UX_SLAVE_TRANSFER *transfer_request, ULONG slave_length, ULONG host_length);
 UINT    ux_device_stack_transfer_request_abort(UX_SLAVE_TRANSFER *transfer_request, ULONG completion_code);
+
+UINT    ux_device_stack_tasks_run(VOID);
+UINT    ux_device_stack_transfer_run(UX_SLAVE_TRANSFER *transfer_request, ULONG slave_length, ULONG host_length);
 
 /* Include USBX utility and system file.  */
 

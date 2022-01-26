@@ -44,7 +44,7 @@ UCHAR usbx_device_class_storage_performance[] = {
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_get_performance            PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,6 +86,9 @@ UCHAR usbx_device_class_storage_performance[] = {
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_performance(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -98,6 +101,7 @@ UINT  _ux_device_class_storage_get_performance(UX_SLAVE_CLASS_STORAGE *storage,
 UINT                    status;
 UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   performance_page;
+ULONG                   data_length = 0;
 
 
     UX_PARAMETER_NOT_USED(lun);
@@ -129,8 +133,7 @@ ULONG                   performance_page;
             _ux_utility_long_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer + 4, 
                                             UX_SLAVE_CLASS_STORAGE_GET_PERFORMANCE_PAYLOAD);
 
-            /* Send a data payload with the read_capacity response buffer.  */
-            _ux_device_stack_transfer_request(transfer_request, UX_SLAVE_CLASS_STORAGE_GET_PERFORMANCE_RESPONSE_LENGTH, UX_SLAVE_CLASS_STORAGE_GET_PERFORMANCE_RESPONSE_LENGTH); 
+            data_length = UX_SLAVE_CLASS_STORAGE_GET_PERFORMANCE_RESPONSE_LENGTH;
             break;
             
         case UX_SLAVE_CLASS_STORAGE_GET_PERFORMANCE_PAGE_0 :
@@ -143,11 +146,31 @@ ULONG                   performance_page;
             _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + 8, 
                                         usbx_device_class_storage_performance, USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH); /* Use case of memcpy is verified. */
 
-            /* Send a data payload with the read_capacity response buffer.  */
-            _ux_device_stack_transfer_request(transfer_request, USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8, USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8); 
+            data_length = USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8;
             break;
+
+        default:
+            data_length = 0;
     }
-    
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Next: Transfer (DATA).  */
+    storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+    storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_READ;
+
+    storage -> ux_device_class_storage_transfer = transfer_request;
+    storage -> ux_device_class_storage_device_length = data_length;
+    storage -> ux_device_class_storage_data_length = data_length;
+    storage -> ux_device_class_storage_data_count = 0;
+    UX_SLAVE_TRANSFER_STATE_RESET(storage -> ux_device_class_storage_transfer);
+
+#else
+
+    /* Send a data payload with the read_capacity response buffer.  */
+    _ux_device_stack_transfer_request(transfer_request, data_length, data_length); 
+#endif
+
     /* Now we set the CSW with success.  */
     storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
     status = UX_SUCCESS;

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_sim_host.h                                   PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,6 +58,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -132,7 +135,9 @@ typedef struct UX_HCD_SIM_HOST_STRUCT
     UINT            ux_hcd_sim_host_periodic_scheduler_active;
     UINT            ux_hcd_sim_host_interruptible;
     ULONG           ux_hcd_sim_host_interrupt_count;
+#if !defined(UX_HOST_STANDALONE)
     UX_TIMER        ux_hcd_sim_host_timer;
+#endif
 } UX_HCD_SIM_HOST;
 
 
@@ -159,8 +164,9 @@ typedef struct UX_HCD_SIM_HOST_ED_STRUCT
 
 /* Define simulator host ED bitmap.  */
 
-#define UX_HCD_SIM_HOST_ED_STATIC                               0x80000000
-#define UX_HCD_SIM_HOST_ED_SKIP                                 0x40000000
+#define UX_HCD_SIM_HOST_ED_STATIC                               0x80000000u
+#define UX_HCD_SIM_HOST_ED_SKIP                                 0x40000000u
+#define UX_HCD_SIM_HOST_ED_TRANSFER                             0x00100000u
 
 
 /* Define simulator host TD structure.  */
@@ -257,6 +263,7 @@ UINT    _ux_hcd_sim_host_transaction_schedule(UX_HCD_SIM_HOST *hcd_sim_host, UX_
 UINT    _ux_hcd_sim_host_transfer_abort(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request);
 UINT    _ux_hcd_sim_host_port_reset(UX_HCD_SIM_HOST *hcd_sim_host, ULONG port_index);
 
+UINT    _ux_hcd_sim_host_transfer_run(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request);
 
 /* Define Device Simulator Class API prototypes.  */
 

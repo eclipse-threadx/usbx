@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_write                        PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,8 +61,8 @@
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
 /*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_put             Release protection semaphore  */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_put                Release protection semaphore  */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -79,12 +79,19 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed ZLP sending issue,    */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_write(UX_HOST_CLASS_PRINTER *printer, UCHAR * data_pointer, 
                                     ULONG requested_length, ULONG *actual_length)
 {
 
+#if defined(UX_HOST_STANDALONE)
+UX_INTERRUPT_SAVE_AREA
+ULONG           transfer_flags;
+#endif
 UX_TRANSFER     *transfer_request;
 UINT            status;
 ULONG           transfer_request_length;
@@ -105,12 +112,24 @@ ULONG           transfer_request_length;
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     }
 
+#if defined(UX_HOST_STANDALONE)
+    UX_DISABLE
+    if (printer -> ux_host_class_printer_flags & UX_HOST_CLASS_PRINTER_FLAG_LOCK)
+    {
+        UX_RESTORE
+        return(UX_BUSY);
+    }
+    printer -> ux_host_class_printer_flags |= UX_HOST_CLASS_PRINTER_FLAG_LOCK;
+    UX_RESTORE
+#else
+
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&printer -> ux_host_class_printer_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&printer -> ux_host_class_printer_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
 
         /* Return error.  */
         return(status);
+#endif
 
     /* Start by resetting the actual length of the transfer.  */
     *actual_length =  0;
@@ -118,6 +137,13 @@ ULONG           transfer_request_length;
     /* Get the pointer to the bulk out endpoint transfer request.  */
     transfer_request =  &printer -> ux_host_class_printer_bulk_out_endpoint -> ux_endpoint_transfer_request;
     
+#if defined(UX_HOST_STANDALONE)
+
+    /* Enable blocking transfer flags.  */
+    transfer_flags = transfer_request -> ux_transfer_request_flags;
+    transfer_request -> ux_transfer_request_flags |= UX_TRANSFER_FLAG_AUTO_WAIT;
+#endif
+
     /* Perform a transfer on the bulk out endpoint until either the transfer is
        completed or when there is an error.  */
     do
@@ -139,9 +165,10 @@ ULONG           transfer_request_length;
         /* If the transfer is successful, we need to wait for the transfer request to be completed.  */
         if (status == UX_SUCCESS)
         {
+#if !defined(UX_HOST_STANDALONE)
             
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PRINTER_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PRINTER_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
@@ -155,7 +182,7 @@ ULONG           transfer_request_length;
                 *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
             
                 /* Unprotect thread reentry to this instance.  */
-                status =  _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+                _ux_host_class_printer_unlock(printer);
 
                 /* Set the completion code.  */
                 transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
@@ -169,12 +196,18 @@ ULONG           transfer_request_length;
                 /* There was an error, return to the caller.  */
                 return(UX_TRANSFER_TIMEOUT);
             }            
+#endif
         }
         else
         {
+#if defined(UX_HOST_STANDALONE)
+
+            /* Restore transfer options.  */
+            transfer_request -> ux_transfer_request_flags = transfer_flags;
+#endif
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+            _ux_host_class_printer_unlock(printer);
 
             /* There was a non transfer error, no partial transfer to be checked */
             return(status);
@@ -188,9 +221,14 @@ ULONG           transfer_request_length;
            actually sent and determine if a partial transfer is OK. */
         if (transfer_request_length !=  transfer_request -> ux_transfer_request_actual_length)
         {
+#if defined(UX_HOST_STANDALONE)
+
+            /* Restore transfer options.  */
+            transfer_request -> ux_transfer_request_flags = transfer_flags;
+#endif
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+            _ux_host_class_printer_unlock(printer);
 
             /* Return success.  */
             return(UX_SUCCESS);
@@ -203,8 +241,14 @@ ULONG           transfer_request_length;
         requested_length -=  transfer_request_length;          
     } while (requested_length);
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Restore transfer options.  */
+    transfer_request -> ux_transfer_request_flags = transfer_flags;
+#endif
+
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+    _ux_host_class_printer_unlock(printer);
 
     /* We get here when all the transfers went through without errors.  */
     return(UX_SUCCESS); 

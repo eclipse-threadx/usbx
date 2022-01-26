@@ -83,7 +83,7 @@
 /*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
-#ifdef TX_ENABLE_EVENT_TRACE
+#ifdef UX_ENABLE_EVENT_TRACE
 VOID  _ux_trace_event_insert(ULONG event_id, ULONG info_field_1, ULONG info_field_2, ULONG info_field_3, ULONG info_field_4, 
                              ULONG filter, TX_TRACE_BUFFER_ENTRY **current_event, ULONG *current_timestamp)
 {

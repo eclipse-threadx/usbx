@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_swar_deactivate                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,8 +60,8 @@
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort endpoint transfer       */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_delete          Delete protection semaphore   */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -75,6 +75,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -91,7 +94,7 @@ UINT                        status;
     swar -> ux_host_class_swar_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&swar -> ux_host_class_swar_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&swar -> ux_host_class_swar_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
     {       
 
@@ -112,13 +115,13 @@ UINT                        status;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(swar -> ux_host_class_swar_class, (VOID *) swar);
 
     /* Destroy the semaphore.  */
-    _ux_utility_semaphore_delete(&swar -> ux_host_class_swar_semaphore);
+    _ux_host_semaphore_delete(&swar -> ux_host_class_swar_semaphore);
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

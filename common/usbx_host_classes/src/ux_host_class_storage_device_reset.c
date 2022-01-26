@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_device_reset                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_device_reset(UX_HOST_CLASS_STORAGE *storage)
@@ -90,7 +93,7 @@ UINT            status;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
     /* We need to prevent other threads from simultaneously using the endpoint. */
-    _ux_utility_semaphore_get(&control_endpoint -> ux_endpoint_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status = _ux_host_semaphore_get(&control_endpoint -> ux_endpoint_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Create a transfer_request for the RESET request.  */
     transfer_request -> ux_transfer_request_data_pointer =      UX_NULL;

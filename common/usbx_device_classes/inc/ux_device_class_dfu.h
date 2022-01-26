@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,6 +54,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -173,8 +176,8 @@ extern   "C" {
 #define UX_SLAVE_CLASS_DFU_MEDIA_STATUS_ERROR                       2 
 
 /* Define DFU thread event signals.  */
-#define UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT                 1
-#define UX_DEVICE_CLASS_DFU_THREAD_EVENT_WAIT_RESET                 2
+#define UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT                 0x1u
+#define UX_DEVICE_CLASS_DFU_THREAD_EVENT_WAIT_RESET                 0x2u
 
 /* Define Slave DFU Class Calling Parameter structure */
 
@@ -212,11 +215,25 @@ typedef struct UX_SLAVE_CLASS_DFU_STRUCT
 #ifdef UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE
     UINT                    (*ux_device_class_dfu_custom_request)(VOID *dfu, UX_SLAVE_TRANSFER *transfer);
 #endif
+
+#if !defined(UX_DEVICE_STANDALONE)
     UX_THREAD               ux_slave_class_dfu_thread;
     UCHAR                   *ux_slave_class_dfu_thread_stack;
     UX_EVENT_FLAGS_GROUP    ux_slave_class_dfu_event_flags_group;
-    
+#else
+    ULONG                   ux_device_class_dfu_flags;
+#endif
 } UX_SLAVE_CLASS_DFU;
+
+#if !defined(UX_DEVICE_STANDALONE)
+#define _ux_device_class_dfu_event_flags_set(dfu, flags)    do {                                    \
+        _ux_utility_event_flags_set(&(dfu) -> ux_slave_class_dfu_event_flags_group, flags, UX_OR);  \
+    } while(0)
+#else
+#define _ux_device_class_dfu_event_flags_set(dfu, flags)    do {                \
+        (dfu) -> ux_device_class_dfu_flags |= flags;                            \
+    } while(0)
+#endif
 
 /* Define Device DFU Class prototypes.  */
 
@@ -229,6 +246,8 @@ VOID  _ux_device_class_dfu_thread(ULONG dfu_class);
 
 UCHAR _ux_device_class_dfu_state_get(UX_SLAVE_CLASS_DFU *dfu);
 VOID  _ux_device_class_dfu_state_sync(UX_SLAVE_CLASS_DFU *dfu);
+
+UINT  _ux_device_class_dfu_tasks_run(VOID *class_instance);
 
 /* Define Device DFU Class API prototypes.  */
 

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_thread                       PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,8 +58,8 @@
 /*    _ux_host_class_cdc_ecm_transmit_queue_clean                         */
 /*                                          Clean transmit queue          */
 /*    _ux_host_stack_transfer_request       Transfer request              */
-/*    _ux_utility_semaphore_get             Get semaphore                 */
-/*    _ux_utility_semaphore_put             Put semaphore                 */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*    _ux_host_semaphore_put                Put semaphore                 */
 /*    _ux_utility_short_get_big_endian      Get 16-bit big endian         */
 /*    _ux_network_driver_link_up            Set state link up             */
 /*    _ux_network_driver_link_down          Set state link down           */
@@ -86,6 +86,9 @@
 /*                                            compile option for using    */
 /*                                            packet pool from NetX,      */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_thread(ULONG parameter)
@@ -108,7 +111,7 @@ USB_NETWORK_DEVICE_TYPE     *usb_network_device_ptr;
     {   
 
         /* Wait for the semaphore to be put by the cdc_ecm interrupt event.  */
-        _ux_utility_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore, UX_WAIT_FOREVER);
+        _ux_host_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore, UX_WAIT_FOREVER);
 
         /* Check the link state. It is either pending up or down.  */
         if (cdc_ecm -> ux_host_class_cdc_ecm_link_state == UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_UP)
@@ -194,14 +197,14 @@ USB_NETWORK_DEVICE_TYPE     *usb_network_device_ptr;
                         /* Signal that we are done arming and resume waiting thread if necessary.  */
                         cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_check_and_arm_in_process =  UX_FALSE;
                         if (cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish == UX_TRUE)
-                            _ux_utility_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
+                            _ux_host_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
     
                         /* Check if the transaction was armed successfully.  */
                         if (status == UX_SUCCESS)
                         {
 
                             /* Wait for the completion of the transfer request.  */
-                            _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_WAIT_FOREVER);
+                            _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_WAIT_FOREVER);
 
                             /* Check the transfer status. If there is a transport error, we ignore the packet
                                and restart it. */
@@ -252,7 +255,7 @@ USB_NETWORK_DEVICE_TYPE     *usb_network_device_ptr;
                         /* Signal that we are done arming and resume waiting thread if necessary.  */
                         cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_check_and_arm_in_process =  UX_FALSE;
                         if (cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish == UX_TRUE)
-                            _ux_utility_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
+                            _ux_host_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
 
                         /* Release packet.  */
                         nx_packet_release(packet);

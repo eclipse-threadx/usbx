@@ -30,12 +30,13 @@
 #include "ux_device_stack.h"
 
 
+#if !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_thread                     PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,6 +44,8 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
 /*    This function is the thread of the storage class.                   */ 
+/*                                                                        */
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -79,9 +82,9 @@
 /*    _ux_device_stack_transfer_request     Transfer request              */ 
 /*    _ux_utility_long_get                  Get 32-bit value              */ 
 /*    _ux_utility_memory_allocate           Allocate memory               */ 
-/*    _ux_utility_semaphore_create          Create semaphore              */ 
+/*    _ux_device_semaphore_create           Create semaphore              */ 
 /*    _ux_utility_delay_ms                  Sleep thread for several ms   */
-/*    _ux_utility_thread_suspend            Suspend thread                */ 
+/*    _ux_device_thread_suspend             Suspend thread                */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -114,6 +117,9 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved TAG management,    */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_storage_thread(ULONG storage_class)
@@ -154,8 +160,11 @@ UCHAR                       *cbw_cb;
             /* We assume the worst situation.  */
             status =  UX_ERROR;
 
-            /* This is the first time we are activated. We need the interface to the class.  */
+            /* We are activated. We need the interface to the class.  */
             interface =  storage -> ux_slave_class_storage_interface;
+
+            /* We assume the worst situation.  */
+            status =  UX_ERROR;
 
             /* Locate the endpoints.  */
             endpoint_in =  interface -> ux_slave_interface_first_endpoint;
@@ -401,7 +410,7 @@ UCHAR                       *cbw_cb;
                                     else
 
                                         /* We must therefore wait a while.  */
-                                        _ux_utility_thread_relinquish();
+                                        _ux_device_thread_relinquish();
                                 }
                                 break;
                             }
@@ -449,7 +458,7 @@ UCHAR                       *cbw_cb;
 
         /* We need to suspend ourselves. We will be resumed by the 
            device enumeration module.  */
-        _ux_utility_thread_suspend(&class -> ux_slave_class_thread);
+        _ux_device_thread_suspend(&class -> ux_slave_class_thread);
     }
 }
-
+#endif

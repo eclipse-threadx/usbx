@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Printer Class                                                       */
 /**                                                                       */
@@ -30,50 +30,53 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_activate                     PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_printer_activate                     PORTABLE C      */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function calls the USBX stack to activate the class.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Printer class command pointer */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_configure      Configure printer class       */ 
-/*    _ux_host_class_printer_endpoints_get  Get endpoints of printer      */ 
-/*    _ux_host_class_printer_name_get       Get printer name              */ 
-/*    _ux_host_stack_class_instance_create  Create class instance         */ 
-/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_semaphore_create          Create printer semaphore      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_entry          Entry of printer class        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function calls the USBX stack to activate the class.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Printer class command pointer */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_printer_configure      Configure printer class       */
+/*    _ux_host_class_printer_endpoints_get  Get endpoints of printer      */
+/*    _ux_host_class_printer_name_get       Get printer name              */
+/*    _ux_host_stack_class_instance_create  Create class instance         */
+/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Free memory block             */
+/*    _ux_host_semaphore_create             Create printer semaphore      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_printer_entry          Entry of printer class        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_activate(UX_HOST_CLASS_COMMAND *command)
@@ -81,8 +84,10 @@ UINT  _ux_host_class_printer_activate(UX_HOST_CLASS_COMMAND *command)
 
 UX_INTERFACE            *interface;
 UX_HOST_CLASS_PRINTER   *printer;
+#if !defined(UX_HOST_STANDALONE)
 UINT                    status;
-    
+#endif
+
 
     /* The printer is always activated by the interface descriptor and not the
        device descriptor.  */
@@ -108,21 +113,29 @@ UINT                    status;
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(printer -> ux_host_class_printer_class, (VOID *) printer);
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Do activate steps.  */
+    printer -> ux_host_class_printer_enum_state = UX_STATE_WAIT;
+    printer -> ux_host_class_printer_state = UX_HOST_CLASS_INSTANCE_MOUNTING;
+    return(UX_SUCCESS);
+#else
+
     /* Configure the printer.  */
     status =  _ux_host_class_printer_configure(printer);
-
-    /* Get the name of the printer from the 1284 descriptor.  */
-    if (status == UX_SUCCESS)
-        status =  _ux_host_class_printer_name_get(printer);
 
     /* Get the printer endpoint(s). We may need to search for Bulk Out and Bulk In endpoints.  */
     if (status == UX_SUCCESS)
         status =  _ux_host_class_printer_endpoints_get(printer);
 
+    /* Get the name of the printer from the 1284 descriptor.  */
+    if (status == UX_SUCCESS)
+        status =  _ux_host_class_printer_name_get(printer);
+
     /* Create the semaphore to protect 2 threads from accessing the same printer instance.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&printer -> ux_host_class_printer_semaphore, "ux_host_class_printer_semaphore", 1);
+        status =  _ux_host_semaphore_create(&printer -> ux_host_class_printer_semaphore, "ux_host_class_printer_semaphore", 1);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }
@@ -138,7 +151,7 @@ UINT                    status;
         if a function has been programmed in the system structure.  */
         if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
         {
-            
+
             /* Call system change function.  */
             _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, printer -> ux_host_class_printer_class, (VOID *) printer);
         }
@@ -159,6 +172,8 @@ UINT                    status;
     _ux_utility_memory_free(printer);
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
+
+#endif
 }
 

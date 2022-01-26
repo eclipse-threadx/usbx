@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_transfer_abort                     PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,10 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            assigned aborting code,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_transfer_abort(UX_SLAVE_TRANSFER *transfer_request, ULONG completion_code)
@@ -94,7 +98,7 @@ UX_SLAVE_DCD    *dcd;
     dcd =  &_ux_system_slave -> ux_system_slave_dcd;
 
     /* Sets the completion code due to bus reset.  */
-    transfer_request -> ux_slave_transfer_request_completion_code =  UX_TRANSFER_BUS_RESET;
+    transfer_request -> ux_slave_transfer_request_completion_code = completion_code;
 
     /* Ensure we're not preempted by the transfer completion ISR.  */
     UX_DISABLE
@@ -116,7 +120,7 @@ UX_SLAVE_DCD    *dcd;
         transfer_request -> ux_slave_transfer_request_status =  UX_TRANSFER_STATUS_ABORT;
 
         /* Wake up the device driver who is waiting on the semaphore.  */
-        _ux_utility_semaphore_put(&transfer_request -> ux_slave_transfer_request_semaphore);
+        _ux_device_semaphore_put(&transfer_request -> ux_slave_transfer_request_semaphore);
     }
     else
     {

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_configuration_deactivate      PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,11 +71,17 @@
 /*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed trace enabled error,  */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_deactivate(UX_DEVICE *device)
 {
 
+#if defined(UX_HOST_STANDALONE)
+UX_INTERRUPT_SAVE_AREA
+#endif
 UX_HOST_CLASS_COMMAND       command;
 UX_CONFIGURATION            *configuration;
 UX_INTERFACE                *interface;
@@ -101,9 +107,22 @@ UINT                        status;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_DEACTIVATE, device, configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Check device lock.  */
+    UX_DISABLE
+    if (device -> ux_device_flags & UX_DEVICE_FLAG_LOCK)
+    {
+        UX_RESTORE
+        return(UX_BUSY);
+    }
+    device -> ux_device_flags |= UX_DEVICE_FLAG_LOCK;
+    UX_RESTORE
+#else
+
     /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
-    status =  _ux_utility_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)
@@ -117,11 +136,16 @@ UINT                        status;
 
         return(UX_SEMAPHORE_ERROR);
     }
+#endif
 
     /* Check for the state of the device, if not configured, we are done.  */
     if (device -> ux_device_state != UX_DEVICE_CONFIGURED)
     {
-        _ux_utility_semaphore_put(&device -> ux_device_protection_semaphore);
+#if defined(UX_HOST_STANDALONE)
+        device -> ux_device_flags &= ~UX_DEVICE_FLAG_LOCK;
+#else
+        _ux_host_semaphore_put(&device -> ux_device_protection_semaphore);
+#endif
         return(UX_SUCCESS);
     }
 
@@ -157,6 +181,10 @@ UINT                        status;
 
     /* The device can now be un-configured.  */
     status =  _ux_host_stack_device_configuration_reset(device);
+
+#if defined(UX_HOST_STANDALONE)
+    device -> ux_device_flags &= ~UX_DEVICE_FLAG_LOCK;
+#endif
 
     /* Return completion status.  */
     return(status);

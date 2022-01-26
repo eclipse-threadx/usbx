@@ -159,7 +159,7 @@ UCHAR                                   *baInterfaceNr;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_activate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -190,7 +190,7 @@ UCHAR                                   *baInterfaceNr;
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
 /*    _ux_utility_memory_allocate           Allocate a memory block       */ 
 /*    _ux_utility_memory_free               Free a memory block           */ 
-/*    _ux_utility_semaphore_create          Create protection semaphore   */ 
+/*    _ux_host_semaphore_create             Create protection semaphore   */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -206,6 +206,9 @@ UCHAR                                   *baInterfaceNr;
 /*                                            created new semaphore to    */
 /*                                            protect control requests,   */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_activate(UX_HOST_CLASS_COMMAND *command)
@@ -273,7 +276,7 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
        video instance.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&video -> ux_host_class_video_semaphore, "ux_video_semaphore", 1);
+        status =  _ux_host_semaphore_create(&video -> ux_host_class_video_semaphore, "ux_video_semaphore", 1);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }
@@ -282,7 +285,7 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
        request at the same time.  */
     if (status == UX_SUCCESS)
     {
-        status = _ux_utility_semaphore_create(&video -> ux_host_class_video_semaphore_control_request, "ux_video_semaphore_control", 1);
+        status = _ux_host_semaphore_create(&video -> ux_host_class_video_semaphore_control_request, "ux_video_semaphore_control", 1);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }
@@ -319,7 +322,7 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
 
     /* Destroy the semaphore.  */
     if (video -> ux_host_class_video_semaphore.tx_semaphore_id != 0)
-        _ux_utility_semaphore_delete(&video -> ux_host_class_video_semaphore);
+        _ux_host_semaphore_delete(&video -> ux_host_class_video_semaphore);
 
     /* Destroy the class instance.  */
     _ux_host_stack_class_instance_destroy(video -> ux_host_class_video_class, (VOID *) video);

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_change                       PORTABLE C      */
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*                                            replaced wMaxPacketSize by  */
 /*                                            calculated payload size,    */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added feedback support,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -81,6 +84,7 @@ UX_SLAVE_INTERFACE                      *interface;
 UX_SLAVE_ENDPOINT                       *endpoint;
 UCHAR                                   *frame_buffer;
 ULONG                                    stream_index;
+ULONG                                    endpoint_dir;
 
 
     /* Get the class container.  */
@@ -118,34 +122,78 @@ ULONG                                    stream_index;
     if (interface -> ux_slave_interface_descriptor.bAlternateSetting != 0)
     {
 
-        /* Locate the endpoints.  ISO IN/OUT for Streaming Interface.  */
+        /* Locate the endpoints.  ISO IN(write)/OUT(read) for Streaming Interface.  */
         endpoint = interface -> ux_slave_interface_first_endpoint;
 
         /* Parse all endpoints.  */
+        endpoint_dir = (stream -> ux_device_class_audio_stream_thread.tx_thread_entry ==
+                        _ux_device_class_audio_read_thread_entry) ?
+                        UX_ENDPOINT_OUT : UX_ENDPOINT_IN;
         stream -> ux_device_class_audio_stream_endpoint = UX_NULL;
-        while (endpoint != UX_NULL)
+
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+        stream -> ux_device_class_audio_stream_feedback = UX_NULL;
+#endif
+        while(endpoint != UX_NULL)
         {
 
-            /* Check the endpoint.  */
-            if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes &
-                    (UX_DEVICE_CLASS_AUDIO_EP_TRANSFER_TYPE_MASK | UX_DEVICE_CLASS_AUDIO_EP_USAGE_TYPE_MASK)) == UX_ISOCHRONOUS_ENDPOINT)
+            /* Check the endpoint attributes.  */
+            if((endpoint -> ux_slave_endpoint_descriptor.bmAttributes &
+                UX_DEVICE_CLASS_AUDIO_EP_TRANSFER_TYPE_MASK) == UX_ISOCHRONOUS_ENDPOINT)
             {
 
-                /* We found the endpoint, check its size.  */
-                if (endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_transfer_length > stream -> ux_device_class_audio_stream_frame_buffer_size - 8)
+                /* Check the endpoint direction.  */
+                if ((endpoint->ux_slave_endpoint_descriptor.bEndpointAddress &
+                     UX_ENDPOINT_DIRECTION) == endpoint_dir)
                 {
 
-                    /* Error trap!  */
-                    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
+                    /* We found the data endpoint, check its size.  */
+                    if (endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_transfer_length > stream -> ux_device_class_audio_stream_frame_buffer_size - 8)
+                    {
 
-                    /* Frame buffer too small for endpoints.  */
-                    return(UX_MEMORY_INSUFFICIENT);
+                        /* Error trap!  */
+                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
+
+                        /* Frame buffer too small for endpoints.  */
+                        return(UX_MEMORY_INSUFFICIENT);
+                    }
+
+                    /* Save it.  */
+                    stream -> ux_device_class_audio_stream_endpoint = endpoint;
                 }
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+                else
+                {
 
-                /* Save it.  */
-                stream -> ux_device_class_audio_stream_endpoint = endpoint;
-                break;
+                    /* We found the feedback endpoint, check its size.  */
+                    if (endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_transfer_length <
+                        (_ux_system_slave->ux_system_slave_speed == UX_HIGH_SPEED_DEVICE ? 4 : 3))
+                    {
+
+                        /* Error trap!  */
+                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
+
+                        /* Frame buffer too small for endpoints.  */
+                        return(UX_MEMORY_INSUFFICIENT);
+                    }
+
+                    /* Set request length.  */
+                    endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_requested_length =
+                        (_ux_system_slave -> ux_system_slave_speed == UX_HIGH_SPEED_DEVICE) ? 4 : 3;
+
+                    /* Save it.  */
+                    stream -> ux_device_class_audio_stream_feedback = endpoint;
+                }
+#endif
             }
+
+            /* Check if done.  */
+            if (stream -> ux_device_class_audio_stream_endpoint
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+                && stream -> ux_device_class_audio_stream_feedback
+#endif
+                )
+                break;
 
             /* Next endpoint.  */
             endpoint =  endpoint -> ux_slave_endpoint_next_endpoint;
@@ -175,12 +223,22 @@ ULONG                                    stream_index;
             frame_buffer += stream -> ux_device_class_audio_stream_frame_buffer_size;
         }
         stream -> ux_device_class_audio_stream_transfer_pos = stream -> ux_device_class_audio_stream_access_pos;
+
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+
+        /* If feedback supported, resume the thread.  */
+        if (stream -> ux_device_class_audio_stream_feedback_thread_stack)
+            _ux_utility_thread_resume(&stream -> ux_device_class_audio_stream_feedback_thread);
+#endif
     }
     else
     {
 
         /* There is no data endpoint.  */
         stream -> ux_device_class_audio_stream_endpoint = UX_NULL;
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+        stream -> ux_device_class_audio_stream_feedback = UX_NULL;
+#endif
 
         /* In this case, we are reverting to the Alternate Setting 0.  We need to terminate the pending transactions.  */
         /* Endpoints actually aborted and destroyed before change command.  */

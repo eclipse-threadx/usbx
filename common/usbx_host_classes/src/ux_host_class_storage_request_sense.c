@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_request_sense                PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,16 +75,21 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_request_sense(UX_HOST_CLASS_STORAGE *storage)
 {
 
-UINT            status;
-UCHAR             *cbw;
-UCHAR             *request_sense_response;
-ULONG           sense_code;
+UCHAR           *cbw;
+UCHAR           *request_sense_response;
 UINT            command_length;
+#if !defined(UX_HOST_STANDALONE)
+UINT            status;
+ULONG           sense_code;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_STORAGE_REQUEST_SENSE, storage, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
@@ -126,7 +131,19 @@ UINT            command_length;
     request_sense_response =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH);
     if (request_sense_response == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
-    
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* Prepare data buffer for request sense.  */
+    storage -> ux_host_class_storage_trans_data_bak = storage -> ux_host_class_storage_trans_data;
+    storage -> ux_host_class_storage_trans_data = request_sense_response;
+
+    /* Perform CBW-DATA-CSW transport.  */
+    storage -> ux_host_class_storage_trans_state = UX_HOST_CLASS_STORAGE_TRANS_CBW;
+
+    return(UX_SUCCESS);
+#else
+
     /* Send the command to transport layer.  */
     status =  _ux_host_class_storage_transport(storage, request_sense_response);
 
@@ -136,9 +153,13 @@ UINT            command_length;
 
         /* We have a successful transaction, even though the sense code could reflect an error. The sense code 
            will be assembled and store in the device instance.  */ 
-        sense_code =  (((ULONG) *(request_sense_response + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_SENSE_KEY)) & 0x0f) << 16;
-        sense_code |=  ((ULONG) *(request_sense_response + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_CODE)) << 8;
-        sense_code |=  (ULONG)  *(request_sense_response + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_CODE_QUALIFIER);
+        sense_code = UX_HOST_CLASS_STORAGE_SENSE_STATUS(
+            (ULONG) *(request_sense_response +
+                      UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_SENSE_KEY),
+            (ULONG) *(request_sense_response +
+                      UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_CODE),
+            (ULONG) *(request_sense_response +
+                      UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_CODE_QUALIFIER));
 
         /* Store the sense code in the storage instance.  */
         storage -> ux_host_class_storage_sense_code =  sense_code;
@@ -152,5 +173,6 @@ UINT            command_length;
 
     /* Return completion code.  */    
     return(status);                                            
+#endif
 }
 

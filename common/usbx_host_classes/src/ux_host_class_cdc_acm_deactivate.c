@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_acm_deactivate                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,8 +60,8 @@
 /*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
 /*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_delete          Delete protection semaphore   */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -75,6 +75,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -82,7 +85,9 @@ UINT  _ux_host_class_cdc_acm_deactivate(UX_HOST_CLASS_COMMAND *command)
 
 UX_HOST_CLASS_CDC_ACM       *cdc_acm;
 UX_TRANSFER                 *transfer_request;
+#if !defined(UX_HOST_STANDALONE)
 UINT                        status;
+#endif
 
     /* Get the instance for this class.  */
     cdc_acm =  (UX_HOST_CLASS_CDC_ACM *) command -> ux_host_class_command_instance;
@@ -90,12 +95,15 @@ UINT                        status;
     /* The cdc_acm is being shut down.  */
     cdc_acm -> ux_host_class_cdc_acm_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
 
+#if !defined(UX_HOST_STANDALONE)
+
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&cdc_acm -> ux_host_class_cdc_acm_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&cdc_acm -> ux_host_class_cdc_acm_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
 
         /* Return error.  */
         return(status);
+#endif
 
     /* If we have the Control Class, we only unmount the interrupt endpoint if it is active.  */
     if (cdc_acm -> ux_host_class_cdc_acm_interface -> ux_interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_CONTROL_CLASS)
@@ -138,15 +146,28 @@ UINT                        status;
     
     }
 
+#if !defined(UX_HOST_STANDALONE)
+
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+#else
+
+    /* If there is allocated resource, free it.  */
+    if (cdc_acm -> ux_host_class_cdc_acm_allocated)
+    {
+        _ux_utility_memory_free(cdc_acm -> ux_host_class_cdc_acm_allocated);
+    }
+#endif
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(cdc_acm -> ux_host_class_cdc_acm_class, (VOID *) cdc_acm);
 
+#if !defined(UX_HOST_STANDALONE)
+
     /* Destroy the semaphore.  */
-    _ux_utility_semaphore_delete(&cdc_acm -> ux_host_class_cdc_acm_semaphore);
+    _ux_host_semaphore_delete(&cdc_acm -> ux_host_class_cdc_acm_semaphore);
+#endif
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

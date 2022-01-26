@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_activate                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,7 +54,7 @@
 /*                                                                        */ 
 /*    _ux_network_driver_activate         Activate NetX USB interface     */
 /*    _ux_utility_memory_set              Set memory                      */
-/*    _ux_utility_thread_resume           Resume thread                   */
+/*    _ux_device_thread_resume            Resume thread                   */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -69,6 +69,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -182,9 +185,9 @@ ULONG                       physical_address_lsw;
                                         ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
     
         /* Resume the endpoint threads.  */
-        _ux_utility_thread_resume(&rndis -> ux_slave_class_rndis_interrupt_thread); 
-        _ux_utility_thread_resume(&rndis -> ux_slave_class_rndis_bulkout_thread); 
-        _ux_utility_thread_resume(&rndis -> ux_slave_class_rndis_bulkin_thread); 
+        _ux_device_thread_resume(&rndis -> ux_slave_class_rndis_interrupt_thread); 
+        _ux_device_thread_resume(&rndis -> ux_slave_class_rndis_bulkout_thread); 
+        _ux_device_thread_resume(&rndis -> ux_slave_class_rndis_bulkin_thread); 
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_RNDIS_ACTIVATE, rndis, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

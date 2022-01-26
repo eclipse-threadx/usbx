@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_acm_write                        PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,7 +61,7 @@
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
 /*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -77,6 +77,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed ZLP sending,          */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_write(UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer, 
@@ -86,6 +89,9 @@ UINT  _ux_host_class_cdc_acm_write(UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_p
 UX_TRANSFER     *transfer_request;
 UINT            status;
 ULONG           transfer_request_length;
+#if defined(UX_HOST_STANDALONE)
+ULONG           transfer_flags;
+#endif
     
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_CDC_ACM_WRITE, cdc_acm, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
@@ -117,12 +123,25 @@ ULONG           transfer_request_length;
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     }
     
+#if defined(UX_HOST_STANDALONE)
+    if (cdc_acm -> ux_host_class_cdc_acm_write_state == UX_STATE_WAIT)
+        return(UX_BUSY);
+    cdc_acm -> ux_host_class_cdc_acm_write_state = UX_STATE_WAIT;
+#endif
+
     /* Start by resetting the actual length of the transfer.  */
     *actual_length =  0;
 
     /* Get the pointer to the bulk out endpoint transfer request.  */
     transfer_request =  &cdc_acm -> ux_host_class_cdc_acm_bulk_out_endpoint -> ux_endpoint_transfer_request;
     
+#if defined(UX_HOST_STANDALONE)
+
+    /* Enable auto wait.  */
+    transfer_flags = transfer_request -> ux_transfer_request_flags;
+    transfer_request -> ux_transfer_request_flags |= UX_TRANSFER_FLAG_AUTO_WAIT;
+#endif
+
     /* Perform a transfer on the bulk out endpoint until either the transfer is
        completed or when there is an error.  */
     do
@@ -145,8 +164,10 @@ ULONG           transfer_request_length;
         if (status == UX_SUCCESS)
         {
             
+#if !defined(UX_HOST_STANDALONE)
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_HOST_CLASS_CDC_ACM_CLASS_TRANSFER_TIMEOUT);
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore,
+                                             transfer_request -> ux_transfer_request_timeout_value);
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
@@ -171,9 +192,23 @@ ULONG           transfer_request_length;
                 /* There was an error, return to the caller.  */
                 return(UX_TRANSFER_TIMEOUT);
             }            
+#endif
         }
         else
         {
+
+#if defined(UX_HOST_STANDALONE)
+
+            /* Update the length of the actual data transferred. We do this after the 
+                abort of the transfer request in case some data was actually received.  */
+            *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
+
+            /* Restore previous setting.  */
+            transfer_request -> ux_transfer_request_flags = transfer_flags;
+
+            /* Not busy any more.  */
+            cdc_acm -> ux_host_class_cdc_acm_write_state = UX_STATE_RESET;
+#endif
 
             /* There was a non transfer error, no partial transfer to be checked */
             return(status);
@@ -199,6 +234,15 @@ ULONG           transfer_request_length;
         requested_length -=  transfer_request_length;          
 
     } while (requested_length);
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* Restore previous setting.  */
+    transfer_request -> ux_transfer_request_flags = transfer_flags;
+
+    /* Not busy any more.  */
+    cdc_acm -> ux_host_class_cdc_acm_write_state = UX_STATE_RESET;
+#endif
 
     /* We get here when all the transfers went through without errors.  */
     return(UX_SUCCESS); 

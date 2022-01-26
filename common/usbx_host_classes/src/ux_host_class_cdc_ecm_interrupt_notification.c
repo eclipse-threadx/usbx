@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_interrupt_notification       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_interrupt_notification(UX_TRANSFER *transfer_request)
@@ -119,7 +122,7 @@ ULONG                                       notification_value;
                 cdc_ecm -> ux_host_class_cdc_ecm_link_state =  UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_UP;                    
                 
                 /* We need to inform the cdc_ecm thread of this change.  */
-                _ux_utility_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
+                _ux_host_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
             }
         }
         else
@@ -149,7 +152,7 @@ ULONG                                       notification_value;
                     cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish =  UX_TRUE;
 
                     /* Wait for the transfer to be armed, or possibly an error. The CDC-ECM thread will wake us up.  */
-                    _ux_utility_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
+                    _ux_host_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
 
                     /* We're no longer waiting.  */
                     cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish =  UX_FALSE;
@@ -159,7 +162,7 @@ ULONG                                       notification_value;
                 _ux_host_stack_transfer_request_abort(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_endpoint -> ux_endpoint_transfer_request);
 
                 /* We need to inform the CDC-ECM thread of this change.  */
-                _ux_utility_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
+                _ux_host_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
             }
         }           
     }        

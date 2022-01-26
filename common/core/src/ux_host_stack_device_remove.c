@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_remove                        PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*                                            added notification for      */
 /*                                            device disconnection,       */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_remove(UX_HCD *hcd, UX_DEVICE *parent, UINT port_index)
@@ -93,12 +96,6 @@ UX_HOST_CLASS_COMMAND       command;
     /* We need to find the device descriptor for the removed device. We can find it
        with the parent device and the port it was attached to. Start with the first device.  */
     device =  _ux_system_host -> ux_system_host_device_array;
-
-    /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_REMOVE, hcd, parent, port_index, device, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
-
-    /* If trace is enabled, unregister this object.  */
-    UX_TRACE_OBJECT_UNREGISTER(device);
 
 #if UX_MAX_DEVICES > 1
     /* Start at the beginning of the list.  */
@@ -144,6 +141,12 @@ UX_HOST_CLASS_COMMAND       command;
         /* We get here when we could not find the device.  */
         return(UX_DEVICE_HANDLE_UNKNOWN);
     }
+
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_REMOVE, hcd, parent, port_index, device, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+
+    /* If trace is enabled, unregister this object.  */
+    UX_TRACE_OBJECT_UNREGISTER(device);
 
     /* We have found the device to be removed. */
     device -> ux_device_state = UX_DEVICE_REMOVED;

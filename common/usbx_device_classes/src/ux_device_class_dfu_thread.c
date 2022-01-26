@@ -28,12 +28,14 @@
 #include "ux_device_class_dfu.h"
 #include "ux_device_stack.h"
 
+
+#if !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_thread                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,6 +45,8 @@
 /*    This function is the thread of the dfu class. It waits for the      */
 /*    dfu command to signal a DFU_DETACH stage and either force a         */ 
 /*    disconnect from the device or wait for the host to detach.          */ 
+/*                                                                        */
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -72,6 +76,8 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_dfu_thread(ULONG dfu_class)
@@ -136,4 +142,4 @@ ULONG                           actual_flags;
         }
     }         
 }
-
+#endif

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_activate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,7 +64,7 @@
 /*    _ux_host_stack_class_instance_create  Create class instance         */ 
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
 /*    _ux_utility_memory_allocate           Allocate a memory block       */ 
-/*    _ux_utility_semaphore_create          Create protection semaphore   */ 
+/*    _ux_host_semaphore_create             Create protection semaphore   */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -77,6 +77,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_activate(UX_HOST_CLASS_COMMAND *command)
@@ -183,7 +186,7 @@ UINT                    status;
 
     /* Create the semaphore to protect multiple threads from accessing the same
        audio instance.  */
-    status =  _ux_utility_semaphore_create(&audio -> ux_host_class_audio_semaphore, "ux_hot_class_audio_semaphore", 1);
+    status =  _ux_host_semaphore_create(&audio -> ux_host_class_audio_semaphore, "ux_hot_class_audio_semaphore", 1);
     if (status != UX_SUCCESS)
         return(UX_SEMAPHORE_ERROR);
 

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_printer.h                             PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,6 +53,10 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added entry public define,  */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            added a new protocol const, */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -76,6 +80,7 @@ extern   "C" {
 #define UX_HOST_CLASS_PRINTER_CLASS                             7
 #define UX_HOST_CLASS_PRINTER_SUBCLASS                          1
 #define UX_HOST_CLASS_PRINTER_PROTOCOL_BI_DIRECTIONAL           2
+#define UX_HOST_CLASS_PRINTER_PROTOCOL_IEEE_1284_4_BI_DIR       3
 #define UX_HOST_CLASS_PRINTER_GET_STATUS                        1
 #define UX_HOST_CLASS_PRINTER_SOFT_RESET                        2
 #define UX_HOST_CLASS_PRINTER_STATUS_LENGTH                     4
@@ -94,6 +99,12 @@ extern   "C" {
 
 #define    UX_HOST_CLASS_PRINTER_GENERIC_NAME                   "USB PRINTER"
 
+
+/* Define Printer flag constants.  */
+
+#define UX_HOST_CLASS_PRINTER_FLAG_LOCK                         0x1u
+
+
 /* Define Printer Class structure.  */
 
 typedef struct UX_HOST_CLASS_PRINTER_STRUCT 
@@ -108,8 +119,25 @@ typedef struct UX_HOST_CLASS_PRINTER_STRUCT
     UX_ENDPOINT     *ux_host_class_printer_bulk_in_endpoint;
     UINT            ux_host_class_printer_state;
     UCHAR           ux_host_class_printer_name[UX_HOST_CLASS_PRINTER_NAME_LENGTH];
+#if !defined(UX_HOST_STANDALONE)
     UX_SEMAPHORE    ux_host_class_printer_semaphore;
+#else
+    UCHAR           *ux_host_class_printer_allocated;
+    ULONG           ux_host_class_printer_flags;
+    UINT            ux_host_class_printer_status;
+    UCHAR           ux_host_class_printer_enum_state;
+    UCHAR           ux_host_class_printer_read_state;
+    UCHAR           ux_host_class_printer_write_state;
+    UCHAR           ux_host_class_printer_next_state;
+#endif
 } UX_HOST_CLASS_PRINTER;
+
+
+#if !defined(UX_HOST_STANDALONE)
+#define _ux_host_class_printer_unlock(printer) _ux_host_semaphore_put(&(printer) -> ux_host_class_printer_semaphore)
+#else
+#define _ux_host_class_printer_unlock(printer) do { (printer)->ux_host_class_printer_flags &= ~UX_HOST_CLASS_PRINTER_FLAG_LOCK; } while(0)
+#endif
 
 
 /* Define Printer Class function prototypes.  */

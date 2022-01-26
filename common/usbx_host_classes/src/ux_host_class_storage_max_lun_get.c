@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_max_lun_get                  PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,7 +57,7 @@
 /*    _ux_host_stack_transfer_request       Process transfer request      */
 /*    _ux_utility_memory_allocate           Allocate memory block         */
 /*    _ux_utility_memory_free               Release memory block          */
-/*    _ux_utility_semaphore_get             Get semaphore                 */
+/*    _ux_host_semaphore_get                Get semaphore                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_max_lun_get(UX_HOST_CLASS_STORAGE *storage)
@@ -96,7 +99,9 @@ UCHAR           *storage_data_buffer;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
     /* We need to prevent other threads from simultaneously using the control endpoint. */
-    _ux_utility_semaphore_get(&control_endpoint -> ux_endpoint_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status = _ux_host_semaphore_get(&control_endpoint -> ux_endpoint_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    if (status != UX_SUCCESS)
+        return(status);
 
     /* Need to allocate memory for the descriptor.  */
     storage_data_buffer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, 1);
@@ -110,6 +115,14 @@ UCHAR           *storage_data_buffer;
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_value =             0;
     transfer_request -> ux_transfer_request_index =             storage -> ux_host_class_storage_interface -> ux_interface_descriptor.bInterfaceNumber;
+
+#if defined(UX_HOST_STANDALONE)
+    storage -> ux_host_class_storage_memory = storage_data_buffer;
+    storage -> ux_host_class_storage_trans = transfer_request;
+    storage -> ux_host_class_storage_state_state = UX_HOST_CLASS_STORAGE_STATE_TRANSFER;
+    storage -> ux_host_class_storage_state_next = UX_HOST_CLASS_STORAGE_STATE_MAX_LUN_SAVE;
+    UX_TRANSFER_STATE_RESET(transfer_request);
+#else
 
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
@@ -138,9 +151,17 @@ UCHAR           *storage_data_buffer;
 
     /* Free all used resources.  */
     _ux_utility_memory_free(storage_data_buffer);
+#endif
 
 #ifdef UX_HOST_CLASS_STORAGE_INCLUDE_LEGACY_PROTOCOL_SUPPORT
     }
+#if defined(UX_HOST_STANDALONE)
+    else
+    {
+        storage -> ux_host_class_storage_trans = UX_NULL;
+        storage -> ux_host_class_storage_state_state = UX_HOST_CLASS_STORAGE_STATE_MAX_LUN_SAVE;
+    }
+#endif
 #endif
 
     /* We always succeed.  */

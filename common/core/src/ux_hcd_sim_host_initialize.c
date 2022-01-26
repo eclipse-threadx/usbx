@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_initialize                         PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added link with DCD,        */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_initialize(UX_HCD *hcd)
@@ -155,7 +158,7 @@ UINT                status;
         hcd_sim_host -> ux_hcd_sim_host_periodic_scheduler_active =  0;
         
         /* We start a timer that will invoke the simulator every timer tick.  */
-        status = _ux_utility_timer_create(&hcd_sim_host -> ux_hcd_sim_host_timer, "USBX Simulation Timer",
+        status = _ux_host_timer_create(&hcd_sim_host -> ux_hcd_sim_host_timer, "USBX Simulation Timer",
                         _ux_hcd_sim_host_timer_function, (ULONG) (ALIGN_TYPE) hcd_sim_host, 1, 1, UX_AUTO_ACTIVATE);
     }
 
@@ -206,7 +209,7 @@ UINT                status;
 
     /* We need to simulate a Root HUB Status Change for the USB stack since the simulator
        has not root HUB per se.  */
-    status = _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
+    status = _ux_host_semaphore_put_rc(&_ux_system_host -> ux_system_host_enum_semaphore);
     if (status != UX_SUCCESS)
 
         /* Resources are still ready but

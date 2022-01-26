@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_device_address_set                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_address_set(UX_DEVICE *device)
@@ -152,6 +155,12 @@ UCHAR           device_address_byte;
     transfer_request -> ux_transfer_request_value =             device_address;
     transfer_request -> ux_transfer_request_index =             0;
 
+#if defined(UX_HOST_STANDALONE)
+    device -> ux_device_enum_trans = transfer_request;
+    status = UX_SUCCESS;
+    return(status);
+#else
+
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
@@ -162,6 +171,9 @@ UCHAR           device_address_byte;
     /* Check completion status.  */
     if (status == UX_SUCCESS)
     {
+
+        /* Mark the device as ADDRESSED now.  */
+        device -> ux_device_state = UX_DEVICE_ADDRESSED;
 
         /* Some devices need some time to accept this address.  */
         _ux_utility_delay_ms(UX_DEVICE_ADDRESS_SET_WAIT);
@@ -177,4 +189,5 @@ UCHAR           device_address_byte;
             we will try again either at the root hub or regular hub. */   
         return(status);
     }
+#endif
 }

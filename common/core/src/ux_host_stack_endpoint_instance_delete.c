@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_endpoint_instance_delete             PORTABLE C      */ 
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed trace enabled error,  */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_endpoint_instance_delete(UX_ENDPOINT *endpoint)
@@ -97,7 +100,7 @@ UX_HCD          *hcd;
         hcd -> ux_hcd_entry_function(hcd, UX_HCD_DESTROY_ENDPOINT, (VOID *) endpoint);
     
         /* Free the semaphore previously attached to the transfer_request of this endpoint.  */
-        _ux_utility_semaphore_delete(&endpoint -> ux_endpoint_transfer_request.ux_transfer_request_semaphore);
+        _ux_host_semaphore_delete(&endpoint -> ux_endpoint_transfer_request.ux_transfer_request_semaphore);
     }
 
     /* If the endpoint requested guaranteed bandwidth, free it now.  */

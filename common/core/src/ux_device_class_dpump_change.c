@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dpump_change                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dpump_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -143,6 +146,13 @@ UX_SLAVE_ENDPOINT                        *endpoint;
 
         /* Keep the alternate setting in the dpump structure. */
         dpump -> ux_slave_class_dpump_alternate_setting =  interface -> ux_slave_interface_descriptor.bAlternateSetting;
+
+#if defined(UX_DEVICE_STANDALONE)
+
+        /* Reset read/write states.  */
+        dpump -> ux_device_class_dpump_read_state = 0;
+        dpump -> ux_device_class_dpump_write_state = 0;
+#endif
 
         /* If there is an activate function call it.  */
         if (dpump -> ux_slave_class_dpump_parameter.ux_slave_class_dpump_instance_activate != UX_NULL)

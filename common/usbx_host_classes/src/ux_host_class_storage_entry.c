@@ -36,7 +36,7 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAG
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_entry                        PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,9 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAG
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed class ext access,     */
 /*                                            resulting in version 6.1.2  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_entry(UX_HOST_CLASS_COMMAND *command)
@@ -95,7 +98,9 @@ UINT  _ux_host_class_storage_entry(UX_HOST_CLASS_COMMAND *command)
 
 UINT                        status;
 UX_HOST_CLASS               *class_inst;
+#if !defined(UX_HOST_STANDALONE)
 UX_HOST_CLASS_STORAGE_EXT   *class_ext;
+#endif
 
 
     /* The command request will tell us we need to do here, either a enumeration
@@ -122,6 +127,8 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
         /* Get class.  */
         class_inst = command -> ux_host_class_command_class_ptr;
 
+#if !defined(UX_HOST_STANDALONE)
+
         /* Allocate UX_HOST_CLASS_STORAGE_EXT.  */
         if (class_inst -> ux_host_class_ext == UX_NULL)
         {
@@ -136,7 +143,7 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
                 return(UX_MEMORY_INSUFFICIENT);
 
             /* Create the storage class thread.  */
-            status =  _ux_utility_thread_create(&class_ext -> ux_host_class_thread,
+            status =  _ux_host_thread_create(&class_ext -> ux_host_class_thread,
                                     "ux_host_storage_thread",
                                     _ux_host_class_storage_thread_entry,
                                     (ULONG) (ALIGN_TYPE) class_inst, 
@@ -166,6 +173,7 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
             /* Get storage class extension.  */
             class_ext = (UX_HOST_CLASS_STORAGE_EXT *)class_inst -> ux_host_class_ext;
         }
+#endif
 
         /* Allocate some memory for the media structures used by UX_MEDIA (default FileX).  */
         if (class_inst -> ux_host_class_media == UX_NULL)
@@ -184,7 +192,7 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
         }
 
         /* Now that the extension pointer has been set, resume the thread.  */
-        tx_thread_resume(&class_ext -> ux_host_class_thread);
+        _ux_host_thread_resume(&class_ext -> ux_host_class_thread);
 
         /* The activate command is used when the device inserted has found a parent and
            is ready to complete the enumeration.   */
@@ -192,6 +200,9 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
 
         /* Return the completion status.  */
         return(status);
+
+    case UX_HOST_CLASS_COMMAND_ACTIVATE_WAIT:
+        return(UX_STATE_NEXT);
 
     case UX_HOST_CLASS_COMMAND_DEACTIVATE:
 
@@ -216,6 +227,8 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
             class_inst -> ux_host_class_media = UX_NULL;
         }
 
+#if !defined(UX_HOST_STANDALONE)
+
         /* Free class extension resources.  */
         if (class_inst -> ux_host_class_ext)
         {
@@ -224,7 +237,7 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
             class_ext = (UX_HOST_CLASS_STORAGE_EXT *)class_inst -> ux_host_class_ext;
 
             /* Delete storage thread.  */
-            _ux_utility_thread_delete(&class_ext -> ux_host_class_thread);
+            _ux_host_thread_delete(&class_ext -> ux_host_class_thread);
 
             /* Free class extension memory.  */
             _ux_utility_memory_free(class_ext);
@@ -232,6 +245,7 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
             /* Set extension pointer to NULL.  */
             class_inst -> ux_host_class_ext = UX_NULL;
         }
+#endif
 
         /* Return success.  */
         return(UX_SUCCESS);

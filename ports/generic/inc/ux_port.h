@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_port.h                                            Generic        */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -42,6 +42,10 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  12-31-2020     Chaoqiong Xiao           Initial Version 6.1.3         */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            moved tx_api.h include and  */
+/*                                            typedefs from ux_api.h,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -65,6 +69,34 @@
 
 #include <stdio.h>
 #include <string.h>
+
+
+#if !defined(UX_STANDALONE)
+#include "tx_api.h"
+#else
+
+/* VAR types used in UX,
+   if TX still used, expects tx_api.h included before include this.  */
+#if !defined(TX_API_H) && !defined(TX_PORT_H)
+
+#include <stdint.h>
+typedef void                                    VOID;
+typedef char                                    CHAR;
+typedef unsigned char                           UCHAR;
+typedef int                                     INT;
+typedef unsigned int                            UINT;
+typedef long                                    LONG;
+typedef unsigned long                           ULONG;
+typedef short                                   SHORT;
+typedef unsigned short                          USHORT;
+typedef uint64_t                                ULONG64;
+
+#ifndef ALIGN_TYPE_DEFINED
+#define ALIGN_TYPE                              ULONG
+#endif
+
+#endif
+#endif
 
 
 /* CPU definition for X86 systems without preemptive timer function.
@@ -210,7 +242,7 @@ VOID    outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Generic Version 6.1.9 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Generic Version 6.1.10 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

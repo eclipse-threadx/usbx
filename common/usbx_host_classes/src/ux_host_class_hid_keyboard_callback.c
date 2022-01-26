@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_keyboard_callback                PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_keyboard_callback(UX_HOST_CLASS_HID_REPORT_CALLBACK *callback)
@@ -486,8 +489,15 @@ UCHAR                               *state_action;
                     else
                         keyboard_instance -> ux_host_class_hid_keyboard_alternate_key_state |= alternate_key_bits[key_state];
 
+#if defined(UX_HOST_STANDALONE)
+
+                    /* Let background task to set LED status.  */
+                    keyboard_instance -> ux_host_class_hid_keyboard_out_state = UX_STATE_WAIT;
+#else
+
                     /* Wake up the keyboard thread semaphore.  */
-                    _ux_utility_semaphore_put(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore);
+                    _ux_host_semaphore_put(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore);
+#endif
                 }
 
 #if defined(UX_HOST_CLASS_HID_KEYBOARD_EVENTS_KEY_CHANGES_MODE) && defined(UX_HOST_CLASS_HID_KEYBOARD_EVENTS_KEY_CHANGES_MODE_REPORT_LOCK_KEYS)

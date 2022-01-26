@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -52,6 +52,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -144,6 +147,16 @@ extern   "C" {
 /* Define event group flag.  */
 #define UX_DEVICE_CLASS_CDC_ACM_WRITE_EVENT                             1
 
+
+/* CDC ACM read state machine states.  */
+#define UX_DEVICE_CLASS_CDC_ACM_READ_START      (UX_STATE_STEP + 1)
+#define UX_DEVICE_CLASS_CDC_ACM_READ_WAIT       (UX_STATE_STEP + 2)
+
+/* CDC ACM write state machine states.  */
+#define UX_DEVICE_CLASS_CDC_ACM_WRITE_START     (UX_STATE_STEP + 1)
+#define UX_DEVICE_CLASS_CDC_ACM_WRITE_WAIT      (UX_STATE_STEP + 2)
+
+
 /* Define Slave CDC Class Calling Parameter structure */
 
 typedef struct UX_SLAVE_CLASS_CDC_ACM_PARAMETER_STRUCT
@@ -160,27 +173,51 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
 {
     UX_SLAVE_INTERFACE                  *ux_slave_class_cdc_acm_interface;
     UX_SLAVE_CLASS_CDC_ACM_PARAMETER    ux_slave_class_cdc_acm_parameter;
+
+#if !defined(UX_DEVICE_STANDALONE)
     UX_MUTEX                            ux_slave_class_cdc_acm_endpoint_in_mutex;
     UX_MUTEX                            ux_slave_class_cdc_acm_endpoint_out_mutex;
+#else
+    UCHAR                               *ux_device_class_cdc_acm_read_buffer;
+    ULONG                               ux_device_class_cdc_acm_read_requested_length;
+    ULONG                               ux_device_class_cdc_acm_read_transfer_length;
+    ULONG                               ux_device_class_cdc_acm_read_actual_length;
+    UINT                                ux_device_class_cdc_acm_read_status;
+    UINT                                ux_device_class_cdc_acm_read_state;
+
+    UCHAR                               *ux_device_class_cdc_acm_write_buffer;
+    ULONG                               ux_device_class_cdc_acm_write_transfer_length;
+    ULONG                               ux_device_class_cdc_acm_write_requested_length;
+    ULONG                               ux_device_class_cdc_acm_write_actual_length;
+    UINT                                ux_device_class_cdc_acm_write_status;
+    UINT                                ux_device_class_cdc_acm_write_state;
+#endif
+
     ULONG                               ux_slave_class_cdc_acm_baudrate;
     UCHAR                               ux_slave_class_cdc_acm_stop_bit;
     UCHAR                               ux_slave_class_cdc_acm_parity;
     UCHAR                               ux_slave_class_cdc_acm_data_bit;
     UCHAR                               ux_slave_class_cdc_acm_data_dtr_state;
     UCHAR                               ux_slave_class_cdc_acm_data_rts_state;
+    UCHAR                               reserved[3];
+
 #ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
+#if !defined(UX_DEVICE_STANDALONE)
     UX_THREAD                           ux_slave_class_cdc_acm_bulkin_thread;
     UX_THREAD                           ux_slave_class_cdc_acm_bulkout_thread;
+    UX_EVENT_FLAGS_GROUP                ux_slave_class_cdc_acm_event_flags_group;
     UCHAR                               *ux_slave_class_cdc_acm_bulkin_thread_stack;
     UCHAR                               *ux_slave_class_cdc_acm_bulkout_thread_stack;
+#endif
     UINT                                (*ux_device_class_cdc_acm_write_callback)(struct UX_SLAVE_CLASS_CDC_ACM_STRUCT *cdc_acm, UINT status, ULONG length);
     UINT                                (*ux_device_class_cdc_acm_read_callback)(struct UX_SLAVE_CLASS_CDC_ACM_STRUCT *cdc_acm, UINT status, UCHAR *data_pointer, ULONG length);
-    UX_EVENT_FLAGS_GROUP                ux_slave_class_cdc_acm_event_flags_group;
     ULONG                               ux_slave_class_cdc_acm_transmission_status;
     ULONG                               ux_slave_class_cdc_acm_scheduled_write;
+#if !defined(UX_DEVICE_STANDALONE)
     ULONG                               ux_slave_class_cdc_acm_callback_total_length;
     UCHAR                               *ux_slave_class_cdc_acm_callback_data_pointer;
     UCHAR                               *ux_slave_class_cdc_acm_callback_current_data_pointer;
+#endif
 #endif
 } UX_SLAVE_CLASS_CDC_ACM;
 
@@ -271,6 +308,12 @@ VOID  _ux_device_class_cdc_acm_bulkout_thread(ULONG class_pointer);
 UINT  _ux_device_class_cdc_acm_write_with_callback(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
                                 ULONG requested_length);
 
+UINT  _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+                                ULONG requested_length, ULONG *actual_length);
+UINT  _ux_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+                                ULONG requested_length, ULONG *actual_length);
+
+UINT  _ux_device_class_cdc_acm_tasks_run(VOID *instance);
 
 /* Define Device CDC Class API prototypes.  */
 
@@ -279,6 +322,9 @@ UINT  _ux_device_class_cdc_acm_write_with_callback(UX_SLAVE_CLASS_CDC_ACM *cdc_a
 #define ux_device_class_cdc_acm_write               _ux_device_class_cdc_acm_write
 #define ux_device_class_cdc_acm_ioctl               _ux_device_class_cdc_acm_ioctl
 #define ux_device_class_cdc_acm_write_with_callback _ux_device_class_cdc_acm_write_with_callback
+
+#define ux_device_class_cdc_acm_read_run            _ux_device_class_cdc_acm_read_run
+#define ux_device_class_cdc_acm_write_run           _ux_device_class_cdc_acm_write_run
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

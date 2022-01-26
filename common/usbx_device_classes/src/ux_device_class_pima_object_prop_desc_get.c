@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_prop_desc_get          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated status handling,    */
+/*                                            passed max length to app,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_prop_desc_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -116,6 +120,7 @@ UCHAR                   *object_props_desc_end;
                             pima -> ux_device_class_pima_transaction_id);
 
     /* Call the application to retrieve the property description dataset.  */
+    object_prop_dataset_length = UX_DEVICE_CLASS_PIMA_MAX_PAYLOAD;
     status = pima -> ux_device_class_pima_object_prop_desc_get(pima, object_property, object_format_code, &object_prop_dataset, &object_prop_dataset_length);
 
     /* See if we have the right format code and object property.  */
@@ -157,14 +162,14 @@ UCHAR                   *object_props_desc_end;
             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
 
             /* Report the error.  */
-            status =  UX_MEMORY_INSUFFICIENT;
+            status =  UX_DEVICE_CLASS_PIMA_RC_GENERAL_ERROR;
         }
     }
     
     /* We get here when we did not find the object format code or the dataset was too large.  */        
 
     /* Now we return a response with error code.  */
-    _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OBJECT_PROP_NOT_SUPPORTED, 0, 0, 0, 0);
+    _ux_device_class_pima_response_send(pima, status, 0, 0, 0, 0);
 
     /* Return completion status.  */
     return(status);

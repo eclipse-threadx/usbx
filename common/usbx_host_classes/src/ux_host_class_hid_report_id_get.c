@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_report_id_get                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,8 +59,8 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_put             Release protection semaphore  */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_put                Release protection semaphore  */ 
 /*    _ux_host_stack_class_instance_verify  Verify class instance is valid*/ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -75,11 +75,16 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_id_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_REPORT_GET_ID *report_id)
 {
-
+#if defined(UX_HOST_STANDALONE)
+UX_INTERRUPT_SAVE_AREA
+#endif
 UINT                        status;
 UX_HOST_CLASS_HID_REPORT    *next_hid_report;
                                                             
@@ -98,9 +103,7 @@ UX_HOST_CLASS_HID_REPORT    *next_hid_report;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
-    if (status != UX_SUCCESS)
-        return(status);
+    _ux_host_class_hid_lock_fail_return(hid);
 
     /* Check if this is the first report to get.  */
     if (report_id -> ux_host_class_hid_report_get_report == UX_NULL)
@@ -172,7 +175,7 @@ UX_HOST_CLASS_HID_REPORT    *next_hid_report;
     }
     
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+    _ux_host_class_hid_unlock(hid);
 
     /* The status variable has been set correctly.  */
     return(status);

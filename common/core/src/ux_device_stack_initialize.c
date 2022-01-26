@@ -42,6 +42,8 @@ UCHAR _ux_system_slave_class_cdc_ecm_name[] =                               "ux_
 UCHAR _ux_system_slave_class_dfu_name[] =                                   "ux_slave_class_dfu";
 UCHAR _ux_system_slave_class_audio_name[] =                                 "ux_slave_class_audio";
 
+UCHAR _ux_system_device_class_printer_name[] =                              "ux_device_class_printer";
+
 /* Define USBX Host variable.  */
 UX_SYSTEM_SLAVE *_ux_system_slave;
 
@@ -50,7 +52,7 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_initialize                         PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -97,6 +99,10 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            added printer support,      */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,
@@ -383,7 +389,7 @@ UCHAR                           *memory;
                 }
         
                 /* Create the semaphore for the endpoint.  */
-                status =  _ux_utility_semaphore_create(&endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_semaphore,
+                status =  _ux_device_semaphore_create(&endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_semaphore,
                                                     "ux_transfer_request_semaphore", 0);
 
                 /* Check completion status.  */
@@ -417,8 +423,8 @@ UCHAR                           *memory;
         {
 
             /* Delete ux_slave_transfer_request_semaphore.  */
-            if (endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_semaphore.tx_semaphore_id != 0)
-                _ux_utility_semaphore_delete(&endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_semaphore);
+            if (_ux_device_semaphore_created(&endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_semaphore))
+                _ux_device_semaphore_delete(&endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_semaphore);
 
             /* Free ux_slave_transfer_request_data_pointer buffer.  */
             if (endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer)

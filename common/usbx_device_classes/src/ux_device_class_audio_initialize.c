@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_initialize                   PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,8 +55,8 @@
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_copy               Copy memory                   */
 /*    _ux_utility_memory_free               Free memory                   */
-/*    _ux_utility_thread_create             Create thread to use          */
-/*    _ux_utility_thread_delete             Delete thread                 */
+/*    _ux_device_thread_create              Create thread to use          */
+/*    _ux_device_thread_delete              Delete thread                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -73,6 +73,10 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            added feedback support,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -180,7 +184,7 @@ ULONG                                   i;
         }
 
         /* Create streaming thread.  */
-        status =  _ux_utility_thread_create(&stream -> ux_device_class_audio_stream_thread , "ux_device_class_audio_stream_thread",
+        status =  _ux_device_thread_create(&stream -> ux_device_class_audio_stream_thread , "ux_device_class_audio_stream_thread",
                     stream_parameter -> ux_device_class_audio_stream_parameter_thread_entry,
                     (ULONG)(ALIGN_TYPE)stream, (VOID *) stream -> ux_device_class_audio_stream_thread_stack,
                     memory_size, UX_THREAD_PRIORITY_CLASS,
@@ -191,6 +195,41 @@ ULONG                                   i;
             break;
 
         UX_THREAD_EXTENSION_PTR_SET(&(stream -> ux_device_class_audio_stream_thread), stream)
+
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+
+        /* Check entry to confirm feedback is supported.  */
+        if (stream_parameter -> ux_device_class_audio_stream_parameter_feedback_thread_entry)
+        {
+
+            /* Create memory block for streaming thread stack in addition.  */
+            if (stream_parameter -> ux_device_class_audio_stream_parameter_feedback_thread_stack_size == 0)
+                memory_size = UX_THREAD_STACK_SIZE;
+            else
+                memory_size = stream_parameter -> ux_device_class_audio_stream_parameter_feedback_thread_stack_size;
+            stream -> ux_device_class_audio_stream_feedback_thread_stack = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, memory_size);
+
+            /* Check for successful allocation.  */
+            if (stream -> ux_device_class_audio_stream_feedback_thread_stack == UX_NULL)
+            {
+                status = UX_MEMORY_INSUFFICIENT;
+                break;
+            }
+
+            /* Create streaming thread.  */
+            status =  _ux_utility_thread_create(&stream -> ux_device_class_audio_stream_feedback_thread , "ux_device_class_audio_stream_feedback_thread",
+                        stream_parameter -> ux_device_class_audio_stream_parameter_feedback_thread_entry,
+                        (ULONG)(ALIGN_TYPE)stream, (VOID *) stream -> ux_device_class_audio_stream_feedback_thread_stack,
+                        memory_size, UX_THREAD_PRIORITY_CLASS,
+                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
+
+            /* Check for successful allocation.  */
+            if (status != UX_SUCCESS)
+                break;
+
+            UX_THREAD_EXTENSION_PTR_SET(&(stream -> ux_device_class_audio_stream_feedback_thread), stream)
+        }
+#endif
 
         /* Save callbacks.  */
         _ux_utility_memory_copy(&stream -> ux_device_class_audio_stream_callbacks,
@@ -230,8 +269,14 @@ ULONG                                   i;
     stream = audio -> ux_device_class_audio_streams;
     for (i = 0; i < audio -> ux_device_class_audio_streams_nb; i ++)
     {
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+        if (stream -> ux_device_class_audio_stream_feedback_thread.tx_thread_id)
+            _ux_utility_thread_delete(&stream -> ux_device_class_audio_stream_feedback_thread);
+        if (stream -> ux_device_class_audio_stream_feedback_thread_stack)
+            _ux_utility_memory_free(stream -> ux_device_class_audio_stream_feedback_thread_stack);
+#endif
         if (stream -> ux_device_class_audio_stream_thread.tx_thread_id)
-            _ux_utility_thread_delete(&stream -> ux_device_class_audio_stream_thread);
+            _ux_device_thread_delete(&stream -> ux_device_class_audio_stream_thread);
         if (stream -> ux_device_class_audio_stream_thread_stack)
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_thread_stack);
         if (stream -> ux_device_class_audio_stream_buffer)

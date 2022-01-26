@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_transport                    PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,8 @@
 /*                                                                        */
 /*    This function is the transport layer for all protocols. It perform  */
 /*    the error recovery and retries if needed.                           */
+/*                                                                        */
+/*    It's for RTOS mode only.                                            */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -72,10 +74,18 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_transport(UX_HOST_CLASS_STORAGE *storage, UCHAR *data_pointer)
 {
+#if defined(UX_HOST_STANDALONE)
+    UX_PARAMETER_NOT_USED(storage);
+    UX_PARAMETER_NOT_USED(data_pointer);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UINT        status;
 UINT        csw_status;
@@ -152,5 +162,6 @@ UINT        csw_status;
             return(status);
         }
     }
+#endif
 #endif
 }

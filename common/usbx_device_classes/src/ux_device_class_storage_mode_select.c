@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_mode_select                PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_mode_select(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -92,7 +95,13 @@ UINT  _ux_device_class_storage_mode_select(UX_SLAVE_CLASS_STORAGE *storage, ULON
     /* This command is not yet supported. So Stall the endpoint.  */
     if (storage -> ux_slave_class_storage_host_length)
     {
+
+#if !defined(UX_DEVICE_STANDALONE)
         _ux_device_stack_endpoint_stall(endpoint_out);
+#else
+        UX_PARAMETER_NOT_USED(endpoint_out);
+#endif
+
         storage -> ux_slave_class_storage_csw_residue = storage -> ux_slave_class_storage_host_length;
     }
 

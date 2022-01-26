@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_initialize                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,7 +54,7 @@
 /*                                                                        */ 
 /*    _ux_utility_memory_allocate           Allocate memory               */ 
 /*    _ux_utility_memory_free               Free memory                   */
-/*    _ux_utility_thread_create             Create thread                 */
+/*    _ux_device_thread_create              Create thread                 */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -70,6 +70,10 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            added cancel callback,      */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -108,7 +112,7 @@ UX_SLAVE_CLASS                          *class;
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_thread_create(&class -> ux_slave_class_thread, "ux_slave_class_thread", 
+        status =  _ux_device_thread_create(&class -> ux_slave_class_thread, "ux_slave_class_thread", 
                     _ux_device_class_pima_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) class -> ux_slave_class_thread_stack,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -177,6 +181,9 @@ UX_SLAVE_CLASS                          *class;
     pima -> ux_device_class_pima_object_properties_list         = pima_parameter -> ux_device_class_pima_parameter_object_properties_list;
 
 #endif
+
+    /* Store the callback functions for request.  */
+    pima -> ux_device_class_pima_cancel                         = pima_parameter -> ux_device_class_pima_parameter_cancel;
 
     /* Store the callback functions for device. */
     pima -> ux_device_class_pima_device_reset                   = pima_parameter -> ux_device_class_pima_parameter_device_reset;

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_activate                       PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,7 +58,6 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    _ux_utility_memory_allocate           Allocate memory               */ 
-/*    _ux_utility_thread_resume             Resume thread                 */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -75,6 +74,8 @@
 /*                                            removed block count (it's   */
 /*                                            from host request wValue),  */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_activate(UX_SLAVE_CLASS_COMMAND *command)

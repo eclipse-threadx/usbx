@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_synchronize_cache          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized command logic,    */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_synchronize_cache(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -89,7 +92,10 @@ UINT                    status;
 ULONG                   lba;
 USHORT                  number_blocks;
 ULONG                   media_status;
+
+#if !defined(UX_DEVICE_STANDALONE)
 UCHAR                   flags;
+#endif
 
 
     UX_PARAMETER_NOT_USED(endpoint_out);
@@ -107,8 +113,6 @@ UCHAR                   flags;
         /* Return success.  */
         return(UX_SUCCESS);
     }
-
-    flags =  *(cbwcb + UX_SLAVE_CLASS_STORAGE_SYNCHRONIZE_CACHE_FLAGS);
 
     /* Get the LBA and number of blocks from the CBWCB in 16 bits.  */
     lba           =         _ux_utility_long_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_SYNCHRONIZE_CACHE_LBA);
@@ -130,7 +134,12 @@ UCHAR                   flags;
 
         /* We have a problem, media status error. Return a bad completion and wait for the
            REQUEST_SENSE command.  */
+#if !defined(UX_DEVICE_STANDALONE)
         _ux_device_stack_endpoint_stall(endpoint_in);
+#else
+        UX_PARAMETER_NOT_USED(endpoint_in);
+        storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_ERR;
+#endif
 
         storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
 
@@ -138,8 +147,25 @@ UCHAR                   flags;
         return(UX_ERROR);
     }
 
+    /* Now it's OK to perform synchronize cache.  */
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Next: Disk (SYNC).  */
+    storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_DISK_WAIT;
+    storage -> ux_device_class_storage_disk_state = UX_DEVICE_CLASS_STORAGE_DISK_OP_START;
+    storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_DISK_OP;
+
+    storage -> ux_device_class_storage_cmd_lba = lba;
+    storage -> ux_device_class_storage_cmd_n_lb = number_blocks;
+
+#else
+
+    /* Get the flags.  */
+    flags =  *(cbwcb + UX_SLAVE_CLASS_STORAGE_SYNCHRONIZE_CACHE_FLAGS);
+
     /* If the immediate bit is set, we return a CSW before flush.  */
-    else if ((flags & UX_SLAVE_CLASS_STORAGE_SYNCHRONIZE_CACHE_FLAGS_IMMED) != 0)
+    if ((flags & UX_SLAVE_CLASS_STORAGE_SYNCHRONIZE_CACHE_FLAGS_IMMED) != 0)
         _ux_device_class_storage_csw_send(storage, lun, endpoint_in, UX_SLAVE_CLASS_STORAGE_CSW_PASSED);
 
     /* Send the flush command to the local media.  */
@@ -170,6 +196,7 @@ UCHAR                   flags;
         /* Return an error.  */
         return(UX_ERROR);
     }
+#endif
 
     /* Return completion status.  */
     return(status);

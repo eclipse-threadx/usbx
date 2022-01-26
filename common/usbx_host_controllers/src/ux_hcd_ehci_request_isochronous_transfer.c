@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_request_isochronous_transfer           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,7 +67,7 @@
 /*                                                                        */
 /*    _ux_utility_mutex_on                  Get mutex                     */
 /*    _ux_utility_mutex_off                 Put mutex                     */
-/*    _ux_utility_semaphore_put             Put semaphore                 */
+/*    _ux_host_semaphore_put                Put semaphore                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -80,6 +80,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_request_isochronous_transfer(UX_HCD_EHCI *hcd_ehci, UX_TRANSFER *transfer_request)
@@ -170,7 +173,7 @@ UCHAR                           start = UX_FALSE;
     if (start)
     {
         hcd_ehci -> ux_hcd_ehci_hcd_owner -> ux_hcd_thread_signal ++;
-        _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
+        _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
     }
 
     /* Return completion status.  */

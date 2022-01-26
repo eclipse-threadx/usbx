@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_done_queue_process                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,7 +66,7 @@
 /*    _ux_hcd_ohci_next_td_clean            Clean next TD                 */ 
 /*    _ux_hcd_ohci_register_read            Read OHCI register            */ 
 /*    _ux_hcd_ohci_register_write           Write OHCI register           */ 
-/*    _ux_utility_semaphore_put             Put producer semaphore        */ 
+/*    _ux_host_semaphore_put                Put producer semaphore        */ 
 /*    _ux_utility_virtual_address           Get virtual address           */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -80,6 +80,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_done_queue_process(UX_HCD_OHCI *hcd_ohci)
@@ -161,7 +164,7 @@ ULONG               current_frame;
                     transfer_request -> ux_transfer_request_completion_code =  UX_SUCCESS;
                     if (transfer_request -> ux_transfer_request_completion_function != UX_NULL)
                         transfer_request -> ux_transfer_request_completion_function(transfer_request);
-                    _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                    _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
                 }
                 break;
 
@@ -188,7 +191,7 @@ ULONG               current_frame;
                 _ux_hcd_ohci_next_td_clean(td);
                 if (transfer_request -> ux_transfer_request_completion_function != UX_NULL)
                     transfer_request -> ux_transfer_request_completion_function(transfer_request);
-                _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
                 break;
 
@@ -201,7 +204,7 @@ ULONG               current_frame;
                 _ux_hcd_ohci_next_td_clean(td);
                 if (transfer_request -> ux_transfer_request_completion_function != UX_NULL)
                     transfer_request -> ux_transfer_request_completion_function(transfer_request);
-                _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_STALLED, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -220,7 +223,7 @@ ULONG               current_frame;
                 _ux_hcd_ohci_next_td_clean(td);
                 if (transfer_request -> ux_transfer_request_completion_function != UX_NULL)
                     transfer_request -> ux_transfer_request_completion_function(transfer_request);
-                _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_NO_ANSWER, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -238,7 +241,7 @@ ULONG               current_frame;
                 _ux_hcd_ohci_next_td_clean(td);
                 if (transfer_request -> ux_transfer_request_completion_function != UX_NULL)
                     transfer_request -> ux_transfer_request_completion_function(transfer_request);
-                _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_ERROR, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -291,7 +294,7 @@ ULONG               current_frame;
                         transfer_request -> ux_transfer_request_completion_code =  UX_SUCCESS;
                         if (transfer_request -> ux_transfer_request_completion_function != UX_NULL)
                             transfer_request -> ux_transfer_request_completion_function(transfer_request);
-                        _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                        _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
                 }
                 break;
 
@@ -307,7 +310,7 @@ ULONG               current_frame;
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_MISSED_FRAME, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
-                _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
                 break;
 
                 
@@ -321,7 +324,7 @@ ULONG               current_frame;
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_ERROR, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
-                _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+                _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
                 break;
             }
         }                

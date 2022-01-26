@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_write                      PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_write(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -94,11 +97,15 @@ UINT                    status;
 UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   lba;
 ULONG                   total_number_blocks; 
-ULONG                   number_blocks; 
 ULONG                   media_status;
 ULONG                   total_length;
+
+#if !defined(UX_DEVICE_STANDALONE)
+ULONG                   number_blocks; 
 ULONG                   transfer_length;
 ULONG                   done_length;
+#endif
+
 
     UX_PARAMETER_NOT_USED(endpoint_in);
 
@@ -139,7 +146,9 @@ ULONG                   done_length;
 
         /* We have a problem, media status error. Return a bad completion and wait for the
            REQUEST_SENSE command.  */
+#if !defined(UX_DEVICE_STANDALONE)
         _ux_device_stack_endpoint_stall(endpoint_out);
+#endif
 
         /* We are done here.  */
         return(UX_ERROR);
@@ -156,7 +165,9 @@ ULONG                   done_length;
 
         /* We have a problem, cannot write to RO drive. Return a bad completion and wait for the
            REQUEST_SENSE command.  */
+#if !defined(UX_DEVICE_STANDALONE)
         _ux_device_stack_endpoint_stall(endpoint_out);
+#endif
 
         /* We are done here.  */
         return(UX_ERROR);
@@ -164,6 +175,27 @@ ULONG                   done_length;
 
     /* Compute the total length to transfer and how much remains.  */
     total_length =  total_number_blocks * storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_block_length;
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Next: Transfer (DATA) -> Disk write.  */
+    storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+    storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_WRITE;
+    storage -> ux_device_class_storage_disk_state = UX_DEVICE_CLASS_STORAGE_DISK_USB_WAIT;
+    storage -> ux_device_class_storage_buffer_state[0] = UX_DEVICE_CLASS_STORAGE_BUFFER_EMPTY;
+    storage -> ux_device_class_storage_buffer_state[1] = UX_DEVICE_CLASS_STORAGE_BUFFER_EMPTY;
+    storage -> ux_device_class_storage_buffer_usb = 0;
+    storage -> ux_device_class_storage_buffer_disk = 0;
+
+    storage -> ux_device_class_storage_transfer = transfer_request;
+    storage -> ux_device_class_storage_device_length = total_length;
+    storage -> ux_device_class_storage_data_length = total_length;
+    storage -> ux_device_class_storage_data_count = 0;
+
+    storage -> ux_device_class_storage_cmd_lba = lba;
+    storage -> ux_device_class_storage_cmd_n_lb = total_number_blocks;
+
+#else
 
     /* Check transfer length.  */
 
@@ -257,6 +289,8 @@ ULONG                   done_length;
     /* Case (9), (11). If host expects more transfer, stall it.  */
     if (storage -> ux_slave_class_storage_csw_residue)
         _ux_device_stack_endpoint_stall(endpoint_out);
+
+#endif /* else defined(UX_DEVICE_STANDALONE) */
 
     /* Now we set the CSW with success.  */
     storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;

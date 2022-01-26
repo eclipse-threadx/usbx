@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_thread                          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,8 +54,8 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request        Transfer request             */
-/*    _ux_utility_semaphore_get              Get semaphore                */
-/*    _ux_utility_semaphore_put              Put semaphore                */
+/*    _ux_host_semaphore_get                 Get semaphore                */
+/*    _ux_host_semaphore_put                 Put semaphore                */
 /*    _ux_utility_memory_allocate            Allocate memory              */
 /*    _ux_utility_memory_free                Free memory                  */
 /*    _ux_utility_memory_set                 Set memory                   */
@@ -78,6 +78,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_thread(ULONG parameter)
@@ -102,7 +105,7 @@ ULONG                        physical_address_lsw;
     {   
 
         /* Wait for the semaphore to be put by the asix interrupt event.  */
-        status = _ux_utility_semaphore_get(&asix -> ux_host_class_asix_interrupt_notification_semaphore, UX_WAIT_FOREVER);
+        status = _ux_host_semaphore_get(&asix -> ux_host_class_asix_interrupt_notification_semaphore, UX_WAIT_FOREVER);
 
         /* Check for successful completion.  */
         if (status != UX_SUCCESS)
@@ -110,7 +113,7 @@ ULONG                        physical_address_lsw;
             return;
 
         /* Protect Thread reentry to this instance.  */
-        status =  _ux_utility_semaphore_get(&asix -> ux_host_class_asix_semaphore, UX_WAIT_FOREVER);
+        status =  _ux_host_semaphore_get(&asix -> ux_host_class_asix_semaphore, UX_WAIT_FOREVER);
 
         /* Check for successful completion.  */
         if (status != UX_SUCCESS)
@@ -131,7 +134,7 @@ ULONG                        physical_address_lsw;
             {
 
                 /* Unprotect thread reentry to this instance.  */
-                _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
                 return;
             }                
@@ -155,7 +158,7 @@ ULONG                        physical_address_lsw;
                 _ux_utility_memory_free(setup_buffer);
 
                 /* Unprotect thread reentry to this instance.  */
-                _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
                 /* Return completion status.  */
                 return;
@@ -182,7 +185,7 @@ ULONG                        physical_address_lsw;
                 _ux_utility_memory_free(setup_buffer);
 
                 /* Unprotect thread reentry to this instance.  */
-                _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
                 /* Return completion status.  */
                 return;
@@ -208,7 +211,7 @@ ULONG                        physical_address_lsw;
                 _ux_utility_memory_free(setup_buffer);
 
                 /* Unprotect thread reentry to this instance.  */
-                _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
                 /* Return completion status.  */
                 return;
@@ -241,7 +244,7 @@ ULONG                        physical_address_lsw;
                 _ux_utility_memory_free(setup_buffer);
 
                 /* Unprotect thread reentry to this instance.  */
-                _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
                 /* Return completion status.  */
                 return;
@@ -268,7 +271,7 @@ ULONG                        physical_address_lsw;
                 _ux_utility_memory_free(setup_buffer);
         
                 /* Unprotect thread reentry to this instance.  */
-                _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
                 /* Return completion status.  */
                 return;
@@ -299,7 +302,7 @@ ULONG                        physical_address_lsw;
                 _ux_utility_memory_free(setup_buffer);
         
                 /* Unprotect thread reentry to this instance.  */
-                _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
                 /* Return completion status.  */
                 return;
@@ -369,7 +372,7 @@ ULONG                        physical_address_lsw;
             }
 
             /* Unprotect thread reentry to this instance.  */
-            _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+            _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
 
             return;
         }
@@ -414,7 +417,7 @@ ULONG                        physical_address_lsw;
             _ux_network_driver_link_down(asix -> ux_host_class_asix_network_handle);
             
             /* Unprotect thread reentry to this instance.  */
-            _ux_utility_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+            _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
             
             return;
 

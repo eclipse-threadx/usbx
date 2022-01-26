@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_acm_ioctl                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_ioctl(UX_HOST_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -88,6 +91,10 @@ UX_HOST_CLASS_CDC_ACM_LINE_CODING       *line_coding;
 UX_HOST_CLASS_CDC_ACM_LINE_STATE        *line_state;
 VOID                                    (*callback_function) (struct UX_HOST_CLASS_CDC_ACM_STRUCT *, ULONG, ULONG );
 ULONG                                   value;
+#if defined(UX_HOST_STANDALONE)
+VOID                                    (*write_callback_function) (struct UX_HOST_CLASS_CDC_ACM_STRUCT *, UINT, ULONG );
+UX_TRANSFER                             *transfer;
+#endif
 
     /* Ensure the instance is valid.  */
     if ((cdc_acm -> ux_host_class_cdc_acm_state !=  UX_HOST_CLASS_INSTANCE_LIVE) && 
@@ -235,7 +242,7 @@ ULONG                                   value;
 
         /* We need to abort transactions on the bulk In pipe.  */
         _ux_host_stack_endpoint_transfer_abort(cdc_acm -> ux_host_class_cdc_acm_bulk_in_endpoint);
-        
+
         /* Status is successful.  */
         status = UX_SUCCESS;
         break;
@@ -247,6 +254,12 @@ ULONG                                   value;
 
         /* We need to abort transactions on the bulk Out pipe.  */
         _ux_host_stack_endpoint_transfer_abort(cdc_acm -> ux_host_class_cdc_acm_bulk_out_endpoint);
+
+#if defined(UX_HOST_STANDALONE)
+
+        /* Reset write state.  */
+        cdc_acm -> ux_host_class_cdc_acm_write_state = UX_STATE_RESET;
+#endif
 
         /* Status is successful.  */
         status = UX_SUCCESS;
@@ -277,6 +290,39 @@ ULONG                                   value;
         status = UX_SUCCESS;
         break;
 
+#if defined(UX_HOST_STANDALONE)
+    case UX_HOST_CLASS_CDC_ACM_IOCTL_WRITE_CALLBACK:
+
+        /* Register a callback when write is done. */
+        write_callback_function = ((VOID (*) (struct UX_HOST_CLASS_CDC_ACM_STRUCT *, UINT, ULONG )) (ALIGN_TYPE)parameter);
+        cdc_acm -> ux_host_class_cdc_acm_write_callback = write_callback_function;
+
+        /* Status is successful.  */
+        status = UX_SUCCESS;
+        break;
+
+    case UX_HOST_CLASS_CDC_ACM_IOCTL_GET_WRITE_STATUS:
+
+        /* Check write state.  */
+        if (cdc_acm -> ux_host_class_cdc_acm_write_state == UX_STATE_WAIT)
+        {
+            status = UX_BUSY;
+        }
+        else
+        {
+
+            /* Get transfer for write.  */
+            transfer = &cdc_acm -> ux_host_class_cdc_acm_bulk_out_endpoint ->
+                                                ux_endpoint_transfer_request;
+
+            /* Status is from transfer completion code.  */
+            status = transfer -> ux_transfer_request_completion_code;
+
+            /* Actual length is from latest write count.  */
+            *(ULONG *)parameter = cdc_acm -> ux_host_class_cdc_acm_write_count;
+        }
+        break;
+#endif
 
     default: 
 

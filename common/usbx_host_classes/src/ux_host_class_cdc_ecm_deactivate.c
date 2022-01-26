@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_deactivate                   PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,8 +60,8 @@
 /*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
 /*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_delete          Delete protection semaphore   */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -81,6 +81,9 @@
 /*                                            compile option for using    */
 /*                                            packet pool from NetX,      */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -142,7 +145,7 @@ UX_TRANSFER                 *transfer_request;
         UX_RESTORE
 
         /* Wait for the transfer to be armed, or possibly an error. The CDC-ECM thread will wake us up.  */
-        _ux_utility_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
+        _ux_host_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
 
         /* We're no longer waiting.  */
         cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish =  UX_FALSE;
@@ -164,7 +167,7 @@ UX_TRANSFER                 *transfer_request;
     _ux_host_stack_class_instance_destroy(cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
 
     /* Now wait for all threads to leave the instance before freeing the resources.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
     /* Free the memory used by the interrupt endpoint.  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint != UX_NULL)
@@ -178,11 +181,11 @@ UX_TRANSFER                 *transfer_request;
     _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_thread_stack);
 
     /* Destroy the bulk semaphores.  */
-    _ux_utility_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore);
-    _ux_utility_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
+    _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore);
+    _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore);
 
     /* Destroy the notification semaphore.  */
-    _ux_utility_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
+    _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
 #ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
     /* Delete the packet pool.  */
     nx_packet_pool_delete(&cdc_ecm -> ux_host_class_cdc_ecm_packet_pool);

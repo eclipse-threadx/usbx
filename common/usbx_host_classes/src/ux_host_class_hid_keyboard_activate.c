@@ -98,7 +98,7 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_keyboard_activate                PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -126,8 +126,8 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
 /*    _ux_host_class_hid_report_set         Do SET_REPORT                 */
 /*    _ux_utility_memory_allocate           Allocate memory block         */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_semaphore_create          Create semaphore              */
-/*    _ux_utility_semaphore_delete          Delete semaphore              */
+/*    _ux_host_semaphore_create             Create semaphore              */
+/*    _ux_host_semaphore_delete             Delete semaphore              */
 /*    _ux_utility_thread_create             Create thread                 */
 /*    _ux_utility_thread_delete             Delete thread                 */
 /*                                                                        */ 
@@ -145,13 +145,18 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_keyboard_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
 {
 
 UX_HOST_CLASS_HID_REPORT_CALLBACK       call_back;
+#if !defined(UX_HOST_STANDALONE)
 UX_HOST_CLASS_HID_CLIENT_REPORT         client_report;
+#endif
 UX_HOST_CLASS_HID_REPORT_GET_ID         report_id;
 UX_HOST_CLASS_HID                       *hid;
 UX_HOST_CLASS_HID_CLIENT                *hid_client;
@@ -182,8 +187,18 @@ UX_HOST_CLASS_HID_FIELD                 *field;
     /* Save the HID instance in the client instance.  */
     keyboard_instance -> ux_host_class_hid_keyboard_hid =  hid;
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Set client task function.  */
+    hid_client -> ux_host_class_hid_client_function = _ux_host_class_hid_keyboard_tasks_run;
+
+    /* The instance is mounting now.  */
+    keyboard_instance -> ux_host_class_hid_keyboard_state =  UX_HOST_CLASS_INSTANCE_MOUNTING;
+#else
+
     /* The instance is live now.  */
     keyboard_instance -> ux_host_class_hid_keyboard_state =  UX_HOST_CLASS_INSTANCE_LIVE;
+#endif
 
     /* Allocate the round-robin buffer that the remote control instance will use
      * to store the usages as they come in.
@@ -207,22 +222,14 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         report_id.ux_host_class_hid_report_get_report = UX_NULL;
         report_id.ux_host_class_hid_report_get_type = UX_HOST_CLASS_HID_REPORT_TYPE_INPUT;
         status =  _ux_host_class_hid_report_id_get(hid, &report_id);
-
-        /* If we are OK, go on.  */
-        if (status == UX_SUCCESS)
-        {
-
-            /* Save the keyboard report ID. */
-            keyboard_instance -> ux_host_class_hid_keyboard_id = (USHORT)(report_id.ux_host_class_hid_report_get_id);
-            
-            /* Set the idle rate of the keyboard to 0. This way a report is generated only when there is an activity.  */
-            status = _ux_host_class_hid_idle_set(hid, 0, keyboard_instance -> ux_host_class_hid_keyboard_id);
-        }
     }
 
     /* If we are OK, go on.  */
     if (status == UX_SUCCESS)
     {
+
+        /* Save the keyboard report ID. */
+        keyboard_instance -> ux_host_class_hid_keyboard_id = (USHORT)(report_id.ux_host_class_hid_report_get_id);
 
 #ifdef UX_HOST_CLASS_HID_KEYBOARD_EVENTS_KEY_CHANGES_MODE
 
@@ -281,12 +288,14 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         status =  _ux_host_class_hid_report_callback_register(hid, &call_back);
     }
 
+#if !defined(UX_HOST_STANDALONE)
+
     /* If we are OK, go on.  */
     if (status == UX_SUCCESS)
     {
 
         /* We need a semaphore now. This will be used to synchronize the HID report with the keyboard thread.  */
-        status =  _ux_utility_semaphore_create(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore, "ux_host_class_hid_keyboard_semaphore", 0);
+        status =  _ux_host_semaphore_create(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore, "ux_host_class_hid_keyboard_semaphore", 0);
         if(status != UX_SUCCESS)
             status = (UX_SEMAPHORE_ERROR);
     }
@@ -314,11 +323,15 @@ UX_HOST_CLASS_HID_FIELD                 *field;
                 UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_KEYBOARD,
                 UX_THREAD_PRIORITY_KEYBOARD, UX_NO_TIME_SLICE, UX_AUTO_START);
 
+#endif
+
     /* If we are OK, go on.  */
     if (status == UX_SUCCESS)
     {
 
+#if !defined(UX_HOST_STANDALONE)
         UX_THREAD_EXTENSION_PTR_SET(&(keyboard_instance -> ux_host_class_hid_keyboard_thread), keyboard_instance)
+#endif
 
         /* Default state of keyboard is with NumLock on.  */
         keyboard_instance -> ux_host_class_hid_keyboard_alternate_key_state |= UX_HID_KEYBOARD_STATE_NUM_LOCK;
@@ -326,7 +339,21 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         /* We need to build the field for the LEDs. */
         keyboard_instance -> ux_host_class_hid_keyboard_led_mask =  keyboard_instance ->  ux_host_class_hid_keyboard_alternate_key_state &
                                                                     UX_HID_KEYBOARD_STATE_MASK_LOCK;
-        
+
+#if defined(UX_HOST_STANDALONE)
+
+        /* Initialize the keyboard layout and use it to decode keys.  */
+        keyboard_instance -> ux_host_class_hid_keyboard_layout = &ux_host_class_hid_keyboard_layout;
+        keyboard_instance -> ux_host_class_hid_keyboard_keys_decode_disable = UX_FALSE;
+
+        /* Remaining things will be done in ACTIVATE_WAIT.
+            - SET_REPORT(LEDs)
+            - SET_IDLE(KEYs, 0)
+            - _periodic_report_start()  */
+        keyboard_instance -> ux_host_class_hid_keyboard_enum_state = UX_STATE_WAIT;
+        return(status);
+#else
+
         /* We need to find the OUTPUT report for the keyboard LEDs.  */
         report_id.ux_host_class_hid_report_get_report = UX_NULL;
         report_id.ux_host_class_hid_report_get_type = UX_HOST_CLASS_HID_REPORT_TYPE_OUTPUT;
@@ -351,6 +378,14 @@ UX_HOST_CLASS_HID_FIELD                 *field;
             /* The HID class will perform the SET_REPORT command.  Do not check for error here, this is
                handled by the function itself.  */
             status = _ux_host_class_hid_report_set(hid, &client_report);
+        }
+
+        /* If we are OK, go on.  */
+        if (status == UX_SUCCESS)
+        {
+
+            /* Set the idle rate of the keyboard to 0. This way a report is generated only when there is an activity.  */
+            status = _ux_host_class_hid_idle_set(hid, 0, keyboard_instance -> ux_host_class_hid_keyboard_id);
         }
 
         /* If we are OK, go on.  */
@@ -387,6 +422,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
 
         /* There is error, delete thread.  */
         _ux_utility_thread_delete(&keyboard_instance -> ux_host_class_hid_keyboard_thread);
+#endif
     }
 
     /* We are here if there is error.  */
@@ -398,14 +434,18 @@ UX_HOST_CLASS_HID_FIELD                 *field;
     if (keyboard_instance -> ux_host_class_hid_keyboard_key_state)
         _ux_utility_memory_free(keyboard_instance -> ux_host_class_hid_keyboard_key_state);
 
+#if !defined(UX_HOST_STANDALONE)
+
     /* Free stack.  */
     if (keyboard_instance -> ux_host_class_hid_keyboard_thread_stack)
         _ux_utility_memory_free(keyboard_instance -> ux_host_class_hid_keyboard_thread_stack);
 
     /* Delete semaphore.  */
     if (keyboard_instance -> ux_host_class_hid_keyboard_semaphore.tx_semaphore_id != UX_EMPTY)
-        _ux_utility_semaphore_delete(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore);
-    
+        _ux_host_semaphore_delete(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore);
+
+#endif
+
     /* Free usage array.  */
     if (keyboard_instance -> ux_host_class_hid_keyboard_usage_array)
         _ux_utility_memory_free(keyboard_instance -> ux_host_class_hid_keyboard_usage_array);

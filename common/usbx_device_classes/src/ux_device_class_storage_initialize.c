@@ -41,7 +41,7 @@ UCHAR _ux_system_slave_class_storage_product_serial[] =                     "123
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_storage_initialize                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -62,8 +62,8 @@ UCHAR _ux_system_slave_class_storage_product_serial[] =                     "123
 /*                                                                        */
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
-/*    _ux_utility_thread_create             Create thread                 */
-/*    _ux_utility_thread_delete             Delete thread                 */
+/*    _ux_device_thread_create              Create thread                 */
+/*    _ux_device_thread_delete              Delete thread                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -79,16 +79,20 @@ UCHAR _ux_system_slave_class_storage_product_serial[] =                     "123
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
 
-UINT                                    status;
+UINT                                    status = UX_SUCCESS;
 UX_SLAVE_CLASS_STORAGE                  *storage;
 UX_SLAVE_CLASS_STORAGE_PARAMETER        *storage_parameter;
-UX_SLAVE_CLASS                          *class;
+UX_SLAVE_CLASS                          *class_inst;
 ULONG                                   lun_index;
+
 
     /* Get the pointer to the application parameters for the storage class.  */
     storage_parameter =  command -> ux_slave_class_command_parameter;
@@ -99,7 +103,7 @@ ULONG                                   lun_index;
         return UX_ERROR;
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_inst =  command -> ux_slave_class_command_class_ptr;
 
     /* Create an instance of the device storage class.  */
     storage =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_STORAGE));
@@ -108,28 +112,37 @@ ULONG                                   lun_index;
     if (storage == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
+#if !defined(UX_DEVICE_STANDALONE)
+
     /* Allocate some memory for the thread stack. */
-    class -> ux_slave_class_thread_stack = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
+    class_inst -> ux_slave_class_thread_stack = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
 
     /* If it's OK, create thread.  */
-    if (class -> ux_slave_class_thread_stack != UX_NULL)
+    if (class_inst -> ux_slave_class_thread_stack != UX_NULL)
 
         /* This instance needs to be running in a different thread. So start
            a new thread. We pass a pointer to the class to the new thread.  This thread
            does not start until we have a instance of the class. */
-        status =  _ux_utility_thread_create(&class -> ux_slave_class_thread, "ux_slave_storage_thread",
+        status =  _ux_device_thread_create(&class_inst -> ux_slave_class_thread, "ux_slave_storage_thread",
                     _ux_device_class_storage_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) class -> ux_slave_class_thread_stack,
+                    (ULONG) (ALIGN_TYPE) class_inst, (VOID *) class_inst -> ux_slave_class_thread_stack,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
     else
         status = UX_MEMORY_INSUFFICIENT;
+#else
+
+    /* Save tasks run entry.  */
+    class_inst -> ux_slave_class_task_function = _ux_device_class_storage_tasks_run;
+
+    status = UX_SUCCESS;
+#endif
 
     /* If thread resources allocated, go on.  */
     if (status == UX_SUCCESS)
     {
 
-        UX_THREAD_EXTENSION_PTR_SET(&(class -> ux_slave_class_thread), class)
+        UX_THREAD_EXTENSION_PTR_SET(&(class_inst -> ux_slave_class_thread), class_inst)
 
         /* Store the number of LUN declared.  */
         storage -> ux_slave_class_storage_number_lun = storage_parameter -> ux_slave_class_storage_parameter_number_lun;
@@ -189,17 +202,19 @@ ULONG                                   lun_index;
                 storage -> ux_slave_class_storage_product_serial = _ux_system_slave_class_storage_product_serial;
 
             /* Save the address of the STORAGE instance inside the STORAGE container.  */
-            class -> ux_slave_class_instance = (VOID *) storage;
+            class_inst -> ux_slave_class_instance = (VOID *) storage;
 
             return(UX_SUCCESS);
         }
 
         /* Free thread resources.  */
-        _ux_utility_thread_delete(&class -> ux_slave_class_thread);
+        _ux_device_thread_delete(&class_inst -> ux_slave_class_thread);
     }
 
-    if (class -> ux_slave_class_thread_stack != UX_NULL)
-        _ux_utility_memory_free(&class -> ux_slave_class_thread_stack);
+#if !defined(UX_DEVICE_STANDALONE)
+    if (class_inst -> ux_slave_class_thread_stack != UX_NULL)
+        _ux_utility_memory_free(&class_inst -> ux_slave_class_thread_stack);
+#endif
 
     /* Free instance.  */
     _ux_utility_memory_free(storage);

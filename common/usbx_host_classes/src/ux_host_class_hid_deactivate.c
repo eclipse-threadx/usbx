@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_deactivate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -62,8 +62,8 @@
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort transfer                */ 
 /*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_utility_semaphore_delete          Delete semaphore              */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
+/*    _ux_host_semaphore_delete             Delete semaphore              */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -77,6 +77,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -85,7 +88,9 @@ UINT  _ux_host_class_hid_deactivate(UX_HOST_CLASS_COMMAND *command)
 UX_HOST_CLASS_HID                   *hid;
 UX_HOST_CLASS_HID_CLIENT_COMMAND    hid_client_command;
 UX_TRANSFER                         *transfer_request;
+#if !defined(UX_HOST_STANDALONE)
 UINT                                status;
+#endif
 
 
     /* Get the instance for this class.  */
@@ -94,15 +99,36 @@ UINT                                status;
     /* The HID is being shut down.  */
     hid -> ux_host_class_hid_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
 
+#if !defined(UX_HOST_STANDALONE)
+
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
 
         /* Return error.  */
         return(status);
+#endif
 
-    /* We need to abort transactions on the interrupt pipe.  */
-    _ux_host_stack_endpoint_transfer_abort(hid -> ux_host_class_hid_interrupt_endpoint);
+#if defined(UX_HOST_STANDALONE)
+    if (hid -> ux_host_class_hid_interrupt_endpoint)
+#endif
+    {
+
+        /* We need to abort transactions on the interrupt pipe.  */
+        _ux_host_stack_endpoint_transfer_abort(hid -> ux_host_class_hid_interrupt_endpoint);
+
+        /* If the Hid class instance has a interrupt pipe with a data payload associated with it
+        it must be freed.  */
+        transfer_request =  &hid -> ux_host_class_hid_interrupt_endpoint -> ux_endpoint_transfer_request;
+
+        /* Then de allocate the memory.  */
+        _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
+    }
+
+#if defined(UX_HOST_STANDALONE)
+    if (hid -> ux_host_class_hid_allocated)
+        _ux_utility_memory_free(hid -> ux_host_class_hid_allocated);
+#endif
 
     /* We need to inform the HID client, if any, of the deactivation.  */
     hid_client_command.ux_host_class_hid_client_command_instance =   (VOID *) hid;
@@ -116,22 +142,15 @@ UINT                                status;
     /* Clean all the HID memory fields.  */
     _ux_host_class_hid_instance_clean(hid);
 
-    /* If the Hid class instance has a interrupt pipe with a data payload associated with it
-       it must be freed.  */
-    transfer_request =  &hid -> ux_host_class_hid_interrupt_endpoint -> ux_endpoint_transfer_request;
-
-    /* Then de allocate the memory.  */
-    _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
-
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(hid -> ux_host_class_hid_class, (VOID *) hid);
 
     /* Destroy the semaphore.  */
-    _ux_utility_semaphore_delete(&hid -> ux_host_class_hid_semaphore);
+    _ux_host_semaphore_delete(&hid -> ux_host_class_hid_semaphore);
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

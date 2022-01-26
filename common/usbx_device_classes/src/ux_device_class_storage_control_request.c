@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_control_request            PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -85,7 +88,9 @@ ULONG                       request;
 ULONG                       request_value;
 ULONG                       request_length;
 UX_SLAVE_CLASS_STORAGE      *storage;
+#if !defined(UX_DEVICE_STANDALONE)
 UX_SLAVE_INTERFACE          *interface;
+#endif
 UX_SLAVE_ENDPOINT           *endpoint_in;
 UX_SLAVE_ENDPOINT           *endpoint_out;
 
@@ -121,6 +126,11 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
         if (request_length != 0)
             return(UX_ERROR);
 
+#if defined(UX_DEVICE_STANDALONE)
+        endpoint_in = storage -> ux_device_class_storage_ep_in;
+        endpoint_out = storage -> ux_device_class_storage_ep_out;
+#else
+
         /* We need the interface to the class.  */
         interface =  storage -> ux_slave_class_storage_interface;
         
@@ -143,6 +153,7 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
             /* We found the endpoint IN first, so next endpoint is OUT.  */
             endpoint_out =  endpoint_in -> ux_slave_endpoint_next_endpoint;
         }
+#endif
             
         /* First cancel any transfer on the endpoint OUT, from the host.  */
         transfer_request =  &endpoint_out -> ux_slave_endpoint_transfer_request;

@@ -29,13 +29,13 @@
 #include "ux_device_stack.h"
 
 
-#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
+#if !defined(UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE) && !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_bulkout_thread             PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -45,6 +45,8 @@
 /*    This function is the thread of the cdc_acm bulk out endpoint. It    */
 /*    is waiting for the host to send data on the bulk out endpoint to    */
 /*    the device.                                                         */
+/*                                                                        */
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -74,6 +76,9 @@
 /*                                            added macro to disable      */
 /*                                            transmission support,       */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_acm_bulkout_thread(ULONG cdc_acm_class)
@@ -151,7 +156,7 @@ UINT                            status;
         }
 
     /* We need to suspend ourselves. We will be resumed by the application if needed.  */
-    _ux_utility_thread_suspend(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread);
+    _ux_device_thread_suspend(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread);
     }
 }
 #endif

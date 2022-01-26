@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_write                          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,8 +57,8 @@
 /*                                                                        */ 
 /*    _ux_host_class_audio_transfer_request Start audio transfer request  */ 
 /*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_put             Put semaphore                 */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_put                Put semaphore                 */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_write(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST *audio_transfer_request)
@@ -97,7 +100,7 @@ UINT        status;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&audio -> ux_host_class_audio_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&audio -> ux_host_class_audio_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
 
@@ -109,7 +112,7 @@ UINT        status;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_utility_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+        status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_AUDIO_WRONG_INTERFACE);
@@ -131,7 +134,7 @@ UINT        status;
     status =  _ux_host_class_audio_transfer_request(audio, audio_transfer_request);
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+    status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
     /* Return completion status.  */
     return(status);

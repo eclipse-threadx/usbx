@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid_mouse.h                           PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +47,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -95,7 +98,10 @@ typedef struct UX_HOST_CLASS_HID_MOUSE_STRUCT
     SLONG           ux_host_class_hid_mouse_y_position;
     ULONG           ux_host_class_hid_mouse_buttons;
     SLONG           ux_host_class_hid_mouse_wheel;
-    
+#if defined(UX_HOST_STANDALONE)
+    UINT            ux_host_class_hid_mouse_enum_state;
+    UINT            ux_host_class_hid_mouse_status;
+#endif
     
 } UX_HOST_CLASS_HID_MOUSE;
 

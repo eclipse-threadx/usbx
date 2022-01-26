@@ -29,12 +29,13 @@
 #include "ux_device_stack.h"
 
 
+#if !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_read                       PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -42,6 +43,8 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
 /*    This function reads from the CDC class.                             */ 
+/*                                                                        */ 
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -79,6 +82,8 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile issue,        */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022x    Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
@@ -227,4 +232,4 @@ ULONG                       local_requested_length;
         /* Simply return the last transaction result.  */
         return(status);        
 }
-
+#endif

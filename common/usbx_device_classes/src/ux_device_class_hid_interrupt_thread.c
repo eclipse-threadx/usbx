@@ -29,19 +29,22 @@
 #include "ux_device_stack.h"
 
 
+#if !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_interrupt_thread               PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
-/*    This function is the thread of the hid interrupt endpoint           */ 
+/*    This function is the thread of the hid interrupt (IN) endpoint      */ 
+/*                                                                        */ 
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -58,7 +61,7 @@
 /*    _ux_device_class_hid_event_get        Get HID event                 */
 /*    _ux_device_stack_transfer_request     Request transfer              */ 
 /*    _ux_utility_memory_copy               Copy memory                   */ 
-/*    _ux_utility_thread_suspend            Suspend thread                */
+/*    _ux_device_thread_suspend             Suspend thread                */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -77,7 +80,10 @@
 /*                                            resulting in version 6.1    */
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved idle generation,   */
-/*                                            resulting in version 6.1    */
+/*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            off for standalone compile, */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_hid_interrupt_thread(ULONG hid_class)
@@ -191,6 +197,7 @@ ULONG                       actual_flags;
         }
              
         /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
-        _ux_utility_thread_suspend(&class -> ux_slave_class_thread);
+        _ux_device_thread_suspend(&class -> ux_slave_class_thread);
     }
 }
+#endif

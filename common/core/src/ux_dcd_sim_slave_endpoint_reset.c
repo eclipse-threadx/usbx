@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_endpoint_reset                    PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*                                            cleared transfer flag and   */
 /*                                            waked up suspended thread,  */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_endpoint_reset(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_ENDPOINT *endpoint)
@@ -78,12 +81,20 @@ UINT  _ux_dcd_sim_slave_endpoint_reset(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE
 
 UX_DCD_SIM_SLAVE_ED     *ed;
 ULONG                   transfer_waiting;
+#if !defined(UX_DEVICE_STANDALONE)
 UX_SLAVE_TRANSFER       *transfer;
+#endif
 
     UX_PARAMETER_NOT_USED(dcd_sim_slave);
 
     /* Get the physical endpoint address in the endpoint container.  */
     ed =  (UX_DCD_SIM_SLAVE_ED *) endpoint -> ux_slave_endpoint_ed;
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Transfer pending always considered.  */
+    transfer_waiting = UX_DCD_SIM_SLAVE_ED_STATUS_TRANSFER;
+#else
 
     /* Save waiting status for non-zero endpoints.  */
     if (ed -> ux_sim_slave_ed_index)
@@ -93,18 +104,23 @@ UX_SLAVE_TRANSFER       *transfer;
     }
     else
         transfer_waiting = 0;
+#endif
 
-    /* Set the state of the endpoint to not stalled.  */
-    ed -> ux_sim_slave_ed_status &=  ~(ULONG)(UX_DCD_SIM_SLAVE_ED_STATUS_STALLED |
-                                              transfer_waiting);
+    /* Clear pending transfer and stall status.  */
+    ed -> ux_sim_slave_ed_status &=  ~(ULONG)(transfer_waiting |
+                                            UX_DCD_SIM_SLAVE_ED_STATUS_STALLED |
+                                            UX_DCD_SIM_SLAVE_ED_STATUS_DONE);
+
+#if !defined(UX_DEVICE_STANDALONE)
 
     /* If some thread is pending, signal wakeup.  */
     if (transfer_waiting)
     {
         transfer = &endpoint -> ux_slave_endpoint_transfer_request;
         transfer -> ux_slave_transfer_request_completion_code = UX_TRANSFER_BUS_RESET;
-        _ux_utility_semaphore_put(&transfer -> ux_slave_transfer_request_semaphore);
+        _ux_device_semaphore_put(&transfer -> ux_slave_transfer_request_semaphore);
     }
+#endif
 
     /* This function never fails.  */
     return(UX_SUCCESS);         

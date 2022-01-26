@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_configuration_set                    PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -42,8 +42,15 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
 /*    This function performs a setting of a device configuration.         */ 
+/*                                                                        */
+/*    In RTOS mode, this function is blocking.                            */
 /*    If the host is OTG capable and the device has an OTG descriptor     */ 
 /*    that supports HNP we perform a SET_FEATURE with b_hnp_support.      */ 
+/*                                                                        */ 
+/*    In standalone mode, when device enumeration is in progress, this    */
+/*    function is non-blocking, it prepares transfer for enum step of     */
+/*    SET_CONFIGURE request. Otherwise it blocks until transfer request   */
+/*    done.                                                               */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -74,6 +81,10 @@
 /*                                            used pointer for current    */
 /*                                            selected configuration,     */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            set device power source,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_configuration_set(UX_CONFIGURATION *configuration)
@@ -143,6 +154,19 @@ UX_HCD          *hcd;
     transfer_request -> ux_transfer_request_value =             (USHORT) configuration -> ux_configuration_descriptor.bConfigurationValue;
     transfer_request -> ux_transfer_request_index =             0;
 
+#if defined(UX_HOST_STANDALONE)
+    if (device -> ux_device_flags &= UX_DEVICE_FLAG_ENUM)
+    {
+
+        /* Special case for enumeration process, non-blocking.  */
+        device -> ux_device_enum_trans = transfer_request;
+        status = UX_SUCCESS;
+        return(status);
+    }
+
+    /* Tend to be blocking after enumeration done.  */
+#endif
+
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
@@ -155,9 +179,14 @@ UX_HCD          *hcd;
     
         /* Store the new configuration value in the device container.  */
         device -> ux_device_current_configuration =  configuration;
+
+        /* Save current device power source.  */
+        device -> ux_device_power_source = (configuration ->
+                                            ux_configuration_descriptor.bmAttributes &
+                                            UX_CONFIGURATION_DEVICE_SELF_POWERED) ?
+                                UX_DEVICE_SELF_POWERED : UX_DEVICE_BUS_POWERED;
     }
 
     /* Return status to caller.  */
     return(status);
 }
-

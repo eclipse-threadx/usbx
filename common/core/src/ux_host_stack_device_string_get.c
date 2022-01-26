@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_string_get                    PORTABLE C      */
-/*                                                           6.1.7        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,10 +75,16 @@
 /*  06-02-2021     Chaoqiong Xiao           Modified comment(s), and      */
 /*                                            removed unnecessary header, */
 /*                                            resulting in version 6.1.7  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_string_get(UX_DEVICE *device, UCHAR *descriptor_buffer, ULONG length, ULONG language_id, ULONG string_index)
 {
+#if defined(UX_HOST_STANDALONE)
+UX_INTERRUPT_SAVE_AREA
+#endif
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 UINT            status;
@@ -100,17 +106,32 @@ UINT            status;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_STRING_GET, device, descriptor_buffer, length, (language_id << 16) | string_index, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
+    /* We need to get the default control endpoint transfer request pointer.  */
+    control_endpoint =  &device -> ux_device_control_endpoint;
+    transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
+
+#if defined(UX_HOST_STANDALONE)
+    UX_DISABLE
+    if ((device -> ux_device_flags & UX_DEVICE_FLAG_LOCK) ||
+        (transfer_request -> ux_transfer_request_flags & UX_TRANSFER_FLAG_LOCK))
+    {
+        UX_RESTORE
+        return(UX_BUSY);
+    }
+    device -> ux_device_flags |= UX_DEVICE_FLAG_LOCK;
+    transfer_request -> ux_transfer_request_flags |=
+                (UX_TRANSFER_FLAG_LOCK | UX_TRANSFER_FLAG_AUTO_DEVICE_UNLOCK);
+    UX_RESTORE
+#else
+
     /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
-    status =  _ux_utility_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)
         return(UX_SEMAPHORE_ERROR);
-
-    /* We need to get the default control endpoint transfer request pointer.  */
-    control_endpoint =  &device -> ux_device_control_endpoint;
-    transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
+#endif
 
     /* Create a transfer request for the GET_DEVICE_ID request.  */
     transfer_request -> ux_transfer_request_data_pointer =      descriptor_buffer;

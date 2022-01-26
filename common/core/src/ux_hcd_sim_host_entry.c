@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_entry                              PORTABLE C      */ 
-/*                                                           6.1.2        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,9 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added HCD uninitialize,     */
 /*                                            resulting in version 6.1.2  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_entry(UX_HCD *hcd, UINT function, VOID *parameter)
@@ -190,7 +193,11 @@ UX_HCD_SIM_HOST     *hcd_sim_host;
 
     case UX_HCD_TRANSFER_REQUEST:
 
+#if defined(UX_HOST_STANDALONE)
+        status =  _ux_hcd_sim_host_transfer_run(hcd_sim_host, (UX_TRANSFER *) parameter);
+#else
         status =  _ux_hcd_sim_host_request_transfer(hcd_sim_host, (UX_TRANSFER *) parameter);
+#endif
         break;
 
 

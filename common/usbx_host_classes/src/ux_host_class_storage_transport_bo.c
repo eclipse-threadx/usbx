@@ -30,12 +30,13 @@
 #include "ux_host_stack.h"
 
 
+#if !defined(UX_HOST_STANDALONE)
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_transport_bo                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,7 +65,7 @@
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
 /*    _ux_utility_long_get                  Get 32-bit word               */
-/*    _ux_utility_semaphore_get             Get semaphore                 */
+/*    _ux_host_semaphore_get                Get semaphore                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -78,6 +79,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_transport_bo(UX_HOST_CLASS_STORAGE *storage, UCHAR *data_pointer)
@@ -116,7 +120,7 @@ UCHAR           *get_status_response;
             return(status);
 
         /* Wait for the completion of the transfer request.  */
-        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
+        status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
 
         /* If the semaphore did not succeed we probably have a time out.  */
         if (status != UX_SUCCESS)
@@ -200,7 +204,7 @@ UCHAR           *get_status_response;
         if (status == UX_SUCCESS)
 
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
 
         /* If the semaphore did not succeed we may have a time out or if we had a problem during the preparation of the transaction
            we should abort the SCSI transaction.  */
@@ -272,7 +276,7 @@ UCHAR           *get_status_response;
             return(status);
 
         /* Wait for the completion of the transfer request.  */
-        status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
+        status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT));
 
         /* Check semaphore status.  */
         if (status != UX_SUCCESS)
@@ -388,3 +392,4 @@ UCHAR           *get_status_response;
     /* Return the error.  */
     return(transfer_request -> ux_transfer_request_completion_code);
 }
+#endif

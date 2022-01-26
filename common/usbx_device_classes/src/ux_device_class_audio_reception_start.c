@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_reception_start              PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,7 +54,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _ux_utility_thread_resume             Resume thread used            */
+/*    _ux_device_thread_resume              Resume thread used            */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -67,6 +67,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio_reception_start(UX_DEVICE_CLASS_AUDIO_STREAM *stream)
@@ -101,6 +104,6 @@ UX_SLAVE_DEVICE             *device;
         return(UX_BUFFER_OVERFLOW);
 
     /* Start read thread.  */
-    _ux_utility_thread_resume(&stream -> ux_device_class_audio_stream_thread);
+    _ux_device_thread_resume(&stream -> ux_device_class_audio_stream_thread);
     return(UX_SUCCESS);
 }

@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_mouse_activate                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,12 +75,17 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_mouse_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
 {
 
+#if !defined(UX_HOST_STANDALONE)
 UX_HOST_CLASS_HID_REPORT_CALLBACK       call_back;
+#endif
 UX_HOST_CLASS_HID_REPORT_GET_ID         report_id;
 UX_HOST_CLASS_HID                       *hid;
 UX_HOST_CLASS_HID_CLIENT                *hid_client;
@@ -106,6 +111,31 @@ UINT                                    status;
 
     /* Save the HID instance in the client instance.  */
     mouse_instance -> ux_host_class_hid_mouse_hid =  hid;
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* The instance is mounting now.  */
+    mouse_instance -> ux_host_class_hid_mouse_state =  UX_HOST_CLASS_INSTANCE_MOUNTING;
+
+    /* Get the report ID for the mouse. The mouse is a INPUT report.
+       This should be 0 but in case. */
+    report_id.ux_host_class_hid_report_get_report = UX_NULL;
+    report_id.ux_host_class_hid_report_get_type = UX_HOST_CLASS_HID_REPORT_TYPE_INPUT;
+    status = _ux_host_class_hid_report_id_get(hid, &report_id);
+
+    /* The report ID should exist.  */
+    if (status == UX_SUCCESS)
+    {
+
+        /* Save the mouse report ID. */
+        mouse_instance -> ux_host_class_hid_mouse_id = (USHORT)report_id.ux_host_class_hid_report_get_id;
+
+        /* Set state for activate wait steps.  */
+        mouse_instance -> ux_host_class_hid_mouse_enum_state = UX_STATE_WAIT;
+
+    }
+    return(status);
+#else
 
     /* The instance is live now.  */
     mouse_instance -> ux_host_class_hid_mouse_state =  UX_HOST_CLASS_INSTANCE_LIVE;
@@ -183,5 +213,6 @@ UINT                                    status;
 
     /* Return completion status.  */
     return(status);    
+#endif
 }
 

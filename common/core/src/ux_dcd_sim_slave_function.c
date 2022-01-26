@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_function                          PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT   _ux_dcd_sim_slave_function(UX_SLAVE_DCD *dcd, UINT function, VOID *parameter)
@@ -112,10 +115,17 @@ UX_DCD_SIM_SLAVE        *dcd_sim_slave;
         status =  _ux_dcd_sim_slave_frame_number_get(dcd_sim_slave, (ULONG *) parameter);
         break;
 
+#if defined(UX_DEVICE_STANDALONE)
+    case UX_DCD_TRANSFER_RUN:
+
+        status =  _ux_dcd_sim_slave_transfer_run(dcd_sim_slave, (UX_SLAVE_TRANSFER *) parameter);
+        break;
+#else
     case UX_DCD_TRANSFER_REQUEST:
 
         status =  _ux_dcd_sim_slave_transfer_request(dcd_sim_slave, (UX_SLAVE_TRANSFER *) parameter);
         break;
+#endif
 
     case UX_DCD_TRANSFER_ABORT:
 
@@ -155,6 +165,11 @@ UX_DCD_SIM_SLAVE        *dcd_sim_slave;
     case UX_DCD_ENDPOINT_STATUS:
 
         status =  _ux_dcd_sim_slave_endpoint_status(dcd_sim_slave, (ULONG) (ALIGN_TYPE) parameter);
+        break;
+
+    case UX_DCD_ISR_PENDING:
+
+        status = UX_SUCCESS;
         break;
 
     default:

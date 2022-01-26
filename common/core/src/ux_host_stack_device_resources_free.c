@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_device_resources_free                PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*                                            definitions, verified       */
 /*                                            memset and memcpy cases,    */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_resources_free(UX_DEVICE *device)
@@ -97,6 +100,39 @@ UCHAR                   device_address_byte;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_RESOURCE_FREE, device, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* Free possible allocated enumeration resources.  */
+    if (device -> ux_device_flags & UX_DEVICE_FLAG_ENUM)
+    {
+
+        /* If transfer buffer is not freed, free it.  */
+        if (device -> ux_device_enum_trans &&
+            device -> ux_device_enum_trans -> ux_transfer_request_data_pointer)
+        {
+            _ux_utility_memory_free(device -> ux_device_enum_trans ->
+                                            ux_transfer_request_data_pointer);
+        }
+
+        /* If configuration is not attached, free it.  */
+        if ((device -> ux_device_enum_state == UX_HOST_STACK_ENUM_CONFIG_DESCR_PARSE) ||
+            ((device -> ux_device_enum_state == UX_HOST_STACK_ENUM_TRANS_WAIT) &&
+            (device -> ux_device_enum_next_state == UX_HOST_STACK_ENUM_CONFIG_DESCR_PARSE)))
+        {
+            if (device -> ux_device_enum_inst.configuration &&
+                device -> ux_device_enum_inst.configuration ->
+                                            ux_configuration_device == UX_NULL)
+            {
+                _ux_utility_memory_free(device -> ux_device_enum_inst.ptr);
+            }
+        }
+    }
+
+    /* Reset device flags.  */
+    device -> ux_device_flags = 0;
+
+#endif
 
     /* Set the alternate setting to zero.  */
     current_alternate_setting = 0;
@@ -179,14 +215,14 @@ UCHAR                   device_address_byte;
     
         /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
             the control endpoint to exit properly.  */
-        _ux_utility_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
     
         /* The control endpoint should be destroyed at the HCD level.  */
         hcd -> ux_hcd_entry_function(hcd, UX_HCD_DESTROY_ENDPOINT, (VOID *) &device -> ux_device_control_endpoint);
     }
 
     /* The semaphore attached to the control endpoint must be destroyed.  */
-    _ux_utility_semaphore_delete(&device -> ux_device_control_endpoint.ux_endpoint_transfer_request.ux_transfer_request_semaphore);
+    _ux_host_semaphore_delete(&device -> ux_device_control_endpoint.ux_endpoint_transfer_request.ux_transfer_request_semaphore);
 
 #if UX_MAX_DEVICES > 1
     /* Check if the device had an assigned address.  */
@@ -211,7 +247,7 @@ UCHAR                   device_address_byte;
 #endif
 
     /* The semaphore for endpoint 0 protection must be destroyed.  */
-    _ux_utility_semaphore_delete(&device -> ux_device_protection_semaphore);
+    _ux_host_semaphore_delete(&device -> ux_device_protection_semaphore);
 
     /* Now this device can be free and its container return to the pool.  */
     _ux_utility_memory_set(device, 0, sizeof(UX_DEVICE)); /* Use case of memset is verified. */

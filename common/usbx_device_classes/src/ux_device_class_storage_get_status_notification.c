@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_get_status_notification    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_status_notification(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -102,8 +105,11 @@ ULONG                   notification_class;
     if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_notification == UX_NULL)
     {
 
+#if !defined(UX_DEVICE_STANDALONE)
+
         /* We need to STALL the IN endpoint.  The endpoint will be reset by the host.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
+#endif
 
         /* And update the REQUEST_SENSE codes.  */
         storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
@@ -141,8 +147,11 @@ ULONG                   notification_class;
     if (status != UX_SUCCESS)
     {
         
+#if !defined(UX_DEVICE_STANDALONE)
+
         /* We need to STALL the IN endpoint.  The endpoint will be reset by the host.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
+#endif
     }    
     else
     {
@@ -161,11 +170,23 @@ ULONG                   notification_class;
         /* Update the notification length. */
         media_notification_length += (ULONG)sizeof (USHORT);
 
+#if !defined(UX_DEVICE_STANDALONE)
         /* Send a data payload with the notification buffer.  */
         _ux_device_stack_transfer_request(transfer_request, 
                                   media_notification_length,
                                   media_notification_length);
-        
+#else
+        /* Next: Transfer (DATA).  */
+        storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+        storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_READ;
+
+        storage -> ux_device_class_storage_transfer = transfer_request;
+        storage -> ux_device_class_storage_device_length = media_notification_length;
+        storage -> ux_device_class_storage_data_length = media_notification_length;
+        storage -> ux_device_class_storage_data_count = 0;
+        UX_SLAVE_TRANSFER_STATE_RESET(storage -> ux_device_class_storage_transfer);
+#endif
+
         /* Now we set the CSW with success.  */
         storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
         status = UX_SUCCESS;

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio20_control_process            PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,10 @@
 /*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added volume RES support,   */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            allowed answer length only  */
+/*                                            when requesting range,      */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio20_control_process(UX_DEVICE_CLASS_AUDIO *audio,
@@ -162,7 +166,7 @@ ULONG                               i;
                     _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 2, control -> ux_device_class_audio20_control_sampling_frequency);
                     _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 6, control -> ux_device_class_audio20_control_sampling_frequency);
                     _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 10, 0);
-                    _ux_device_stack_transfer_request(transfer, 14, request_length);
+                    _ux_device_stack_transfer_request(transfer, UX_MIN(14, request_length), request_length);
                     return(UX_SUCCESS);
 
                 default:

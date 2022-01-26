@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_report_callback_register         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,8 +61,8 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    _ux_host_stack_class_instance_verify  Verify class instance is valid*/ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_put             Release protection semaphore  */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_put                Release protection semaphore  */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -76,11 +76,16 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_callback_register(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_REPORT_CALLBACK *call_back)
 {
-
+#if defined(UX_HOST_STANDALONE)
+UX_INTERRUPT_SAVE_AREA
+#endif
 UINT                            status;
 UX_HOST_CLASS_HID_REPORT         *hid_report;
 
@@ -99,11 +104,7 @@ UX_HOST_CLASS_HID_REPORT         *hid_report;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
-    if (status!=UX_SUCCESS)
-
-        /* Return error.  */
-        return(status);
+    _ux_host_class_hid_lock_fail_return(hid);
 
     /* Search for the report ID. Note that this can only be an Input report!  */
     hid_report =  hid -> ux_host_class_hid_parser.ux_host_class_hid_parser_input_report;
@@ -123,7 +124,7 @@ UX_HOST_CLASS_HID_REPORT         *hid_report;
             hid_report -> ux_host_class_hid_report_callback_length   =   call_back -> ux_host_class_hid_report_callback_length;
 
             /* Unprotect thread reentry to this instance.  */
-            _ux_utility_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+            _ux_host_class_hid_unlock(hid);
 
             /* Tell the user the report was OK and the call back was registered.  */
             return(UX_SUCCESS);
@@ -134,7 +135,7 @@ UX_HOST_CLASS_HID_REPORT         *hid_report;
     }
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+    _ux_host_class_hid_unlock(hid);
 
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_HID_REPORT_ERROR);

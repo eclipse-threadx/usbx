@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_activate                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_activate(UX_HOST_CLASS_COMMAND *command)
@@ -120,7 +123,7 @@ UINT                        status;
     status =  _ux_host_class_dpump_endpoints_get(dpump);
 
     /* Create the semaphore to protect 2 threads from accessing the same dpump instance.  */
-    status =  _ux_utility_semaphore_create(&dpump -> ux_host_class_dpump_semaphore, "ux_dpump_semaphore", 1);
+    status =  _ux_host_semaphore_create(&dpump -> ux_host_class_dpump_semaphore, "ux_dpump_semaphore", 1);
     if (status != UX_SUCCESS)
         return(UX_SEMAPHORE_ERROR);
 

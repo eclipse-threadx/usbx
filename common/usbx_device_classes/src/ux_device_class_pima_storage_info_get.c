@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_storage_info_get              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved sanity checks,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_storage_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG storage_id)
@@ -149,7 +152,12 @@ UCHAR                   *storage_info_pointer;
         /* Fill in the free space in image.  */
         _ux_utility_long_put(storage_info + UX_DEVICE_CLASS_PIMA_STORAGE_FREE_SPACE_IMAGE, 
                                 pima -> ux_device_class_pima_storage_free_space_image);
-    
+
+        /* Sanity check for buffer length.  */
+        UX_ASSERT(UX_DEVICE_CLASS_PIMA_STORAGE_FREE_STORAGE_DESCRIPTION + 2 +
+                _ux_utility_string_length_get(pima -> ux_device_class_pima_storage_description) * 2 +
+                _ux_utility_string_length_get(pima -> ux_device_class_pima_storage_volume_label) * 2);
+
         /* Fill in the storage description string.  */
         _ux_utility_string_to_unicode(pima -> ux_device_class_pima_storage_description, storage_info_pointer); 
     
@@ -179,5 +187,3 @@ UCHAR                   *storage_info_pointer;
     /* Return completion status.  */
     return(status);
 }
-
-

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_read                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,12 +76,18 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_read(UX_HOST_CLASS_DPUMP *dpump, UCHAR *data_pointer, 
                                     ULONG requested_length, ULONG *actual_length)
 {
 
+#if defined(UX_HOST_STANDALONE)
+UX_INTERRUPT_SAVE_AREA
+#endif
 UX_TRANSFER     *transfer_request;
 UINT            status;
 ULONG           transfer_request_length;
@@ -103,16 +109,33 @@ ULONG           transfer_request_length;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&dpump -> ux_host_class_dpump_semaphore, UX_WAIT_FOREVER);
+#if defined(UX_HOST_STANDALONE)
+    UX_DISABLE
+    if (dpump -> ux_host_class_dpump_flags & UX_HOST_CLASS_DPUMP_READ_LOCK)
+    {
+        UX_RESTORE
+        return(UX_BUSY);
+    }
+    dpump -> ux_host_class_dpump_flags |= UX_HOST_CLASS_DPUMP_READ_LOCK;
+    UX_RESTORE
+#else
+    status =  _ux_host_semaphore_get(&dpump -> ux_host_class_dpump_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
+#endif
 
     /* Start by resetting the actual length of the transfer to zero.  */
     *actual_length =  0;
 
     /* Get the pointer to the bulk in endpoint in the transfer_request.  */
     transfer_request =  &dpump -> ux_host_class_dpump_bulk_in_endpoint -> ux_endpoint_transfer_request;
-    
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* Here wait blocking mode is used.  */
+    transfer_request -> ux_transfer_request_flags |= UX_TRANSFER_FLAG_AUTO_WAIT;
+#endif
+
     /* Perform a transfer on the bulk in endpoint until either the transfer is
        completed or until there is an error.  */
     while (requested_length)
@@ -131,12 +154,22 @@ ULONG           transfer_request_length;
         /* Perform the transfer.  */
         status =  _ux_host_stack_transfer_request(transfer_request);
 
+#if defined(UX_HOST_STANDALONE)
+
+        /* If the transfer is not success, return error.  */
+        if (status != UX_SUCCESS)
+        {
+            dpump -> ux_host_class_dpump_flags &= ~UX_HOST_CLASS_DPUMP_READ_LOCK;
+            return(status);
+        }
+#else
+
         /* If the transfer is successful, we need to wait for the transfer request to be completed.  */
         if (status == UX_SUCCESS)
         {
             
             /* Wait for the completion of the transfer_request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_HOST_CLASS_DPUMP_CLASS_TRANSFER_TIMEOUT);
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_HOST_CLASS_DPUMP_CLASS_TRANSFER_TIMEOUT);
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
@@ -150,7 +183,7 @@ ULONG           transfer_request_length;
                 *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
             
                 /* Unprotect thread reentry to this instance.  */
-                status =  _ux_utility_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
+                _ux_host_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
 
                 /* Set the completion code.  */
                 transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
@@ -169,11 +202,12 @@ ULONG           transfer_request_length;
         {
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_utility_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
+            status =  _ux_host_semaphore_put_rc(&dpump -> ux_host_class_dpump_semaphore);
 
             /* There was a non transfer error, no partial transfer to be checked.  */
             return(status);
         }
+#endif
 
         /* Update the length of the transfer. Normally all the data has to be received.  */
         *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
@@ -185,7 +219,7 @@ ULONG           transfer_request_length;
         {
         
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_utility_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
+            _ux_host_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
             
             /* Return success to caller.  */
             return(UX_SUCCESS);
@@ -199,7 +233,11 @@ ULONG           transfer_request_length;
     }    
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
+#if defined(UX_HOST_STANDALONE)
+    dpump -> ux_host_class_dpump_flags &= ~UX_HOST_CLASS_DPUMP_READ_LOCK;
+#else
+    _ux_host_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
+#endif
 
     /* We get here when all the transfers went through without errors.  */
     return(UX_SUCCESS); 

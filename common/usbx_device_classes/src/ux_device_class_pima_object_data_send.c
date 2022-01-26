@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_data_send              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated status handling,    */
+/*                                            improved cancel flow,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_data_send(UX_SLAVE_CLASS_PIMA *pima)
@@ -96,6 +100,9 @@ ULONG                       total_length;
     if (status == UX_SUCCESS)
     {    
 
+        /* Data phase (Bulk OUT).  */
+        pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_DATA_OUT;
+
         /* Set the object length.  */
         object_length =  object -> ux_device_class_pima_object_compressed_size;   
         
@@ -116,7 +123,14 @@ ULONG                       total_length;
         {
         
             /* Get a data payload.  */
-            status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_PIMA_OBJECT_INFO_BUFFER_SIZE, UX_DEVICE_CLASS_PIMA_OBJECT_INFO_BUFFER_SIZE);
+            status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH, UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH);
+
+            /* It's canceled, do not proceed.  */
+            if (pima -> ux_device_class_pima_state == UX_DEVICE_CLASS_PIMA_PHASE_IDLE)
+            {
+                pima -> ux_device_class_pima_device_status = UX_DEVICE_CLASS_PIMA_RC_OK;
+                return(UX_ERROR);
+            }
 
             /* Check for the status. We may have had a request to cancel the transaction from the host.  */
             if (status != UX_SUCCESS)
@@ -188,8 +202,9 @@ ULONG                       total_length;
             {        
 
                 /* Do some sanity check.  */
-                if (object_length < (transfer_length - UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE))
+                if (object_length < transfer_length)
                 {
+
                     /* We have an overflow. Do not proceed.  */
                     status = UX_ERROR;
                     break;
@@ -221,6 +236,13 @@ ULONG                       total_length;
                     
                 }                        
 
+            }
+
+            /* It's canceled, do not proceed.  */
+            if (pima -> ux_device_class_pima_state == UX_DEVICE_CLASS_PIMA_PHASE_IDLE)
+            {
+                pima -> ux_device_class_pima_device_status = UX_DEVICE_CLASS_PIMA_RC_OK;
+                return(UX_ERROR);
             }
         }
     }

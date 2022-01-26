@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_activate                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -63,7 +63,7 @@
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
 /*    _ux_utility_memory_allocate           Allocate memory block         */ 
 /*    _ux_utility_memory_free               Free memory                   */
-/*    _ux_utility_semaphore_create          Create semaphore              */ 
+/*    _ux_host_semaphore_create             Create semaphore              */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -76,6 +76,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_activate(UX_HOST_CLASS_COMMAND  *command)
@@ -110,6 +113,18 @@ UINT                status;
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(command -> ux_host_class_command_class_ptr, (VOID *) hid);
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Set class tasks function.  */
+    hid -> ux_host_class_hid_class -> ux_host_class_task_function = _ux_host_class_hid_tasks_run;
+
+    /* Set activate state to first step.  */
+    hid -> ux_host_class_hid_enum_state = UX_STATE_WAIT;
+
+    status = UX_SUCCESS;
+    return(status);
+#else
+
     /* Configure the HID.  */
     status =  _ux_host_class_hid_configure(hid);
 
@@ -135,7 +150,7 @@ UINT                status;
 
         /* Create the semaphore to protect multiple threads from accessing the same
         storage instance.  */
-        status =  _ux_utility_semaphore_create(&hid -> ux_host_class_hid_semaphore, "ux_host_class_hid_semaphore", 1);
+        status =  _ux_host_semaphore_create(&hid -> ux_host_class_hid_semaphore, "ux_host_class_hid_semaphore", 1);
 
         if (status == UX_SUCCESS)
         {
@@ -188,5 +203,7 @@ UINT                status;
 
     /* Return error code. */
     return(status);
+
+#endif
 }
 

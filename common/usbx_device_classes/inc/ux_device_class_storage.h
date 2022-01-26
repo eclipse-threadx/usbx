@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_storage.h                           PORTABLE C      */
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,6 +54,9 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved TAG management,    */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -75,6 +78,7 @@ extern   "C" {
 #ifndef UX_MAX_SLAVE_LUN
 #define UX_MAX_SLAVE_LUN                                            2
 #endif
+
 
 /* Define Storage Class USB Class constants.  */
 
@@ -134,6 +138,12 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_CBW_CB_LENGTH                        14
 #define UX_SLAVE_CLASS_STORAGE_CBW_CB                               15
 #define UX_SLAVE_CLASS_STORAGE_CBW_LENGTH                           31
+
+#define UX_DEVICE_CLASS_STORAGE_CBW_FLAG_DIR                        (1u<<7)
+#define UX_DEVICE_CLASS_STORAGE_CBW_FLAG_IN                         (1u<<7)
+#define UX_DEVICE_CLASS_STORAGE_CBW_FLAG_D2H                        (1u<<7)
+#define UX_DEVICE_CLASS_STORAGE_CBW_FLAG_OUT                        (0u)
+#define UX_DEVICE_CLASS_STORAGE_CBW_FLAG_H2D                        (0u)
 
 
 /* Define Storage Class SCSI response status wrapper constants.  */
@@ -433,6 +443,39 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_PAGE_CODE_IEC                            0x1C
 #define UX_SLAVE_CLASS_STORAGE_PAGE_CODE_ALL                            0x3F
 
+#if defined(UX_DEVICE_STANDALONE)
+
+/* Define Device Storage Class states.  */
+
+#define UX_DEVICE_CLASS_STORAGE_STATE_IDLE              (UX_STATE_STEP + 0)
+#define UX_DEVICE_CLASS_STORAGE_STATE_RESET             (UX_STATE_STEP + 1)
+#define UX_DEVICE_CLASS_STORAGE_STATE_RESET_WAIT        (UX_STATE_STEP + 2)
+#define UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START       (UX_STATE_STEP + 3)
+#define UX_DEVICE_CLASS_STORAGE_STATE_TRANS_WAIT        (UX_STATE_STEP + 4)
+#define UX_DEVICE_CLASS_STORAGE_STATE_TRANS_NEXT        (UX_STATE_STEP + 5)
+#define UX_DEVICE_CLASS_STORAGE_STATE_DISK_WAIT         (UX_STATE_STEP + 6)
+#define UX_DEVICE_CLASS_STORAGE_STATE_DISK_ERROR        (UX_STATE_STEP + 7)
+
+#define UX_DEVICE_CLASS_STORAGE_DISK_IDLE               (0)
+#define UX_DEVICE_CLASS_STORAGE_DISK_OP_START           (1)
+#define UX_DEVICE_CLASS_STORAGE_DISK_OP_WAIT            (2)
+#define UX_DEVICE_CLASS_STORAGE_DISK_OP_NEXT            (3)
+#define UX_DEVICE_CLASS_STORAGE_DISK_USB_WAIT           (4)
+#define UX_DEVICE_CLASS_STORAGE_DISK_USB_ERROR          (5)
+
+#define UX_DEVICE_CLASS_STORAGE_BUFFER_IDLE             (0)
+#define UX_DEVICE_CLASS_STORAGE_BUFFER_EMPTY            (1)
+#define UX_DEVICE_CLASS_STORAGE_BUFFER_FULL             (2)
+
+#define UX_DEVICE_CLASS_STORAGE_CMD_IDLE                (0)
+#define UX_DEVICE_CLASS_STORAGE_CMD_CBW                 (1)
+#define UX_DEVICE_CLASS_STORAGE_CMD_ERR                 (2)
+#define UX_DEVICE_CLASS_STORAGE_CMD_CSW                 (3)
+#define UX_DEVICE_CLASS_STORAGE_CMD_WRITE               (4)
+#define UX_DEVICE_CLASS_STORAGE_CMD_READ                (5)
+#define UX_DEVICE_CLASS_STORAGE_CMD_DISK_OP             (6)
+
+#endif
 
 /* Define Slave Storage Class LUN structure.  */
 
@@ -447,6 +490,7 @@ typedef struct UX_SLAVE_CLASS_STORAGE_LUN_STRUCT
     ULONG           ux_slave_class_storage_request_sense_status;
     ULONG           ux_slave_class_storage_disk_status;
     ULONG           ux_slave_class_storage_last_session_state;
+
     UINT            (*ux_slave_class_storage_media_read)(VOID *storage, ULONG lun, UCHAR *data_pointer, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_write)(VOID *storage, ULONG lun, UCHAR *data_pointer, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_flush)(VOID *storage, ULONG lun, ULONG number_blocks, ULONG lba, ULONG *media_status);
@@ -482,6 +526,34 @@ typedef struct UX_SLAVE_CLASS_STORAGE_STRUCT
     UCHAR                       *ux_slave_class_storage_product_id;
     UCHAR                       *ux_slave_class_storage_product_rev;
     UCHAR                       *ux_slave_class_storage_product_serial;
+
+#if defined(UX_DEVICE_STANDALONE)
+    UCHAR                       *ux_device_class_storage_buffer[2];
+    UCHAR                       ux_device_class_storage_buffer_state[2];
+    UCHAR                       ux_device_class_storage_buffer_usb;
+    UCHAR                       ux_device_class_storage_buffer_disk;
+
+    UCHAR                       ux_device_class_storage_cmd;
+    UCHAR                       ux_device_class_storage_cmd_state;
+    UCHAR                       ux_device_class_storage_disk_state;
+    UCHAR                       ux_device_class_storage_state;
+
+    UX_SLAVE_ENDPOINT           *ux_device_class_storage_ep_out;
+    UX_SLAVE_ENDPOINT           *ux_device_class_storage_ep_in;
+    UX_SLAVE_TRANSFER           *ux_device_class_storage_transfer;
+
+    ULONG                       ux_device_class_storage_device_length;
+    UCHAR                       *ux_device_class_storage_data_buffer;
+    ULONG                       ux_device_class_storage_data_length;
+    ULONG                       ux_device_class_storage_data_count;
+    ULONG                       ux_device_class_storage_trans_host_length;
+    ULONG                       ux_device_class_storage_trans_device_length;
+
+    ULONG                       ux_device_class_storage_cmd_lba;
+    ULONG                       ux_device_class_storage_cmd_n_lb;
+    ULONG                       ux_device_class_storage_disk_n_lb;
+    ULONG                       ux_device_class_storage_media_status;
+#endif
 
 } UX_SLAVE_CLASS_STORAGE;
 
@@ -567,6 +639,8 @@ UINT    _ux_device_class_storage_get_performance(UX_SLAVE_CLASS_STORAGE *storage
 UINT    _ux_device_class_storage_read_dvd_structure(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
                                             UX_SLAVE_ENDPOINT *endpoint_in,
                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+
+UINT    _ux_device_class_storage_tasks_run(VOID *instance);
 
 /* Define Device Storage Class API prototypes.  */
 

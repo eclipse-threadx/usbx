@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_initialize                     PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,7 +57,7 @@
 /*    _ux_utility_descriptor_parse          Parse a descriptor            */
 /*    _ux_utility_event_flags_create        Create event flags            */
 /*    _ux_utility_event_flags_delete        Delete event flags            */
-/*    _ux_utility_thread_create             Create thread                 */
+/*    _ux_device_thread_create              Create thread                 */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -77,6 +77,9 @@
 /*                                            fixed max transfer size,    */
 /*                                            added max size limit check, */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -183,6 +186,8 @@ ULONG                                   descriptor_length;
 
     }
 
+#if !defined(UX_DEVICE_STANDALONE)
+
     /* Create a event flag group for the dfu class to synchronize with the event interrupt thread.  */
     status =  _ux_utility_event_flags_create(&dfu -> ux_slave_class_dfu_event_flags_group, "ux_device_class_dfu_event_flag");
 
@@ -204,7 +209,7 @@ ULONG                                   descriptor_length;
     /* dfu needs a thread to watch for disconnect and timer event for the DFU_DETACH sequence.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_thread_create(&dfu -> ux_slave_class_dfu_thread , "ux_slave_class_dfu_thread", 
+        status =  _ux_device_thread_create(&dfu -> ux_slave_class_dfu_thread , "ux_slave_class_dfu_thread", 
                     _ux_device_class_dfu_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) dfu -> ux_slave_class_dfu_thread_stack,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -216,18 +221,26 @@ ULONG                                   descriptor_length;
     }
 
     UX_THREAD_EXTENSION_PTR_SET(&(dfu -> ux_slave_class_dfu_thread), class)
+#else
+
+    /* Set task function.  */
+    class -> ux_slave_class_task_function = _ux_device_class_dfu_tasks_run;
+#endif
 
     /* Return completion status.  */
     if (status == UX_SUCCESS)
         return(UX_SUCCESS);
     
     /* There is error, free resources.  */
-    /* The last resource, thread is not created or created error, no need to free.  */
 
+#if !defined(UX_DEVICE_STANDALONE)
+
+    /* The last resource, thread is not created or created error, no need to free.  */
     if (dfu -> ux_slave_class_dfu_thread_stack)
         _ux_utility_memory_free(dfu -> ux_slave_class_dfu_thread_stack);
     if (dfu -> ux_slave_class_dfu_event_flags_group.tx_event_flags_group_id != 0)
         _ux_utility_event_flags_delete(&dfu -> ux_slave_class_dfu_event_flags_group);
+#endif
 
     /* Detach from container and free instance memory.  */
     class -> ux_slave_class_instance = UX_NULL;

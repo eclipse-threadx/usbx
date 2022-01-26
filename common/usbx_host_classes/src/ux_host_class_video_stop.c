@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_stop                           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,8 +58,8 @@
 /*                                          Abort outstanding transfer    */
 /*    _ux_host_stack_interface_setting_select                             */
 /*                                          Select interface              */
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_put             Release semaphore             */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_put                Release semaphore             */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_stop(UX_HOST_CLASS_VIDEO *video)
@@ -84,7 +87,7 @@ UINT                    streaming_interface;
 
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
 
     /* Get the interface number of the video streaming interface.  */
     streaming_interface =  video -> ux_host_class_video_streaming_interface -> ux_interface_descriptor.bInterfaceNumber;
@@ -126,7 +129,7 @@ UINT                    streaming_interface;
                 video -> ux_host_class_video_isochronous_endpoint = UX_NULL;
 
                 /* Unprotect thread reentry to this instance.  */
-                status =  _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+                status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
                 /* Return successful completion.  */
                 return(UX_SUCCESS);
@@ -138,7 +141,7 @@ UINT                    streaming_interface;
     }
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore);
+    status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
     /* Return completion status.  */
     return(status);

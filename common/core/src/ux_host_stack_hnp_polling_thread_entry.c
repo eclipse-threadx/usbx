@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_hnp_polling_thread_entry             PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*                                            used pointer for current    */
 /*                                            selected configuration,     */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_hnp_polling_thread_entry(ULONG argument)
@@ -176,7 +179,7 @@ UINT                        status;
 
                                             /* Protect the control endpoint semaphore here.  It will be unprotected in the 
                                                 transfer request function.  */
-                                            status =  _ux_utility_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+                                            status =  _ux_host_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
                                             /* Perform a GET_STATUS on this device to see if it wants to become the host.  */
                                             /* Create a transfer_request for the SET_CONFIGURATION request. No data for this request.  */

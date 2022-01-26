@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_transfer_request                  PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,12 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            cleared transfer status     */
+/*                                            before semaphore wakeup to  */
+/*                                            avoid a race condition,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_transfer_request(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_TRANSFER *transfer_request)
@@ -99,12 +105,9 @@ UINT                    status;
         ed -> ux_sim_slave_ed_status |= UX_DCD_SIM_SLAVE_ED_STATUS_TRANSFER;
 
         /* We should wait for the semaphore to wake us up.  */
-        status =  _ux_utility_semaphore_get(&transfer_request -> ux_slave_transfer_request_semaphore,
+        status =  _ux_device_semaphore_get(&transfer_request -> ux_slave_transfer_request_semaphore,
                                             transfer_request -> ux_slave_transfer_request_timeout);
            
-        /* Reset the ED to TRANSFER status.  */
-        ed -> ux_sim_slave_ed_status &= ~(ULONG)UX_DCD_SIM_SLAVE_ED_STATUS_TRANSFER;
-            
         /* Check the completion code. */
         if (status != UX_SUCCESS)
         {
@@ -112,7 +115,9 @@ UINT                    status;
             transfer_request -> ux_slave_transfer_request_status = UX_TRANSFER_STATUS_COMPLETED;
             return(status);
         }
-        
+
+        /* ED TRANSFER has been cleared before semaphore wakeup.  */
+
         /* Check the transfer request completion code. We may have had a BUS reset or
            a device disconnection.  */
         if (transfer_request -> ux_slave_transfer_request_completion_code != UX_SUCCESS)

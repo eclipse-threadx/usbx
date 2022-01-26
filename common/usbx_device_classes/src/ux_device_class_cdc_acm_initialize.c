@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_initialize                 PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*                                            moved transmission resource */
 /*                                            allocate to here (init),    */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -86,7 +89,9 @@ UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command)
 UX_SLAVE_CLASS_CDC_ACM                  *cdc_acm;
 UX_SLAVE_CLASS_CDC_ACM_PARAMETER        *cdc_acm_parameter;
 UX_SLAVE_CLASS                          *class;
+#if !defined(UX_DEVICE_STANDALONE)
 UINT                                    status;
+#endif
 
     /* Get the class container.  */
     class =  command -> ux_slave_class_command_class_ptr;
@@ -108,6 +113,8 @@ UINT                                    status;
     cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_instance_activate = cdc_acm_parameter -> ux_slave_class_cdc_acm_instance_activate;
     cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_instance_deactivate = cdc_acm_parameter -> ux_slave_class_cdc_acm_instance_deactivate;
     cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change = cdc_acm_parameter -> ux_slave_class_cdc_acm_parameter_change;
+
+#if !defined(UX_DEVICE_STANDALONE)
 
     /* Create the Mutex for each endpoint as multiple threads cannot access each pipe at the same time.  */
     status =  _ux_utility_mutex_create(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex, "ux_slave_class_cdc_acm_in_mutex");
@@ -140,6 +147,8 @@ UINT                                    status;
         return(UX_MUTEX_ERROR);
     }        
     
+#endif
+
     /* Update the line coding fields with default values.  */
     cdc_acm -> ux_slave_class_cdc_acm_baudrate  =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_BAUDRATE;
     cdc_acm -> ux_slave_class_cdc_acm_stop_bit  =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_STOP_BIT;
@@ -147,6 +156,12 @@ UINT                                    status;
     cdc_acm -> ux_slave_class_cdc_acm_data_bit  =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_DATA_BIT;
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
+
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Set task function.  */
+    class -> ux_slave_class_task_function = _ux_device_class_cdc_acm_tasks_run;
+#else
 
     /* We need to prepare the 2 threads for sending and receiving.  */
     /* Allocate some memory for the bulk out and in thread stack. */
@@ -252,6 +267,7 @@ UINT                                    status;
         return(status);
     }
 
+#endif
 #endif
 
     /* Return completion status.  */

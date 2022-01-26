@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_control_request                PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_host_class_video_control_request(UX_HOST_CLASS_VIDEO *video,
@@ -99,7 +102,7 @@ UCHAR           interface_number;
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_semaphore_control_request, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_semaphore_control_request, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
 
@@ -113,7 +116,7 @@ UCHAR           interface_number;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
 
         /* Return an error.  */
         return(UX_MEMORY_INSUFFICIENT);
@@ -133,7 +136,7 @@ UCHAR           interface_number;
 
     /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
-    status =  _ux_utility_semaphore_get(&video -> ux_host_class_video_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&video -> ux_host_class_video_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)
@@ -141,7 +144,7 @@ UCHAR           interface_number;
 
         /* Something went wrong. */
         _ux_utility_memory_free(control_buffer);
-        _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
         return(status);
     }
 
@@ -175,7 +178,7 @@ UCHAR           interface_number;
         _ux_utility_memory_free(control_buffer);
 
         /* Unprotect thread reentry to this instance.  */
-        _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
 
         /* Return completion status.  */
         return(status);
@@ -194,7 +197,7 @@ UCHAR           interface_number;
     _ux_utility_memory_free(control_buffer);
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
+    _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore_control_request);
 
     /* Return completion status.  */
     return(status);

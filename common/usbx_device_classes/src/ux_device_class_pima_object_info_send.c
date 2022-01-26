@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_info_send              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated status handling,    */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_info_send(UX_SLAVE_CLASS_PIMA *pima, ULONG storage_id, ULONG parent_object_handle)
@@ -101,8 +104,8 @@ ULONG                       object_handle;
     object_info =  transfer_request -> ux_slave_transfer_request_data_pointer;
 
     /* Get the data payload.  */
-    status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_PIMA_OBJECT_INFO_BUFFER_SIZE, 
-                                                    UX_DEVICE_CLASS_PIMA_OBJECT_INFO_BUFFER_SIZE);
+    status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH, 
+                                                    UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH);
 
     /* Check if there was an error. If so, stall the endpoint.  */
     if (status != UX_SUCCESS)
@@ -222,8 +225,9 @@ ULONG                       object_handle;
         status = pima -> ux_device_class_pima_object_info_send(pima, object, storage_id, parent_object_handle, &object_handle);
         
         /* Now we return a response with success.  */
-        _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 3, pima -> ux_device_class_pima_storage_id, 
-                                            parent_object_handle, object_handle);
+        status = (status == UX_SUCCESS) ? UX_DEVICE_CLASS_PIMA_RC_OK : status;
+        _ux_device_class_pima_response_send(pima, status, 3, pima -> ux_device_class_pima_storage_id, 
+                                            object -> ux_device_class_pima_object_parent_object, object_handle);
 
         /* Store the object handle. It will be used for the OBJECT_SEND command.  */
         pima -> ux_device_class_pima_current_object_handle =  object_handle;

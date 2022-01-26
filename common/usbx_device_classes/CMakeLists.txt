@@ -7,6 +7,9 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_control_request.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_deactivate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_set.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_frame_write.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_ioctl.c
@@ -18,6 +21,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_sample_read24.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_sample_read32.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_sample_read8.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_speed_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_stream_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_transmission_start.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_unitialize.c
@@ -33,8 +37,11 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_ioctl.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_read.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_read_run.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_unitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_write.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_write_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_write_with_callback.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_ecm_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_ecm_bulkin_thread.c
@@ -54,6 +61,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_state_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_state_sync.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_control_request.c
@@ -64,8 +72,15 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_event_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_interrupt_thread.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_read.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_event_free.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_event_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_thread.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_report_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_report_set.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_control_request.c
@@ -101,6 +116,16 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_storage_id_send.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_storage_info_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_thread.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_activate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_control_request.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_deactivate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_ioctl.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_read.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_soft_reset.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_uninitialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_write.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_bulkin_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_bulkout_thread.c
@@ -139,6 +164,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_request_sense.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_start_stop.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_synchronize_cache.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_test_ready.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_uninitialize.c

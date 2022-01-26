@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_new_device_create                    PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -102,6 +102,10 @@
 /*                                            added a new parameter to    */
 /*                                            return created device,      */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            reset device power source,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_new_device_create(UX_HCD *hcd, UX_DEVICE *device_owner,
@@ -159,15 +163,17 @@ UX_ENDPOINT         *control_endpoint;
        Initialize the device structure.  */
     device -> ux_device_handle =         (ULONG) (ALIGN_TYPE) device;
     device -> ux_device_state =          UX_DEVICE_ATTACHED;
+    device -> ux_device_address =        0;
     device -> ux_device_speed =          device_speed;
     UX_DEVICE_MAX_POWER_SET(device, port_max_power);
     UX_DEVICE_PARENT_SET(device, device_owner);
     UX_DEVICE_HCD_SET(device, hcd);
     UX_DEVICE_PORT_LOCATION_SET(device, port_index);
+    device -> ux_device_power_source =   UX_DEVICE_BUS_POWERED;
 
     /* Create a semaphore for the device. This is to protect endpoint 0 mostly for OTG HNP polling. The initial count is 1 as
        a mutex mechanism.  */
-    status =  _ux_utility_semaphore_create(&device -> ux_device_protection_semaphore, "ux_host_endpoint0_semaphore", 1);
+    status =  _ux_host_semaphore_create(&device -> ux_device_protection_semaphore, "ux_host_endpoint0_semaphore", 1);
 
     /* Check semaphore creation.  */
     if (status != UX_SUCCESS)
@@ -188,7 +194,7 @@ UX_ENDPOINT         *control_endpoint;
     control_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_endpoint = control_endpoint;
 
     /* Create a semaphore for this endpoint to be attached to its transfer request.  */
-    status =  _ux_utility_semaphore_create(&control_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_semaphore, "ux_host_transfer_request_semaphore", 0);
+    status =  _ux_host_semaphore_create(&control_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_semaphore, "ux_host_transfer_request_semaphore", 0);
 
     /* Check semaphore creation.  */
     if (status != UX_SUCCESS)
@@ -208,6 +214,28 @@ UX_ENDPOINT         *control_endpoint;
 
     /* Create the default control endpoint at the HCD level.  */
     status =  hcd -> ux_hcd_entry_function(hcd, UX_HCD_CREATE_ENDPOINT, (VOID *) control_endpoint);
+
+#if defined(UX_HOST_STANDALONE)
+    if (status == UX_SUCCESS)
+    {
+
+        /* Now control endpoint is ready, set state to running. */
+        control_endpoint -> ux_endpoint_state =          UX_ENDPOINT_RUNNING;
+
+        /* Setup default control request timeout.  */
+        control_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_timeout_value =
+                            UX_MS_TO_TICK_NON_ZERO(UX_CONTROL_TRANSFER_TIMEOUT);
+
+        /* Set default control request mode to wait.  */
+        control_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_flags |=
+                                                    UX_TRANSFER_FLAG_AUTO_WAIT;
+    }
+
+    /* Enumeration steps will be done in task state machine.  */
+
+#else
+
+    /* Going on to do enumeration (requests).  */
     if (status == UX_SUCCESS)
     {
 
@@ -253,6 +281,7 @@ UX_ENDPOINT         *control_endpoint;
         /* If trace is enabled, register this object.  */
         UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_DEVICE, hcd, device_owner, port_index, 0);
     }
+#endif
 
     /* Return status. If there's an error, device resources that have been 
        allocated until this point should be freed by the caller via _ux_host_stack_device_resources_free.  */

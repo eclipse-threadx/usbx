@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_gser_write                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,8 +60,8 @@
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
 /*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_put             Release protection semaphore  */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_put                Release protection semaphore  */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -75,6 +75,9 @@
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_gser_write(UX_HOST_CLASS_GSER *gser, 
@@ -101,7 +104,7 @@ ULONG           transfer_request_length;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
 
@@ -137,7 +140,7 @@ ULONG           transfer_request_length;
         {
             
             /* Wait for the completion of the transfer request.  */
-            status =  _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_GSER_CLASS_TRANSFER_TIMEOUT));
+            status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_GSER_CLASS_TRANSFER_TIMEOUT));
 
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
@@ -151,7 +154,7 @@ ULONG           transfer_request_length;
                 *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
             
                 /* Unprotect thread reentry to this instance.  */
-                status =  _ux_utility_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
+                status =  _ux_host_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
 
                 /* Set the completion code.  */
                 transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
@@ -167,7 +170,7 @@ ULONG           transfer_request_length;
         {
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_utility_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
+            status =  _ux_host_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
 
             /* There was a non transfer error, no partial transfer to be checked */
             return(status);
@@ -183,7 +186,7 @@ ULONG           transfer_request_length;
         {
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_utility_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
+            status =  _ux_host_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
 
             /* Return success.  */
             return(UX_SUCCESS);
@@ -199,7 +202,7 @@ ULONG           transfer_request_length;
         
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
+    status =  _ux_host_semaphore_put(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore);
 
     /* We get here when all the transfers went through without errors.  */
     return(UX_SUCCESS); 

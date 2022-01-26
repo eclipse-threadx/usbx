@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_interrupt_thread              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,11 +56,11 @@
 /*                                                                        */ 
 /*    _ux_device_stack_transfer_request     Request transfer              */ 
 /*    _ux_utility_memory_allocate           Allocate memory               */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */
+/*    _ux_device_semaphore_get              Get semaphore                 */
 /*    _ux_device_class_pima_event_get       Get PIMA event                */
 /*    _ux_utility_long_put                  Put 32-bit value              */
 /*    _ux_utility_short_put                 Put 16-bit value              */
-/*    _ux_utility_thread_suspend            Suspend thread                */
+/*    _ux_device_thread_suspend             Suspend thread                */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -73,6 +73,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            added transaction ID,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_pima_interrupt_thread(ULONG pima_class)
@@ -119,7 +123,7 @@ UCHAR                       *buffer;
         { 
 
             /* Wait until something has awaken us.  */
-            status =  _ux_utility_semaphore_get(&pima -> ux_device_class_pima_interrupt_thread_semaphore, UX_WAIT_FOREVER);
+            status =  _ux_device_semaphore_get(&pima -> ux_device_class_pima_interrupt_thread_semaphore, UX_WAIT_FOREVER);
             
             /* Check the completion code. */
             if (status != UX_SUCCESS)
@@ -147,7 +151,7 @@ UCHAR                       *buffer;
                 _ux_utility_short_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_EVENT_CODE, (USHORT)pima_event.ux_device_class_pima_event_code);
                 
                 /* Put the transaction ID.  */
-                _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_TRANSACTION_ID, 0xFFFFFFFF);
+                _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_TRANSACTION_ID, pima_event.ux_device_class_pima_event_transaction_id);
                 
                 /* Put the value of parameter 1.   */
                 _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_1, pima_event.ux_device_class_pima_event_parameter_1);
@@ -171,7 +175,7 @@ UCHAR                       *buffer;
         }
 
     /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
-    _ux_utility_thread_suspend(&pima -> ux_device_class_pima_interrupt_thread);
+    _ux_device_thread_suspend(&pima -> ux_device_class_pima_interrupt_thread);
     }
 }
 

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_acm_reception_stop               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,7 +58,7 @@
 /*                                                                        */ 
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort transfer                */
-/*    _ux_utility_semaphore_get             Get semaphore                 */
+/*    _ux_host_semaphore_get                Get semaphore                 */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_reception_stop(UX_HOST_CLASS_CDC_ACM *cdc_acm, 
@@ -125,10 +128,13 @@ UX_TRANSFER              *transfer_request;
     /* Reset the completion callback function.  */
     transfer_request -> ux_transfer_request_completion_function = UX_NULL;
 
+#if !defined(UX_HOST_STANDALONE)
+
     /* Clear semaphore counts that were (incorrectly) increased during each transfer 
        completion.  */
     while (transfer_request -> ux_transfer_request_semaphore.tx_semaphore_count)
-        _ux_utility_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, 0);
+        _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, 0);
+#endif
 
     /* This function never really fails.  */
     return(UX_SUCCESS);

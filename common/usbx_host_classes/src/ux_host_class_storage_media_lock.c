@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_media_lock                   PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT    _ux_host_class_storage_media_lock(UX_HOST_CLASS_STORAGE_MEDIA *storage_media, ULONG wait)
@@ -83,9 +86,11 @@ UINT                            status;
 
     /* Get storage instance.  */
     storage = storage_media -> ux_host_class_storage_media_storage;
+    if (storage == UX_NULL)
+        return(UX_ERROR);
 
     /* Protect thread reentry to this instance.  */
-    status = _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, wait);
+    status = _ux_host_class_storage_lock(storage, wait);
     if (status != UX_SUCCESS)
         return(status);
 

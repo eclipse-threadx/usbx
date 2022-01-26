@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_stream_get                   PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,8 +57,6 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _ux_utility_thread_delete             Delete thread used            */
-/*    _ux_utility_memory_free               Free used local memory        */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -71,6 +69,8 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT    _ux_device_class_audio_stream_get(UX_DEVICE_CLASS_AUDIO *audio,

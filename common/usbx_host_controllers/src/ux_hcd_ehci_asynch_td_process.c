@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_asynch_td_process                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,7 +59,7 @@
 /*                                                                        */ 
 /*    (ux_transfer_request_completion_function) Completion function       */ 
 /*    _ux_hcd_ehci_ed_clean                 Clean ED                      */ 
-/*    _ux_utility_semaphore_put             Put semaphore                 */ 
+/*    _ux_host_semaphore_put                Put semaphore                 */ 
 /*    _ux_utility_virtual_address           Get virtual address           */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_TD  *_ux_hcd_ehci_asynch_td_process(UX_EHCI_ED *ed, UX_EHCI_TD *td)
@@ -144,7 +147,7 @@ ULONG           pid;
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, td_error, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         /* Wake up the semaphore for this request.  */
-        _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+        _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
         /* Nothing else to be processed in this queue.  */
         return(UX_NULL);
@@ -186,7 +189,7 @@ ULONG           pid;
                 transfer_request -> ux_transfer_request_completion_function(transfer_request);
     
             /* Wake up the semaphore for this request.  */
-            _ux_utility_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
+            _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
 
             /* Nothing else to be processed in this queue */
             return(UX_NULL);

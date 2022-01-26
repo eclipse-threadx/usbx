@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_response_send                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated command phase,      */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_response_send(UX_SLAVE_CLASS_PIMA *pima, ULONG response_code, 
@@ -133,6 +136,9 @@ ULONG                   header_size;
             break;
             
     }    
+
+    /* Set phase to response.  */
+    pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_RESPONSE;
 
     /* Send the response block.  */
     status =  _ux_device_stack_transfer_request(transfer_request, header_size, 0);

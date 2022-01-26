@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_uninitialize               PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*                                            moved transmission resource */
 /*                                            free to here (uninit),      */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_acm_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -91,6 +94,8 @@ UX_SLAVE_CLASS              *class;
     if (cdc_acm != UX_NULL)
     {
 
+#if !defined(UX_DEVICE_STANDALONE)
+
         /* Delete the IN endpoint mutex.  */
         _ux_utility_mutex_delete(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
 
@@ -104,6 +109,7 @@ UX_SLAVE_CLASS              *class;
         _ux_utility_thread_delete(&cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread);
         _ux_utility_event_flags_delete(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group);
         _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack);
+#endif
 #endif
 
         /* Free the resources.  */

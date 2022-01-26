@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_thread                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,9 +57,9 @@
 /*    _ux_device_stack_transfer_request     Request transfer              */ 
 /*    _ux_device_stack_endpoint_stall       Stall endpoint                */
 /*    _ux_utility_memory_allocate           Allocate memory               */ 
-/*    _ux_utility_semaphore_create          Create semaphore              */
-/*    _ux_utility_thread_create             Create thread                 */
-/*    _ux_utility_thread_suspend            Suspend thread                */ 
+/*    _ux_device_semaphore_create           Create semaphore              */
+/*    _ux_device_thread_create              Create thread                 */
+/*    _ux_device_thread_suspend             Suspend thread                */ 
 /*    _ux_utility_short_get                 Get 16-bit value              */
 /*    _ux_utility_long_get                  Get 32-bit value              */
 /*    _ux_device_class_pima_device_info_send                              */
@@ -115,6 +115,11 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            updated phase states,       */
+/*                                            refined internal function,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_pima_thread(ULONG pima_class)
@@ -151,7 +156,7 @@ UINT                        status;
     }        
 
     /* Allocate a semaphore to this thread.  */
-    status =  _ux_utility_semaphore_create(&pima -> ux_device_class_pima_interrupt_thread_semaphore,
+    status =  _ux_device_semaphore_create(&pima -> ux_device_class_pima_interrupt_thread_semaphore,
                                           "ux_device_class_interrupt_thread_semaphore", 0);
 
     /* Check completion status.  */
@@ -164,7 +169,7 @@ UINT                        status;
     
     /* The Pima device class needs 2 threads, one is activated by default for the command\response and one needs to be
        created here for the interrupt pipe event.  */
-    status =  _ux_utility_thread_create(&pima -> ux_device_class_pima_interrupt_thread, "ux_slave_class_thread_pima_interrupt", 
+    status =  _ux_device_thread_create(&pima -> ux_device_class_pima_interrupt_thread, "ux_slave_class_thread_pima_interrupt", 
                 _ux_device_class_pima_interrupt_thread,
                 (ULONG) (ALIGN_TYPE) pima, (VOID *) pima -> ux_device_class_pima_interrupt_thread_stack,
                 UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -195,6 +200,9 @@ UINT                        status;
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
         { 
         
+            /* Phase idle.  */
+            pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_IDLE;
+
             /* Send the request to the device controller.  */
             status =  _ux_device_stack_transfer_request(transfer_request, 64, 64);
      
@@ -205,7 +213,6 @@ UINT                        status;
                 /* Obtain the buffer address containing the PIMA command.  */
                 pima_command =  transfer_request -> ux_slave_transfer_request_data_pointer;
                 
-
                 /* Check to make sure we have a command block.  */
                 if (_ux_utility_short_get(pima_command + UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_TYPE) == UX_DEVICE_CLASS_PIMA_CT_COMMAND_BLOCK)
                 {
@@ -226,6 +233,9 @@ UINT                        status;
                     /* Retrieve the parameter 3.  */
                     pima_parameter_3 = _ux_utility_long_get(pima_command + UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_PARAMETER_3);
                     
+                    /* Phase command.  */
+                    pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_COMMAND;
+
                     /* We check first if this is a GET_DEVICE_INFO as this is the only command which does not require 
                        a session to be opened.  */
                     
@@ -238,34 +248,48 @@ UINT                        status;
                             status = _ux_device_class_pima_device_info_send(pima);
                             break;                            
 
-
                         case UX_DEVICE_CLASS_PIMA_OC_OPEN_SESSION               :       
                         
-                            /* Check if session is already opened.  */
-                            if (pima -> ux_device_class_pima_session_id == 0)
+                            /* If the first parameter is 0x00000000,
+                                 the operation should fail with a response of Invalid_Parameter.
+                               If a session is already open, and the device does not support multiple sessions,
+                                 the response Session_Already_Open should be returned,
+                                 with the SessionID of the already open session as the first response parameter.
+                               The response Session_Already_Open should also be used if the device supports multiple sessions,
+                                 but a session with that ID is already open.
+                               If the device supports multiple sessions, and the maximum number of sessions are open,
+                                 the device should respond with Device_Busy  */
+                            if (pima_parameter_1 == 0)
                             {
+                                _ux_device_class_pima_response_send(pima,
+                                            UX_DEVICE_CLASS_PIMA_RC_INVALID_PARAMETER, 0, 0, 0, 0);
+                                break;
+                            }
+                            /* Check if session is already opened.  */
+                            if (pima -> ux_device_class_pima_session_id != 0)
+                            {
+                                _ux_device_class_pima_response_send(pima,
+                                            UX_DEVICE_CLASS_PIMA_RC_SESSION_ALREADY_OPENED,
+                                            pima -> ux_device_class_pima_session_id, 0, 0, 0);
+                                break;
+                            }
                         
                                 /* Session can be opened.  */
-                                _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 0, 0, 0, 0);
-                                
-                                /* Store the session number.  */
                                 pima -> ux_device_class_pima_session_id =  pima_parameter_1;
-
+                            pima -> ux_device_class_pima_transaction_id = 0;
+                            _ux_device_class_pima_response_send(pima,
+                                        UX_DEVICE_CLASS_PIMA_RC_OK, 0, 0, 0, 0);
                             break;
-
 
                         default :
                         
-                    
                             /* Check if a session is opened.  */
                             if (pima -> ux_device_class_pima_session_id == 0)
                             {
                             
                                 /* We cannot proceed since the session is not opened.  */
                                 _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_SESSION_NOT_OPEN, 0, 0, 0, 0);
-                            
                             }
-
                             else
                             {
                         
@@ -280,8 +304,8 @@ UINT                        status;
                             
                                         /* Session is now closed.  */
                                         pima -> ux_device_class_pima_session_id = 0;
+                                    break;
 
-                                        break;
                                     case UX_DEVICE_CLASS_PIMA_OC_GET_STORAGE_IDS            :           
 
                                         /* Return the array of storage IDs to the host.  In this version, we support
@@ -325,7 +349,7 @@ UINT                        status;
                                     case UX_DEVICE_CLASS_PIMA_OC_DELETE_OBJECT              :       
 
                                         /* Delete one or more objects.  */
-                                        status = _ux_device_class_pima_object_delete(pima, pima_parameter_1);
+                                    status = _ux_device_class_pima_object_delete(pima, pima_parameter_1, pima_parameter_2);
                                         break;                            
                                     
                                     case UX_DEVICE_CLASS_PIMA_OC_SEND_OBJECT_INFO           :           
@@ -448,7 +472,6 @@ UINT                        status;
 
                             }
                         }
-                    }
                     
                     /* Check error code. */
                     if (status != UX_SUCCESS)
@@ -464,7 +487,7 @@ UINT                        status;
         }
 
     /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
-    _ux_utility_thread_suspend(&class -> ux_slave_class_thread);
+    _ux_device_thread_suspend(&class -> ux_slave_class_thread);
     }
 }
 

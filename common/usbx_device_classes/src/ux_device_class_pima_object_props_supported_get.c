@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_props_supported_get    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved sanity checks,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_props_supported_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -127,6 +130,9 @@ USHORT                  *object_props_list_pointer;
 
             /* Add the header size.  */
             object_props_list_length += UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE;
+
+            /* Sanity check of buffer length.  */
+            UX_ASSERT(object_props_list_length <= UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH);
 
             /* Fill in the size of the response header.  */
             _ux_utility_long_put(object_props_list + UX_DEVICE_CLASS_PIMA_DATA_HEADER_LENGTH, 

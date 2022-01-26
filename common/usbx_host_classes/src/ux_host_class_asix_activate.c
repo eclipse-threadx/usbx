@@ -36,7 +36,7 @@ UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_activate                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,8 +64,8 @@ UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*    _ux_host_stack_transfer_request          Transfer request           */
 /*    _ux_utility_memory_allocate              Allocate memory block      */ 
 /*    _ux_utility_memory_free                  Free memory block          */ 
-/*    _ux_utility_semaphore_create             Create semaphore           */
-/*    _ux_utility_semaphore_delete             Delete semaphore           */
+/*    _ux_host_semaphore_create                Create semaphore           */
+/*    _ux_host_semaphore_delete                Delete semaphore           */
 /*    _ux_utility_thread_create                Create thread              */
 /*    _ux_utility_thread_delete                Delete thread              */
 /*    nx_packet_pool_create                    Create NetX packet pool    */
@@ -84,6 +84,9 @@ UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_activate(UX_HOST_CLASS_COMMAND *command)
@@ -137,7 +140,7 @@ UX_TRANSFER                         *transfer_request;
     /* Create the semaphore to protect 2 threads from accessing the same asix instance.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&asix -> ux_host_class_asix_semaphore, "ux_host_class_asix_semaphore", 1);
+        status =  _ux_host_semaphore_create(&asix -> ux_host_class_asix_semaphore, "ux_host_class_asix_semaphore", 1);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }
@@ -145,7 +148,7 @@ UX_TRANSFER                         *transfer_request;
     /* Create the semaphore to wake up the Asix thread.  */
     if(status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&asix -> ux_host_class_asix_interrupt_notification_semaphore, "ux_host_class_asix_interrupt_notification_semaphore", 0);
+        status =  _ux_host_semaphore_create(&asix -> ux_host_class_asix_interrupt_notification_semaphore, "ux_host_class_asix_interrupt_notification_semaphore", 0);
         if (status != UX_SUCCESS)
             status = UX_SEMAPHORE_ERROR;
     }
@@ -264,11 +267,11 @@ UX_TRANSFER                         *transfer_request;
 
     /* Free asix -> ux_host_class_asix_interrupt_notification_semaphore.  */
     if (asix -> ux_host_class_asix_interrupt_notification_semaphore.tx_semaphore_id != 0)
-        _ux_utility_semaphore_delete(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
+        _ux_host_semaphore_delete(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
 
     /* Free asix -> ux_host_class_asix_semaphore.  */
     if (asix -> ux_host_class_asix_semaphore.tx_semaphore_id != 0)
-        _ux_utility_semaphore_delete(&asix -> ux_host_class_asix_semaphore);
+        _ux_host_semaphore_delete(&asix -> ux_host_class_asix_semaphore);
 
     /* Destroy class instance.  */
     _ux_host_stack_class_instance_destroy(asix -> ux_host_class_asix_class, (VOID *) asix);

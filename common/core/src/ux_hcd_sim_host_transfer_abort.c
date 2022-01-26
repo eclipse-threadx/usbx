@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_transfer_abort                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_transfer_abort(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request)
@@ -100,11 +103,15 @@ UX_HCD_SIM_HOST_TD      *tail_td;
         return(UX_ENDPOINT_HANDLE_UNKNOWN);
     }
 
+#if defined(UX_HOST_STANDALONE)
+    ed -> ux_sim_host_ed_status |= UX_HCD_SIM_HOST_ED_SKIP;
+#else
     /* The endpoint may be active. If so, set the skip bit.  */
     ed -> ux_sim_host_ed_status |=  UX_HCD_SIM_HOST_ED_SKIP;
     
     /* Wait for the controller to finish the current frame processing.  */
     _ux_utility_delay_ms(1);
+#endif
 
     /* Remove all the TDs from this ED and leave the head and tail pointing to the dummy TD.  */
     head_td =  ed -> ux_sim_host_ed_head_td;
@@ -124,8 +131,13 @@ UX_HCD_SIM_HOST_TD      *tail_td;
         head_td =  ed -> ux_sim_host_ed_head_td;
     }
 
+#if defined(UX_HOST_STANDALONE)
+    /* Remove the skip and transfer bits in the ED.  */
+    ed -> ux_sim_host_ed_status &= ~(UX_HCD_SIM_HOST_ED_SKIP|UX_HCD_SIM_HOST_ED_TRANSFER);
+#else
     /* Remove the reset bit in the ED.  */
-    ed -> ux_sim_host_ed_status =  (ULONG)~UX_HCD_SIM_HOST_ED_SKIP;
+    ed -> ux_sim_host_ed_status &=  (ULONG)~UX_HCD_SIM_HOST_ED_SKIP;
+#endif
 
     /* Return successful completion.  */
     return(UX_SUCCESS);         

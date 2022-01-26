@@ -60,7 +60,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_initialize                             PORTABLE C      */
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,8 +88,8 @@
 /*    _ux_utility_memory_allocate           Allocate memory block         */
 /*    _ux_utility_memory_delete             Delete memory block           */
 /*    _ux_utility_physical_address          Get physical address          */
-/*    _ux_utility_semaphore_create          Create semaphore              */
-/*    _ux_utility_semaphore_delete          Delete semaphore              */
+/*    _ux_host_semaphore_create             Create semaphore              */
+/*    _ux_host_semaphore_delete             Delete semaphore              */
 /*    _ux_utility_mutex_create              Create mutex                  */
 /*    _ux_utility_mutex_delete              Delete mutex                  */
 /*    _ux_utility_set_interrupt_handler     Set interrupt handler         */
@@ -111,6 +111,9 @@
 /*  08-02-2021     Wen Wang                 Modified comment(s),          */
 /*                                            fixed spelling error,       */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_initialize(UX_HCD *hcd)
@@ -334,7 +337,7 @@ UINT                    status = UX_SUCCESS;
     /* We must enable the HCD protection semaphore.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&hcd_ehci -> ux_hcd_ehci_protect_semaphore, "ux_hcd_protect_semaphore", 1);
+        status =  _ux_host_semaphore_create(&hcd_ehci -> ux_hcd_ehci_protect_semaphore, "ux_hcd_protect_semaphore", 1);
         if (status != UX_SUCCESS)
             status = (UX_SEMAPHORE_ERROR);
     }
@@ -342,7 +345,7 @@ UINT                    status = UX_SUCCESS;
     /* We must enable the HCD doorbell semaphore.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore, "ux_hcd_doorbell_semaphore", 0);
+        status =  _ux_host_semaphore_create(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore, "ux_hcd_doorbell_semaphore", 0);
         if (status != UX_SUCCESS)
             status = (UX_SEMAPHORE_ERROR);
     }
@@ -395,7 +398,7 @@ UINT                    status = UX_SUCCESS;
 
         /* Wakeup enum thread.  */
         if (status != 0)
-            _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
+            _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
 
         /* Return successful status.  */
         return(UX_SUCCESS);
@@ -419,9 +422,9 @@ UINT                    status = UX_SUCCESS;
     if (hcd_ehci -> ux_hcd_ehci_periodic_mutex.tx_mutex_id != 0)
         _ux_utility_mutex_delete(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
     if (hcd_ehci -> ux_hcd_ehci_protect_semaphore.tx_semaphore_id != 0)
-        _ux_utility_semaphore_delete(&hcd_ehci -> ux_hcd_ehci_protect_semaphore);
+        _ux_host_semaphore_delete(&hcd_ehci -> ux_hcd_ehci_protect_semaphore);
     if (hcd_ehci -> ux_hcd_ehci_doorbell_semaphore.tx_semaphore_id != 0)
-        _ux_utility_semaphore_delete(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore);
+        _ux_host_semaphore_delete(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore);
     _ux_utility_memory_free(hcd_ehci);
 
     /* Return error status code.  */

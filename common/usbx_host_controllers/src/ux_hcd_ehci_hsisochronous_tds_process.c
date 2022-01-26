@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_hsisochronous_tds_process              PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,7 +58,7 @@
 /*    (ux_transfer_request_completion_function)                           */
 /*                                          Transfer Completion function  */
 /*    _ux_hcd_ehci_register_read            Read EHCI register            */
-/*    _ux_utility_semaphore_put             Put semaphore                 */
+/*    _ux_host_semaphore_put                Put semaphore                 */
 /*    _ux_utility_physical_address          Get physical address          */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -75,6 +75,9 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_HSISO_TD* _ux_hcd_ehci_hsisochronous_tds_process(
@@ -257,7 +260,7 @@ UINT                            i;
                 transfer -> ux_transfer_request_completion_function(transfer);
 
             /* Put semaphore.  */
-            _ux_utility_semaphore_put(&transfer -> ux_transfer_request_semaphore);
+            _ux_host_semaphore_put(&transfer -> ux_transfer_request_semaphore);
 
         } /* for (;i < n_fr;)  */
     }

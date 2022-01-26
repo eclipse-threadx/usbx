@@ -40,7 +40,7 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_dfu_control_request                PORTABLE C      */
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,10 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warning,      */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added UPLOAD length check,  */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -162,15 +166,13 @@ ULONG                   media_status;
                     {
 
                         /* Wake up the DFU thread and send a detach request..  */
-                        _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT, UX_OR);
-
+                        _ux_device_class_dfu_event_flags_set(dfu, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT);
                     }
                     else
                     {
 
                         /* We expect the host to issue a reset.  Arm a timer in the DFU thread.  */
-                        _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_WAIT_RESET, UX_OR);
-
+                        _ux_device_class_dfu_event_flags_set(dfu, UX_DEVICE_CLASS_DFU_THREAD_EVENT_WAIT_RESET);
                     }
 
                     /* We can switch dfu state machine.  */
@@ -375,9 +377,10 @@ ULONG                   media_status;
 #ifndef UX_DEVICE_CLASS_DFU_UPLOAD_DISABLE
                 case UX_SLAVE_CLASS_DFU_COMMAND_UPLOAD:
 
-                    /* bitCanUpload != 1, or length = 0.  */
+                    /* bitCanUpload != 1, or length = 0, or length > wTransferSize (we can support max of control buffer size).  */
                     if (!(_ux_system_slave -> ux_system_slave_device_dfu_capabilities & UX_SLAVE_CLASS_DFU_CAPABILITY_CAN_UPLOAD) ||
-                        request_length == 0)
+                        (request_length == 0) ||
+                        (request_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH))
                     {
                         _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
 
@@ -624,9 +627,7 @@ ULONG                   media_status;
                     {
 
                         /* Wake up the DFU thread and send a detach request..  */
-                        _ux_utility_event_flags_set(
-                            &dfu -> ux_slave_class_dfu_event_flags_group,
-                            UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT, UX_OR);
+                        _ux_device_class_dfu_event_flags_set(dfu, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT);
                     }
 #else
 
@@ -648,7 +649,7 @@ ULONG                   media_status;
                             {
 
                                 /* Wake up the DFU thread and send a detach request..  */
-                                _ux_utility_event_flags_set(&dfu -> ux_slave_class_dfu_event_flags_group, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT, UX_OR);
+                                _ux_device_class_dfu_event_flags_set(dfu, UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT);
 
                             }
 

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_change                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,7 +55,7 @@
 /*    _ux_network_driver_link_up            Link status up                */
 /*    _ux_network_driver_link_down          Link status down              */
 /*    _ux_utility_memory_set                Set memory                    */
-/*    _ux_utility_thread_resume             Resume thread                 */
+/*    _ux_device_thread_resume              Resume thread                 */
 /*    _ux_utility_event_flags_set           Set event flags               */
 /*    _ux_device_stack_transfer_all_request_abort                         */
 /*                                          Abort transfer                */
@@ -75,6 +75,9 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -150,8 +153,8 @@ UX_SLAVE_ENDPOINT                       *endpoint;
                                         ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
 
         /* Resume the endpoint threads.  */
-        _ux_utility_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread); 
-        _ux_utility_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread); 
+        _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread); 
+        _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread); 
         
         /* Wake up the Interrupt thread and send a network notification to the host.  */
         _ux_utility_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                

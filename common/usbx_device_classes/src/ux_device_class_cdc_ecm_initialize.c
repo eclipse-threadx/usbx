@@ -34,7 +34,7 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_ecm_initialize                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,8 +59,8 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*    _ux_utility_mutex_delete              Delete Mutex                  */
 /*    _ux_utility_event_flags_create        Create Flag group             */
 /*    _ux_utility_event_flags_delete        Delete Flag group             */
-/*    _ux_utility_thread_create             Create Thread                 */
-/*    _ux_utility_thread_delete             Delete Thread                 */
+/*    _ux_device_thread_create              Create Thread                 */
+/*    _ux_device_thread_delete              Delete Thread                 */
 /*    nx_packet_pool_create                 Create NetX packet pool       */
 /*    nx_packet_pool_delete                 Delete NetX packet pool       */
 /*                                                                        */
@@ -79,6 +79,9 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -166,7 +169,7 @@ UINT                                            status;
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread , "ux_slave_class_cdc_ecm_interrupt_thread",
+        status =  _ux_device_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread , "ux_slave_class_cdc_ecm_interrupt_thread",
                     _ux_device_class_cdc_ecm_interrupt_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -184,7 +187,7 @@ UINT                                            status;
         /* Bulk endpoint treatment needs to be running in a different thread. So start
         a new thread. We pass a pointer to the cdc_ecm instance to the new thread.  This thread
         does not start until we have a instance of the class. */
-        status =  _ux_utility_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread , "ux_slave_class_cdc_ecm_bulkout_thread",
+        status =  _ux_device_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread , "ux_slave_class_cdc_ecm_bulkout_thread",
                     _ux_device_class_cdc_ecm_bulkout_thread,
                     (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -199,7 +202,7 @@ UINT                                            status;
             /* Bulk endpoint treatment needs to be running in a different thread. So start
             a new thread. We pass a pointer to the cdc_ecm instance to the new thread.  This thread
             does not start until we have a instance of the class. */
-            status =  _ux_utility_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread , "ux_slave_class_cdc_ecm_bulkin_thread",
+            status =  _ux_device_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread , "ux_slave_class_cdc_ecm_bulkin_thread",
                         _ux_device_class_cdc_ecm_bulkin_thread,
                         (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack ,
                         UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -242,13 +245,13 @@ UINT                                            status;
                     return(UX_SUCCESS);
                 }
 
-                _ux_utility_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread);
+                _ux_device_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread);
             }
 
-            _ux_utility_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread);
+            _ux_device_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread);
         }
 
-        _ux_utility_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread);
+        _ux_device_thread_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread);
     }
 
     /* Free allocated resources.  */

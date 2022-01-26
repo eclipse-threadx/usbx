@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_event_set                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,7 +55,7 @@
 /*                                             event                      */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    _ux_utility_semaphore_put                Put semaphore              */
+/*    _ux_device_semaphore_put                 Put semaphore              */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -68,6 +68,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            added transaction ID,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_event_set(UX_SLAVE_CLASS_PIMA *pima, 
@@ -123,13 +127,14 @@ UX_SLAVE_DEVICE                 *device;
     current_pima_event =  pima -> ux_device_class_pima_event_array_tail;
     
     /* fill in the event structure from the user.  */
-    current_pima_event -> ux_device_class_pima_event_code         = pima_event -> ux_device_class_pima_event_code;      
-    current_pima_event -> ux_device_class_pima_event_parameter_1  = pima_event -> ux_device_class_pima_event_parameter_1;     
-    current_pima_event -> ux_device_class_pima_event_parameter_2  = pima_event -> ux_device_class_pima_event_parameter_2;     
-    current_pima_event -> ux_device_class_pima_event_parameter_3  = pima_event -> ux_device_class_pima_event_parameter_3;     
+    current_pima_event -> ux_device_class_pima_event_code           = pima_event -> ux_device_class_pima_event_code;      
+    current_pima_event -> ux_device_class_pima_event_transaction_id = pima_event -> ux_device_class_pima_event_transaction_id;
+    current_pima_event -> ux_device_class_pima_event_parameter_1    = pima_event -> ux_device_class_pima_event_parameter_1;     
+    current_pima_event -> ux_device_class_pima_event_parameter_2    = pima_event -> ux_device_class_pima_event_parameter_2;     
+    current_pima_event -> ux_device_class_pima_event_parameter_3    = pima_event -> ux_device_class_pima_event_parameter_3;     
     
     /* Set a semaphore to wake up the interrupt thread.  */
-    _ux_utility_semaphore_put(&pima -> ux_device_class_pima_interrupt_thread_semaphore);
+    _ux_device_semaphore_put(&pima -> ux_device_class_pima_interrupt_thread_semaphore);
 
     /* Return event status to the user.  */
     return(UX_SUCCESS);

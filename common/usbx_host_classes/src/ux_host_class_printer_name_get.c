@@ -30,12 +30,102 @@
 #include "ux_host_stack.h"
 
 
+#if !defined(UX_HOST_STANDALONE)
+static inline
+#else
+VOID _ux_host_class_printer_name_parse(UX_HOST_CLASS_PRINTER *printer, UCHAR *descriptor_buffer, ULONG descriptor_length);
+#endif
+VOID _ux_host_class_printer_name_parse(UX_HOST_CLASS_PRINTER *printer, UCHAR *descriptor_buffer, ULONG descriptor_length)
+{
+ULONG           length;
+UCHAR *         printer_name_buffer;
+UCHAR *         printer_name;
+UINT            printer_name_length;
+
+    /* Cannot use descriptor buffer, so copy it to 1284 buffer.  */
+    printer_name_buffer =  descriptor_buffer;
+
+    /* Retrieve the printer name which is a USHORT at the beginning of the returned buffer.  */
+    length =  (USHORT)_ux_utility_short_get_big_endian(printer_name_buffer);
+    if (length < descriptor_length)
+        descriptor_length = length;
+
+    /* Point the name buffer after the length.  */
+    printer_name_buffer +=  2;
+
+    /* Parse the name for a tag which is in the form DES: or DESCRIPTOR:  */
+    while (descriptor_length != 0)
+    {
+
+        if (descriptor_length > 12)
+        {
+
+            /* Compare the current pointer position with the DESCRIPTOR: tag.  */
+            if (_ux_utility_memory_compare(printer_name_buffer, UX_HOST_CLASS_PRINTER_TAG_DESCRIPTION, 12) == UX_SUCCESS)
+            {
+
+                printer_name_buffer +=  12;
+                descriptor_length =  (USHORT)(descriptor_length - 12);
+                break;
+            }
+        }
+
+        if (descriptor_length > 4)
+        {
+
+            /* Compare the current pointer position with the DES: tag.  */
+            if (_ux_utility_memory_compare(printer_name_buffer, UX_HOST_CLASS_PRINTER_TAG_DES, 4) == UX_SUCCESS)
+            {
+
+                printer_name_buffer +=  4;
+                descriptor_length = (USHORT)(descriptor_length - 4);
+                break;
+            }
+        }
+        
+        /* And reduce the remaining length by 1.  */
+        descriptor_length--;
+
+        /* Increment the descriptor pointer.  */
+        printer_name_buffer++;
+    }
+
+    /* If the length remaining is 0, we have not found the descriptor tag we wanted.  */
+    if (descriptor_length == 0)
+    {
+
+        /* Use the generic USB printer name.  */
+        _ux_utility_memory_copy(printer -> ux_host_class_printer_name, UX_HOST_CLASS_PRINTER_GENERIC_NAME, 11); /* Use case of memcpy is verified. */
+    }
+    else
+    {
+
+        /* We have found a tag and the name is right after delimited by ; or a 0.  */
+        printer_name =  printer -> ux_host_class_printer_name;
+        printer_name_length =  UX_HOST_CLASS_PRINTER_NAME_LENGTH;
+
+        /* Parse the name and only copy the name until the max length is reached
+            or the delimiter is reached.  */
+        while ((descriptor_length--) && (printer_name_length--))
+        {
+
+            /* Check for the delimiter.  */
+            if((*printer_name_buffer == 0) || (*printer_name_buffer == ';'))
+                break;
+            else
+                /* Copy the name of the printer to the printer instance character
+                    by character.  */
+                *printer_name++ =  *printer_name_buffer++;
+        }
+    }
+}
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_name_get                     PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,20 +169,21 @@
 /*                                            supported interface other   */
 /*                                            than number zero,           */
 /*                                            resulting in version 6.1.4  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_name_get(UX_HOST_CLASS_PRINTER *printer)
 {
 
 UCHAR *         descriptor_buffer;
-UCHAR *         printer_name_buffer;
-UCHAR *         printer_name;
 UX_INTERFACE    *interface;
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
+#if !defined(UX_HOST_STANDALONE)
 UINT            status;
-USHORT          descriptor_length;
-UINT            printer_name_length;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_PRINTER_NAME_GET, printer, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
@@ -118,6 +209,12 @@ UINT            printer_name_length;
     transfer_request -> ux_transfer_request_index =             (interface -> ux_interface_descriptor.bInterfaceNumber  << 8) |
                                                                 (interface -> ux_interface_descriptor.bAlternateSetting     );
 
+#if defined(UX_HOST_STANDALONE)
+    printer -> ux_host_class_printer_allocated = descriptor_buffer;
+    UX_TRANSFER_STATE_RESET(transfer_request);
+    return(UX_SUCCESS);
+#else
+
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
@@ -125,86 +222,16 @@ UINT            printer_name_length;
     if(status == UX_SUCCESS)
     {
 
-        /* Cannot use descriptor buffer, so copy it to 1284 buffer.  */
-        printer_name_buffer =  descriptor_buffer;
-
-        /* Retrieve the printer name which is a USHORT at the beginning of the returned buffer.  */
-        descriptor_length =  (USHORT)_ux_utility_short_get_big_endian(printer_name_buffer);
-    
-        /* Point the name buffer after the length.  */
-        printer_name_buffer +=  2;
-
-        /* Parse the name for a tag which is in the form DES: or DESCRIPTOR:  */
-        while (descriptor_length != 0)
-        {
-
-            if (descriptor_length > 12)
-            {
-
-                /* Compare the current pointer position with the DESCRIPTOR: tag.  */
-                if (_ux_utility_memory_compare(printer_name_buffer, UX_HOST_CLASS_PRINTER_TAG_DESCRIPTION, 12) == UX_SUCCESS)
-                {
-
-                    printer_name_buffer +=  12;
-                    descriptor_length =  (USHORT)(descriptor_length - 12);
-                    break;
+        _ux_host_class_printer_name_parse(printer, descriptor_buffer,
+                                    UX_HOST_CLASS_PRINTER_DESCRIPTOR_LENGTH);
                 }
-            }
-
-            if (descriptor_length > 4)
-            {
-
-                /* Compare the current pointer position with the DES: tag.  */
-                if (_ux_utility_memory_compare(printer_name_buffer, UX_HOST_CLASS_PRINTER_TAG_DES, 4) == UX_SUCCESS)
-                {
-
-                    printer_name_buffer +=  4;
-                    descriptor_length = (USHORT)(descriptor_length - 4);
-                    break;
-                }
-            }
-            
-            /* And reduce the remaining length by 1.  */
-            descriptor_length--;
-
-            /* Increment the descriptor pointer.  */
-            printer_name_buffer++;
-        }
-
-        /* If the length remaining is 0, we have not found the descriptor tag we wanted.  */
-        if (descriptor_length == 0)
-        {
-
-            /* Use the generic USB printer name.  */
-            _ux_utility_memory_copy(printer -> ux_host_class_printer_name, UX_HOST_CLASS_PRINTER_GENERIC_NAME, 11); /* Use case of memcpy is verified. */
-        }
-        else
-        {
-
-            /* We have found a tag and the name is right after delimited by ; or a 0.  */
-            printer_name =  printer -> ux_host_class_printer_name;
-            printer_name_length =  UX_HOST_CLASS_PRINTER_NAME_LENGTH;
-
-            /* Parse the name and only copy the name until the max length is reached
-               or the delimiter is reached.  */
-            while ((descriptor_length--) && (printer_name_length--))
-            {
-
-                /* Check for the delimiter.  */
-                if((*printer_name_buffer == 0) || (*printer_name_buffer == ';'))
-                    break;
-                else
-                    /* Copy the name of the printer to the printer instance character
-                       by character.  */
-                    *printer_name++ =  *printer_name_buffer++;
-            }
-        }
-    }
 
     /* Free all used resources.  */
     _ux_utility_memory_free(descriptor_buffer);
 
     /* Return completion status.  */
     return(status);
+
+#endif
 }
 

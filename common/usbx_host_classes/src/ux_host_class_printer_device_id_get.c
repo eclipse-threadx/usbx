@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_printer_device_id_get                PORTABLE C      */
-/*                                                           6.1.4        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,10 +76,16 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_device_id_get(UX_HOST_CLASS_PRINTER *printer, UCHAR *descriptor_buffer, ULONG length)
 {
+#if defined(UX_HOST_STANDALONE)
+UX_INTERRUPT_SAVE_AREA
+#endif
 UX_INTERFACE         *interface;
 UX_ENDPOINT          *control_endpoint;
 UX_TRANSFER          *transfer_request;
@@ -90,20 +96,34 @@ UINT                 status;
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_PRINTER_DEVICE_ID_GET, printer, descriptor_buffer, length, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&printer -> ux_host_class_printer_semaphore, UX_WAIT_FOREVER);
+#if defined(UX_HOST_STANDALONE)
+    UX_DISABLE
+    if ((printer -> ux_host_class_printer_flags & UX_HOST_CLASS_PRINTER_FLAG_LOCK) ||
+        (printer -> ux_host_class_printer_device -> ux_device_flags & UX_DEVICE_FLAG_LOCK))
+    {
+        UX_RESTORE
+        return(UX_BUSY);
+    }
+    printer -> ux_host_class_printer_flags |= UX_HOST_CLASS_PRINTER_FLAG_LOCK;
+    printer -> ux_host_class_printer_device -> ux_device_flags |= UX_DEVICE_FLAG_LOCK;
+    UX_RESTORE
+#else
+
+    status =  _ux_host_semaphore_get(&printer -> ux_host_class_printer_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
 
     /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
-    status =  _ux_utility_semaphore_get(&printer -> ux_host_class_printer_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&printer -> ux_host_class_printer_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)
     {
-        _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+        _ux_host_semaphore_put(&printer -> ux_host_class_printer_semaphore);
         return(status);
     }
+#endif
 
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &printer -> ux_host_class_printer_device -> ux_device_control_endpoint;
@@ -121,11 +141,17 @@ UINT                 status;
     transfer_request -> ux_transfer_request_index =             (interface -> ux_interface_descriptor.bInterfaceNumber  << 8) |
                                                                 (interface -> ux_interface_descriptor.bAlternateSetting     );
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Enable auto unlock device.  */
+    transfer_request -> ux_transfer_request_flags |= UX_TRANSFER_FLAG_AUTO_DEVICE_UNLOCK;
+#endif
+
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&printer -> ux_host_class_printer_semaphore);
+    _ux_host_class_printer_unlock(printer);
 
     /* Return completion status.  */
     return(status);

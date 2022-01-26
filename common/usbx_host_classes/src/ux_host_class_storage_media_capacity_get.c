@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_media_capacity_get           PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*                                            added option to disable FX  */
 /*                                            media integration,          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_capacity_get(UX_HOST_CLASS_STORAGE *storage)
@@ -85,10 +88,14 @@ UINT            status;
 UCHAR           *cbw;
 UCHAR           *capacity_response;
 UINT            command_length;
+#if !defined(UX_HOST_STANDALONE)
 ULONG           command_retry;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_STORAGE_MEDIA_CAPACITY_GET, storage, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
+
+#if !defined(UX_HOST_STANDALONE)
 
     /* Set the default to either 512 or 2048 bytes.  */
     switch (storage -> ux_host_class_storage_media_type)
@@ -121,6 +128,7 @@ ULONG           command_retry;
         status =  _ux_host_class_storage_media_format_capacity_get(storage);
         if (status != UX_SUCCESS)
             return(status);
+#endif
 
         /* Use a pointer for the cbw, easier to manipulate.  */
         cbw =  (UCHAR *) storage -> ux_host_class_storage_cbw;
@@ -145,6 +153,17 @@ ULONG           command_retry;
         capacity_response =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_STORAGE_READ_CAPACITY_RESPONSE_LENGTH);
         if (capacity_response == UX_NULL)
             return(UX_MEMORY_INSUFFICIENT);
+
+#if defined(UX_HOST_STANDALONE)
+
+        /* Initialize state for transport.  */
+        UX_HOST_CLASS_STORAGE_TRANS_STATE_RESET(storage);
+        storage -> ux_host_class_storage_state_state = UX_HOST_CLASS_STORAGE_STATE_TRANSPORT;
+        storage -> ux_host_class_storage_state_next = UX_HOST_CLASS_STORAGE_STATE_CAP_SAVE;
+        storage -> ux_host_class_storage_trans_data = capacity_response;
+        status = UX_SUCCESS;
+        return(status);
+#else
 
         /* Send the command to transport layer.  */
         status =  _ux_host_class_storage_transport(storage, capacity_response);
@@ -186,4 +205,5 @@ ULONG           command_retry;
     /* We get here when we could not retrieve the sector size through the READ_CAPACITY command.
        It's OK, we still calculated the default based on the device type.  */
     return(UX_SUCCESS);
+#endif
 }

@@ -30,12 +30,13 @@
 #include "ux_host_stack.h"
 
 
+#if !defined(UX_HOST_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_device_initialize            PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,6 +44,8 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
 /*    This function initializes the USB storage device.                   */ 
+/*                                                                        */ 
+/*    This function is for RTOS mode.                                     */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -83,6 +86,10 @@
 /*                                            fixed logic of creating     */
 /*                                            multiple storage media,     */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved media insert/eject */
+/*                                            management without FX,      */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_device_initialize(UX_HOST_CLASS_STORAGE *storage)
@@ -193,10 +200,11 @@ UINT                            inst_index;
         {
 
             /* Find an unused storage media slot.  */
-            if (storage_media -> ux_host_class_storage_media_storage == UX_NULL)
+            if (storage_media -> ux_host_class_storage_media_status != UX_USED)
             {
 
                 /* Use this free storage media slot.  */
+                storage_media -> ux_host_class_storage_media_status = UX_USED;
                 storage_media -> ux_host_class_storage_media_storage = storage;
 
                 /* Save media information.  */
@@ -213,6 +221,7 @@ UINT                            inst_index;
                                         storage -> ux_host_class_storage_class, (VOID *) storage_media);
                 }
                 
+                /* Media inserted in slot, done.  */
                 break;
             }
         }
@@ -223,4 +232,4 @@ UINT                            inst_index;
        return success. The storage thread will try to remount the ones that failed.  */
     return(UX_SUCCESS);
 }
-
+#endif

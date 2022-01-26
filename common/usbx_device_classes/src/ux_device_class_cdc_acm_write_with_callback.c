@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_write_with_callback        PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*                                            added macro to disable      */
 /*                                            transmission support,       */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write_with_callback(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
@@ -127,6 +130,21 @@ UINT                        status;
         return(UX_ERROR);
     }
 
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Save the length to be sent. */
+    cdc_acm -> ux_device_class_cdc_acm_write_requested_length = requested_length;
+
+    /* And the buffer pointer.  */
+    cdc_acm -> ux_device_class_cdc_acm_write_buffer = buffer;
+
+    /* Schedule a transmission.  */
+    cdc_acm -> ux_slave_class_cdc_acm_scheduled_write = UX_TRUE;
+
+    /* Status success.  */
+    status = (UX_SUCCESS);
+#else
+
     /* Save the length to be sent. */
     cdc_acm -> ux_slave_class_cdc_acm_callback_total_length = requested_length;
 
@@ -138,6 +156,7 @@ UINT                        status;
 
     /* Invoke the bulkin thread by sending a flag .  */
     status = _ux_utility_event_flags_set(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group, UX_DEVICE_CLASS_CDC_ACM_WRITE_EVENT, UX_OR);
+#endif
 
     /* Simply return the last function result.  When we leave this function, the deferred writing has been scheduled. */
     return(status);

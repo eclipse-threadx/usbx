@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -68,6 +68,16 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added option for assert,    */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            added option for device     */
+/*                                            audio feedback endpoint,    */
+/*                                            added option for MTP,       */
+/*                                            added options for HID       */
+/*                                            interrupt OUT support,      */
+/*                                            added option to validate    */
+/*                                            class code in enumeration,  */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -359,9 +369,38 @@
 
 /* #define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE  */
 
+/* defined, this macro enables device audio feedback endpoint support.  */
+
+/* #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT  */
+
+/* Defined, device HID interrupt OUT transfer is supported.  */
+
+/* #define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT  */
+
 /* Defined, this macro enables device bi-directional-endpoint support.  */
 
 /* #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT  */
+
+/* Defined, this macro enables device/host PIMA MTP support.  */
+
+/* #define UX_PIMA_WITH_MTP_SUPPORT  */
+
+/* Defined, this macro enables host device class code validation.
+   Only following USB-IF allowed device class code is allowed:
+   0x00, 0x02 (CDC Control), 0x09 (Hub), 0x11 (Billboard), 0xDC (Diagnostic), 0xEF (MISC), 0xFF (Vendor)
+   Refer to https://www.usb.org/defined-class-codes for more details.
+ */
+
+/* #define UX_HOST_DEVICE_CLASS_CODE_VALIDATION_ENABLE  */
+
+/* Defined, host HID interrupt OUT transfer is supported.  */
+
+/* #define UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT  */
+
+/* Define HID report transfer timeout value in millisecond.
+   The default is 10000 milliseconds.  */
+
+/* #define UX_HOST_CLASS_HID_REPORT_TRANSFER_TIMEOUT               10000 */
 
 /* Defined, this value will only enable the host side of usbx.  */
 /* #define UX_HOST_SIDE_ONLY   */
@@ -380,7 +419,23 @@
 #endif 
 #endif 
 
-/* Defined, this value represents the maximum size of single tansfers for the SCSI data phase.
+/* Defined, this macro will enable the standalone mode of usbx.  */
+/* #define UX_STANDALONE  */
+
+/* Defined, this macro will remove the FileX dependency of host storage.
+   In this mode, sector access is offered instead of directly FileX FX_MEDIA support.
+   Use following APIs for media obtain and access:
+   - ux_host_class_storage_media_get : get instance of UX_HOST_CLASS_STORAGE_MEDIA
+   - ux_host_class_storage_media_lock : lock specific media for further read/write
+   - ux_host_class_storage_media_read : read sectors on locked media
+   - ux_host_class_storage_media_write : write sectors on locked media
+   - ux_host_class_storage_media_unlock : unlock media
+   Note it's forced defined/enabled in standalone mode of usbx.
+*/
+/* #define UX_HOST_CLASS_STORAGE_NO_FILEX  */
+
+/* Defined, this value represents the maximum size of single transfers for the SCSI data phase.
+   By default it's 1024.
 */
 
 #define UX_HOST_CLASS_STORAGE_MAX_TRANSFER_SIZE             (1024 * 1)
@@ -389,6 +444,29 @@
 */
 #define UX_DEBUG_LOG_SIZE                                   (1024 * 16)
 
+/* Defined, this macro represents the non-blocking function to return time tick.
+   This macro is used only in standalone mode.
+   The tick rate is defined by UX_PERIODIC_RATE.
+   If it's not defined, or TX is not included, a external function must be
+   implement in application:
+      extern  ULONG       _ux_utility_time_get(VOID);
+*/
+/* #define _ux_utility_time_get() tx_time_get()  */
+
+/* Defined, this macro represents the non-blocking function to disable interrupts
+   and return old interrupt setting flags.
+   If it's not defined, or TX is not included, a external function must be
+   implement in application:
+      extern ALIGN_TYPE   _ux_utility_interrupt_disable(VOID);
+*/
+/* #define _ux_utility_interrupt_disable() _tx_thread_interrupt_disable()  */
+
+/* Defined, this macro represents the non-blocking function to restore interrupts.
+   If it's not defined, or TX is not included, a external function must be
+   implement in application:
+      extern VOID         _ux_utility_interrupt_restore(ALIGN_TYPE);
+*/
+/* #define _ux_utility_interrupt_restore(flags) _tx_thread_interrupt_restore(flags)  */
 
 /* Defined, this enables the assert checks inside usbx.  */
 #define UX_ENABLE_ASSERT

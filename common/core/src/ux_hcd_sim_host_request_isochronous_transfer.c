@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_request_isochronous_transfer       PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed payload calculation,  */
 /*                                            resulting in version 6.1.9  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_request_isochronous_transfer(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request)
@@ -156,6 +159,9 @@ ULONG                       n_trans, packet_size;
         else
 
             data_td -> ux_sim_host_iso_td_direction =  UX_HCD_SIM_HOST_TD_OUT;
+
+        /* Mark the TD with the DATA phase.  */
+        data_td -> ux_sim_host_iso_td_status |=  UX_HCD_SIM_HOST_TD_DATA_PHASE;
 
         /* Set the frame number.  */
         ed -> ux_sim_host_ed_frame =  current_frame_number;

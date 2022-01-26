@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_transmit_queue_clean         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,7 +53,7 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    _ux_utility_semaphore_get             Get bulk out semaphore        */ 
+/*    _ux_host_semaphore_get                Get bulk out semaphore        */ 
 /*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
 /*    nx_packet_transmit_release            Release NetX packet           */ 
 /*                                                                        */ 
@@ -71,6 +71,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_transmit_queue_clean(UX_HOST_CLASS_CDC_ECM *cdc_ecm)
@@ -99,7 +102,7 @@ NX_PACKET               *next_packet;
         UX_RESTORE
 
         /* Wait for write function to resume us.  */
-        _ux_utility_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
+        _ux_host_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
 
         /* We're done waiting.  */
         cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish =  UX_FALSE;

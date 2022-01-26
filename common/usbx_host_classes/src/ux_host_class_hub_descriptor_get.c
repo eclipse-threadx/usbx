@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_descriptor_get                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved protocol handling, */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_descriptor_get(UX_HOST_CLASS_HUB *hub)
@@ -84,6 +87,7 @@ UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 UINT            status;
 #if UX_MAX_DEVICES > 1
+ULONG           tt_protocols; /* (bDeviceProtocol << 8) | bInterfaceProtocol  */
 ULONG           port_index;
 #endif
 
@@ -122,31 +126,74 @@ ULONG           port_index;
                                                                     (UCHAR *) &hub -> ux_host_class_hub_descriptor);
 
             /* Check the protocol used by the HUB. This will indicate if the HUB supports multiple TTs in high speed mode.  */
-            switch (hub -> ux_host_class_hub_device -> ux_device_descriptor.bDeviceProtocol)
+            tt_protocols = (hub -> ux_host_class_hub_device -> ux_device_descriptor.bDeviceProtocol << 8) |
+                            hub -> ux_host_class_hub_interface -> ux_interface_descriptor.bInterfaceProtocol;
+            switch(tt_protocols)
             {
 
-            case UX_HOST_CLASS_HUB_PROTOCOL_FS:
+            /* 1. A hub operating at full-/low-speed has a device descriptor with a bDeviceProtocol field set to zero(0)
+             *    and an interface descriptor with a bInterfaceProtocol field set to zero(0).
+             */
+            case (UX_HOST_CLASS_HUB_PROTOCOL_FS << 8):
 
                 /* In the case of full speed hub, there are no TTs to declare */
                 break;
-               
-               
-            case UX_HOST_CLASS_HUB_PROTOCOL_SINGLE_TT:
-                    
+
+            /* 2. A hub that has a single TT must set the bDeviceProtocol field of the device descriptor to one(1) and
+             *    the interface descriptor bInterfaceProtocol field set to 0.
+             * 3. A multiple TT hub must set the bDeviceProtocol field of the device descriptor to two (2).
+             *    The first interface descriptor has the bInterfaceProtocol field set to one(1).
+             */
+            case (UX_HOST_CLASS_HUB_PROTOCOL_SINGLE_TT << 8): /* Fall through.  */
+            case (UX_HOST_CLASS_HUB_PROTOCOL_MULTIPLE_TT << 8) | UX_HOST_CLASS_HUB_PROTOCOL_SINGLE_TT:
+
+                /* Single TT hub or single TT interface.  */
+                /* Check if current setting supports this Hub.  */
+                if (hub -> ux_host_class_hub_descriptor.bNbPorts > UX_MAX_TT)
+                {
+
+                    /* Error trap. */
+                    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HUB, UX_TOO_MANY_HUB_PORTS);
+
+                    /* If trace is enabled, insert this event into the trace buffer.  */
+                    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TOO_MANY_HUB_PORTS, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+                    status = UX_TOO_MANY_HUB_PORTS;
+                    break;
+                }
+
                 /* In a single TT state, all the downstream ports report to the same
-                   TT and share the 1.1 USB segment bandwidth. This is a very crude
-                   but working method, we simply set all the ports bits to the first
-                   TT.  */
+                    TT and share the 1.1 USB segment bandwidth. This is a very crude
+                    but working method, we simply set all the ports bits to the first
+                    TT.  */
                 hub -> ux_host_class_hub_device -> ux_device_hub_tt[0].ux_hub_tt_port_mapping =   UX_TT_MASK;
                 hub -> ux_host_class_hub_device -> ux_device_hub_tt[0].ux_hub_tt_max_bandwidth =  UX_TT_BANDWIDTH;
-                break;          
+                break;
 
+            /* 3. A multiple TT hub must set the bDeviceProtocol field of the device descriptor to two (2).
+             *    The first interface descriptor has the bInterfaceProtocol field set to one(1).
+             *    Such a hub also has a second interface descriptor where the bInterfaceProtocol is set to two(2).
+             */
+            case (UX_HOST_CLASS_HUB_PROTOCOL_MULTIPLE_TT << 8) | UX_HOST_CLASS_HUB_PROTOCOL_MULTIPLE_TT:
 
-            case UX_HOST_CLASS_HUB_PROTOCOL_MULTIPLE_TT:
+                /* Multiple TTs.  */
+                /* Check if current setting supports this Hub.  */
+                if (hub -> ux_host_class_hub_descriptor.bNbPorts > UX_MAX_TT)
+                {
+
+                    /* Error trap. */
+                    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HUB, UX_TOO_MANY_HUB_PORTS);
+
+                    /* If trace is enabled, insert this event into the trace buffer.  */
+                    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TOO_MANY_HUB_PORTS, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+                    status = UX_TOO_MANY_HUB_PORTS;
+                    break;
+                }
 
                 /* In the case of multiple TTs, each downstream port can sustain the USB 1.1
-                   max bandwidth and therefore we allocate one TT per port with that bandwidth.  */
-                for (port_index = 0; port_index < hub -> ux_host_class_hub_descriptor.bNbPorts;port_index++)
+                    max bandwidth and therefore we allocate one TT per port with that bandwidth.  */
+                for (port_index = 0; port_index < hub -> ux_host_class_hub_descriptor.bNbPorts; port_index++)
                 {
 
                     hub -> ux_host_class_hub_device -> ux_device_hub_tt[port_index].ux_hub_tt_port_mapping =   (ULONG)(1 << port_index);
@@ -154,8 +201,7 @@ ULONG           port_index;
                 }
                 break;
 
-            
-            default:
+            default: /* Invalid bDeviceProtocol and bInterfaceProtocol pair.  */
 
                 /* Error trap. */
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HUB, UX_DESCRIPTOR_CORRUPTED);
@@ -188,4 +234,3 @@ ULONG           port_index;
     /* Return completion status.  */
     return(status);
 }
-

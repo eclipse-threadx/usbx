@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_inquiry                    PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed USB CV test issues,   */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -102,6 +105,8 @@ UCHAR                   *inquiry_buffer;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_INQUIRY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
+#if !defined(UX_DEVICE_STANDALONE)
+
     /* Check direction.  */
     if (storage -> ux_slave_class_storage_host_length &&
         (storage -> ux_slave_class_storage_cbw_flags & 0x80) == 0)
@@ -110,6 +115,7 @@ UCHAR                   *inquiry_buffer;
         storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
         return(UX_ERROR);
     }
+#endif
 
     /* From the SCSI Inquiry payload, get the page code.  */
     inquiry_page_code =  *(cbwcb + UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE);
@@ -190,8 +196,10 @@ UCHAR                   *inquiry_buffer;
 
     default:
             
+#if !defined(UX_DEVICE_STANDALONE)
         /* The page code is not supported.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
+#endif
 
         /* And update the REQUEST_SENSE codes.  */
         storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
@@ -210,6 +218,19 @@ UCHAR                   *inquiry_buffer;
     if (status != UX_SUCCESS)
         return(status);
 
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Next: Transfer (DATA).  */
+    storage -> ux_device_class_storage_state = UX_DEVICE_CLASS_STORAGE_STATE_TRANS_START;
+    storage -> ux_device_class_storage_cmd_state = UX_DEVICE_CLASS_STORAGE_CMD_READ;
+
+    storage -> ux_device_class_storage_transfer = transfer_request;
+    storage -> ux_device_class_storage_device_length = inquiry_length;
+    storage -> ux_device_class_storage_data_length = inquiry_length;
+    storage -> ux_device_class_storage_data_count = 0;
+
+#else
+
     /* Send a data payload with the inquiry response buffer.  */
     if (inquiry_length)
         _ux_device_stack_transfer_request(transfer_request, inquiry_length, inquiry_length);
@@ -219,6 +240,7 @@ UCHAR                   *inquiry_buffer;
     {
         _ux_device_stack_endpoint_stall(endpoint_in);
     }
+#endif
 
     /* Return completion status.  */
     return(status);

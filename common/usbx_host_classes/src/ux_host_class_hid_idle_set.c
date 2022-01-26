@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_idle_set                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,8 +58,8 @@
 /*                                                                        */ 
 /*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
 /*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_put             Release protection semaphore  */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_put                Release protection semaphore  */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -74,10 +74,21 @@
 /*                                            protected default control   */
 /*                                            endpoint before using it,   */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_idle_set(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id)
 {
+#if defined(UX_HOST_STANDALONE)
+UINT            status;
+    do
+    {
+        status = _ux_host_class_hid_idle_set_run(hid, idle_time, report_id);
+    } while(status == UX_STATE_WAIT || status == UX_STATE_LOCK);
+    return(hid -> ux_host_class_hid_status);
+#else
 
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
@@ -96,14 +107,18 @@ UINT            status;
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     }
 
+    /* We need to get the default control endpoint transfer request pointer.  */
+    control_endpoint =  &hid -> ux_host_class_hid_device -> ux_device_control_endpoint;
+    transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
+
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
 
     /* Protect the control endpoint semaphore here.  It will be unprotected in the 
        transfer request function.  */
-    status =  _ux_utility_semaphore_get(&hid -> ux_host_class_hid_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&hid -> ux_host_class_hid_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)
@@ -111,14 +126,10 @@ UINT            status;
 
         /* Something went wrong. */
         /* Unprotect thread reentry to this instance.  */
-        _ux_utility_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+        _ux_host_semaphore_put(&hid -> ux_host_class_hid_semaphore);
 
         return(status);
     }
-
-    /* We need to get the default control endpoint transfer request pointer.  */
-    control_endpoint =  &hid -> ux_host_class_hid_device -> ux_device_control_endpoint;
-    transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
     /* Create a transfer request for the SET_IDLE request.  */
     transfer_request -> ux_transfer_request_data_pointer =      UX_NULL;
@@ -132,9 +143,9 @@ UINT            status;
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+    _ux_host_semaphore_put(&hid -> ux_host_class_hid_semaphore);
 
     /* Return the function status.  */
     return(status);
+#endif
 }
-

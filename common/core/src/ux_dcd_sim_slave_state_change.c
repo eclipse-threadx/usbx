@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_dcd_sim_slave_state_change                      PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            simulate force disconnect,  */
 /*                                            resulting in version 6.1.6  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_state_change(UX_DCD_SIM_SLAVE *dcd_sim_slave, ULONG state)
@@ -94,7 +97,7 @@ UX_HCD              *hcd;
         if (hcd)
         {
             hcd -> ux_hcd_root_hub_signal[0] = 2;
-            _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
+            _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
         }
     }
 

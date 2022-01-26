@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_gser_configure                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,7 +59,7 @@
 /*    _ux_host_stack_configuration_interface_get  Get interface           */ 
 /*    _ux_host_stack_device_configuration_get     Get configuration       */ 
 /*    _ux_host_stack_device_configuration_select  Select configuration    */ 
-/*    _ux_utility_semaphore_create                Create semaphore        */
+/*    _ux_host_semaphore_create                   Create semaphore        */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -74,6 +74,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_gser_configure(UX_HOST_CLASS_GSER *gser)
@@ -158,7 +161,7 @@ UX_DEVICE               *parent_device;
             gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_interface -> ux_interface_class =  gser -> ux_host_class_gser_device -> ux_device_class ;
 
             /* Create the semaphore to protect 2 threads from accessing the same gser instance.  */
-            status =  _ux_utility_semaphore_create(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore, "ux_host_class_gser_semaphore", 1);
+            status =  _ux_host_semaphore_create(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore, "ux_host_class_gser_semaphore", 1);
 
             /* Check status.  */
             if (status != UX_SUCCESS)

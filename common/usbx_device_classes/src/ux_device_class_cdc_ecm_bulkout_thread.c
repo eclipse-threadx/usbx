@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_bulkout_thread             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,7 +59,7 @@
 /*    _ux_utility_memory_copy               Copy memory                   */
 /*    nx_packet_allocate                    Allocate NetX packet          */
 /*    nx_packet_release                     Free NetX packet              */
-/*    _ux_utility_thread_suspend            Suspend thread                */
+/*    _ux_device_thread_suspend             Suspend thread                */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -75,6 +75,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_bulkout_thread(ULONG cdc_ecm_class)
@@ -177,7 +180,7 @@ ULONG                           ip_given_length;
         }
              
         /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
-        _ux_utility_thread_suspend(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread);
+        _ux_device_thread_suspend(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread);
     }
 }
 

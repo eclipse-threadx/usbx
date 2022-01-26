@@ -30,13 +30,13 @@
 #include "ux_host_stack.h"
 
 
-#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+#if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX) && !defined(UX_HOST_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_driver_entry                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -45,7 +45,10 @@
 /*                                                                        */ 
 /*    This function is the entry point for the FileX file system. All     */ 
 /*    FileX driver I/O calls are are multiplexed here and rerouted to     */ 
-/*    the proper USB storage class functions.                             */ 
+/*    the proper USB storage class functions.                             */
+/*                                                                        */
+/*    This entry is for FX support, it's not available if FX media is not */
+/*    integrated or standalone mode is used.                              */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -61,8 +64,8 @@
 /*                                          Translate error status codes  */ 
 /*    _ux_host_class_storage_media_read     Read sector(s)                */ 
 /*    _ux_host_class_storage_media_write    Write sector(s)               */ 
-/*    _ux_utility_semaphore_get             Get protection semaphore      */ 
-/*    _ux_utility_semaphore_put             Release protection semaphore  */ 
+/*    _ux_host_semaphore_get                Get protection semaphore      */ 
+/*    _ux_host_semaphore_put                Release protection semaphore  */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -77,6 +80,8 @@
 /*                                            added option to disable FX  */
 /*                                            media integration,          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_storage_driver_entry(FX_MEDIA *media)
@@ -104,7 +109,7 @@ UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
     }
 
     /* Protect Thread reentry to this instance.  */
-    _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+    status = _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
 
     /* Restore the LUN number from the media instance.  */
     storage -> ux_host_class_storage_lun =  storage_media -> ux_host_class_storage_media_lun;
@@ -215,6 +220,6 @@ UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
     }
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+    _ux_host_semaphore_put(&storage -> ux_host_class_storage_semaphore);
 }
 #endif /* !defined(UX_HOST_CLASS_STORAGE_NO_FILEX) */

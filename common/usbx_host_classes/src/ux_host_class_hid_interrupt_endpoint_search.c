@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_interrupt_endpoint_search        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,12 +71,16 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Xiuwen Cai, CQ Xiao      Modified comment(s),          */
+/*                                            added interrupt OUT support,*/
+/*                                            added timeout initialize,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_interrupt_endpoint_search(UX_HOST_CLASS_HID *hid)
 {
 
-UINT            status;
+UINT            status = UX_ENDPOINT_HANDLE_UNKNOWN;
 UX_INTERFACE    *interface;
 UX_ENDPOINT     *endpoint;
 UX_TRANSFER     *transfer_request;
@@ -88,7 +92,7 @@ UX_TRANSFER     *transfer_request;
     while(endpoint != UX_NULL)
     {
 
-        /* Found interrupt IN endpoint.  */
+        /* Find interrupt IN endpoint.  */
         if (((endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_IN) &&
             ((endpoint -> ux_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_INTERRUPT_ENDPOINT))
         {
@@ -110,6 +114,9 @@ UX_TRANSFER     *transfer_request;
             /* Interrupt transactions have a completion routine. */
             transfer_request -> ux_transfer_request_completion_function =  _ux_host_class_hid_transfer_request_completed;
 
+            /* Transfer timeout : wait forever.  */
+            transfer_request -> ux_transfer_request_timeout_value = UX_WAIT_FOREVER;
+
             /* Obtain a buffer for this transaction. The buffer will always be reused.  */
             transfer_request -> ux_transfer_request_data_pointer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, 
                                                                         transfer_request -> ux_transfer_request_requested_length);
@@ -119,19 +126,33 @@ UX_TRANSFER     *transfer_request;
             {
                 hid -> ux_host_class_hid_interrupt_endpoint_status =  UX_HOST_CLASS_HID_INTERRUPT_ENDPOINT_READY;
                 status = UX_SUCCESS;
+#if !defined(UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT)
+                
+                /* We have found the interrupt IN endpoint, just stop searching.  */
+                break;
+#endif
             }
             else
+            {
                 status = UX_MEMORY_INSUFFICIENT;
-
-            /* Return completion status.  */
-            return(status);
+                break;
+            }
         }
+#if defined(UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT)
+        else if (((endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_OUT) &&
+            ((endpoint -> ux_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_INTERRUPT_ENDPOINT))
+        {
+
+            /* Found the interrupt OUT endpoint, save it.  */
+            hid -> ux_host_class_hid_interrupt_out_endpoint = endpoint;
+        }
+#endif
 
         /* Check next endpoint.  */
         endpoint = endpoint -> ux_endpoint_next_endpoint;
     }
 
-    /* Return error completion.  */
-    return(UX_ENDPOINT_HANDLE_UNKNOWN);
+    /* Return completion status.  */
+    return(status);
 }
 

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_partial_object_data_get       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,11 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved cancel flow,       */
+/*                                            updated status handling,    */
+/*                                            improved sanity checks,     */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_partial_object_data_get(UX_SLAVE_CLASS_PIMA *pima, 
@@ -180,26 +185,23 @@ ULONG                       object_bytes_sent;
                 if (status != UX_SUCCESS)
                 {
     
-                    /* We need to inform the host of an error.  */
-                    status =  UX_ERROR;
                     break;
                 }
                 else
                 {    
+
                     /* Adjust the length of the object.  */
                     object_length -= object_length_received;
 
                     /* Adjust the length to be sent.  */
                     object_length_transfer = object_length_received + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE;
-                    
                 }                        
-                                                                                        
             }
             else
             {        
 
                 /* Calculate the maximum length for the first packet.  */
-                object_length_demanded = UX_DEVICE_CLASS_PIMA_OBJECT_INFO_BUFFER_SIZE;
+                object_length_demanded = UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH;
     
                 /* Can we get that much from the application ?  */
                 if (object_length_demanded > total_length)
@@ -217,32 +219,35 @@ ULONG                       object_bytes_sent;
                 {
     
                     /* We need to inform the host of an error.  */
-                    status =  UX_ERROR;
                     break;
-    
                 }
-
                 else
                 {
+
                     /* Adjust the length of the object.  */
                     object_length -= object_length_received;
                     
                     /* Adjust the length to be sent.  */
                     object_length_transfer = object_length_received;
                 }                    
-
             }
-            
-            /* Check if it is the last transfer.  */
-            if (object_length_transfer != total_length)
 
-                /* Not the last transfer, just send the object data to the host.  */
-                status =  _ux_device_stack_transfer_request(transfer_request, object_length_transfer, object_length_transfer);
+            /* It's canceled, do not proceed.  */
+            if (pima -> ux_device_class_pima_state == UX_DEVICE_CLASS_PIMA_PHASE_IDLE)
+            {
+                pima -> ux_device_class_pima_device_status = UX_DEVICE_CLASS_PIMA_RC_OK;
+                return(UX_ERROR);
+            }
 
-            else
+            /* Send the object data to the host.  */
+            status =  _ux_device_stack_transfer_request(transfer_request, object_length_transfer, UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH);
 
-                /* It's the last transfer, we need to send a ZLP if the last packet is a full packet.  */
-                status =  _ux_device_stack_transfer_request(transfer_request, object_length_transfer, 0);
+            /* It's canceled, do not proceed.  */
+            if (pima -> ux_device_class_pima_state == UX_DEVICE_CLASS_PIMA_PHASE_IDLE)
+            {
+                pima -> ux_device_class_pima_device_status = UX_DEVICE_CLASS_PIMA_RC_OK;
+                return(UX_ERROR);
+            }
 
             /* Check for the status. We may have had a request to cancel the transaction from the host.  */
             if (status != UX_SUCCESS)
@@ -254,31 +259,25 @@ ULONG                       object_bytes_sent;
                     
                     /* Do not proceed.  */
                     return(UX_ERROR);
-    
                 }                    
-    
                 else
-    
                 {
     
                     /* We need to inform the host of an error.  */
-                    status =  UX_ERROR;
+                    status =  UX_DEVICE_CLASS_PIMA_RC_GENERAL_ERROR;
                     break;
-    
                 }
             }
-    
             else
-    
             {
 
                 /* Do some sanity check.  */
                 if (total_length < object_length_received)
                 {
+
                     /* We have an overflow. Do not proceed.  */
                     status = UX_ERROR;
                     break;
-
                 }
     
                 /* Adjust the offset within the object data.  */
@@ -286,13 +285,11 @@ ULONG                       object_bytes_sent;
                 
                 /* Update the total length to be sent.  */
                 total_length -= object_length_transfer;
-    
             }
-        
         }
+
         /* Now we return a response with success.  */
         _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 1, object_bytes_sent, 0, 0);
-
     }
 
     /* Check if status is OK.  */
@@ -305,5 +302,3 @@ ULONG                       object_bytes_sent;
     /* Return completion status.  */
     return(status);
 }
-
-

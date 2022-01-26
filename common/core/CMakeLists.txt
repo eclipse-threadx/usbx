@@ -13,14 +13,17 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_state_change.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_transfer_abort.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_transfer_request.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_transfer_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_change.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_deactivate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_read.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_read_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_write.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dpump_write_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_alternate_setting_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_alternate_setting_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_class_register.c
@@ -41,9 +44,11 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_interface_start.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_microsoft_extension_register.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_set_feature.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_transfer_abort.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_transfer_all_request_abort.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_transfer_request.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_transfer_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_stack_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_asynch_queue_process.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_asynch_schedule.c
@@ -77,6 +82,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_timer_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_transaction_schedule.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_transfer_abort.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_transfer_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_hcd_sim_host_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_dpump_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_dpump_configure.c
@@ -144,11 +150,14 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_rh_device_extraction.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_rh_device_insertion.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_role_swap.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_transfer_request.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_transfer_request_abort.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_transfer_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_stack_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_system_error_handler.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_system_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_system_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_system_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_trace_event_insert.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_trace_event_update.c

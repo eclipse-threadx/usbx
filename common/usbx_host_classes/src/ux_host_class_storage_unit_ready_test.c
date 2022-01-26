@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_unit_ready_test              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_unit_ready_test(UX_HOST_CLASS_STORAGE *storage)
@@ -100,11 +103,20 @@ UINT            command_length;
     
     /* Prepare the TEST UNIT READY command block.  */
     *(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_TEST_READY_OPERATION) =  UX_HOST_CLASS_STORAGE_SCSI_TEST_READY;
-    
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* Prepare states.  */
+    UX_HOST_CLASS_STORAGE_TRANS_STATE_RESET(storage);
+    storage -> ux_host_class_storage_state_state = UX_HOST_CLASS_STORAGE_STATE_TRANSPORT;
+    storage -> ux_host_class_storage_state_next = UX_HOST_CLASS_STORAGE_STATE_TEST_CHECK;
+    status = UX_SUCCESS;
+#else
+
     /* Send the command to transport layer.  */
     status =  _ux_host_class_storage_transport(storage, UX_NULL);
+#endif
 
     /* Return completion status.  */
     return(status);                                            
 }
-

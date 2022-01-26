@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_deactivate                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -90,7 +93,7 @@ UINT                        status;
     dpump -> ux_host_class_dpump_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_utility_semaphore_get(&dpump -> ux_host_class_dpump_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&dpump -> ux_host_class_dpump_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
     {        
 
@@ -107,13 +110,13 @@ UINT                        status;
     _ux_host_stack_endpoint_transfer_abort(dpump -> ux_host_class_dpump_bulk_in_endpoint);
 
     /* If the class instance was busy, let it finish properly and not return.  */
-    _ux_utility_thread_sleep(UX_ENUMERATION_THREAD_WAIT); 
+    _ux_host_thread_sleep(UX_ENUMERATION_THREAD_WAIT); 
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(dpump -> ux_host_class_dpump_class, (VOID *) dpump);
 
     /* Destroy the semaphore.  */
-    _ux_utility_semaphore_delete(&dpump -> ux_host_class_dpump_semaphore);
+    _ux_host_semaphore_delete(&dpump -> ux_host_class_dpump_semaphore);
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

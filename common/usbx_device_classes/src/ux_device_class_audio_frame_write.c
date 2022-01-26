@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_frame_write                  PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed frame length check,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio_frame_write(UX_DEVICE_CLASS_AUDIO_STREAM *stream, UCHAR *frame, ULONG length)
@@ -105,7 +108,7 @@ ULONG                       frame_buffer_size;
 
     /* Check frame length.  */
     frame_buffer_size = stream -> ux_device_class_audio_stream_frame_buffer_size;
-    if (frame_buffer_size < length)
+    if ((frame_buffer_size - 8) < length)
         return(UX_ERROR);
 
     /* Check overflow!!  */

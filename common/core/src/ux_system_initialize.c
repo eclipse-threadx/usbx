@@ -69,7 +69,7 @@ UCHAR _ux_system_container_id_descriptor_structure[] =                      {1,1
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_system_initialize                               PORTABLE C      */ 
-/*                                                           6.1.3        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -112,6 +112,9 @@ UCHAR _ux_system_container_id_descriptor_structure[] =                      {1,1
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added BOS support,          */
 /*                                            resulting in version 6.1.3  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
@@ -121,8 +124,11 @@ UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memor
 UX_MEMORY_BLOCK     *memory_block;
 ALIGN_TYPE          int_memory_pool_start;
 VOID                *regular_memory_pool_end;
-UINT                status;
 ULONG               memory_pool_offset;
+#if !defined(UX_STANDALONE)
+UINT                status;
+#endif
+
 
     /* Reset memory block */
     _ux_utility_memory_set(regular_memory_pool_start, 0, regular_memory_size); /* Use case of memset is verified. */
@@ -251,10 +257,13 @@ ULONG               memory_pool_offset;
     
 #endif
 
+#if !defined(UX_STANDALONE)
+
     /* Create the Mutex object used by USBX to control critical sections.  */
-    status =  _ux_utility_mutex_create(&_ux_system -> ux_system_mutex, "ux_system_mutex");
+    status =  _ux_system_mutex_create(&_ux_system -> ux_system_mutex, "ux_system_mutex");
     if(status != UX_SUCCESS)
         return(UX_MUTEX_ERROR);
+#endif
 
     return(UX_SUCCESS);
 }

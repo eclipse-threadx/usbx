@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_transfer_request_completed       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,7 +65,7 @@
 /*                                                                        */ 
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
-/*    _ux_utility_semaphore_put             Put the signaling semaphore   */ 
+/*    _ux_host_semaphore_put                Put the signaling semaphore   */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -78,6 +78,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_transfer_request_completed(UX_TRANSFER *transfer_request)
@@ -119,7 +122,7 @@ UX_HOST_CLASS_HUB        *hub;
     
     /* Now we can set the semaphore, the enum thread will wake up and will
        call the HUB instance which has a status change.  */
-    _ux_utility_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
+    _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);
 
     /* Return to caller.  */
     return;

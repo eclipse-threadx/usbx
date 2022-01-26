@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_door_bell_wait                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,8 +58,8 @@
 /*                                                                        */ 
 /*    _ux_hcd_ehci_register_read            Read EHCI register            */ 
 /*    _ux_hcd_ehci_register_write           Write EHCI register           */ 
-/*    _ux_utility_semaphore_get             Get semaphore                 */ 
-/*    _ux_utility_semaphore_put             Release semaphore             */ 
+/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*    _ux_host_semaphore_put                Release semaphore             */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ehci_door_bell_wait(UX_HCD_EHCI *hcd_ehci)
@@ -82,7 +85,7 @@ UINT        status;
     
 
     /* Protect against multiple thread entry to this HCD.  */
-    status =  _ux_utility_semaphore_get(&hcd_ehci -> ux_hcd_ehci_protect_semaphore, UX_WAIT_FOREVER);
+    status =  _ux_host_semaphore_get(&hcd_ehci -> ux_hcd_ehci_protect_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return;
 
@@ -92,10 +95,10 @@ UINT        status;
     _ux_hcd_ehci_register_write(hcd_ehci, EHCI_HCOR_USB_COMMAND, ehci_register);
 
     /* Wait for the doorbell to be awaken.  */
-    status =  _ux_utility_semaphore_get(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore, UX_WAIT_FOREVER);
+    _ux_host_semaphore_get_norc(&hcd_ehci -> ux_hcd_ehci_doorbell_semaphore, UX_WAIT_FOREVER);
 
     /* Free the protection semaphore.  */
-    status =  _ux_utility_semaphore_put(&hcd_ehci -> ux_hcd_ehci_protect_semaphore);
+    _ux_host_semaphore_put(&hcd_ehci -> ux_hcd_ehci_protect_semaphore);
 
     /* Return to caller.  */        
     return;

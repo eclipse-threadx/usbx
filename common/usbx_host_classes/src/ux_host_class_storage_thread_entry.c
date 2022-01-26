@@ -30,12 +30,13 @@
 #include "ux_host_stack.h"
 
 
+#if !defined(UX_HOST_STANDALONE)
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_thread_entry                 PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +48,8 @@
 /*    remount a media after the storage instance has opened the media to  */
 /*    UX_MEDIA (default FileX) and the media is either not present        */
 /*    or was removed and is being re-inserted.                            */
+/*                                                                        */
+/*    It's for RTOS mode.                                                 */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -68,8 +71,8 @@
 /*    _ux_host_class_storage_media_format_capacity_get                    */
 /*                                          Get media format capacity     */
 /*    _ux_utility_memory_free               Free memory block             */
-/*    _ux_utility_semaphore_get             Get a semaphore               */
-/*    _ux_utility_semaphore_put             Put a semaphore               */
+/*    _ux_host_semaphore_get                Get a semaphore               */
+/*    _ux_host_semaphore_put                Put a semaphore               */
 /*    _ux_utility_delay_ms                  Thread sleep                  */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -90,6 +93,9 @@
 /*                                            class specific structured   */
 /*                                            data,                       */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_storage_thread_entry(ULONG class_address)
@@ -130,7 +136,7 @@ UCHAR                           *memory;
 
                 /* We need to ensure nobody is accessing this storage instance. We use
                    the storage class instance semaphore to protect.  */
-                status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                status =  _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                 if (status != UX_SUCCESS)
                     break;
 
@@ -192,7 +198,7 @@ UCHAR                           *memory;
                                     memory =  storage_media -> ux_host_class_storage_media_memory;
 
                                     /* Let UX_MEDIA (default FileX) use this instance.  */
-                                    status =  _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+                                    _ux_host_semaphore_put(&storage -> ux_host_class_storage_semaphore);
 
                                     /* Ask UX_MEDIA (default FileX) to unmount the partition.  */
                                     ux_media_close(media);
@@ -204,7 +210,7 @@ UCHAR                           *memory;
                                     ux_media_id_set(media, 0);
 
                                     /* Now, we protect the storage instance.  */
-                                    status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                    status =  _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                                     if (status != UX_SUCCESS)
                                         break;
 
@@ -214,13 +220,18 @@ UCHAR                           *memory;
 #else
 
                                 /* Check storage instance and lun number.  */
+                                if (storage_media -> ux_host_class_storage_media_status != UX_USED)
+                                    continue;
                                 if (storage_media -> ux_host_class_storage_media_storage != storage)
                                     continue;
                                 if (storage_media -> ux_host_class_storage_media_lun != storage -> ux_host_class_storage_lun)
                                     continue;
 
                                 /* Release the instance.  */
-                                status = _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+                                status = _ux_host_semaphore_put_rc(&storage -> ux_host_class_storage_semaphore);
+
+                                /* Free the storage media.  */
+                                storage_media -> ux_host_class_storage_media_status = UX_UNUSED;
 
                                 /* Invoke callback for media removal.  */
                                 if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
@@ -231,11 +242,8 @@ UCHAR                           *memory;
                                                         storage -> ux_host_class_storage_class, (VOID *) storage_media);
                                 }
 
-                                /* Free the storage media.  */
-                                storage_media -> ux_host_class_storage_media_storage = UX_NULL;
-
                                 /* Now, we protect the storage instance.  */
-                                status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                status =  _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                                 if (status != UX_SUCCESS)
                                     break;
 #endif
@@ -267,7 +275,7 @@ UCHAR                           *memory;
                                         memory =  storage_media -> ux_host_class_storage_media_memory;
 
                                         /* Let UX_MEDIA (default FileX) use this instance.  */
-                                        status =  _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+                                        _ux_host_semaphore_put(&storage -> ux_host_class_storage_semaphore);
 
                                         /* Ask UX_MEDIA (default FileX) to unmount the partition.  */
                                         ux_media_close(media);
@@ -279,7 +287,7 @@ UCHAR                           *memory;
                                         ux_media_id_set(media, 0);
 
                                         /* Now, we protect the storage instance.  */
-                                        status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                        status =  _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                                         if (status != UX_SUCCESS)
                                             break;
 
@@ -289,13 +297,18 @@ UCHAR                           *memory;
 #else
 
                                     /* Check storage instance and lun number.  */
+                                    if (storage_media -> ux_host_class_storage_media_status != UX_USED)
+                                        continue;
                                     if (storage_media -> ux_host_class_storage_media_storage != storage)
                                         continue;
                                     if (storage_media -> ux_host_class_storage_media_lun != storage -> ux_host_class_storage_lun)
                                         continue;
 
                                     /* Release the instance.  */
-                                    status = _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+                                    status = _ux_host_semaphore_put_rc(&storage -> ux_host_class_storage_semaphore);
+
+                                    /* Free the storage media.  */
+                                    storage_media -> ux_host_class_storage_media_status = UX_UNUSED;
 
                                     /* Invoke callback for media removal.  */
                                     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
@@ -306,11 +319,8 @@ UCHAR                           *memory;
                                                             storage -> ux_host_class_storage_class, (VOID *) storage_media);
                                     }
 
-                                    /* Free the storage media.  */
-                                    storage_media -> ux_host_class_storage_media_storage = UX_NULL;
-
                                     /* Now, we protect the storage instance.  */
-                                    status =  _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                    status =  _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                                     if (status != UX_SUCCESS)
                                         break;
 #endif
@@ -343,7 +353,7 @@ UCHAR                           *memory;
                                         break;
 
                                     /* Let UX_MEDIA (default FileX) use this instance.  */
-                                    _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+                                    _ux_host_semaphore_put(&storage -> ux_host_class_storage_semaphore);
 
 #if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
 
@@ -358,10 +368,11 @@ UCHAR                           *memory;
                                     {
 
                                         /* Skip used storage media slots.  */
-                                        if (storage_media -> ux_host_class_storage_media_storage != UX_NULL)
+                                        if (storage_media -> ux_host_class_storage_media_status == UX_USED)
                                             continue;
 
                                         /* Use this free storage media slot.  */
+                                        storage_media -> ux_host_class_storage_media_status = UX_USED;
                                         storage_media -> ux_host_class_storage_media_storage = storage;
 
                                         /* Save media information.  */
@@ -381,7 +392,7 @@ UCHAR                           *memory;
 #endif
 
                                     /* Now, we protect the storage instance.  */
-                                    _ux_utility_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                    status = _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                                 }
                                 break;
 
@@ -392,7 +403,7 @@ UCHAR                           *memory;
                 }
 
                 /* Other threads are now allowed to access this storage instance.  */
-                status =  _ux_utility_semaphore_put(&storage -> ux_host_class_storage_semaphore);
+                _ux_host_semaphore_put(&storage -> ux_host_class_storage_semaphore);
             }
 
             /* Move to the next entry in the storage instances link.  */
@@ -400,3 +411,4 @@ UCHAR                           *memory;
         }
     }
 }
+#endif

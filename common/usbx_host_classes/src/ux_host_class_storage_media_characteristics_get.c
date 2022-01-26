@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_characteristics_get    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_characteristics_get(UX_HOST_CLASS_STORAGE *storage)
@@ -109,7 +112,16 @@ UINT            command_length;
     inquiry_response =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH);
     if (inquiry_response == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
-    
+
+#if defined(UX_HOST_STANDALONE)
+    UX_HOST_CLASS_STORAGE_TRANS_STATE_RESET(storage);
+    storage -> ux_host_class_storage_memory = inquiry_response;
+    storage -> ux_host_class_storage_state_state = UX_HOST_CLASS_STORAGE_STATE_TRANSPORT;
+    storage -> ux_host_class_storage_state_next = UX_HOST_CLASS_STORAGE_STATE_INQUIRY_SAVE;
+    storage -> ux_host_class_storage_trans_data = inquiry_response;
+    status = UX_SUCCESS;
+    return(status);
+#else
     /* Send the command to transport layer.  */
     status =  _ux_host_class_storage_transport(storage, inquiry_response);
 
@@ -132,5 +144,6 @@ UINT            command_length;
     
     /* Return completion status.  */
     return(status);                                            
+#endif
 }
 

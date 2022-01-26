@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dpump_activate                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dpump_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -122,6 +125,12 @@ UX_SLAVE_ENDPOINT                       *endpoint;
         endpoint =  endpoint -> ux_slave_endpoint_next_endpoint;
     }
 
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Reset read/write states.  */
+    dpump -> ux_device_class_dpump_read_state = 0;
+    dpump -> ux_device_class_dpump_write_state = 0;
+#endif
 
     /* If there is a activate function call it.  */
     if (dpump -> ux_slave_class_dpump_parameter.ux_slave_class_dpump_instance_activate != UX_NULL)

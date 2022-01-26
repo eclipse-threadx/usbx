@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dpump.h                             PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +47,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -92,8 +95,20 @@ typedef struct UX_SLAVE_CLASS_DPUMP_STRUCT
     UX_SLAVE_ENDPOINT                   *ux_slave_class_dpump_bulkin_endpoint;
     UX_SLAVE_ENDPOINT                   *ux_slave_class_dpump_bulkout_endpoint;
     ULONG                               ux_slave_class_dpump_alternate_setting;
-    
-
+#if defined(UX_DEVICE_STANDALONE)
+    UCHAR                               *ux_device_class_dpump_write_buffer;
+    ULONG                               ux_device_class_dpump_write_requested_length;
+    ULONG                               ux_device_class_dpump_write_transfer_length;
+    ULONG                               ux_device_class_dpump_write_actual_length;
+    UINT                                ux_device_class_dpump_write_state;
+    UINT                                ux_device_class_dpump_write_status;
+    UCHAR                               *ux_device_class_dpump_read_buffer;
+    ULONG                               ux_device_class_dpump_read_requested_length;
+    ULONG                               ux_device_class_dpump_read_transfer_length;
+    ULONG                               ux_device_class_dpump_read_actual_length;
+    UINT                                ux_device_class_dpump_read_state;
+    UINT                                ux_device_class_dpump_read_status;
+#endif
 } UX_SLAVE_CLASS_DPUMP;
 
 /* Define Device Data Pump Class prototypes.  */
@@ -104,7 +119,11 @@ UINT    _ux_device_class_dpump_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_dpump_entry(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_dpump_read(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
                                 ULONG requested_length, ULONG *actual_length);
+UINT    _ux_device_class_dpump_read_run(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
+                                ULONG requested_length, ULONG *actual_length);
 UINT    _ux_device_class_dpump_write(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
+                                ULONG requested_length, ULONG *actual_length);
+UINT    _ux_device_class_dpump_write_run(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
                                 ULONG requested_length, ULONG *actual_length);
 UINT    _ux_device_class_dpump_change(UX_SLAVE_CLASS_COMMAND *command);
                                 
@@ -112,7 +131,9 @@ UINT    _ux_device_class_dpump_change(UX_SLAVE_CLASS_COMMAND *command);
 
 #define ux_device_class_dpump_entry                               _ux_device_class_dpump_entry
 #define ux_device_class_dpump_read                                _ux_device_class_dpump_read
+#define ux_device_class_dpump_read_run                            _ux_device_class_dpump_read_run
 #define ux_device_class_dpump_write                               _ux_device_class_dpump_write
+#define ux_device_class_dpump_write_run                           _ux_device_class_dpump_write_run
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   
