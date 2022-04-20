@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_configure                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_configure(UX_HOST_CLASS_VIDEO *video)
@@ -106,7 +109,7 @@ UX_DEVICE               *parent_device;
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CONFIGURATION_HANDLE_UNKNOWN);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        //UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONFIGURATION_HANDLE_UNKNOWN, video -> ux_host_class_video_device, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONFIGURATION_HANDLE_UNKNOWN, video -> ux_host_class_video_device, 0, 0, UX_TRACE_ERRORS, 0, 0)
     
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
      
@@ -139,6 +142,8 @@ UX_DEVICE               *parent_device;
 
     /* We have the valid configuration. Ask the USBX stack to set this configuration */        
     status =  _ux_host_stack_device_configuration_select(configuration);
+    if (status != UX_SUCCESS)
+        return(status);
 
     /* Start with interface number 0.  */
     interface_number =  0;

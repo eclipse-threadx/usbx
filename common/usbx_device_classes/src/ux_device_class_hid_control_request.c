@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_control_request                PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +84,8 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -190,7 +192,7 @@ UX_SLAVE_CLASS_HID          *hid;
 #else
 
                         /* Set an event to wake up the interrupt thread.  */
-                        _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_IDLE_RATE, UX_OR);
+                        _ux_device_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_IDLE_RATE, UX_OR);
 #endif
                     }
                 }

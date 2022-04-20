@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_transfer_abort                         PORTABLE C      */
-/*                                                           6.1.8        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,8 +57,8 @@
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    _ux_utility_virtual_address           Get virtual address           */
-/*    _ux_utility_mutex_on                  Get mutex                     */
-/*    _ux_utility_mutex_off                 Put mutex                     */
+/*    _ux_host_mutex_on                     Get mutex                     */
+/*    _ux_host_mutex_off                    Put mutex                     */
 /*    _ux_utility_delay_ms                  Delay milliseconds            */
 /*    _ux_hcd_ehci_ed_clean                 Clean TDs on ED               */
 /*                                                                        */
@@ -79,6 +79,9 @@
 /*  08-02-2021     Wen Wang                 Modified comment(s),          */
 /*                                            fixed spelling error,       */
 /*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_transfer_abort(UX_HCD_EHCI *hcd_ehci,UX_TRANSFER *transfer_request)
@@ -116,7 +119,7 @@ ULONG                           remain_count;
     {
 
         /* Lock the periodic table.  */
-        _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+        _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
 #if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)
         if (endpoint -> ux_endpoint_device -> ux_device_speed != UX_HIGH_SPEED_DEVICE)
@@ -177,7 +180,7 @@ ULONG                           remain_count;
             _ux_utility_delay_ms(1);
 
         /* Release the periodic table.  */
-        _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+        _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
     }
     else
 

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_initialize                 PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,7 +55,7 @@
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
 /*    _ux_utility_mutex_create              Create mutex                  */
-/*    _ux_utility_mutex_delete              Delete mutex                  */
+/*    _ux_device_mutex_delete               Delete mutex                  */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -66,10 +66,17 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
+#if defined(UX_DEVICE_STANDALONE)
+    UX_PARAMETER_NOT_USED(command);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UX_DEVICE_CLASS_PRINTER                 *printer;
 UX_DEVICE_CLASS_PRINTER_PARAMETER       *printer_parameter;
@@ -120,7 +127,7 @@ UINT                                    status;
     {
 
         /* Delete the endpoint IN mutex.  */
-        _ux_utility_mutex_delete(&printer -> ux_device_class_printer_endpoint_in_mutex);
+        _ux_device_mutex_delete(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
         /* Free the resources.  */
         _ux_utility_memory_free(printer);
@@ -134,4 +141,5 @@ UINT                                    status;
 
     /* Return completion status.  */
     return(UX_SUCCESS);
+#endif
 }

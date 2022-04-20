@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_acm_endpoints_get                PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            initialized timeout value,  */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_endpoints_get(UX_HOST_CLASS_CDC_ACM *cdc_acm)
@@ -97,7 +100,7 @@ UX_TRANSFER     *transfer_request;
         {                        
     
             /* Get interface endpoint.  */
-            status =  _ux_host_stack_interface_endpoint_get(cdc_acm -> ux_host_class_cdc_acm_interface, endpoint_index, &endpoint);
+            _ux_host_stack_interface_endpoint_get(cdc_acm -> ux_host_class_cdc_acm_interface, endpoint_index, &endpoint);
     
             /* Check if endpoint is bulk and OUT.  */
             if (((endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_OUT) &&
@@ -160,7 +163,7 @@ UX_TRANSFER     *transfer_request;
         {                        
     
             /* Get the endpoint handle.  */
-            status =  _ux_host_stack_interface_endpoint_get(cdc_acm -> ux_host_class_cdc_acm_interface, endpoint_index, &endpoint);
+            _ux_host_stack_interface_endpoint_get(cdc_acm -> ux_host_class_cdc_acm_interface, endpoint_index, &endpoint);
 
             /* Check if endpoint is Interrupt and IN.  */
             if (((endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_IN) &&

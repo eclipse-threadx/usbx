@@ -34,7 +34,7 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_ecm_initialize                 PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,7 +56,7 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
 /*    _ux_utility_mutex_create              Create Mutex                  */
-/*    _ux_utility_mutex_delete              Delete Mutex                  */
+/*    _ux_device_mutex_delete               Delete Mutex                  */
 /*    _ux_utility_event_flags_create        Create Flag group             */
 /*    _ux_utility_event_flags_delete        Delete Flag group             */
 /*    _ux_device_thread_create              Create Thread                 */
@@ -82,10 +82,17 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
+#if defined(UX_DEVICE_STANDALONE)
+    UX_PARAMETER_NOT_USED(command);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UX_SLAVE_CLASS_CDC_ECM                          *cdc_ecm;
 UX_SLAVE_CLASS_CDC_ECM_PARAMETER                *cdc_ecm_parameter;
@@ -266,10 +273,10 @@ UINT                                            status;
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack);
     if (cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack)
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack);
-    _ux_utility_mutex_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+    _ux_device_mutex_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
     _ux_utility_memory_free(cdc_ecm);
 
     /* Return completion status.  */
     return(status);
+#endif
 }
-

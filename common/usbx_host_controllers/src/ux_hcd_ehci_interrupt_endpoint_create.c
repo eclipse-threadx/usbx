@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_interrupt_endpoint_create              PORTABLE C      */ 
-/*                                                           6.1.6        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,8 +76,8 @@
 /*    _ux_hcd_ehci_least_traffic_list_get   Get least traffic list        */ 
 /*    _ux_hcd_ehci_poll_rate_entry_get      Get anchor for poll rate      */
 /*    _ux_utility_physical_address          Get physical address          */ 
-/*    _ux_utility_mutex_on                  Get mutex                     */
-/*    _ux_utility_mutex_off                 Put mutex                     */
+/*    _ux_host_mutex_on                     Get mutex                     */
+/*    _ux_host_mutex_off                    Put mutex                     */
 /*    _ux_hcd_ehci_periodic_descriptor_link Link/unlink descriptor        */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -101,6 +101,9 @@
 /*                                            some macro options,         */
 /*                                            filled max transfer length, */
 /*                                            resulting in version 6.1.6  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_interrupt_endpoint_create(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -245,7 +248,7 @@ UINT                            i;
     interval = (1u << interval); /* 1 (1/8ms), 2, 4, 8 (1ms)  */
 
     /* We are now updating the periodic list.  */
-    _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Get the list index with the least traffic.  */
     ed_list =  _ux_hcd_ehci_least_traffic_list_get(hcd_ehci, microframe_load, microframe_ssplit_count);
@@ -292,7 +295,7 @@ UINT                            i;
        not be error but we check it any way.  */
     if (i >= interval)
     {
-        _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+        _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
         ed -> ux_ehci_ed_status = UX_UNUSED;
         return(UX_NO_BANDWIDTH_AVAILABLE);
     }
@@ -411,7 +414,7 @@ UINT                            i;
     hcd_ehci -> ux_hcd_ehci_interrupt_ed_list = ed;
 
     /* Release the periodic list.  */
-    _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Return successful completion.  */
     return(UX_SUCCESS);         

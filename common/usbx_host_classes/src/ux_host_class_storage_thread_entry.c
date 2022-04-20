@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_thread_entry                 PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -96,6 +96,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_storage_thread_entry(ULONG class_address)
@@ -392,7 +395,7 @@ UCHAR                           *memory;
 #endif
 
                                     /* Now, we protect the storage instance.  */
-                                    status = _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
+                                    _ux_host_semaphore_get(&storage -> ux_host_class_storage_semaphore, UX_WAIT_FOREVER);
                                 }
                                 break;
 

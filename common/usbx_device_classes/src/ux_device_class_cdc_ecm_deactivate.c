@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_deactivate                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,7 +55,7 @@
 /*                                                                        */ 
 /*    _ux_device_stack_transfer_all_request_abort                         */
 /*                                          Abort all transfers           */
-/*    _ux_utility_event_flags_set           Set event flags               */
+/*    _ux_device_event_flags_set            Set event flags               */
 /*    _ux_network_driver_deactivate         Deactivate NetX USB interface */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -72,6 +72,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_deactivate(UX_SLAVE_CLASS_COMMAND *command)
@@ -120,7 +123,7 @@ UX_SLAVE_CLASS              *class;
                 _ux_device_stack_transfer_all_request_abort(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_endpoint, UX_TRANSFER_BUS_RESET);
 
             /* Wake up the bulk in thread so it will release the NetX resources used and suspend.  */
-            _ux_utility_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);                
+            _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);                
 
             /* If there is a deactivate function call it.  */
             if (cdc_ecm -> ux_slave_class_cdc_ecm_parameter.ux_slave_class_cdc_ecm_instance_deactivate != UX_NULL)

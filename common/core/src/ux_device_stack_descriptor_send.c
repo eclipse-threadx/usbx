@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_descriptor_send                    PORTABLE C      */
-/*                                                           6.1.3        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added BOS support,          */
 /*                                            resulting in version 6.1.3  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_descriptor_send(ULONG descriptor_type, ULONG request_index, ULONG host_length)
@@ -104,7 +107,7 @@ UCHAR                           *device_framework;
 UCHAR                           *device_framework_end;
 ULONG                           device_framework_length;
 ULONG                           descriptor_length;
-ULONG                           target_descriptor_length;
+ULONG                           target_descriptor_length = 0;
 UINT                            status =  UX_ERROR;
 ULONG                           length;
 UCHAR                           *string_memory;

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_write                      PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,8 +60,8 @@
 /*                                                                        */
 /*   _ux_utility_memory_copy                Copy memory                   */
 /*   _ux_device_stack_transfer_request      Transfer request              */
-/*   _ux_utility_mutex_on                   Take Mutex                    */
-/*   _ux_utility_mutex_off                  Release Mutex                 */
+/*   _ux_device_mutex_on                    Take Mutex                    */
+/*   _ux_device_mutex_off                   Release Mutex                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -72,6 +72,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_printer_write(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
@@ -112,7 +115,7 @@ UINT                        status = 0;
         return(UX_FUNCTION_NOT_SUPPORTED);
 
     /* Protect this thread.  */
-    _ux_utility_mutex_on(&printer -> ux_device_class_printer_endpoint_in_mutex);
+    _ux_device_mutex_on(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
     /* We are writing to the IN endpoint.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
@@ -128,7 +131,7 @@ UINT                        status = 0;
         status =  _ux_device_stack_transfer_request(transfer_request, 0, 0);
 
         /* Free Mutex resource.  */
-        _ux_utility_mutex_off(&printer -> ux_device_class_printer_endpoint_in_mutex);
+        _ux_device_mutex_off(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
         /* Return the status.  */
         return(status);
@@ -176,7 +179,7 @@ UINT                        status = 0;
         {
 
             /* Free Mutex resource.  */
-            _ux_utility_mutex_off(&printer -> ux_device_class_printer_endpoint_in_mutex);
+            _ux_device_mutex_off(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
             /* We had an error, abort.  */
             return(status);
@@ -184,7 +187,7 @@ UINT                        status = 0;
     }
 
     /* Free Mutex resource.  */
-    _ux_utility_mutex_off(&printer -> ux_device_class_printer_endpoint_in_mutex);
+    _ux_device_mutex_off(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
     /* Check why we got here, either completion or device was extracted.  */
     if (device -> ux_slave_device_state != UX_DEVICE_CONFIGURED)

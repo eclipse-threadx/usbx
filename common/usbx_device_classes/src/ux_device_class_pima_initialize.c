@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_initialize                    PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,11 +74,17 @@
 /*                                            refined macros names,       */
 /*                                            added cancel callback,      */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
+#if defined(UX_DEVICE_STANDALONE)
+    UX_PARAMETER_NOT_USED(command);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 UINT                                    status;
 UX_SLAVE_CLASS_PIMA                     *pima;
 UX_SLAVE_CLASS_PIMA_PARAMETER           *pima_parameter;
@@ -223,5 +229,6 @@ UX_SLAVE_CLASS                          *class;
 
     /* Return completion status.  */
     return(status);
+#endif
 }
 

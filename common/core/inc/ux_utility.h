@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_utility.h                                        PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -186,6 +189,7 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #if !defined(UX_DEVICE_STANDALONE)
 #define _ux_device_thread_create                                _ux_utility_thread_create
 #define _ux_device_thread_delete                                _ux_utility_thread_delete
+#define _ux_device_thread_entry(t)                              ((t)->tx_thread_entry)
 #define _ux_device_thread_suspend                               _ux_utility_thread_suspend
 #define _ux_device_thread_resume                                _ux_utility_thread_resume
 #define _ux_device_thread_relinquish                            _ux_utility_thread_relinquish
@@ -206,6 +210,7 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #else
 #define _ux_device_thread_create(t,name,entry,entry_param,stack,stack_size,priority,preempt_threshold,time_slice,auto_start) (UX_SUCCESS)
 #define _ux_device_thread_delete(t)                             do{}while(0)
+#define _ux_device_thread_entry(t)                              ((UX_THREAD_ENTRY)t)
 #define _ux_device_thread_suspend(t)                            do{}while(0)
 #define _ux_device_thread_resume(t)                             do{}while(0)
 #define _ux_device_thread_relinquish(t)                         do{}while(0)
@@ -230,6 +235,7 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_host_thread_create                                  _ux_utility_thread_create
 #define _ux_host_thread_created(thr)                            ((thr)->tx_thread_id != 0)
 #define _ux_host_thread_delete                                  _ux_utility_thread_delete
+#define _ux_host_thread_entry(thr)                              ((thr)->tx_thread_entry)
 #define _ux_host_thread_resume                                  _ux_utility_thread_resume
 #define _ux_host_thread_sleep                                   _ux_utility_thread_sleep
 #define _ux_host_thread_schedule_other                          _ux_utility_thread_schedule_other
@@ -255,6 +261,7 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_host_thread_create(t,name,entry,entry_param,stack,stack_size,priority,preempt_threshold,time_slice,auto_start) (UX_SUCCESS)
 #define _ux_host_thread_created(t)                              (UX_FALSE)
 #define _ux_host_thread_delete(t)                               do{}while(0)
+#define _ux_host_thread_entry(thr)                              (UX_NULL)
 #define _ux_host_thread_resume(t)                               do{}while(0)
 #define _ux_host_thread_sleep(t)                                do{}while(0)
 #define _ux_host_thread_schedule_other(t)                       do{}while(0)
@@ -266,7 +273,7 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_host_semaphore_get_norc(sem,t)                      do{}while(0)
 #define _ux_host_semaphore_put(sem)                             do{}while(0)
 #define _ux_host_semaphore_put_rc(sem)                          (UX_SUCCESS)
-#define _ux_host_mutex_create(mutex,name)                       do{}while(0)
+#define _ux_host_mutex_create(mutex,name)                       (UX_SUCCESS)
 #define _ux_host_mutex_delete(mutex)                            do{}while(0)
 #define _ux_host_mutex_off(mutex)                               do{}while(0)
 #define _ux_host_mutex_on(mutex)                                do{}while(0)

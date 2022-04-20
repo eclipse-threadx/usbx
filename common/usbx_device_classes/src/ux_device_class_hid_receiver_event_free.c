@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_receiver_event_free             PORTABLE C     */
-/*                                                            6.1.10      */
+/*                                                            6.1.11      */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid)
@@ -99,7 +102,7 @@ UCHAR                                   *next_pos;
     pos -> ux_device_class_hid_received_event_length = 0;
 
     /* Inform receiver thread to (re)start.  */
-    _ux_utility_event_flags_set(&hid -> ux_device_class_hid_event_flags_group,
+    _ux_device_event_flags_set(&hid -> ux_device_class_hid_event_flags_group,
                                 UX_DEVICE_CLASS_HID_RECEIVER_RESTART, UX_OR);
 
     /* Return event status to the user.  */

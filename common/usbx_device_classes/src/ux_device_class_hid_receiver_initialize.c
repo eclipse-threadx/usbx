@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_receiver_initialize            PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added receiver callback,    */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
@@ -163,6 +166,10 @@ UINT                                    status = UX_SUCCESS;
 
         /* Initialize uninitialize function.  */
         (*receiver) -> ux_device_class_hid_receiver_uninitialize = _ux_device_class_hid_receiver_uninitialize;
+
+        /* Initialize callback function.  */
+        (*receiver) -> ux_device_class_hid_receiver_event_callback =
+                    parameter -> ux_device_class_hid_parameter_receiver_event_callback;
 
         /* Done success.  */
         return(UX_SUCCESS);

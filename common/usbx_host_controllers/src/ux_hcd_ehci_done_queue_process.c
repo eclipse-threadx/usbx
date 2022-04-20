@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_done_queue_process                     PORTABLE C      */
-/*                                                           6.1.2        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warning,      */
 /*                                            resulting in version 6.1.2  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ehci_done_queue_process(UX_HCD_EHCI *hcd_ehci)
@@ -93,7 +96,7 @@ UX_EHCI_ED                      *start_ed;
 UX_EHCI_PERIODIC_LINK_POINTER   lp;
 
     /* We scan the active isochronous list first.  */
-    _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
     lp.itd_ptr = hcd_ehci -> ux_hcd_ehci_hsiso_scan_list;
     while(lp.itd_ptr != UX_NULL)
     {
@@ -101,12 +104,12 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
         /* Process the iTD, return next active TD.  */
         lp.itd_ptr = _ux_hcd_ehci_hsisochronous_tds_process(hcd_ehci, lp.itd_ptr);
     }
-    _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
 #if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)
 
     /* We scan the split isochronous list then.  */
-    _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
     lp.sitd_ptr = hcd_ehci -> ux_hcd_ehci_fsiso_scan_list;
     while(lp.sitd_ptr != UX_NULL)
     {
@@ -114,13 +117,13 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
         /* Process the iTD, return next active TD.  */
         lp.sitd_ptr = _ux_hcd_ehci_fsisochronous_tds_process(hcd_ehci, lp.sitd_ptr);
     }
-    _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
 #endif
 #endif
 
     /* We scan the linked interrupt list then.  */
-    _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
     ed.ed_ptr = hcd_ehci -> ux_hcd_ehci_interrupt_ed_list;
     while(ed.ed_ptr != UX_NULL)
     {
@@ -135,7 +138,7 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
         /* Next ED.  */
         ed.ed_ptr = ed.ed_ptr -> ux_ehci_ed_next_ed;
     }
-    _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Now we can parse the asynchronous list. The head ED is always empty and
        used as an anchor only.  */

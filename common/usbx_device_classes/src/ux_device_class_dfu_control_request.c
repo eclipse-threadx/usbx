@@ -40,7 +40,7 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_dfu_control_request                PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -89,6 +89,9 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*                                            added UPLOAD length check,  */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked r/w callback status,*/
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -103,6 +106,7 @@ ULONG                   request;
 ULONG                   request_value;
 ULONG                   request_length;
 ULONG                   actual_length;
+UINT                    status;
 #if defined(UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE) || (UX_DEVICE_CLASS_DFU_STATUS_MODE != 1)
 ULONG                   media_status;
 #endif
@@ -305,10 +309,18 @@ ULONG                   media_status;
                             dfu -> ux_slave_class_dfu_notify(dfu, UX_SLAVE_CLASS_DFU_NOTIFICATION_BEGIN_DOWNLOAD);
 
                             /* Write the first block to the firmware.  */
-                            dfu -> ux_slave_class_dfu_write(dfu, request_value,
+                            status = dfu -> ux_slave_class_dfu_write(dfu, request_value,
                                                                 transfer_request -> ux_slave_transfer_request_data_pointer,
                                                                 request_length,
                                                                 &actual_length);
+
+                            /* Application can actively reject and set error state.  */
+                            if (status != UX_SUCCESS)
+                            {
+                                _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
+                                _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_ERROR;
+                                break;
+                            }
 
                             /* In the system, state the DFU state machine to dfu DOWNLOAD SYNC.  */
                             _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_DNLOAD_SYNC;
@@ -396,10 +408,18 @@ ULONG                   media_status;
                     dfu -> ux_slave_class_dfu_notify(dfu, UX_SLAVE_CLASS_DFU_NOTIFICATION_BEGIN_UPLOAD);
 
                     /* Read the first block to the firmware.  */
-                    dfu -> ux_slave_class_dfu_read(dfu, request_value,
+                    status = dfu -> ux_slave_class_dfu_read(dfu, request_value,
                                                         transfer_request -> ux_slave_transfer_request_data_pointer,
                                                         request_length,
                                                         &actual_length);
+
+                    /* Application can actively reject and set error state.  */
+                    if (status != UX_SUCCESS)
+                    {
+                        _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
+                        _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_ERROR;
+                        break;
+                    }
 
                     /* In the system, state the DFU state machine to dfu UPLOAD IDLE.  */
                     _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_UPLOAD_IDLE;
@@ -537,10 +557,18 @@ ULONG                   media_status;
                     {
 
                         /* Write the next block to the firmware.  */
-                        dfu -> ux_slave_class_dfu_write(dfu, request_value,
+                        status = dfu -> ux_slave_class_dfu_write(dfu, request_value,
                                                             transfer_request -> ux_slave_transfer_request_data_pointer,
                                                             request_length,
                                                             &actual_length);
+
+                        /* Application can actively reject and set error state.  */
+                        if (status != UX_SUCCESS)
+                        {
+                            _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
+                            _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_ERROR;
+                            break;
+                        }
 
                         /* In the system, state the DFU state machine to dfu DOWNLOAD SYNC.  */
                         _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_DNLOAD_SYNC;
@@ -782,10 +810,18 @@ ULONG                   media_status;
                 /* We received a UPLOAD command with length > 0.  */
 
                 /* Read the next block from the firmware.  */
-                dfu -> ux_slave_class_dfu_read(dfu, request_value,
+                status = dfu -> ux_slave_class_dfu_read(dfu, request_value,
                                                     transfer_request -> ux_slave_transfer_request_data_pointer,
                                                     request_length,
                                                     &actual_length);
+
+                /* Application can actively reject and set error state.  */
+                if (status != UX_SUCCESS)
+                {
+                    _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
+                    _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_ERROR;
+                    break;
+                }
 
                 /* If it's short frame, switch to dfu IDLE.  */
                 if (actual_length < request_length)

@@ -28,12 +28,13 @@
 #include "ux_api.h"
 
 
+#if !defined(UX_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_event_flags_get                         PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +74,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            off in standalone build,    */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_utility_event_flags_get(UX_EVENT_FLAGS_GROUP*group_ptr, ULONG requested_flags, 
@@ -91,4 +95,4 @@ ULONG   local_actual_flags_ptr;
     /* Return completion status.  */
     return(status);
 }
-
+#endif

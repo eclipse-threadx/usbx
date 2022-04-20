@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_asynchronous_endpoint_destroy          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*                                            fixed physical and virtual  */
 /*                                            address conversion,         */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed an addressing issue,  */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_asynchronous_endpoint_destroy(UX_HCD_OHCI *hcd_ohci, UX_ENDPOINT *endpoint)
@@ -164,7 +167,10 @@ ULONG           ohci_register;
 
     /* Update the previous ED pointer in the next ED if exists.  */
     if (next_ed != UX_NULL)
+    {
+        next_ed = _ux_utility_virtual_address(next_ed);
         next_ed -> ux_ohci_ed_previous_ed =  previous_ed;
+    }
 
     /* Ensure that the potential Halt bit is removed in the head ED.  */
     value_td =  (ULONG) _ux_utility_virtual_address(ed -> ux_ohci_ed_head_td) & UX_OHCI_ED_MASK_TD;

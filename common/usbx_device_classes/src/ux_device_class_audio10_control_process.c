@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio10_control_process            PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added volume RES support,   */
 /*                                            resulting in version 6.1.6  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio10_control_process(UX_DEVICE_CLASS_AUDIO *audio,
@@ -221,6 +224,7 @@ ULONG                               i;
                 default:
                     break;
                 }
+                break;
 
             default:
                 break;

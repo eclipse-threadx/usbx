@@ -30,12 +30,13 @@
 #include "ux_host_stack.h"
 
 
+#if !defined(UX_HOST_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_deactivate                      PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +81,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -142,7 +147,7 @@ UINT                        status;
     asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_DOWN;
 
     /* Deregister this interface to the NetX USB interface broker.  */
-    status = _ux_network_driver_deactivate((VOID *) asix, asix -> ux_host_class_asix_network_handle);
+    _ux_network_driver_deactivate((VOID *) asix, asix -> ux_host_class_asix_network_handle);
     
     /* If the interrupt endpoint is defined, clean any pending transfer.  */
     if (asix -> ux_host_class_asix_interrupt_endpoint != UX_NULL)
@@ -218,4 +223,4 @@ UINT                        status;
     /* Return successful status.  */
     return(UX_SUCCESS);         
 }
-
+#endif

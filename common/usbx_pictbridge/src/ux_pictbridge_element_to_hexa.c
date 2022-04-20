@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_element_to_hexa                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_element_to_hexa(UCHAR *element, ULONG *hexa_value)
@@ -101,7 +104,7 @@ UINT                    status;
     {
     
         /* Shift the previous content by 1 nibble.  */
-        local_hexa_value = local_hexa_value << 4;
+        local_hexa_value = (local_hexa_value << 4) & 0xFFFFFFFFu;
     
         /* Get the element content.  */
         element_content = *element;

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_asix.h                                PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -67,8 +70,15 @@ extern   "C" {
 #endif  
 
 
+#if !defined(UX_HOST_STANDALONE)
 #include "nx_api.h"
 #include "ux_network_driver.h"
+#else
+
+/* Assume NX things for compiling.  */
+#define NX_PACKET                                   VOID*
+#define NX_PACKET_POOL                              VOID*
+#endif
 
 /* Define to check if NetX preserved header size is compatible with ASIX.  */
 /* #define UX_HOST_CLASS_ASIX_HEADER_CHECK_ENABLE */
@@ -363,9 +373,11 @@ typedef struct UX_HOST_CLASS_ASIX_STRUCT
     UX_INTERFACE    *ux_host_class_asix_interface;
     UINT            ux_host_class_asix_instance_status;
     UINT            ux_host_class_asix_state;
+
     UX_SEMAPHORE    ux_host_class_asix_semaphore;
     UX_SEMAPHORE    ux_host_class_asix_interrupt_notification_semaphore;
     UX_THREAD       ux_host_class_asix_thread;
+
     UCHAR           *ux_host_class_asix_thread_stack;
     ULONG           ux_host_class_asix_notification_count;
     ULONG           ux_host_class_asix_primary_phy_id;
@@ -377,9 +389,11 @@ typedef struct UX_HOST_CLASS_ASIX_STRUCT
     ULONG           ux_host_class_asix_speed_selected;
     ULONG           ux_host_class_asix_device_state;
     ULONG           ux_host_class_asix_link_state;
+
     NX_PACKET       *ux_host_class_asix_xmit_queue;
     NX_PACKET       *ux_host_class_asix_receive_queue;
     NX_PACKET_POOL  ux_host_class_asix_packet_pool;
+
     UCHAR           *ux_host_class_asix_pool_memory;
     UCHAR           ux_host_class_asix_node_id[UX_HOST_CLASS_ASIX_NODE_ID_LENGTH];
     VOID            (*ux_host_class_asix_device_status_change_callback)(struct UX_HOST_CLASS_ASIX_STRUCT *asix, 

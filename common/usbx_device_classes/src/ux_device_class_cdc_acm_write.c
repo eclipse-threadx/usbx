@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_write                      PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -63,8 +63,8 @@
 /*                                                                        */ 
 /*   _ux_utility_memory_copy                Copy memory                   */ 
 /*   _ux_device_stack_transfer_request      Transfer request              */ 
-/*   _ux_utility_mutex_on                   Take Mutex                    */ 
-/*   _ux_utility_mutex_off                  Release Mutex                 */ 
+/*   _ux_device_mutex_on                    Take Mutex                    */ 
+/*   _ux_device_mutex_off                   Release Mutex                 */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -84,6 +84,8 @@
 /*                                            resulting in version 6.1.9  */
 /*  01-31-2022x    Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
@@ -141,7 +143,7 @@ UINT                        status = 0;
     }
 
     /* Protect this thread.  */
-    _ux_utility_mutex_on(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
+    _ux_device_mutex_on(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
         
     /* We are writing to the IN endpoint.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
@@ -157,7 +159,7 @@ UINT                        status = 0;
         status =  _ux_device_stack_transfer_request(transfer_request, 0, 0);
 
         /* Free Mutex resource.  */
-        _ux_utility_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
+        _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
 
         /* Return the status.  */
         return(status);
@@ -208,7 +210,7 @@ UINT                        status = 0;
             {
              
                 /* Free Mutex resource.  */
-                _ux_utility_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
+                _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
                 
                 /* We had an error, abort.  */
                 return(status);
@@ -218,7 +220,7 @@ UINT                        status = 0;
 
     
     /* Free Mutex resource.  */
-    _ux_utility_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
+    _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
 
     /* Check why we got here, either completion or device was extracted.  */
     if (device -> ux_slave_device_state != UX_DEVICE_CONFIGURED)

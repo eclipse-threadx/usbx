@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_hexa_to_element                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_hexa_to_element(ULONG hexa_value, UCHAR *element)
@@ -118,7 +121,14 @@ ULONG                   element_shift;
         element_length++;
 
         /* Continue shifting by one nibble.  */
-        element_shift = element_shift - 4;        
+        if (element_shift >= 4)
+        {
+            element_shift = element_shift - 4;
+        }
+        else
+        {
+            break;
+        }
     }       
 
     /* Operation was successful.  */

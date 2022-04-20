@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_remote_control_activate          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed clients management,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_remote_control_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -79,6 +82,7 @@ UINT  _ux_host_class_hid_remote_control_activate(UX_HOST_CLASS_HID_CLIENT_COMMAN
 UX_HOST_CLASS_HID_REPORT_CALLBACK        call_back;
 UX_HOST_CLASS_HID                        *hid;
 UX_HOST_CLASS_HID_CLIENT                 *hid_client;
+UX_HOST_CLASS_HID_CLIENT_REMOTE_CONTROL  *client_remote_control;
 UX_HOST_CLASS_HID_REMOTE_CONTROL         *remote_control_instance;
 UINT                                     status = UX_SUCCESS;
 
@@ -86,15 +90,18 @@ UINT                                     status = UX_SUCCESS;
     /* Get the instance to the HID class.  */
     hid =  command -> ux_host_class_hid_client_command_instance;
 
-    /* And of the HID client.  */
-    hid_client =  hid -> ux_host_class_hid_client;
-
-    /* Get some memory for both the HID class instance of this client
+    /* Get some memory for both the HID class instance and copy of this client
        and for the callback.  */
-    remote_control_instance =  (UX_HOST_CLASS_HID_REMOTE_CONTROL *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
-                                                                                                sizeof(UX_HOST_CLASS_HID_REMOTE_CONTROL));
-    if (remote_control_instance == UX_NULL)
+    client_remote_control =  (UX_HOST_CLASS_HID_CLIENT_REMOTE_CONTROL *)
+                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
+                                sizeof(UX_HOST_CLASS_HID_CLIENT_REMOTE_CONTROL));
+    if (client_remote_control == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
+
+    /* Get client instance and client copy.  */
+    remote_control_instance = &client_remote_control -> ux_host_class_hid_client_remote_control_remote_control;
+    hid_client = &client_remote_control -> ux_host_class_hid_client_remote_control_client;
+    _ux_utility_memory_copy(hid_client, hid -> ux_host_class_hid_client, sizeof(UX_HOST_CLASS_HID_CLIENT)); /* Use case of memcpy is verified. */
 
     /* Attach the remote control instance to the client instance.  */
     hid_client -> ux_host_class_hid_client_local_instance =  (VOID *) remote_control_instance;
@@ -147,6 +154,9 @@ UINT                                     status = UX_SUCCESS;
         if (status == UX_SUCCESS)
         {
 
+            /* Use out copy of client.  */
+            hid -> ux_host_class_hid_client = hid_client;
+
             /* If trace is enabled, insert this event into the trace buffer.  */
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_HID_REMOTE_CONTROL_ACTIVATE, hid, remote_control_instance, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
@@ -165,9 +175,6 @@ UINT                                     status = UX_SUCCESS;
     }
 
     /* We are here when there is error.  */
-
-    /* Detach instance.  */
-    hid_client -> ux_host_class_hid_client_local_instance = UX_NULL;
 
     /* Free usage array.  */
     if (remote_control_instance -> ux_host_class_hid_remote_control_usage_array)

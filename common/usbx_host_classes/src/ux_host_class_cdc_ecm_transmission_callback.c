@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_transmission_callback        PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,10 +77,16 @@
 /*                                            use pre-calculated value    */
 /*                                            instead of wMaxPacketSize,  */
 /*                                            resulting in version 6.1.9  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_transmission_callback(UX_TRANSFER *transfer_request)
 {
+#if defined(UX_HOST_STANDALONE)
+    UX_PARAMETER_NOT_USED(transfer_request);
+#else
 
 UX_HOST_CLASS_CDC_ECM           *cdc_ecm;
 NX_PACKET                       *current_packet;
@@ -183,4 +189,5 @@ UCHAR                           *packet_header;
 
     /* There is no status to be reported back to the stack.  */
     return; 
+#endif
 }

@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_ecm.h                           PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -49,6 +49,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -65,8 +68,28 @@ extern   "C" {
 
 #endif  
 
+#if !defined(UX_DEVICE_STANDALONE)
 #include "nx_api.h"
 #include "ux_network_driver.h"
+#else
+
+/* Assume NX definitions for compiling.  */
+#define NX_PACKET                                               VOID*
+/*
+UINT  _ux_network_driver_deactivate(VOID *ux_instance, VOID *ux_network_handle);
+VOID  _ux_network_driver_link_up(VOID *ux_network_handle);
+VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
+*/
+#ifndef _ux_network_driver_deactivate
+#define _ux_network_driver_deactivate(a,b)                      do {} while(0)
+#endif
+#ifndef _ux_network_driver_link_up
+#define _ux_network_driver_link_up(a)                           do {} while(0)
+#endif
+#ifndef _ux_network_driver_link_down
+#define _ux_network_driver_link_down(a)                         do {} while(0)
+#endif
+#endif
 
 /* Define generic CDC_ECM equivalences.  */
 #define UX_DEVICE_CLASS_CDC_ECM_CLASS_COMMUNICATION_CONTROL                 0x02
@@ -289,26 +312,33 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
     ULONG                                   ux_slave_class_cdc_ecm_ethernet_multicast_filter;
     ULONG                                   ux_slave_class_cdc_ecm_ethernet_power_management_filter;
     ULONG                                   ux_slave_class_cdc_ecm_ethernet_packet_filter;
-    UX_EVENT_FLAGS_GROUP                    ux_slave_class_cdc_ecm_event_flags_group;
     UCHAR                                   ux_slave_class_cdc_ecm_local_node_id[UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH];
     UCHAR                                   ux_slave_class_cdc_ecm_remote_node_id[UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH];
-    NX_IP                                   *ux_slave_class_cdc_ecm_nx_ip;
     ULONG                                   ux_slave_class_cdc_ecm_nx_ip_address;
     ULONG                                   ux_slave_class_cdc_ecm_nx_ip_network_mask;
+    UCHAR                                   *ux_slave_class_cdc_ecm_pool_memory;
+
+#if !defined(UX_DEVICE_STANDALONE)
+    NX_IP                                   *ux_slave_class_cdc_ecm_nx_ip;
     NX_INTERFACE                            *ux_slave_class_cdc_ecm_nx_interface;
     NX_PACKET                               *ux_slave_class_cdc_ecm_xmit_queue;
     NX_PACKET                               *ux_slave_class_cdc_ecm_xmit_queue_tail;
     NX_PACKET                               *ux_slave_class_cdc_ecm_receive_queue;
-    UCHAR                                   *ux_slave_class_cdc_ecm_pool_memory;
     NX_PACKET_POOL                          ux_slave_class_cdc_ecm_packet_pool;
+#endif
+
+#if !defined(UX_DEVICE_STANDALONE)
+    UX_EVENT_FLAGS_GROUP                    ux_slave_class_cdc_ecm_event_flags_group;
     UX_THREAD                               ux_slave_class_cdc_ecm_bulkin_thread;
     UX_THREAD                               ux_slave_class_cdc_ecm_bulkout_thread;
     UX_THREAD                               ux_slave_class_cdc_ecm_interrupt_thread;
+    UX_MUTEX                                ux_slave_class_cdc_ecm_mutex;
     UCHAR                                   *ux_slave_class_cdc_ecm_bulkin_thread_stack;
     UCHAR                                   *ux_slave_class_cdc_ecm_bulkout_thread_stack;
     UCHAR                                   *ux_slave_class_cdc_ecm_interrupt_thread_stack;
+#endif
+
     ULONG                                   ux_slave_class_cdc_ecm_link_state;
-    UX_MUTEX                                ux_slave_class_cdc_ecm_mutex;
     VOID                                    *ux_slave_class_cdc_ecm_network_handle;
     
 } UX_SLAVE_CLASS_CDC_ECM;

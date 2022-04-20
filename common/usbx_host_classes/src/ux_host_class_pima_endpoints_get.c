@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_endpoints_get                   PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*                                            use pre-calculated value    */
 /*                                            instead of wMaxPacketSize,  */
 /*                                            resulting in version 6.1.9  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_endpoints_get(UX_HOST_CLASS_PIMA *pima)
@@ -210,7 +213,7 @@ UX_TRANSFER     *transfer_request;
                 {
                     
                     /* The transfer on the interrupt endpoint can be started.  */
-                    status =  _ux_host_stack_transfer_request(transfer_request);
+                    _ux_host_stack_transfer_request(transfer_request);
 
                 }
     

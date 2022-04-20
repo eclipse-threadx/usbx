@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid_remote_control.h                  PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +47,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed clients management,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -85,6 +88,14 @@ typedef struct UX_HOST_CLASS_HID_REMOTE_CONTROL_STRUCT
     ULONG           *ux_host_class_hid_remote_control_usage_array_head;
     ULONG           *ux_host_class_hid_remote_control_usage_array_tail;
 } UX_HOST_CLASS_HID_REMOTE_CONTROL;
+
+typedef struct UX_HOST_CLASS_HID_CLIENT_REMOTE_CONTROL_STRUCT
+{
+    UX_HOST_CLASS_HID_REMOTE_CONTROL
+                    ux_host_class_hid_client_remote_control_remote_control;
+    UX_HOST_CLASS_HID_CLIENT
+                    ux_host_class_hid_client_remote_control_client;
+} UX_HOST_CLASS_HID_CLIENT_REMOTE_CONTROL;
 
 /* Define HID Remote Control Class function prototypes.  */
 

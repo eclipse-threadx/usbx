@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_initialize                     PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -88,7 +91,7 @@ UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)
 UX_SLAVE_CLASS_DFU                      *dfu;
 UX_SLAVE_CLASS_DFU_PARAMETER            *dfu_parameter;
 UX_SLAVE_CLASS                          *class;
-UINT                                    status;
+UINT                                    status = UX_DESCRIPTOR_CORRUPTED;
 UX_DFU_FUNCTIONAL_DESCRIPTOR            dfu_functional_descriptor;
 UCHAR                                   *dfu_framework; 
 ULONG                                   dfu_framework_length;
@@ -132,7 +135,6 @@ ULONG                                   descriptor_length;
     dfu_framework_length =  _ux_system_slave -> ux_system_slave_dfu_framework_length;
     
     /* Parse the device framework and locate interfaces and endpoint descriptor(s).  */
-    status = UX_DESCRIPTOR_CORRUPTED;
     while (dfu_framework_length != 0)
     {
 

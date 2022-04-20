@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_prolific_setup                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_prolific_setup(UX_HOST_CLASS_PROLIFIC *prolific)
@@ -360,7 +363,7 @@ UINT                        status;
     transfer_request -> ux_transfer_request_value               =  UX_HOST_CLASS_PROLIFIC_COMMAND_REG_CONFIGURE;
 
     /* Send request to HCD layer.  */
-    status =  _ux_host_stack_transfer_request(transfer_request);
+    _ux_host_stack_transfer_request(transfer_request);
 
 
     /* Reset upstream data pipes part 1.  */

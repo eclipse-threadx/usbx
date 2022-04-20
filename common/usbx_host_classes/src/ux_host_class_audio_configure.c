@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_configure                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_configure(UX_HOST_CLASS_AUDIO *audio)
@@ -135,6 +138,17 @@ UX_DEVICE               *parent_device;
 
     /* We have the valid configuration. Ask the USBX stack to set this configuration */        
     status =  _ux_host_stack_device_configuration_select(configuration);
+    if (status != UX_SUCCESS)
+    {
+
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, status);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, status, audio -> ux_host_class_audio_device, 0, 0, UX_TRACE_ERRORS, 0, 0)
+    
+        return(status);
+    }
 
     /* Start with interface number 0.  */
     interface_number =  0;

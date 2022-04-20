@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_thread                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_pictbridge_dpshost_thread(ULONG parameter)
@@ -178,7 +181,8 @@ UINT                    status;
                     
                     /* We have received an order to print one or more picture.  */
                     _ux_pictbridge_dpshost_startjob(pictbridge);
-                
+                    break;
+
                 default                                             :
                     break;
             }            

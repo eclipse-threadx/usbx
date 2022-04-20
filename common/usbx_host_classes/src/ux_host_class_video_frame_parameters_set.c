@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_frame_parameters_set           PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_frame_parameters_set(UX_HOST_CLASS_VIDEO *video, ULONG frame_format, ULONG width, ULONG height, ULONG frame_interval)
@@ -187,7 +191,8 @@ ULONG                                           max_payload_size;
 
         /* Check if the frame interval is valid.  */
         if (frame_interval >= min_frame_interval && frame_interval <= max_frame_interval &&
-           ((frame_interval - min_frame_interval) % frame_interval_step == 0))
+           ((frame_interval_step == 0) ||
+            (frame_interval - min_frame_interval) % frame_interval_step == 0))
         {
 
             /* Save the frame interval.  */
@@ -218,6 +223,8 @@ ULONG                                           max_payload_size;
 
     /* Protect thread reentry to this instance.  */
     status =  _ux_host_semaphore_get(&video -> ux_host_class_video_semaphore, UX_WAIT_FOREVER);
+    if (status != UX_SUCCESS)
+        return(status);
 
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &video -> ux_host_class_video_device -> ux_device_control_endpoint;
@@ -232,7 +239,7 @@ ULONG                                           max_payload_size;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Return error.  */
         return(UX_MEMORY_INSUFFICIENT);

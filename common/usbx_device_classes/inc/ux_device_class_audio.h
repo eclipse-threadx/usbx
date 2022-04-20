@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio.h                             PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,6 +53,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added feedback support,     */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -365,14 +368,18 @@ typedef struct UX_DEVICE_CLASS_AUDIO_STREAM_STRUCT
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
     UX_SLAVE_ENDPOINT                       *ux_device_class_audio_stream_feedback;
 
+#if !defined(UX_DEVICE_STANDALONE)
     UCHAR                                   *ux_device_class_audio_stream_feedback_thread_stack;
     UX_THREAD                                ux_device_class_audio_stream_feedback_thread;
+#endif
 #endif
 
     UX_DEVICE_CLASS_AUDIO_STREAM_CALLBACKS   ux_device_class_audio_stream_callbacks;
 
+#if !defined(UX_DEVICE_STANDALONE)
     UCHAR                                   *ux_device_class_audio_stream_thread_stack;
     UX_THREAD                                ux_device_class_audio_stream_thread;
+#endif
 
     UCHAR                                   *ux_device_class_audio_stream_buffer;
     ULONG                                    ux_device_class_audio_stream_buffer_size;

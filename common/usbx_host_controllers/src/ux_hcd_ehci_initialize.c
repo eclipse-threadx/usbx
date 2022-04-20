@@ -60,7 +60,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_initialize                             PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -90,8 +90,8 @@
 /*    _ux_utility_physical_address          Get physical address          */
 /*    _ux_host_semaphore_create             Create semaphore              */
 /*    _ux_host_semaphore_delete             Delete semaphore              */
-/*    _ux_utility_mutex_create              Create mutex                  */
-/*    _ux_utility_mutex_delete              Delete mutex                  */
+/*    _ux_host_mutex_create                 Create mutex                  */
+/*    _ux_host_mutex_delete                 Delete mutex                  */
 /*    _ux_utility_set_interrupt_handler     Set interrupt handler         */
 /*    _ux_utility_delay_ms                  Delay ms                      */
 /*                                                                        */
@@ -114,10 +114,17 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_initialize(UX_HCD *hcd)
 {
+#if defined(UX_HOST_STANDALONE)
+    UX_PARAMETER_NOT_USED(hcd);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UX_HCD_EHCI             *hcd_ehci;
 UX_EHCI_ED              *ed;
@@ -329,7 +336,7 @@ UINT                    status = UX_SUCCESS;
         _ux_hcd_ehci_register_write(hcd_ehci, EHCI_HCOR_CONFIG_FLAG, UX_EHCI_ROUTE_TO_LOCAL_HC);
 
         /* Create mutex for periodic list modification.  */
-        status = _ux_utility_mutex_create(&hcd_ehci -> ux_hcd_ehci_periodic_mutex, "ehci_periodic_mutex");
+        status = _ux_host_mutex_create(&hcd_ehci -> ux_hcd_ehci_periodic_mutex, "ehci_periodic_mutex");
         if (status != UX_SUCCESS)
             status = (UX_MUTEX_ERROR);
     }
@@ -420,7 +427,7 @@ UINT                    status = UX_SUCCESS;
         _ux_utility_memory_free(hcd_ehci -> ux_hcd_ehci_hsiso_td_list);
 #endif
     if (hcd_ehci -> ux_hcd_ehci_periodic_mutex.tx_mutex_id != 0)
-        _ux_utility_mutex_delete(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+        _ux_host_mutex_delete(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
     if (hcd_ehci -> ux_hcd_ehci_protect_semaphore.tx_semaphore_id != 0)
         _ux_host_semaphore_delete(&hcd_ehci -> ux_hcd_ehci_protect_semaphore);
     if (hcd_ehci -> ux_hcd_ehci_doorbell_semaphore.tx_semaphore_id != 0)
@@ -429,5 +436,5 @@ UINT                    status = UX_SUCCESS;
 
     /* Return error status code.  */
     return(status);
+#endif
 }
-

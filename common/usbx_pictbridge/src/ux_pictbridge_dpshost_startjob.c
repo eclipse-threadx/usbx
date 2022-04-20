@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_startjob                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_startjob(UX_PICTBRIDGE *pictbridge)
@@ -180,7 +183,7 @@ UCHAR                               *object_buffer;
 
             
             /* Close the object.  */
-            status = _ux_host_class_pima_object_close(pima, pima_session, 
+            _ux_host_class_pima_object_close(pima, pima_session,
                                                 printinfo -> ux_pictbridge_printinfo_fileid, &pima_object);
             /* Return an error.  */
              return(UX_MEMORY_INSUFFICIENT);
@@ -269,7 +272,7 @@ UCHAR                               *object_buffer;
          }    
         
          /* Close the object.  */
-         status = _ux_host_class_pima_object_close(pima, pima_session, 
+         status = _ux_host_class_pima_object_close(pima, pima_session,
                                                 printinfo -> ux_pictbridge_printinfo_fileid, &pima_object);
         /* Check error code.  */
         if (status != UX_SUCCESS)

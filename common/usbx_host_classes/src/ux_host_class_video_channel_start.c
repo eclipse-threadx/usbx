@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_channel_start                  PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_channel_start(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_PARAMETER_CHANNEL *video_parameter)
@@ -119,7 +122,7 @@ UINT                    max_payload_size;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Return error.  */        
         return(UX_MEMORY_INSUFFICIENT);
@@ -255,7 +258,7 @@ UINT                    max_payload_size;
                                                 _ux_utility_memory_free(control_buffer);
 
                                                 /* Unprotect thread reentry to this instance.  */
-                                                status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
+                                                _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
                     
                                                 /* Return successful completion.  */
                                                 return(UX_SUCCESS);             

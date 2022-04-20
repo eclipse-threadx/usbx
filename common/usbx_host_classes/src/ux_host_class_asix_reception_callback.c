@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_reception_callback              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,11 +73,17 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_reception_callback (UX_TRANSFER *transfer_request)
 {
-                                
+#if defined(UX_HOST_STANDALONE)
+    UX_PARAMETER_NOT_USED(transfer_request);
+#else
+
 UX_HOST_CLASS_ASIX              *asix;
 NX_PACKET                       *packet;
 ULONG                           ip_given_length;
@@ -156,5 +162,5 @@ UINT                            status;
     }
     /* There is no status to be reported back to the stack.  */
     return; 
+#endif
 }
-

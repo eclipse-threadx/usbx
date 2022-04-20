@@ -30,12 +30,13 @@
 #include "ux_host_stack.h"
 
 
+#if !defined(UX_HOST_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_deactivate                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +85,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -145,7 +150,7 @@ UX_TRANSFER                 *transfer_request;
         UX_RESTORE
 
         /* Wait for the transfer to be armed, or possibly an error. The CDC-ECM thread will wake us up.  */
-        _ux_host_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
+        _ux_host_semaphore_get_norc(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish_semaphore, UX_WAIT_FOREVER);
 
         /* We're no longer waiting.  */
         cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_transfer_waiting_for_check_and_arm_to_finish =  UX_FALSE;
@@ -158,7 +163,7 @@ UX_TRANSFER                 *transfer_request;
     }
 
     /* Now we can abort the transfer.  */
-    _ux_host_stack_transfer_request_abort(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_endpoint -> ux_endpoint_transfer_request);
+    _ux_host_stack_transfer_request_abort(transfer_request);
 
     /* De-register this interface to the NetX USB interface broker.  */
     _ux_network_driver_deactivate((VOID *) cdc_ecm, cdc_ecm -> ux_host_class_cdc_ecm_network_handle);
@@ -212,4 +217,4 @@ UX_TRANSFER                 *transfer_request;
     /* Return successful status.  */
     return(UX_SUCCESS);
 }
-
+#endif

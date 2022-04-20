@@ -29,12 +29,14 @@
 #include "ux_host_class_asix.h"
 #include "ux_host_stack.h"
 
+
+#if !defined(UX_HOST_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_thread                          PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +83,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_thread(ULONG parameter)
@@ -322,7 +328,16 @@ ULONG                        physical_address_lsw;
                                         &asix -> ux_host_class_asix_network_handle, 
                                         physical_address_msw,
                                         physical_address_lsw);
-            
+            if (status != UX_SUCCESS)
+            {
+
+                /* Unprotect thread reentry to this instance.  */
+                _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
+
+                /* Return completion status.  */
+                return;
+            }
+
             /* Now the link is up.  */
             asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_UP;
 
@@ -424,4 +439,4 @@ ULONG                        physical_address_lsw;
         }
     }    
 }
-
+#endif

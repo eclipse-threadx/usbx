@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_write                          PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_write(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST *audio_transfer_request)
@@ -112,7 +115,7 @@ UINT        status;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+        _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_AUDIO_WRONG_INTERFACE);
@@ -134,7 +137,7 @@ UINT        status;
     status =  _ux_host_class_audio_transfer_request(audio, audio_transfer_request);
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+    _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
     /* Return completion status.  */
     return(status);

@@ -98,7 +98,7 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_keyboard_activate                PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -148,6 +148,9 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed clients management,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_keyboard_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -160,6 +163,7 @@ UX_HOST_CLASS_HID_CLIENT_REPORT         client_report;
 UX_HOST_CLASS_HID_REPORT_GET_ID         report_id;
 UX_HOST_CLASS_HID                       *hid;
 UX_HOST_CLASS_HID_CLIENT                *hid_client;
+UX_HOST_CLASS_HID_CLIENT_KEYBOARD       *client_keyboard;
 UX_HOST_CLASS_HID_KEYBOARD              *keyboard_instance;
 ULONG                                   event_process_memory_size;
 UINT                                    status = UX_SUCCESS;
@@ -171,15 +175,21 @@ UX_HOST_CLASS_HID_FIELD                 *field;
     /* Get the instance to the HID class.  */
     hid =  command -> ux_host_class_hid_client_command_instance;
 
-    /* And of the HID client.  */
-    hid_client =  hid -> ux_host_class_hid_client;
-
-    /* Get some memory for both the HID class instance of this client
+    /* Get some memory for both the HID class instance and copy of this client
        and for the callback.  */
-    keyboard_instance =  (UX_HOST_CLASS_HID_KEYBOARD *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
-                                                                                        sizeof(UX_HOST_CLASS_HID_KEYBOARD));
-    if (keyboard_instance == UX_NULL)
+    client_keyboard =  (UX_HOST_CLASS_HID_CLIENT_KEYBOARD *)
+                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
+                                    sizeof(UX_HOST_CLASS_HID_CLIENT_KEYBOARD));
+    if (client_keyboard == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
+
+    /* Use allocated memory.
+     * - create a client copy.
+     * - get keyboard instance.
+     */
+    keyboard_instance = &client_keyboard -> ux_host_class_hid_client_keyboard_keyboard;
+    hid_client = &client_keyboard -> ux_host_class_hid_client_keyboard_client;
+    _ux_utility_memory_copy(hid_client, hid -> ux_host_class_hid_client, sizeof(UX_HOST_CLASS_HID_CLIENT)); /* Use case of memcpy is verified. */
 
     /* Attach the remote control instance to the client instance.  */
     hid_client -> ux_host_class_hid_client_local_instance =  (VOID *) keyboard_instance;
@@ -255,8 +265,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         UX_UTILITY_MULC_SAFE(keyboard_instance -> ux_host_class_hid_keyboard_key_count, 6, event_process_memory_size, status);
 
         /* Calculation overflow check.  */
-        if (status != UX_SUCCESS)
-            return(status);
+        if (status == UX_SUCCESS)
 #else
 
         /* We reserve 3 bytes for lock keys, 3 for processing.  */
@@ -266,11 +275,14 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         event_process_memory_size = keyboard_instance -> ux_host_class_hid_keyboard_key_count * 2;
 #endif
 
+        {
+
         /* Allocate memory for usages states.  */
         keyboard_instance -> ux_host_class_hid_keyboard_key_state = (UCHAR *)
                             _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, event_process_memory_size);
         if (keyboard_instance -> ux_host_class_hid_keyboard_key_state == UX_NULL)
             status = UX_MEMORY_INSUFFICIENT;
+    }
     }
 
     /* If we are OK, go on.  */
@@ -351,6 +363,9 @@ UX_HOST_CLASS_HID_FIELD                 *field;
             - SET_IDLE(KEYs, 0)
             - _periodic_report_start()  */
         keyboard_instance -> ux_host_class_hid_keyboard_enum_state = UX_STATE_WAIT;
+
+        /* It's fine, replace client with our copy.  */
+        hid -> ux_host_class_hid_client = hid_client;
         return(status);
 #else
 
@@ -404,6 +419,9 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         if (status == UX_SUCCESS)
         {
 
+            /* It's fine, replace client copy.  */
+            hid -> ux_host_class_hid_client = hid_client;
+
             /* If all is fine and the device is mounted, we may need to inform the application
                if a function has been programmed in the system structure.  */
             if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
@@ -426,9 +444,6 @@ UX_HOST_CLASS_HID_FIELD                 *field;
     }
 
     /* We are here if there is error.  */
-
-    /* Detach instance.  */
-    hid_client -> ux_host_class_hid_client_local_instance = UX_NULL;
 
     /* Free usage state.  */
     if (keyboard_instance -> ux_host_class_hid_keyboard_key_state)
@@ -456,4 +471,3 @@ UX_HOST_CLASS_HID_FIELD                 *field;
     /* Return completion status.  */
     return(status);
 }
-

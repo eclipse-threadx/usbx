@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_uninitialize                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,8 @@
 /*                                            added standalone support,   */
 /*                                            added interrupt OUT support,*/
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -107,7 +109,7 @@ UX_SLAVE_CLASS                          *class;
 #if !defined(UX_DEVICE_STANDALONE)
 
     /* Free read mutex.  */
-    _ux_utility_mutex_delete(&hid -> ux_device_class_hid_read_mutex);
+    _ux_device_mutex_delete(&hid -> ux_device_class_hid_read_mutex);
 #endif
 
     /* Uninitialize receiver.  */

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_regular_td_obtain                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,8 +55,8 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    _ux_utility_memory_set                Set memory block              */ 
-/*    _ux_utility_mutex_on                  Get protection mutex          */ 
-/*    _ux_utility_mutex_off                 Release protection mutex      */ 
+/*    _ux_host_mutex_on                     Get protection mutex          */
+/*    _ux_host_mutex_off                    Release protection mutex      */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -71,6 +71,9 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_TD  *_ux_hcd_ehci_regular_td_obtain(UX_HCD_EHCI *hcd_ehci)
@@ -82,7 +85,7 @@ ULONG           td_element;
 
 
     /* Get the mutex as this is a critical section.  */
-    _ux_utility_mutex_on(&_ux_system -> ux_system_mutex);
+    _ux_host_mutex_on(&_ux_system -> ux_system_mutex);
 
     /* Start the search from the beginning of the list.  */
     td =  hcd_ehci -> ux_hcd_ehci_td_list;
@@ -105,7 +108,7 @@ ULONG           td_element;
             td -> ux_ehci_td_alternate_link_pointer =  (UX_EHCI_TD *) td_element;
             
             /* Release the protection.  */
-            _ux_utility_mutex_off(&_ux_system -> ux_system_mutex);
+            _ux_host_mutex_off(&_ux_system -> ux_system_mutex);
 
             /* Success, return TD pointer.  */
             return(td);
@@ -118,7 +121,7 @@ ULONG           td_element;
     /* There is no available TD in the TD list.  */
 
     /* Release protection.  */
-    _ux_utility_mutex_off(&_ux_system -> ux_system_mutex);
+    _ux_host_mutex_off(&_ux_system -> ux_system_mutex);
 
     /* Error, return a null.  */
     return(UX_NULL);

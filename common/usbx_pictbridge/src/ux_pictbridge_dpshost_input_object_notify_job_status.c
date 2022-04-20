@@ -36,7 +36,7 @@
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_input_object_notify_job_status               */
 /*                                                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*                                                                        */ 
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -74,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_pictbridge_dpshost_input_object_notify_job_status(UX_PICTBRIDGE *pictbridge, 
@@ -111,7 +114,10 @@ UINT                                 status = UX_SUCCESS;
     /* Check length to go.  */
     object_length += 7;
     if (object_length > UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER)
+    {
         status = UX_MEMORY_INSUFFICIENT;
+        return (status);
+    }
 
     /* Insert xxx decimal.  */
     status = _ux_pictbridge_hexa_to_decimal_string(printinfo -> ux_pictbridge_printinfo_current_page, pima_object_buffer, UX_PICTBRIDGE_LEADING_ZERO_ON, 3);

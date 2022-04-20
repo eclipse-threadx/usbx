@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_transfer_buffer_add            PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_buffer_add(UX_HOST_CLASS_VIDEO *video, UCHAR* buffer)
@@ -116,7 +119,7 @@ ULONG           packet_size;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_VIDEO_WRONG_INTERFACE);
@@ -133,7 +136,7 @@ ULONG           packet_size;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
+        _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
         /* Return error status.  */
         return(UX_MEMORY_ARRAY_FULL);

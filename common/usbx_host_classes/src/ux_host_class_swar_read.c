@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_swar_read                            PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_read(UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer, 
@@ -154,7 +157,7 @@ ULONG           transfer_request_length;
                 *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
             
                 /* Unprotect thread reentry to this instance.  */
-                status =  _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
+                _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
 
                 /* Set the completion code.  */
                 transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
@@ -173,7 +176,7 @@ ULONG           transfer_request_length;
         {
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
+            _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
 
             /* There was a non transfer error, no partial transfer to be checked.  */
             return(status);
@@ -189,7 +192,7 @@ ULONG           transfer_request_length;
         {
         
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
+            _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
             
             /* Return success to caller.  */
             return(UX_SUCCESS);
@@ -203,7 +206,7 @@ ULONG           transfer_request_length;
     }    
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
+    _ux_host_semaphore_put(&swar -> ux_host_class_swar_semaphore);
 
     /* We get here when all the transfers went through without errors.  */
     return(UX_SUCCESS); 

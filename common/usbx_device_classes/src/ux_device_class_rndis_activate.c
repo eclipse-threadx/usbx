@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_activate                     PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,11 +72,18 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
+#if defined(UX_DEVICE_STANDALONE)
+    UX_PARAMETER_NOT_USED(command);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
+
 UX_SLAVE_INTERFACE          *interface;            
 UX_SLAVE_CLASS_RNDIS        *rndis;
 UX_SLAVE_CLASS              *class;
@@ -211,5 +218,5 @@ ULONG                       physical_address_lsw;
         /* Return completion status.  */
         return(UX_SUCCESS);
     }
+#endif
 }
-

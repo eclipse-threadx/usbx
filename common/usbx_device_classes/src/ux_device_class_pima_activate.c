@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_activate                      PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,12 +69,14 @@
 /*                                            refined macros names,       */
 /*                                            added variables initialize, */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
                                           
- UINT                                    status;
 UX_SLAVE_INTERFACE                      *interface;
 UX_SLAVE_CLASS_PIMA                     *pima;
 UX_SLAVE_CLASS                          *class;
@@ -136,7 +138,7 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
     pima -> ux_device_class_pima_device_status = UX_DEVICE_CLASS_PIMA_RC_OK;
 
     /* Resume thread.  */
-    status =  _ux_device_thread_resume(&class -> ux_slave_class_thread); 
+    _ux_device_thread_resume(&class -> ux_slave_class_thread); 
     
     /* If there is a activate function call it.  */
     if (pima -> ux_device_class_pima_instance_activate != UX_NULL)
@@ -152,6 +154,6 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
     UX_TRACE_OBJECT_REGISTER(UX_TRACE_DEVICE_OBJECT_TYPE_INTERFACE, pima, 0, 0, 0)
 
     /* Return completion status.  */
-    return(status);
+    return(UX_SUCCESS);
 }
 

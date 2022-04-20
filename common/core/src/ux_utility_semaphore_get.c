@@ -28,12 +28,13 @@
 #include "ux_api.h"
 
 
+#if !defined(UX_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_semaphore_get                           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +71,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            off in standalone build,    */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_utility_semaphore_get(UX_SEMAPHORE *semaphore, ULONG semaphore_signal)
@@ -109,4 +113,4 @@ UX_THREAD   *suspended_thread;
     /* Return completion status.  */
     return(status);
 }
-
+#endif

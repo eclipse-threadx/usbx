@@ -159,7 +159,7 @@ UCHAR                                   *baInterfaceNr;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_activate                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -209,6 +209,10 @@ UCHAR                                   *baInterfaceNr;
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_activate(UX_HOST_CLASS_COMMAND *command)
@@ -248,7 +252,7 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
     interface -> ux_interface_class_instance =  (VOID *) video;
 
     /* Create this class instance.  */
-    status =  _ux_host_stack_class_instance_create(video -> ux_host_class_video_class, (VOID *) video);
+    _ux_host_stack_class_instance_create(video -> ux_host_class_video_class, (VOID *) video);
         
     /* Configure the video.  */
     status =  _ux_host_class_video_configure(video);     
@@ -321,7 +325,7 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
        no need to free.  */
 
     /* Destroy the semaphore.  */
-    if (video -> ux_host_class_video_semaphore.tx_semaphore_id != 0)
+    if (_ux_host_semaphore_created(&video -> ux_host_class_video_semaphore))
         _ux_host_semaphore_delete(&video -> ux_host_class_video_semaphore);
 
     /* Destroy the class instance.  */

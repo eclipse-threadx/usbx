@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_write                          PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_write(UX_HOST_CLASS_DPUMP *dpump, UCHAR * data_pointer, 
@@ -218,7 +221,7 @@ ULONG           transfer_request_length;
         {
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_host_semaphore_put_rc(&dpump -> ux_host_class_dpump_semaphore);
+            _ux_host_semaphore_put(&dpump -> ux_host_class_dpump_semaphore);
 
             /* Return success.  */
             return(UX_SUCCESS);

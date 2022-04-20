@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_streaming_sampling_set         PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_streaming_sampling_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling)
@@ -113,7 +116,7 @@ UINT                    streaming_interface;
     {
  
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+        _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
         return(status);
     }
 
@@ -163,7 +166,7 @@ UINT                    streaming_interface;
                             audio -> ux_host_class_audio_isochronous_endpoint =  endpoint;
 
                             /* Unprotect thread reentry to this instance.  */
-                            status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+                            _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
                             /* Return successful completion.  */
                             return(UX_SUCCESS);             
@@ -178,7 +181,7 @@ UINT                    streaming_interface;
     }
         
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+    _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_NO_ALTERNATE_SETTING);

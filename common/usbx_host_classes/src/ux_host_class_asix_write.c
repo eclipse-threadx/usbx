@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_write                           PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,10 +74,18 @@
 /*  08-02-2021     Wen Wang                 Modified comment(s),          */
 /*                                            fixed spelling error,       */
 /*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_write(VOID *asix_class, NX_PACKET *packet)
 {
+#if defined(UX_HOST_STANDALONE)
+    UX_PARAMETER_NOT_USED(asix_class);
+    UX_PARAMETER_NOT_USED(packet);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UX_TRANSFER         *transfer_request;
 UINT                status;
@@ -195,6 +203,5 @@ UX_HOST_CLASS_ASIX  *asix;
 
     /* We are done here.  */
     return(UX_SUCCESS);            
-
+#endif
 }
-

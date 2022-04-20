@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_gser_activate                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_gser_activate(UX_HOST_CLASS_COMMAND *command)
@@ -101,7 +104,7 @@ UINT                                status;
     device -> ux_device_class_instance =  (VOID *) gser;
 
     /* Create this class instance.  */
-    status =  _ux_host_stack_class_instance_create(gser -> ux_host_class_gser_class, (VOID *) gser);
+    _ux_host_stack_class_instance_create(gser -> ux_host_class_gser_class, (VOID *) gser);
 
     /* Configure the gser class.  */
     status =  _ux_host_class_gser_configure(gser);

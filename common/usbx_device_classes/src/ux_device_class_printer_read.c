@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_read                       PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,7 +61,7 @@
 /*                                                                        */
 /*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_utility_memory_copy               Copy memory                   */
-/*    _ux_utility_mutex_off                 Release mutex                 */
+/*    _ux_device_mutex_off                  Release mutex                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -72,6 +72,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_printer_read(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
@@ -108,7 +111,7 @@ ULONG                       local_requested_length;
     endpoint = printer -> ux_device_class_printer_endpoint_out;
 
     /* Protect this thread.  */
-    _ux_utility_mutex_on(&printer -> ux_device_class_printer_endpoint_out_mutex);
+    _ux_device_mutex_on(&printer -> ux_device_class_printer_endpoint_out_mutex);
 
     /* All Printer reading  are on the endpoint OUT, from the host.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
@@ -160,7 +163,7 @@ ULONG                       local_requested_length;
 
                 /* We are done.  */
                 /* Free Mutex resource.  */
-                _ux_utility_mutex_off(&printer -> ux_device_class_printer_endpoint_out_mutex);
+                _ux_device_mutex_off(&printer -> ux_device_class_printer_endpoint_out_mutex);
 
                 /* Return with success.  */
                 return(UX_SUCCESS);
@@ -170,7 +173,7 @@ ULONG                       local_requested_length;
         {
 
             /* Free Mutex resource.  */
-            _ux_utility_mutex_off(&printer -> ux_device_class_printer_endpoint_out_mutex);
+            _ux_device_mutex_off(&printer -> ux_device_class_printer_endpoint_out_mutex);
 
             /* We got an error.  */
             return(status);
@@ -178,7 +181,7 @@ ULONG                       local_requested_length;
     }
 
     /* Free Mutex resource.  */
-    _ux_utility_mutex_off(&printer -> ux_device_class_printer_endpoint_out_mutex);
+    _ux_device_mutex_off(&printer -> ux_device_class_printer_endpoint_out_mutex);
 
     /* Check why we got here, either completion or device was extracted.  */
     if (device -> ux_slave_device_state != UX_DEVICE_CONFIGURED)

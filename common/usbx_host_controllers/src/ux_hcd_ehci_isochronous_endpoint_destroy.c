@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_isochronous_endpoint_destroy           PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,8 +56,8 @@
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    None                                                                */
-/*    _ux_utility_mutex_on                  Get mutex                     */
-/*    _ux_utility_mutex_off                 Put mutex                     */
+/*    _ux_host_mutex_on                     Get mutex                     */
+/*    _ux_host_mutex_off                    Put mutex                     */
 /*    _ux_hcd_ehci_periodic_descriptor_link Link/unlink descriptor        */
 /*    _ux_utility_memory_free               Free memory                   */
 /*                                                                        */
@@ -79,6 +79,9 @@
 /*                                            fixed compile issues with   */
 /*                                            some macro options,         */
 /*                                            resulting in version 6.1.6  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_isochronous_endpoint_destroy(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -114,7 +117,7 @@ ULONG                           last_size;
     ed_td.void_ptr = endpoint -> ux_endpoint_ed;
 
     /* Access to periodic list.  */
-    _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Check active iTD/siTD and unlink it.  */
 #if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)
@@ -269,7 +272,7 @@ ULONG                           last_size;
     }
 
     /* Release periodic list.  */
-    _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Now we can safely make the iTD/siTDs free.  */
 #if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)

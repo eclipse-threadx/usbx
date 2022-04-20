@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_prolific_ioctl                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_prolific_ioctl(UX_HOST_CLASS_PROLIFIC *prolific, ULONG ioctl_function,
@@ -250,7 +253,7 @@ VOID                                (*callback_function) (struct UX_HOST_CLASS_P
         transfer_request -> ux_transfer_request_index               =  0;
         
         /* Send request to HCD layer.  */
-        status =  _ux_host_stack_transfer_request(transfer_request);
+        _ux_host_stack_transfer_request(transfer_request);
     
         /* Reset upstream data pipes part 1.  */
         transfer_request -> ux_transfer_request_data_pointer        =  UX_NULL;

@@ -20,10 +20,20 @@
 /**************************************************************************/
 /**************************************************************************/
 
+#include "ux_api.h"
+
+#if !defined(UX_STANDALONE)
+#ifndef UX_NETWORK_DRIVER_ENABLE
+#define UX_NETWORK_DRIVER_ENABLE
+#endif
+#else
+/* Standalone mode not supported.  */
+#endif
+
+#if defined(UX_NETWORK_DRIVER_ENABLE)
 #include "tx_api.h"
 #include "tx_thread.h"
 #include "nx_api.h"
-#include "ux_api.h"
 
 #include "ux_network_driver.h"
 
@@ -36,7 +46,7 @@ static USB_NETWORK_DEVICE_TYPE usb_network_devices[USB_NETWORK_DEVICE_MAX_INSTAN
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_init                                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +79,9 @@ static USB_NETWORK_DEVICE_TYPE usb_network_devices[USB_NETWORK_DEVICE_MAX_INSTAN
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_network_driver_init(VOID)
@@ -966,3 +979,4 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device_ptr = (USB_NETWORK_DEVICE_TYPE*)ux_n
     usb_network_device_ptr -> ux_network_device_link_status = NX_FALSE;
 
 }
+#endif

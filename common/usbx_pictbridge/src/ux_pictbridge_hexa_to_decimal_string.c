@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_hexa_to_decimal_string               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,10 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed maximum decimal       */
+/*                                            calculation issue,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_hexa_to_decimal_string(ULONG hexa_value, UCHAR *decimal_string, 
@@ -121,7 +125,7 @@ ULONG                   decimal_max[8] = {9, 99, 999, 9999, 99999, 999999, 99999
     }
 
     /* If value exceeds, do not proceed.  */
-    if (hexa_value > decimal_max[decimal_string_shift - 1])
+    if (hexa_value > decimal_max[max_digit_string_size - 1])
         return(UX_ERROR);
 
     /* Set the leading zero flag.  */

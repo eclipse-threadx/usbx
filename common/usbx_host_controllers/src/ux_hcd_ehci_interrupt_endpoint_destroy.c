@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_interrupt_endpoint_destroy             PORTABLE C      */
-/*                                                           6.1.6        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,8 +57,8 @@
 /*                                                                        */
 /*    _ux_hcd_ehci_door_bell_wait           Setup doorbell wait           */
 /*    _ux_utility_physical_address          Get physical address          */
-/*    _ux_utility_mutex_on                  Get mutex                     */
-/*    _ux_utility_mutex_off                 Put mutex                     */
+/*    _ux_host_mutex_on                     Get mutex                     */
+/*    _ux_host_mutex_off                    Put mutex                     */
 /*    _ux_hcd_ehci_periodic_descriptor_link Link/unlink descriptor        */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -79,6 +79,9 @@
 /*                                            fixed compile issues with   */
 /*                                            some macro options,         */
 /*                                            resulting in version 6.1.6  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_interrupt_endpoint_destroy(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -94,7 +97,7 @@ ULONG                         max_packet_size;
     ed =  (UX_EHCI_ED *) endpoint -> ux_endpoint_ed;
 
     /* Access to periodic list.  */
-    _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Unlink the periodic item.  */
     _ux_hcd_ehci_periodic_descriptor_link(ed -> ux_ehci_ed_previous_ed,
@@ -190,7 +193,7 @@ ULONG                         max_packet_size;
     }
 
     /* Release periodic list.  */
-    _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Arm the doorbell and wait for its completion.  */
     _ux_hcd_ehci_door_bell_wait(hcd_ehci);

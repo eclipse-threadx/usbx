@@ -65,7 +65,7 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_mode_sense                 PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -112,6 +112,9 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -242,7 +245,6 @@ ULONG                   page_length;
         *(page_pointer + 1) = UX_SLAVE_CLASS_STORAGE_IEC_MODE_PAGE_PAGE_LENGTH;
 
         mode_data_length += page_length;
-        page_pointer += page_length;
     }
 
     /* Put the payload length in the header.  */

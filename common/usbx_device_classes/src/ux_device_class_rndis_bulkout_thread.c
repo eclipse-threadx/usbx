@@ -28,12 +28,14 @@
 #include "ux_device_class_rndis.h"
 #include "ux_device_stack.h"
 
+
+#if !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkout_thread               PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +81,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class)
@@ -215,4 +220,4 @@ ULONG                           packet_payload;
         _ux_device_thread_suspend(&rndis -> ux_slave_class_rndis_bulkout_thread);
     }
 }
-
+#endif

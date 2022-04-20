@@ -26,15 +26,16 @@
 #define UX_SOURCE_CODE
 
 #include "ux_api.h"
+
+
+#if !defined(UX_STANDALONE)
 #include "tx_thread.h"
-
-
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_utility_thread_identify                         PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +70,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            off in standalone build,    */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UX_THREAD *_ux_utility_thread_identify(VOID)
@@ -79,4 +83,4 @@ UX_THREAD *_ux_utility_thread_identify(VOID)
         is the thread running prior to the ISR. Instead, we set it to null.  */
     return(UX_THREAD_GET_SYSTEM_STATE() ? UX_NULL : tx_thread_identify());
 }
-
+#endif

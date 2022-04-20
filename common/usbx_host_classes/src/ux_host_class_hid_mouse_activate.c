@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_mouse_activate                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed clients management,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_mouse_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -89,6 +92,7 @@ UX_HOST_CLASS_HID_REPORT_CALLBACK       call_back;
 UX_HOST_CLASS_HID_REPORT_GET_ID         report_id;
 UX_HOST_CLASS_HID                       *hid;
 UX_HOST_CLASS_HID_CLIENT                *hid_client;
+UX_HOST_CLASS_HID_CLIENT_MOUSE          *client_mouse;
 UX_HOST_CLASS_HID_MOUSE                 *mouse_instance;
 UINT                                    status;
 
@@ -96,15 +100,18 @@ UINT                                    status;
     /* Get the instance to the HID class.  */
     hid =  command -> ux_host_class_hid_client_command_instance;
 
-    /* And of the HID client.  */
-    hid_client =  hid -> ux_host_class_hid_client;
-
-    /* Get some memory for both the HID class instance of this client
+    /* Get some memory for both the HID class instance and copy of this client
        and for the callback.  */
-    mouse_instance =  (UX_HOST_CLASS_HID_MOUSE *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
-                                                                                sizeof(UX_HOST_CLASS_HID_MOUSE));
-    if(mouse_instance == UX_NULL)
+    client_mouse =  (UX_HOST_CLASS_HID_CLIENT_MOUSE *)
+                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
+                                        sizeof(UX_HOST_CLASS_HID_CLIENT_MOUSE));
+    if(client_mouse == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
+
+    /* Get client and mouse instance.  */
+    mouse_instance = &client_mouse -> ux_host_class_hid_client_mouse_mouse;
+    hid_client = &client_mouse -> ux_host_class_hid_client_mouse_client;
+    _ux_utility_memory_copy(hid_client, hid -> ux_host_class_hid_client, sizeof(UX_HOST_CLASS_HID_CLIENT)); /* Use case of memcpy is verified. */
 
     /* Attach the mouse instance to the client instance.  */
     hid_client -> ux_host_class_hid_client_local_instance =  (VOID *) mouse_instance;
@@ -134,6 +141,9 @@ UINT                                    status;
         mouse_instance -> ux_host_class_hid_mouse_enum_state = UX_STATE_WAIT;
 
     }
+
+    /* Use our copy of client.  */
+    hid -> ux_host_class_hid_client = hid_client;
     return(status);
 #else
 
@@ -186,6 +196,9 @@ UINT                                    status;
         if (status == UX_SUCCESS)
         {
 
+            /* Use our copy of client.  */
+            hid -> ux_host_class_hid_client = hid_client;
+
             /* If all is fine and the device is mounted, we may need to inform the application
                if a function has been programmed in the system structure.  */
             if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
@@ -204,9 +217,6 @@ UINT                                    status;
     }
 
     /* We are here if there is error.  */
-
-    /* Detach the client instance.  */
-    hid_client -> ux_host_class_hid_client_local_instance = UX_NULL;
 
     /* Free mouse client instance.  */
     _ux_utility_memory_free(mouse_instance);

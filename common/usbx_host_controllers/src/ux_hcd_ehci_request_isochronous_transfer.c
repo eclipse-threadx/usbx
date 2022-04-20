@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_request_isochronous_transfer           PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,8 +65,8 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _ux_utility_mutex_on                  Get mutex                     */
-/*    _ux_utility_mutex_off                 Put mutex                     */
+/*    _ux_host_mutex_on                     Get mutex                     */
+/*    _ux_host_mutex_off                    Put mutex                     */
 /*    _ux_host_semaphore_put                Put semaphore                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -83,6 +83,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_request_isochronous_transfer(UX_HCD_EHCI *hcd_ehci, UX_TRANSFER *transfer_request)
@@ -116,7 +119,7 @@ UCHAR                           start = UX_FALSE;
     lp.ed_ptr =  endpoint -> ux_endpoint_ed;
 
     /* Lock the periodic list to update.  */
-    _ux_utility_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_on(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Append the request to iTD/siTD request list tail.  */
 #if defined(UX_HCD_EHCI_SPLIT_TRANSFER_ENABLE)
@@ -167,7 +170,7 @@ UCHAR                           start = UX_FALSE;
         (*tail) = ((*tail) -> ux_transfer_request_next_transfer_request);
 
     /* Release the periodic table.  */
-    _ux_utility_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
+    _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);
 
     /* Simulate iTD/siTD done to start - HCD signal.  */
     if (start)

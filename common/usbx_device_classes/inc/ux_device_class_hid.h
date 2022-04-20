@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_hid.h                               PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,6 +58,9 @@
 /*                                            added standalone support,   */
 /*                                            added interrupt OUT support,*/
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added receiver callback,    */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -215,6 +218,7 @@ typedef struct UX_DEVICE_CLASS_HID_RECEIVER_STRUCT
 {
 
     VOID                    (*ux_device_class_hid_receiver_uninitialize)(struct UX_DEVICE_CLASS_HID_RECEIVER_STRUCT *receiver);
+    VOID                    (*ux_device_class_hid_receiver_event_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid);
 
     ULONG                   ux_device_class_hid_receiver_event_buffer_size;
     UX_DEVICE_CLASS_HID_RECEIVED_EVENT
@@ -250,6 +254,7 @@ typedef struct UX_SLAVE_CLASS_HID_PARAMETER_STRUCT
     UINT                    (*ux_device_class_hid_parameter_receiver_initialize)(UX_SLAVE_CLASS_HID *hid, struct UX_SLAVE_CLASS_HID_PARAMETER_STRUCT *parameter, UX_DEVICE_CLASS_HID_RECEIVER **receiver);
     ULONG                   ux_device_class_hid_parameter_receiver_event_max_number;
     ULONG                   ux_device_class_hid_parameter_receiver_event_max_length;
+    VOID                    (*ux_device_class_hid_parameter_receiver_event_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid);
 #endif
 
 } UX_SLAVE_CLASS_HID_PARAMETER;

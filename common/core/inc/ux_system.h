@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_system.h                                         PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*                                            added standalone support,   */
 /*                                            added device printer name,  */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added device CCID name,     */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -145,6 +148,7 @@ extern UCHAR _ux_system_slave_class_cdc_ecm_name[];
 extern UCHAR _ux_system_slave_class_dfu_name[];
 
 extern UCHAR _ux_system_device_class_printer_name[];
+extern UCHAR _ux_system_device_class_ccid_name[];
 
 #if defined(UX_HOST_SIDE_ONLY)
 #define _ux_system_host_tasks_run      _ux_host_stack_tasks_run

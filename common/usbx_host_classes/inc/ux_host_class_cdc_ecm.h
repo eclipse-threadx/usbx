@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_cdc_ecm.h                             PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -54,6 +54,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -70,9 +73,16 @@ extern   "C" {
 
 #endif  
 
-/* Include the NetX API.  */
+#if !defined(UX_HOST_STANDALONE)
 #include "nx_api.h"
 #include "ux_network_driver.h"
+#else
+
+/* Assume NX things for compiling.  */
+#define NX_PACKET                                   VOID*
+#define NX_PACKET_POOL                              VOID*
+#endif
+
 
 /* Define CDC_ECM Class constants.  Insert here the PID/VID of vendors and products using the CDC ECM chipset. 
    It is a better mechanism to put this value in the ux_user.h file. */

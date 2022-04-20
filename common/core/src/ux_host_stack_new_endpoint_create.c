@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_new_endpoint_create                  PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added descriptor validate,  */
 /*                                            resulting in version 6.1.9  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            fixed size calculation,     */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_new_endpoint_create(UX_INTERFACE *interface,
@@ -143,7 +147,7 @@ ULONG           n_tran;
     }
 
     /* Interrupt/isochronous endpoint, max 1024 and 3 transactions can be accepted.  */
-    if (endpoint_type == UX_INTERRUPT_ENDPOINT || endpoint_type == UX_ISOCHRONOUS_ENDPOINT)
+    else
     {
 
         /* Max size over 1024 is not allowed.  */
@@ -181,6 +185,7 @@ ULONG           n_tran;
         }
 
         /* Save final packet size.  */
+        n_tran >>= UX_MAX_NUMBER_OF_TRANSACTIONS_SHIFT;
         packet_size *= (n_tran + 1);
     }
 

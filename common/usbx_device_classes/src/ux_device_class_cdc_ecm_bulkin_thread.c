@@ -28,12 +28,14 @@
 #include "ux_device_class_cdc_ecm.h"
 #include "ux_device_stack.h"
 
+
+#if !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_bulkin_thread              PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,8 +59,8 @@
 /*                                                                        */ 
 /*    _ux_device_stack_transfer_request     Request transfer              */ 
 /*    _ux_utility_event_flags_get           Get event flags               */
-/*    _ux_utility_mutex_on                  Take mutex                    */
-/*    _ux_utility_mutex_off                 Free mutex                    */
+/*    _ux_device_mutex_on                   Take mutex                    */
+/*    _ux_device_mutex_off                  Free mutex                    */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -78,6 +80,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_bulkin_thread(ULONG cdc_ecm_class)
@@ -128,7 +133,7 @@ ULONG                           transfer_length;
                 {
 
                     /* Ensure no other threads are modifying the xmit queue.  */
-                    _ux_utility_mutex_on(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+                    _ux_device_mutex_on(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
                     /* Get the current packet in the list.  */
                     current_packet =  cdc_ecm -> ux_slave_class_cdc_ecm_xmit_queue;
@@ -137,7 +142,7 @@ ULONG                           transfer_length;
                     cdc_ecm -> ux_slave_class_cdc_ecm_xmit_queue =  current_packet -> nx_packet_queue_next;
                 
                     /* Free Mutex resource.  */
-                    _ux_utility_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+                    _ux_device_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
                     
                     /* If the link is down no need to rearm a packet. */
                     if (cdc_ecm -> ux_slave_class_cdc_ecm_link_state == UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_UP)
@@ -197,12 +202,12 @@ ULONG                           transfer_length;
             {
 
                 /* We need to ensure nobody is adding to the queue, so get the mutex protection. */
-                _ux_utility_mutex_on(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+                _ux_device_mutex_on(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
                 /* Since we got the mutex, we know no one is trying to modify the queue; we also know
                    no one can start modifying the queue since the link state is down, so we can just 
                    release the mutex.  */
-                _ux_utility_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+                _ux_device_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
                 /* We get here when the link is down. All packets pending must be freed.  */
                 while (cdc_ecm -> ux_slave_class_cdc_ecm_xmit_queue != UX_NULL)
@@ -236,3 +241,4 @@ ULONG                           transfer_length;
         _ux_device_thread_suspend(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread);
     }
 }
+#endif

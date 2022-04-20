@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_streaming_sampling_get         PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_streaming_sampling_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS *audio_sampling)
@@ -146,7 +149,7 @@ UINT                                     previous_match_found;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+            _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
             return(UX_DESCRIPTOR_CORRUPTED);
         }
@@ -228,7 +231,7 @@ UINT                                     previous_match_found;
                         audio_sampling -> ux_host_class_audio_sampling_characteristics_frequency_high =  audio_sampling -> ux_host_class_audio_sampling_characteristics_frequency_low;
 
                         /* Unprotect thread reentry to this instance.  */
-                        status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+                        _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
                         /* We have found the first streaming characteristics.  */
                         return(UX_SUCCESS);
@@ -296,7 +299,7 @@ UINT                                     previous_match_found;
                                         audio_sampling -> ux_host_class_audio_sampling_characteristics_frequency_high =  lower_frequency;
 
                                         /* Unprotect thread reentry to this instance.  */
-                                        status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+                                        _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
                                         /* Return successful completion.  */
                                         return(UX_SUCCESS);
@@ -334,7 +337,7 @@ UINT                                     previous_match_found;
                                 audio_sampling -> ux_host_class_audio_sampling_characteristics_frequency_high =  higher_frequency;
 
                                 /* Unprotect thread reentry to this instance.  */
-                                status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+                                _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
                                 /* Return successful completion.  */
                                 return(UX_SUCCESS);
@@ -350,7 +353,7 @@ UINT                                     previous_match_found;
                                 audio_sampling -> ux_host_class_audio_sampling_characteristics_frequency_high =  lower_frequency;
 
                                 /* Unprotect thread reentry to this instance.  */
-                                status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+                                _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
                                 /* Return successful completion.  */
                                 return(UX_SUCCESS);
@@ -372,7 +375,7 @@ UINT                                     previous_match_found;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             /* Unprotect thread reentry to this instance.  */
-            status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+            _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
             return(UX_DESCRIPTOR_CORRUPTED);
         }
@@ -385,7 +388,7 @@ UINT                                     previous_match_found;
     }
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+    _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_NO_ALTERNATE_SETTING);

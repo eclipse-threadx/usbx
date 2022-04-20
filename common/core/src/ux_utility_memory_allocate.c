@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_memory_allocate                         PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  *_ux_utility_memory_allocate(ULONG memory_alignment, ULONG memory_cache_flag,
@@ -303,7 +306,7 @@ ALIGN_TYPE          int_memory_buffer;
         {
 
             /* Setup the leftover memory block.  */
-            leftover_memory_block = (UX_MEMORY_BLOCK *) ((ALIGN_TYPE) new_memory_block + sizeof(UX_MEMORY_BLOCK) + memory_size_requested);
+            leftover_memory_block = (UX_MEMORY_BLOCK *) (((ALIGN_TYPE) new_memory_block + sizeof(UX_MEMORY_BLOCK) + memory_size_requested) & 0xFFFFFFFFu);
             leftover_memory_block -> ux_memory_block_next =  new_memory_block -> ux_memory_block_next;
             leftover_memory_block -> ux_memory_block_previous =  new_memory_block;
             leftover_memory_block -> ux_memory_block_size =  leftover - (ULONG)sizeof(UX_MEMORY_BLOCK);

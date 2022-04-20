@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_stack_device_configuration_deactivate      PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_deactivate(UX_DEVICE *device)
@@ -101,11 +104,8 @@ UINT                        status;
         return(UX_DEVICE_HANDLE_UNKNOWN);
     }
 
-    /* Get the configuration.  */
-    configuration = device -> ux_device_current_configuration;
-
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_DEACTIVATE, device, configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_DEACTIVATE, device, device -> ux_device_current_configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
 #if defined(UX_HOST_STANDALONE)
 
@@ -132,7 +132,7 @@ UINT                        status;
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_SEMAPHORE_ERROR);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_SEMAPHORE_ERROR, configuration, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_SEMAPHORE_ERROR, device -> ux_device_current_configuration, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_SEMAPHORE_ERROR);
     }

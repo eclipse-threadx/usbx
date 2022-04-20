@@ -29,12 +29,13 @@
 #include "ux_device_stack.h"
 
 
+#if !defined(UX_DEVICE_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_thread                        PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -120,6 +121,9 @@
 /*                                            updated phase states,       */
 /*                                            refined internal function,  */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_pima_thread(ULONG pima_class)
@@ -490,4 +494,4 @@ UINT                        status;
     _ux_device_thread_suspend(&class -> ux_slave_class_thread);
     }
 }
-
+#endif

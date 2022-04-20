@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_receiver_thread                PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added receiver callback,    */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_hid_receiver_thread(ULONG hid_instance)
@@ -130,7 +133,7 @@ ULONG                               temp;
         transfer = &hid -> ux_device_class_hid_read_endpoint -> ux_slave_endpoint_transfer_request;
 
         /* Protect read.  */
-        _ux_utility_mutex_on(&hid -> ux_device_class_hid_read_mutex);
+        _ux_device_mutex_on(&hid -> ux_device_class_hid_read_mutex);
 
         /* Issue the transfer request.  */
         status = _ux_device_stack_transfer_request(transfer, 
@@ -138,10 +141,10 @@ ULONG                               temp;
                     receiver -> ux_device_class_hid_receiver_event_buffer_size);
 
         /* Check status and ignore ZLPs.  */
-        if (status != UX_SUCCESS ||
-            transfer -> ux_slave_transfer_request_actual_length == 0)
+        if ((status != UX_SUCCESS) ||
+            (transfer -> ux_slave_transfer_request_actual_length == 0))
         {
-            _ux_utility_mutex_off(&hid -> ux_device_class_hid_read_mutex);
+            _ux_device_mutex_off(&hid -> ux_device_class_hid_read_mutex);
             continue;
         }
 
@@ -153,7 +156,7 @@ ULONG                               temp;
                         temp); /* Use case of memcpy is verified. */
 
         /* Unprotect read.  */
-        _ux_utility_mutex_off(&hid -> ux_device_class_hid_read_mutex);
+        _ux_device_mutex_off(&hid -> ux_device_class_hid_read_mutex);
 
         /* Advance the save position.  */
         next_pos = (UCHAR *)pos + receiver -> ux_device_class_hid_receiver_event_buffer_size + sizeof(ULONG);
@@ -163,6 +166,10 @@ ULONG                               temp;
 
         /* Save received data length (it's valid now).  */
         pos -> ux_device_class_hid_received_event_length = temp;
+
+        /* Notify application that a event is received.  */
+        if (receiver -> ux_device_class_hid_receiver_event_callback)
+            receiver -> ux_device_class_hid_receiver_event_callback(hid);
     }
 }
 #endif

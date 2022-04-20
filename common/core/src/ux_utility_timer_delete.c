@@ -28,12 +28,13 @@
 #include "ux_api.h"
 
 
+#if !defined(UX_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_timer_delete                            PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -63,6 +64,9 @@
 /*    DATE              NAME                      DESCRIPTION             */ 
 /*                                                                        */ 
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            off in standalone build,    */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_utility_timer_delete(TX_TIMER *timer)
@@ -77,3 +81,4 @@ UINT    status;
     /* Return completion status.  */
     return(status);
 }
+#endif

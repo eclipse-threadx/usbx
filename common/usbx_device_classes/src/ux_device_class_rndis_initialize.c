@@ -78,7 +78,7 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_initialize                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -103,7 +103,7 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*    _ux_utility_event_flags_create        Create Flag group             */ 
 /*    _ux_utility_event_flags_delete        Delete Flag group             */ 
 /*    _ux_utility_mutex_create              Create mutex                  */
-/*    _ux_utility_mutex_delete              Delete mutex                  */
+/*    _ux_device_mutex_delete               Delete mutex                  */
 /*    _ux_device_semaphore_create           Create semaphore              */
 /*    _ux_device_semaphore_delete           Delete semaphore              */
 /*    _ux_device_thread_create              Create thread                 */
@@ -129,10 +129,17 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
+#if defined(UX_DEVICE_STANDALONE)
+    UX_PARAMETER_NOT_USED(command);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UX_SLAVE_CLASS_RNDIS                        *rndis;
 UX_SLAVE_CLASS_RNDIS_PARAMETER              *rndis_parameter;
@@ -365,12 +372,12 @@ UINT                                        status;
 
     /* Delete rndis -> ux_slave_class_rndis_mutex.  */
     if (rndis -> ux_slave_class_rndis_mutex.tx_mutex_id != 0)
-        _ux_utility_mutex_delete(&rndis -> ux_slave_class_rndis_mutex);
+        _ux_device_mutex_delete(&rndis -> ux_slave_class_rndis_mutex);
 
     /* Free memory for rndis instance.  */
     _ux_utility_memory_free(rndis);
 
     /* Return completion status.  */
     return(status);
+#endif
 }
-

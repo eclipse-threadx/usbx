@@ -43,6 +43,8 @@ UCHAR _ux_system_slave_class_dfu_name[] =                                   "ux_
 UCHAR _ux_system_slave_class_audio_name[] =                                 "ux_slave_class_audio";
 
 UCHAR _ux_system_device_class_printer_name[] =                              "ux_device_class_printer";
+UCHAR _ux_system_device_class_ccid_name[] =                                 "ux_device_class_ccid";
+UCHAR _ux_system_device_class_video_name[] =                                "ux_device_class_video";
 
 /* Define USBX Host variable.  */
 UX_SYSTEM_SLAVE *_ux_system_slave;
@@ -52,7 +54,7 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_initialize                         PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -103,6 +105,10 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*                                            added standalone support,   */
 /*                                            added printer support,      */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added CCID support,         */
+/*                                            added video support,        */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,

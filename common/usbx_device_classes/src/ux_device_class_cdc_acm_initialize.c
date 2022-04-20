@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_initialize                 PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,7 +59,7 @@
 /*    _ux_utility_memory_allocate           Allocate memory               */ 
 /*    _ux_utility_memory_free               Free memory                   */ 
 /*    _ux_utility_mutex_create              Create mutex                  */ 
-/*    _ux_utility_mutex_delete              Delete mutex                  */ 
+/*    _ux_device_mutex_delete               Delete mutex                  */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -81,6 +81,8 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -138,7 +140,7 @@ UINT                                    status;
     {
 
         /* Delete the endpoint IN mutex.  */
-        _ux_utility_mutex_delete(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
+        _ux_device_mutex_delete(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
 
         /* Free the resources.  */
         _ux_utility_memory_free(cdc_acm);
@@ -261,8 +263,8 @@ UINT                                    status;
             _ux_utility_event_flags_delete(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group);
         if (cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack)
             _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack);
-        _ux_utility_mutex_delete(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
-        _ux_utility_mutex_delete(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
+        _ux_device_mutex_delete(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_in_mutex);
+        _ux_device_mutex_delete(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
         _ux_utility_memory_free(cdc_acm);
         return(status);
     }

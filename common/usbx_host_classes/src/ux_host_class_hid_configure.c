@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_configure                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_configure(UX_HOST_CLASS_HID *hid)
@@ -134,7 +137,7 @@ UX_DEVICE               *parent_device;
 #endif
 
     /* We have the valid configuration. Ask the USBX stack to set this configuration.  */        
-    status =  _ux_host_stack_device_configuration_select(configuration);
+    _ux_host_stack_device_configuration_select(configuration);
 
     /* If the operation went well, the hid default alternate setting for the HID interface is active 
        and the interrupt endpoint is now enabled. We have to memorize the first interface since the 

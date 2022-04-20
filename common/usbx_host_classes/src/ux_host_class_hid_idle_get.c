@@ -203,7 +203,7 @@ UINT            status;
 #if defined(UX_HOST_STANDALONE)
     _ux_host_class_hid_unlock(hid);
 #else
-    status =  _ux_host_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+    _ux_host_semaphore_put(&hid -> ux_host_class_hid_semaphore);
 #endif
 
     /* Return the completion status.  */

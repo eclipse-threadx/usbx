@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_activate                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_activate(UX_HOST_CLASS_COMMAND *command)
@@ -107,7 +110,7 @@ UINT                        status;
     interface -> ux_interface_class_instance =  (VOID *) dpump;
 
     /* Create this class instance.  */
-    status =  _ux_host_stack_class_instance_create(dpump -> ux_host_class_dpump_class, (VOID *) dpump);
+    _ux_host_stack_class_instance_create(dpump -> ux_host_class_dpump_class, (VOID *) dpump);
 
     /* Configure the dpump.  */
     status =  _ux_host_class_dpump_configure(dpump);     
@@ -120,7 +123,7 @@ UINT                        status;
 
     /* Get the dpump endpoint(s). We will need to search for Bulk Out and Bulk In endpoints.  Do not check for errors
        here as the alternate setting for this interface may be 0 which has no endpoints.  */
-    status =  _ux_host_class_dpump_endpoints_get(dpump);
+    _ux_host_class_dpump_endpoints_get(dpump);
 
     /* Create the semaphore to protect 2 threads from accessing the same dpump instance.  */
     status =  _ux_host_semaphore_create(&dpump -> ux_host_class_dpump_semaphore, "ux_dpump_semaphore", 1);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_read                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,7 +64,7 @@
 /*                                                                        */ 
 /*    _ux_device_stack_transfer_request     Transfer request              */ 
 /*    _ux_utility_memory_copy               Copy memory                   */ 
-/*    _ux_utility_mutex_off                 Release mutex                 */ 
+/*    _ux_device_mutex_off                  Release mutex                 */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -84,6 +84,8 @@
 /*                                            resulting in version 6.1.9  */
 /*  01-31-2022x    Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
@@ -142,7 +144,7 @@ ULONG                       local_requested_length;
     }
 
     /* Protect this thread.  */
-    _ux_utility_mutex_on(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
+    _ux_device_mutex_on(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
         
     /* All CDC reading  are on the endpoint OUT, from the host.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
@@ -192,7 +194,7 @@ ULONG                       local_requested_length;
 
                 /* We are done.  */
                 /* Free Mutex resource.  */
-                _ux_utility_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
+                _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
     
                 /* Return with success.  */
                 return(UX_SUCCESS);
@@ -203,7 +205,7 @@ ULONG                       local_requested_length;
         {
             
             /* Free Mutex resource.  */
-            _ux_utility_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
+            _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
     
             /* We got an error.  */
             return(status);
@@ -212,7 +214,7 @@ ULONG                       local_requested_length;
 
     
     /* Free Mutex resource.  */
-    _ux_utility_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
+    _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
 
     /* Check why we got here, either completion or device was extracted.  */
     if (device -> ux_slave_device_state != UX_DEVICE_CONFIGURED)

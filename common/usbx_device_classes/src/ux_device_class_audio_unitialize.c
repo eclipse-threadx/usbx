@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_uninitialize                 PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*                                            added feedback support,     */
 /*                                            fixed stream uninitialize,  */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -97,15 +100,17 @@ ULONG                            i;
         stream = (UX_DEVICE_CLASS_AUDIO_STREAM *)((UCHAR *)audio + sizeof(UX_DEVICE_CLASS_AUDIO));
         for (i = 0; i < audio -> ux_device_class_audio_streams_nb; i ++)
         {
+#if !defined(UX_DEVICE_STANDALONE)
             _ux_device_thread_delete(&stream -> ux_device_class_audio_stream_thread);
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
             if (stream -> ux_device_class_audio_stream_feedback_thread_stack)
             {
-                _ux_utility_thread_delete(&stream -> ux_device_class_audio_stream_feedback_thread);
+                _ux_device_thread_delete(&stream -> ux_device_class_audio_stream_feedback_thread);
                 _ux_utility_memory_free(stream -> ux_device_class_audio_stream_feedback_thread_stack);
             }
 #endif
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_thread_stack);
+#endif
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_buffer);
 
             /* Next stream instance.  */

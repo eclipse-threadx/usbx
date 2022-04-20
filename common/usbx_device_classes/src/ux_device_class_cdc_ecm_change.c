@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_change                     PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,7 +56,7 @@
 /*    _ux_network_driver_link_down          Link status down              */
 /*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_device_thread_resume              Resume thread                 */
-/*    _ux_utility_event_flags_set           Set event flags               */
+/*    _ux_device_event_flags_set            Set event flags               */
 /*    _ux_device_stack_transfer_all_request_abort                         */
 /*                                          Abort transfer                */
 /*                                                                        */ 
@@ -78,6 +78,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -157,7 +160,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
         _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread); 
         
         /* Wake up the Interrupt thread and send a network notification to the host.  */
-        _ux_utility_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                
+        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                
 
         /* If there is an activate function call it.  */
         if (cdc_ecm -> ux_slave_class_cdc_ecm_parameter.ux_slave_class_cdc_ecm_instance_activate != UX_NULL)
@@ -182,10 +185,10 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
         /* Notify the thread waiting for network notification events. In this case,
            the event is that the link state has been switched to down.  */
-        _ux_utility_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                
+        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                
 
         /* Wake up the bulk in thread so that it can clean up the xmit queue.  */
-        _ux_utility_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);                
+        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);                
 
         /* If there is a deactivate function call it.  */
         if (cdc_ecm -> ux_slave_class_cdc_ecm_parameter.ux_slave_class_cdc_ecm_instance_deactivate != UX_NULL)

@@ -28,6 +28,23 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_frame_commit.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_frame_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_activate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_auto_seq_done.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_auto_seq_start.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_control_abort.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_control_request.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_deactivate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_hardware_error.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_icc_insert.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_icc_remove.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_notify_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_response.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_runner_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_time_extension.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_bulkin_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_bulkout_thread.c
@@ -170,6 +187,24 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_verify.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_write.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_activate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_change.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_control_request.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_deactivate.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_ioctl.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_max_payload_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_read_payload_free.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_read_payload_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_read_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_reception_start.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_stream_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_transmission_start.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_uninitialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_write_payload_commit.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_write_payload_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_write_thread_entry.c
 
     # {{END_TARGET_SOURCES}}
 )

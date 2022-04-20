@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_change                       PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added feedback support,     */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -126,9 +129,16 @@ ULONG                                    endpoint_dir;
         endpoint = interface -> ux_slave_interface_first_endpoint;
 
         /* Parse all endpoints.  */
+#if defined(UX_DEVICE_STANDALONE)
+
+        /* Standalone mode not supported.  */
+        endpoint_dir = 0;
+#else
+
         endpoint_dir = (stream -> ux_device_class_audio_stream_thread.tx_thread_entry ==
                         _ux_device_class_audio_read_thread_entry) ?
                         UX_ENDPOINT_OUT : UX_ENDPOINT_IN;
+#endif
         stream -> ux_device_class_audio_stream_endpoint = UX_NULL;
 
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)

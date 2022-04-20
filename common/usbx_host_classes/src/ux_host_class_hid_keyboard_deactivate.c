@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_keyboard_deactivate              PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_keyboard_deactivate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -83,14 +86,14 @@ UINT  _ux_host_class_hid_keyboard_deactivate(UX_HOST_CLASS_HID_CLIENT_COMMAND *c
 UX_HOST_CLASS_HID              *hid;
 UX_HOST_CLASS_HID_CLIENT       *hid_client;
 UX_HOST_CLASS_HID_KEYBOARD     *keyboard_instance;
-UINT                            status;
+UINT                            status = UX_SUCCESS;
 
 
     /* Get the instance to the HID class.  */
     hid =  command -> ux_host_class_hid_client_command_instance;
 
     /* Stop the periodic report.  */
-    status =  _ux_host_class_hid_periodic_report_stop(hid);
+    _ux_host_class_hid_periodic_report_stop(hid);
 
     /* Get the HID client pointer.  */
     hid_client =  hid -> ux_host_class_hid_client;

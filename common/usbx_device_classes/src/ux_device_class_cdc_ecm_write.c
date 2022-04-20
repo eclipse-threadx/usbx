@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_write                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,8 +56,8 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*   _ux_device_stack_transfer_request      Transfer request              */ 
-/*   _ux_utility_mutex_off                  Release mutex                 */
-/*   _ux_utility_event_flags_set            Set event flags               */
+/*   _ux_device_mutex_off                   Release mutex                 */
+/*   _ux_device_event_flags_set             Set event flags               */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -73,10 +73,18 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_write(VOID *cdc_ecm_class, NX_PACKET *packet)
 {
+#if defined(UX_DEVICE_STANDALONE)
+    UX_PARAMETER_NOT_USED(cdc_ecm_class);
+    UX_PARAMETER_NOT_USED(packet);
+    return(UX_FUNCTION_NOT_SUPPORTED);
+#else
 
 UINT                        status;
 UX_SLAVE_CLASS_CDC_ECM      *cdc_ecm;
@@ -85,7 +93,7 @@ UX_SLAVE_CLASS_CDC_ECM      *cdc_ecm;
     cdc_ecm = (UX_SLAVE_CLASS_CDC_ECM *) cdc_ecm_class;
 
     /* Protect this thread.  */
-    _ux_utility_mutex_on(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+    _ux_device_mutex_on(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
     /* We only want to send the packet if the link is up.  */
     if (cdc_ecm->ux_slave_class_cdc_ecm_link_state == UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_UP)
@@ -109,10 +117,10 @@ UX_SLAVE_CLASS_CDC_ECM      *cdc_ecm;
         packet -> nx_packet_queue_next =  NX_NULL;
 
         /* Free Mutex resource.  */
-        _ux_utility_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+        _ux_device_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
         /* Set an event to wake up the bulkin thread.  */
-        _ux_utility_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_BULKIN_EVENT, UX_OR);                
+        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_BULKIN_EVENT, UX_OR);                
 
         /* Packet successfully added. Return success.  */
         status =  UX_SUCCESS;
@@ -121,7 +129,7 @@ UX_SLAVE_CLASS_CDC_ECM      *cdc_ecm;
     {
 
         /* Free Mutex resource.  */
-        _ux_utility_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
+        _ux_device_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
         /* Report error to application.  */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_CDC_ECM_LINK_STATE_DOWN_ERROR);
@@ -132,4 +140,5 @@ UX_SLAVE_CLASS_CDC_ECM      *cdc_ecm;
 
     /* We are done here.  */
     return(status);            
+#endif
 }

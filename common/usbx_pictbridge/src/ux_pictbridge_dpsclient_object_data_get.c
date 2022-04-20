@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_data_get            PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_data_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, UCHAR *object_buffer, ULONG object_offset,
@@ -128,8 +131,6 @@ UINT                            status;
     }
     else
     {
-        /* Get the object info from the job info structure.  */
-        object_info = (UX_SLAVE_CLASS_PIMA_OBJECT *) pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object;
         
         /* Obtain the data from the application jobinfo callback.  */
         status = pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object_data_read(pictbridge, object_handle, object_buffer, object_offset,

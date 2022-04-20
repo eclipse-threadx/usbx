@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_pima.h                              PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,6 +55,9 @@
 /*                                            improved internal function, */
 /*                                            added cancel callback,      */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -819,10 +822,12 @@ typedef struct UX_SLAVE_CLASS_PIMA_STRUCT
     ULONG                   ux_device_class_pima_storage_free_space_image;
     UCHAR                   *ux_device_class_pima_storage_description;
     UCHAR                   *ux_device_class_pima_storage_volume_label;
+#if !defined(UX_DEVICE_STANDALONE)
     UX_SEMAPHORE            ux_device_class_pima_semaphore;
     UX_THREAD               ux_device_class_pima_interrupt_thread;
     UCHAR                   *ux_device_class_pima_interrupt_thread_stack;
     UX_SEMAPHORE            ux_device_class_pima_interrupt_thread_semaphore;
+#endif
     UX_SLAVE_CLASS_PIMA_EVENT    
                             *ux_device_class_pima_event_array;
     UX_SLAVE_CLASS_PIMA_EVENT    

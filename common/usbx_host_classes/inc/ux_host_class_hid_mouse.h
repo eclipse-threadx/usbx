@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid_mouse.h                           PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed clients management,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -104,6 +107,12 @@ typedef struct UX_HOST_CLASS_HID_MOUSE_STRUCT
 #endif
     
 } UX_HOST_CLASS_HID_MOUSE;
+
+typedef struct UX_HOST_CLASS_HID_CLIENT_MOUSE_STRUCT
+{
+    UX_HOST_CLASS_HID_MOUSE     ux_host_class_hid_client_mouse_mouse;
+    UX_HOST_CLASS_HID_CLIENT    ux_host_class_hid_client_mouse_client;
+} UX_HOST_CLASS_HID_CLIENT_MOUSE;
 
 /* Define HID Mouse Class function prototypes.  */
 

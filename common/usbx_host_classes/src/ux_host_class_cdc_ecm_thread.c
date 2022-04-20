@@ -29,12 +29,14 @@
 #include "ux_host_class_cdc_ecm.h"
 #include "ux_host_stack.h"
 
+
+#if !defined(UX_HOST_STANDALONE)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_thread                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -89,6 +91,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_thread(ULONG parameter)
@@ -111,7 +116,7 @@ USB_NETWORK_DEVICE_TYPE     *usb_network_device_ptr;
     {   
 
         /* Wait for the semaphore to be put by the cdc_ecm interrupt event.  */
-        _ux_host_semaphore_get(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore, UX_WAIT_FOREVER);
+        _ux_host_semaphore_get_norc(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore, UX_WAIT_FOREVER);
 
         /* Check the link state. It is either pending up or down.  */
         if (cdc_ecm -> ux_host_class_cdc_ecm_link_state == UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_UP)
@@ -204,7 +209,7 @@ USB_NETWORK_DEVICE_TYPE     *usb_network_device_ptr;
                         {
 
                             /* Wait for the completion of the transfer request.  */
-                            _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_WAIT_FOREVER);
+                            _ux_host_semaphore_get_norc(&transfer_request -> ux_transfer_request_semaphore, UX_WAIT_FOREVER);
 
                             /* Check the transfer status. If there is a transport error, we ignore the packet
                                and restart it. */
@@ -288,3 +293,4 @@ USB_NETWORK_DEVICE_TYPE     *usb_network_device_ptr;
         }
     }    
 }
+#endif

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_start                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_start(UX_PICTBRIDGE *pictbridge, UX_HOST_CLASS_PIMA *pima)
@@ -254,7 +257,7 @@ UINT                                length, length1;
     if (status != UX_SUCCESS)
     {
         /* Close the pima session.  */
-        status = _ux_host_class_pima_session_close(pima, pima_session);
+        _ux_host_class_pima_session_close(pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
     }        
@@ -266,7 +269,7 @@ UINT                                length, length1;
     if (status != UX_SUCCESS)
     {
         /* Close the pima session.  */
-        status = _ux_host_class_pima_session_close(pictbridge -> ux_pictbridge_pima, pima_session);
+        _ux_host_class_pima_session_close(pictbridge -> ux_pictbridge_pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
     }        
@@ -277,7 +280,7 @@ UINT                                length, length1;
     if (status != UX_SUCCESS)
     {
         /* Close the pima session.  */
-        status = _ux_host_class_pima_session_close(pima, pima_session);
+        _ux_host_class_pima_session_close(pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
     }        
@@ -290,7 +293,7 @@ UINT                                length, length1;
     if (status != UX_SUCCESS)
     {
         /* Close the pima session.  */
-        status = _ux_host_class_pima_session_close(pima, pima_session);
+        _ux_host_class_pima_session_close(pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
     }        
@@ -306,7 +309,7 @@ UINT                                length, length1;
         if (status != UX_SUCCESS)
         {
             /* Close the pima session.  */
-            status = _ux_host_class_pima_session_close(pima, pima_session);
+            _ux_host_class_pima_session_close(pima, pima_session);
 
             return(UX_PICTBRIDGE_ERROR_INVALID_OBJECT_HANDLE );
         }        
@@ -352,7 +355,7 @@ UINT                                length, length1;
                         {
 
                             /* Close the pima session.  */
-                            status = _ux_host_class_pima_session_close(pima, pima_session);
+                            _ux_host_class_pima_session_close(pima, pima_session);
 
                             return(UX_PICTBRIDGE_ERROR_INVALID_OBJECT_HANDLE);
                         }        
@@ -373,7 +376,7 @@ UINT                                length, length1;
     }
     
     /* We come here when we have not found any script or the script does not have the DDISCVRY.DPS file. Close the pima session.  */
-    status = _ux_host_class_pima_session_close(pima, pima_session);
+    _ux_host_class_pima_session_close(pima, pima_session);
     return(UX_PICTBRIDGE_ERROR_NO_DISCOVERY_SCRIPT);
 }
 

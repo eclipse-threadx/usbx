@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_transport_cb                 PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*                                            fixed CB request index,     */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_transport_cb(UX_HOST_CLASS_STORAGE *storage, UCHAR *data_pointer)
@@ -116,7 +119,7 @@ UX_ENDPOINT     *control_endpoint;
     transfer_request -> ux_transfer_request_requested_length =  (ULONG) * (cbw + UX_HOST_CLASS_STORAGE_CBW_CB_LENGTH);
 
     /* Send the ufi block on the control endpoint.  */
-    status =  _ux_host_stack_transfer_request(transfer_request);
+    _ux_host_stack_transfer_request(transfer_request);
 
     /* Check the transfer status. If there is a transport error, the host must perform
        a reset recovery.  */

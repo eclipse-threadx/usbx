@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_printer.h                           PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -39,6 +39,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -105,8 +108,10 @@ typedef struct UX_DEVICE_CLASS_PRINTER_STRUCT
     ULONG                   ux_device_class_printer_port_status;
     UX_DEVICE_CLASS_PRINTER_PARAMETER
                             ux_device_class_printer_parameter;
+#if !defined(UX_DEVICE_STANDALONE)
     UX_MUTEX                ux_device_class_printer_endpoint_out_mutex;
     UX_MUTEX                ux_device_class_printer_endpoint_in_mutex;
+#endif
 } UX_DEVICE_CLASS_PRINTER;
 
 

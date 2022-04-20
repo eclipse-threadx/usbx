@@ -36,7 +36,7 @@
 /*                                                                        */
 /*    _ux_pictbridge_dpshost_output_object_configure_print_service        */
 /*                                                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  04-25-2022     Yajun Xia                Modified comment(s),          */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_pictbridge_dpshost_output_object_configure_print_service(UX_PICTBRIDGE *pictbridge, 
@@ -111,6 +114,8 @@ UINT        status;
     status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_vendorname, 
                                             UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_END | UX_PICTBRIDGE_TAG_FLAG_VARIABLE_STRING,
                                             UX_NULL, 0, (VOID *)(ALIGN_TYPE) pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_product_name, &pima_object_buffer, &object_length);
+    if (status != UX_SUCCESS)
+        return(status);
 
 
     /* Add the line <vendorSpecificVersion> major_minor </vendorSpecificVersion> */

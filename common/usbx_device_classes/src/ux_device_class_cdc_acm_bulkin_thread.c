@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_bulkin_thread              PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used whole buffer for write,*/
+/*                                            refined macros names,       */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_acm_bulkin_thread(ULONG cdc_acm_class)
@@ -162,10 +166,10 @@ ULONG                           sent_length;
                     {
 
                         /* Check the length remaining to send.  */
-                        if (total_length > endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize)
+                        if (total_length > UX_SLAVE_REQUEST_DATA_MAX_LENGTH)
 
                             /* We can't fit all the length.  */
-                            transfer_length =  endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize;
+                            transfer_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
 
                         else
 

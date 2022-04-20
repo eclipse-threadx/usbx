@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_control_value_set              PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_control_value_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control)
@@ -117,7 +120,7 @@ UCHAR *         control_buffer;
     {
 
         /* Unprotect thread reentry to this instance.  */
-        status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+        _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
         /* Return an error.  */        
         return(UX_MEMORY_INSUFFICIENT);
@@ -151,7 +154,7 @@ UCHAR *         control_buffer;
     _ux_utility_memory_free(control_buffer);
 
     /* Unprotect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+    _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
 
     /* Return completion status.  */
     return(status);

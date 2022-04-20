@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_uninitialize               PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,7 +53,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
-/*    _ux_utility_mutex_delete              Delete Mutex                  */
+/*    _ux_device_mutex_delete               Delete Mutex                  */
 /*    _ux_utility_memory_free               Free used local memory        */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -65,6 +65,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -84,10 +87,10 @@ UX_SLAVE_CLASS              *class;
     {
 
         /* Delete the IN endpoint mutex.  */
-        _ux_utility_mutex_delete(&printer -> ux_device_class_printer_endpoint_in_mutex);
+        _ux_device_mutex_delete(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
         /* Out Mutex. */
-        _ux_utility_mutex_delete(&printer -> ux_device_class_printer_endpoint_out_mutex);
+        _ux_device_mutex_delete(&printer -> ux_device_class_printer_endpoint_out_mutex);
 
         /* Free the resources.  */
         _ux_utility_memory_free(printer);

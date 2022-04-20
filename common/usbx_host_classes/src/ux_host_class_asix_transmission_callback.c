@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_transmission_callback           PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,10 +74,16 @@
 /*  08-02-2021     Wen Wang                 Modified comment(s),          */
 /*                                            fixed spelling error,       */
 /*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed standalone compile,   */
+/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_transmission_callback (UX_TRANSFER *transfer_request)
 {
+#if defined(UX_HOST_STANDALONE)
+    UX_PARAMETER_NOT_USED(transfer_request);
+#else
 
 UX_HOST_CLASS_ASIX              *asix;
 NX_PACKET                       *current_packet;
@@ -147,5 +153,5 @@ UCHAR                           *packet_header;
 
     /* There is no status to be reported back to the stack.  */
     return; 
+#endif
 }
-
