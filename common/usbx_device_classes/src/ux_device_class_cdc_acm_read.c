@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_read                       PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,6 +86,10 @@
 /*                                            resulting in version 6.1.10 */
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
@@ -94,7 +98,7 @@ UINT _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffe
 
 UX_SLAVE_ENDPOINT           *endpoint;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_INTERFACE          *interface;
+UX_SLAVE_INTERFACE          *interface_ptr;
 UX_SLAVE_TRANSFER           *transfer_request;
 UINT                        status= UX_SUCCESS;
 ULONG                       local_requested_length;
@@ -130,10 +134,10 @@ ULONG                       local_requested_length;
     }
     
     /* This is the first time we are activated. We need the interface to the class.  */
-    interface =  cdc_acm -> ux_slave_class_cdc_acm_interface;
+    interface_ptr =  cdc_acm -> ux_slave_class_cdc_acm_interface;
     
     /* Locate the endpoints.  */
-    endpoint =  interface -> ux_slave_interface_first_endpoint;
+    endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
     
     /* Check the endpoint direction, if OUT we have the correct endpoint.  */
     if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_OUT)

@@ -30,19 +30,21 @@
 #include "ux_host_stack.h"
 
 
+#if !defined(UX_HOST_CLASS_AUDIO_DISABLE_CONTROLS)
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_device_controls_list_get       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
-/*    This function obtains the controls for the audio device.            */ 
+/*    This function obtains the controls of first found feature unit      */
+/*    for the audio device.                                               */ 
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -69,16 +71,18 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added audio 2.0 support,    */
+/*                                            internal clean up,          */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_device_controls_list_get(UX_HOST_CLASS_AUDIO *audio)
 {
 
 UCHAR *                                         descriptor;
-UX_INTERFACE_DESCRIPTOR                         interface_descriptor;
-UX_HOST_CLASS_AUDIO_INPUT_TERMINAL_DESCRIPTOR   input_interface_descriptor;
-UX_HOST_CLASS_AUDIO_FEATURE_UNIT_DESCRIPTOR     feature_unit_interface_descriptor;
 ULONG                                           total_descriptor_length;
+ULONG                                           ac_interface;
 ULONG                                           descriptor_length;
 ULONG                                           descriptor_type;
 ULONG                                           descriptor_subtype;
@@ -86,12 +90,16 @@ ULONG                                           descriptor_found;
 ULONG                                           control_size_bytes;
 UCHAR *                                         control_bit_map_address;
 ULONG                                           channel_number;
+ULONG                                           itt_nb_channels;
     
 
     /* Get the descriptor to the entire configuration */
     descriptor =               audio -> ux_host_class_audio_configuration_descriptor;
     total_descriptor_length =  audio -> ux_host_class_audio_configuration_descriptor_length;
-    
+
+    /* Get AC interface number.  */
+    ac_interface = audio -> ux_host_class_audio_control_interface_number;
+
     /* Default is Interface descriptor not yet found.  */    
     descriptor_found =  UX_FALSE;
     
@@ -121,16 +129,10 @@ ULONG                                           channel_number;
         switch(descriptor_type)
         {
 
-
         case UX_INTERFACE_DESCRIPTOR_ITEM:
 
-            /* Parse the interface descriptor and make it machine independent.  */
-            _ux_utility_descriptor_parse(descriptor, _ux_system_interface_descriptor_structure,
-                                            UX_INTERFACE_DESCRIPTOR_ENTRIES, (UCHAR *) &interface_descriptor);
-
-            /* Ensure we have the correct interface for Audio streaming.  */
-            if ((interface_descriptor.bInterfaceClass == UX_HOST_CLASS_AUDIO_CLASS) &&
-                (interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_AUDIO_SUBCLASS_CONTROL))
+            /* Ensure we have the correct AC interface for Audio streaming.  */
+            if (ac_interface == descriptor[2])
              
                 /* Mark we have found it.  */
                 descriptor_found =  UX_TRUE;
@@ -138,7 +140,6 @@ ULONG                                           channel_number;
 
                 descriptor_found =  UX_FALSE;
             break;
-                
 
         case UX_HOST_CLASS_AUDIO_CS_INTERFACE:
 
@@ -151,34 +152,53 @@ ULONG                                           channel_number;
                 {
 
                 case UX_HOST_CLASS_AUDIO_CS_INPUT_TERMINAL:
-                                        
-                    /* Make the descriptor machine independent.  */
-                    _ux_utility_descriptor_parse(descriptor, _ux_system_class_audio_input_terminal_descriptor_structure,
-                                            UX_HOST_CLASS_AUDIO_INPUT_TERMINAL_DESCRIPTOR_ENTRIES, (UCHAR *) &input_interface_descriptor);
-                                                        
+
+#if defined(UX_HOST_CLASS_AUDIO_2_SUPPORT)
+                    if (_ux_host_class_audio_protocol_get(audio) == UX_HOST_CLASS_AUDIO_PROTOCOL_IP_VERSION_02_00)
+                    {
+
+                        /* Get bNrChannels @ 8.  */
+                        itt_nb_channels = descriptor[8];
+                    }
+                    else
+#endif
+                    {
+
+                        /* Get bNrChannels @ 7.  */
+                        itt_nb_channels = descriptor[7];
+                    }
+
                     /* Get the number of channels and check for maximum allowed.  */
-                    if (input_interface_descriptor.bNrChannels > UX_HOST_CLASS_AUDIO_MAX_CHANNEL)
-                        audio -> ux_host_class_audio_channels =  UX_HOST_CLASS_AUDIO_MAX_CHANNEL;
+                    if (itt_nb_channels > UX_HOST_CLASS_AUDIO_MAX_CHANNEL)
+                        audio -> ux_host_class_audio_channels = UX_HOST_CLASS_AUDIO_MAX_CHANNEL;
                     else                                    
-                        audio -> ux_host_class_audio_channels =  input_interface_descriptor.bNrChannels;
+                        audio -> ux_host_class_audio_channels = itt_nb_channels;
                     break;
 
-                
                 case UX_HOST_CLASS_AUDIO_CS_FEATURE_UNIT:
 
-                    /* Make the descriptor machine independent.  */
-                    _ux_utility_descriptor_parse(descriptor, _ux_system_class_audio_feature_unit_descriptor_structure,
-                                            UX_HOST_CLASS_AUDIO_FEATURE_UNIT_DESCRIPTOR_ENTRIES, (UCHAR *) &feature_unit_interface_descriptor);
-                                                        
-                    /* Store the Feature Unit ID, used to set/get the audio controls.  */
-                    audio -> ux_host_class_audio_feature_unit_id =  feature_unit_interface_descriptor.bUnitID;
+                    /* Store the Feature Unit ID @ 3, used to set/get the audio controls.  */
+                    audio -> ux_host_class_audio_feature_unit_id = descriptor[3];
 
-                    /* Get the size of each control in bytes.  */
-                    control_size_bytes =  feature_unit_interface_descriptor.bControlSize;
-                            
-                    /* Get the address of the first control bit map.  */
-                    control_bit_map_address =  (UCHAR *) &feature_unit_interface_descriptor.bmaControls;
-                            
+#if defined(UX_HOST_CLASS_AUDIO_2_SUPPORT)
+
+                    /* Audio 2.0 control size is fixed to 4 (bytes), controls start from @ 5.  */
+                    if (_ux_host_class_audio_protocol_get(audio) == UX_HOST_CLASS_AUDIO_PROTOCOL_IP_VERSION_02_00)
+                    {
+                        control_size_bytes = 4;
+                        control_bit_map_address =  (UCHAR *) &descriptor[5];
+                    }
+                    else
+#endif
+                    {
+
+                        /* Get the size of each control in bytes @ 5.  */
+                        control_size_bytes =  descriptor[5];
+
+                        /* Get the address of the first control bit map @ 6.  */
+                        control_bit_map_address =  (UCHAR *) &descriptor[6];
+                    }
+
                     /* Walk all the controls and retrieve them one by one.  */
                     for (channel_number = 0; channel_number < audio -> ux_host_class_audio_channels; channel_number++)
                     {
@@ -252,4 +272,4 @@ ULONG                                           channel_number;
        not find the right audio device.  */
     return(UX_HOST_CLASS_AUDIO_WRONG_TYPE);
 }
-
+#endif

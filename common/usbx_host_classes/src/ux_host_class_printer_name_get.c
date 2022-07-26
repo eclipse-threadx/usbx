@@ -125,7 +125,7 @@ UINT            printer_name_length;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_name_get                     PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -172,13 +172,17 @@ UINT            printer_name_length;
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_name_get(UX_HOST_CLASS_PRINTER *printer)
 {
 
 UCHAR *         descriptor_buffer;
-UX_INTERFACE    *interface;
+UX_INTERFACE    *interface_ptr;
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 #if !defined(UX_HOST_STANDALONE)
@@ -198,7 +202,7 @@ UINT            status;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Need interface for wIndex.  */
-    interface = printer -> ux_host_class_printer_interface;
+    interface_ptr = printer -> ux_host_class_printer_interface;
 
     /* Create a transfer request for the GET_DEVICE_ID request.  */
     transfer_request -> ux_transfer_request_data_pointer =      descriptor_buffer;
@@ -206,8 +210,8 @@ UINT            status;
     transfer_request -> ux_transfer_request_function =          UX_HOST_CLASS_PRINTER_GET_DEVICE_ID;
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_value =             0; /* Do not support multiple configuration for now.  */
-    transfer_request -> ux_transfer_request_index =             (interface -> ux_interface_descriptor.bInterfaceNumber  << 8) |
-                                                                (interface -> ux_interface_descriptor.bAlternateSetting     );
+    transfer_request -> ux_transfer_request_index =             (interface_ptr -> ux_interface_descriptor.bInterfaceNumber  << 8) |
+                                                                (interface_ptr -> ux_interface_descriptor.bAlternateSetting     );
 
 #if defined(UX_HOST_STANDALONE)
     printer -> ux_host_class_printer_allocated = descriptor_buffer;
@@ -224,7 +228,7 @@ UINT            status;
 
         _ux_host_class_printer_name_parse(printer, descriptor_buffer,
                                     UX_HOST_CLASS_PRINTER_DESCRIPTOR_LENGTH);
-                }
+    }
 
     /* Free all used resources.  */
     _ux_utility_memory_free(descriptor_buffer);

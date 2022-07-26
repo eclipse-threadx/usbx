@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_interrupt_endpoint_start         PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*                                            use pre-calculated value    */
 /*                                            instead of wMaxPacketSize,  */
 /*                                            resulting in version 6.1.9  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added timeout value init,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_interrupt_endpoint_start(UX_HOST_CLASS_HUB *hub)
@@ -102,6 +105,9 @@ UX_TRANSFER     *transfer_request;
         transfer_request =  &hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_transfer_request;
         transfer_request -> ux_transfer_request_requested_length = transfer_request -> ux_transfer_request_packet_length;
         transfer_request -> ux_transfer_request_actual_length =  0;
+
+        /* Set timeout - wait forever.  */
+        transfer_request -> ux_transfer_request_timeout_value = UX_WAIT_FOREVER;
 
         /* Since this transfer_request has a callback, we need the HUB instance to be stored in the transfer request.  */
         transfer_request -> ux_transfer_request_class_instance =  (VOID *) hub;

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_xml_function_input_startjob          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*                                                                        */ 
 /*                                                                        */ 
 /*  AUTHOR                                                                */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_xml_function_input_startjob(UX_PICTBRIDGE *pictbridge, 
@@ -111,7 +114,7 @@ UX_PICTBRIDGE_EVENT         *pictbridge_event;
     pictbridge -> ux_pictbridge_event_array_head    = pictbridge_next_event;
 
     /* Wake up the Pictbridge notification handler thread.  */
-    _ux_utility_semaphore_put(&pictbridge -> ux_pictbridge_notification_semaphore);
+    _ux_system_semaphore_put(&pictbridge -> ux_pictbridge_notification_semaphore);
 
     /* This function never fails.  */
     return(UX_SUCCESS);

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_new_interface_create                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_new_interface_create(UX_CONFIGURATION *configuration,
@@ -87,7 +91,7 @@ UINT  _ux_host_stack_new_interface_create(UX_CONFIGURATION *configuration,
 {
 
 UX_INTERFACE        *list_interface;
-UX_INTERFACE        *interface;
+UX_INTERFACE        *interface_ptr;
 UINT                number_endpoints;
 UINT                descriptor_length;
 UINT                descriptor_type;
@@ -95,30 +99,30 @@ UINT                status;
 UCHAR               *this_interface_descriptor;
 
     /* Obtain memory for storing this new interface.  */
-    interface =  (UX_INTERFACE *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_INTERFACE));
+    interface_ptr =  (UX_INTERFACE *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_INTERFACE));
     
     /* If no memory left, exit with error.  */        
-    if (interface == UX_NULL)
+    if (interface_ptr == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Save the interface handle in the container, this is for ensuring the
        interface container is not corrupted.  */
-    interface -> ux_interface_handle =  (ULONG) (ALIGN_TYPE) interface;
+    interface_ptr -> ux_interface_handle =  (ULONG) (ALIGN_TYPE) interface_ptr;
 
     /* Parse the interface descriptor and make it machine independent.  */
     _ux_utility_descriptor_parse(descriptor,
                             _ux_system_interface_descriptor_structure,
                             UX_INTERFACE_DESCRIPTOR_ENTRIES,
-                            (UCHAR *) &interface -> ux_interface_descriptor);
+                            (UCHAR *) &interface_ptr -> ux_interface_descriptor);
 
     /* The configuration that owns this interface is memorized in the 
        interface container itself, easier for back chaining.  */
-    interface -> ux_interface_configuration =  configuration;
+    interface_ptr -> ux_interface_configuration =  configuration;
     
     /* If the interface belongs to an IAD, remember the IAD Class/SubClass/Protocol.  */
-    interface -> ux_interface_iad_class    = configuration -> ux_configuration_iad_class;
-    interface -> ux_interface_iad_subclass = configuration -> ux_configuration_iad_subclass;
-    interface -> ux_interface_iad_protocol = configuration -> ux_configuration_iad_protocol;
+    interface_ptr -> ux_interface_iad_class    = configuration -> ux_configuration_iad_class;
+    interface_ptr -> ux_interface_iad_subclass = configuration -> ux_configuration_iad_subclass;
+    interface_ptr -> ux_interface_iad_protocol = configuration -> ux_configuration_iad_protocol;
 
     /* There is 2 cases for the creation of the interface descriptor 
        if this is the first one, the interface descriptor is hooked
@@ -126,7 +130,7 @@ UCHAR               *this_interface_descriptor;
        is hooked to the end of the chain of interfaces.  */
     if (configuration -> ux_configuration_first_interface == UX_NULL)
     {
-        configuration -> ux_configuration_first_interface =  interface;
+        configuration -> ux_configuration_first_interface =  interface_ptr;
     }
     else
     {
@@ -141,13 +145,13 @@ UCHAR               *this_interface_descriptor;
         }
 
         /* Hook the interface.  */
-        list_interface -> ux_interface_next_interface =  interface;
+        list_interface -> ux_interface_next_interface =  interface_ptr;
     }
 
     /* Traverse the interface in search of all endpoints that belong to it.
        We need the length remaining in the descriptor and the number of endpoints
        reported for this interface.  */
-    number_endpoints =  interface -> ux_interface_descriptor.bNumEndpoints;
+    number_endpoints =  interface_ptr -> ux_interface_descriptor.bNumEndpoints;
 
     this_interface_descriptor = descriptor;
 
@@ -176,7 +180,7 @@ UCHAR               *this_interface_descriptor;
         {
 
             /* We have found an endpoint descriptor for this interface.  */
-            status =  _ux_host_stack_new_endpoint_create(interface, descriptor);
+            status =  _ux_host_stack_new_endpoint_create(interface_ptr, descriptor);
 
             /* Check return status.  */
             if(status != UX_SUCCESS)

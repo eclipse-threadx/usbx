@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_activate                         PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,19 +79,23 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_activate(UX_HOST_CLASS_COMMAND  *command)
 {
 
-UX_INTERFACE        *interface;
+UX_INTERFACE        *interface_ptr;
 UX_HOST_CLASS_HID   *hid;
 UINT                status;
 
 
     /* The HID is always activated by the interface descriptor and not the
        device descriptor.  */
-    interface =  (UX_INTERFACE *) command -> ux_host_class_command_container;
+    interface_ptr =  (UX_INTERFACE *) command -> ux_host_class_command_container;
     
     /* Instantiate this HID class */
     hid =  _ux_utility_memory_allocate(UX_NO_ALIGN,  UX_REGULAR_MEMORY,sizeof(UX_HOST_CLASS_HID));
@@ -102,13 +106,13 @@ UINT                status;
     hid -> ux_host_class_hid_class =  command -> ux_host_class_command_class_ptr;
 
     /* Store the interface container into the HID class instance.  */
-    hid -> ux_host_class_hid_interface =  interface;
+    hid -> ux_host_class_hid_interface =  interface_ptr;
 
     /* Store the device container into the HID class instance.  */
-    hid -> ux_host_class_hid_device =  interface -> ux_interface_configuration -> ux_configuration_device;
+    hid -> ux_host_class_hid_device =  interface_ptr -> ux_interface_configuration -> ux_configuration_device;
 
     /* This instance of the device must also be stored in the interface container.  */
-    interface -> ux_interface_class_instance =  (VOID *) hid;
+    interface_ptr -> ux_interface_class_instance =  (VOID *) hid;
 
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(command -> ux_host_class_command_class_ptr, (VOID *) hid);
@@ -196,7 +200,7 @@ UINT                status;
     _ux_host_stack_class_instance_destroy(hid -> ux_host_class_hid_class, (VOID *) hid);
 
     /* Unmount instance. */
-    interface -> ux_interface_class_instance = UX_NULL;
+    interface_ptr -> ux_interface_class_instance = UX_NULL;
 
     /* Free instance. */
     _ux_utility_memory_free(hid);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_transfer_abort                         PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved iso abort support, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_transfer_abort(UX_HCD_EHCI *hcd_ehci,UX_TRANSFER *transfer_request)
@@ -90,10 +93,15 @@ UINT  _ux_hcd_ehci_transfer_abort(UX_HCD_EHCI *hcd_ehci,UX_TRANSFER *transfer_re
 UX_ENDPOINT                     *endpoint;
 UX_EHCI_HSISO_ED                *ied;
 UX_EHCI_PERIODIC_LINK_POINTER   lp;
+UX_EHCI_HSISO_TD                *fr_td;
 UX_TRANSFER                     **list_head;
 UX_TRANSFER                     *transfer;
 ULONG                           max_load_count;
-ULONG                           remain_count;
+ULONG                           frindex;
+ULONG                           fr_start;
+ULONG                           fr_req;
+ULONG                           first_new_aborted = 1;
+
 
     UX_PARAMETER_NOT_USED(hcd_ehci);
 
@@ -145,18 +153,48 @@ ULONG                           remain_count;
             (*list_head) == transfer_request)
         {
             *list_head = UX_NULL;
-            remain_count = 0;
+
+            /* Clear controls any way.  */
+            for (frindex = 0; frindex < 4; frindex ++)
+            {
+
+                /* Get actual iTD used and clear controls.  */
+                fr_td = ied -> ux_ehci_hsiso_ed_fr_td[frindex];
+                fr_td -> ux_ehci_hsiso_td_control[(frindex << 1)]     &= ~UX_EHCI_HSISO_STATUS_ACTIVE;
+                fr_td -> ux_ehci_hsiso_td_control[(frindex << 1) + 1] &= ~UX_EHCI_HSISO_STATUS_ACTIVE;
+                fr_td -> ux_ehci_hsiso_td_frload = 0;
+                fr_td -> ux_ehci_hsiso_td_fr_transfer[0] = UX_NULL;
+                fr_td -> ux_ehci_hsiso_td_fr_transfer[1] = UX_NULL;
+            }
+
+            /* Transfer needs restart.  */
+            ied -> ux_ehci_hsiso_ed_frstart = 0xFF;
+            ied -> ux_ehci_hsiso_ed_fr_hc = 0;
+            ied -> ux_ehci_hsiso_ed_fr_sw = 0;
+            ied -> ux_ehci_hsiso_ed_transfer_tail = UX_NULL;
+            ied -> ux_ehci_hsiso_ed_transfer_first_new = UX_NULL;
+            ied -> ux_ehci_hsiso_ed_frload = 0;
         }
         else
         {
 
-            /* At least one request remains.  */
-            remain_count = 1;
+            /* At least one request remains (no restart).  */
 
-            /* Remove it and transfers after it.  */
+            /* Get the next micro-frame index.  */
+            fr_start = (ULONG)ied -> ux_ehci_hsiso_ed_fr_hc << ied -> ux_ehci_hsiso_ed_frinterval_shift;
+            fr_start += ied -> ux_ehci_hsiso_ed_frstart;
+            fr_start &= 0x7u;
+
+            /* First request micro-frame index offset is 0.  */
+            fr_req = 0;
+
+            /* Remove the transfer and transfers after it.  */
             transfer = (*list_head) -> ux_transfer_request_next_transfer_request;
             while(transfer)
             {
+
+                /* Check next micro-frame index.  */
+                fr_req += ied -> ux_ehci_hsiso_ed_frinterval;
 
                 /* If next is transfer we expect, remove from it.  */
                 if (transfer -> ux_transfer_request_next_transfer_request == transfer_request)
@@ -167,17 +205,31 @@ ULONG                           remain_count;
                     break;
                 }
 
+                /* If that's first new, it means first new is in remained list.  */
+                if (transfer == ied -> ux_ehci_hsiso_ed_transfer_first_new)
+                    first_new_aborted = 0;
+
                 /* Next transfer.  */
                 transfer = transfer -> ux_transfer_request_next_transfer_request;
+            }
 
-                /* Remain plus one.  */
-                remain_count ++;
+            /* If first new is removed, set to null.  */
+            if (first_new_aborted)
+                ied -> ux_ehci_hsiso_ed_transfer_first_new = UX_NULL;
+
+            /* If some micro-frames are removed, modify control.  */
+            for (; fr_req < max_load_count; fr_req += ied -> ux_ehci_hsiso_ed_frinterval)
+            {
+                frindex = fr_start + fr_req;
+                frindex &= 0x7u;
+
+                /* Get actual iTD used and clear control.  */
+                fr_td = ied -> ux_ehci_hsiso_ed_fr_td[frindex >> 1];
+                fr_td -> ux_ehci_hsiso_td_frload           &= (UCHAR)~(1u << frindex);
+                fr_td -> ux_ehci_hsiso_td_control[frindex] &= ~UX_EHCI_HSISO_STATUS_ACTIVE;
+                fr_td -> ux_ehci_hsiso_td_fr_transfer[frindex & 1u] = UX_NULL;
             }
         }
-
-        /* Wait a while so background transfer completed.  */
-        if (remain_count < max_load_count)
-            _ux_utility_delay_ms(1);
 
         /* Release the periodic table.  */
         _ux_host_mutex_off(&hcd_ehci -> ux_hcd_ehci_periodic_mutex);

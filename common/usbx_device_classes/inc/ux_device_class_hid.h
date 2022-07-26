@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_hid.h                               PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,6 +61,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added receiver callback,    */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone int out,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -120,6 +123,16 @@ extern   "C" {
 
 #define UX_DEVICE_CLASS_HID_PROTOCOL_BOOT                           0
 #define UX_DEVICE_CLASS_HID_PROTOCOL_REPORT                         1
+
+/* Define HID standalone read/receiver states.  */
+
+#define UX_DEVICE_CLASS_HID_READ_START                              (UX_STATE_STEP + 1)
+#define UX_DEVICE_CLASS_HID_READ_WAIT                               (UX_STATE_STEP + 2)
+
+#define UX_DEVICE_CLASS_HID_RECEIVER_START                          (UX_STATE_STEP + 3)
+#define UX_DEVICE_CLASS_HID_RECEIVER_WAIT                           (UX_STATE_STEP + 4)
+#define UX_DEVICE_CLASS_HID_RECEIVER_ERROR                          (UX_STATE_STEP + 5)
+
 
 /* Define HID event info structure.  */
 
@@ -196,10 +209,11 @@ typedef struct UX_SLAVE_CLASS_HID_STRUCT
     UX_MUTEX                        ux_device_class_hid_read_mutex;
 #else
     UCHAR                           *ux_device_class_hid_read_buffer;
-    UCHAR                           ux_device_class_hid_read_requested_length;
-    UCHAR                           ux_device_class_hid_read_actual_length;
-    UCHAR                           ux_device_class_hid_read_transfer_length;
+    ULONG                           ux_device_class_hid_read_requested_length;
+    ULONG                           ux_device_class_hid_read_actual_length;
+    ULONG                           ux_device_class_hid_read_transfer_length;
     UINT                            ux_device_class_hid_read_state;
+    UINT                            ux_device_class_hid_read_status;
 #endif
 #endif
 
@@ -233,7 +247,7 @@ typedef struct UX_DEVICE_CLASS_HID_RECEIVER_STRUCT
 #if !defined(UX_DEVICE_STANDALONE)
     UX_THREAD               ux_device_class_hid_receiver_thread;
 #else
-    VOID                    (*ux_device_class_hid_receiver_tasks_run)(struct UX_SLAVE_CLASS_HID_STRUCT *hid);
+    UINT                    (*ux_device_class_hid_receiver_tasks_run)(struct UX_SLAVE_CLASS_HID_STRUCT *hid);
 #endif
 } UX_DEVICE_CLASS_HID_RECEIVER;
 
@@ -294,6 +308,10 @@ UINT  _ux_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
                                 UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
 UINT  _ux_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 
+UINT  _ux_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid,
+                                UCHAR *buffer, ULONG requested_length,
+                                ULONG *actual_length);
+UINT  _ux_device_class_hid_receiver_tasks_run(UX_SLAVE_CLASS_HID *hid);
 
 /* Define Device HID Class API prototypes.  */
 
@@ -306,6 +324,7 @@ UINT  _ux_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 #define ux_device_class_hid_protocol_get(hid)   (hid -> ux_device_class_hid_protocol)
 
 #define ux_device_class_hid_read                _ux_device_class_hid_read
+#define ux_device_class_hid_read_run            _ux_device_class_hid_read_run
 
 #define ux_device_class_hid_receiver_initialize _ux_device_class_hid_receiver_initialize
 #define ux_device_class_hid_receiver_event_get  _ux_device_class_hid_receiver_event_get

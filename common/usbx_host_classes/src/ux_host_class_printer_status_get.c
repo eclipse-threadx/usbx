@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_status_get                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_status_get(UX_HOST_CLASS_PRINTER *printer, ULONG *printer_status)
@@ -89,7 +93,7 @@ UINT  _ux_host_class_printer_status_get(UX_HOST_CLASS_PRINTER *printer, ULONG *p
 #if defined(UX_HOST_STANDALONE)
 UX_INTERRUPT_SAVE_AREA
 #endif
-UX_INTERFACE    *interface;
+UX_INTERFACE    *interface_ptr;
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 UINT            status;
@@ -152,7 +156,7 @@ UCHAR *         printer_status_buffer;
     }
 
     /* Need interface for wIndex.  */
-    interface = printer -> ux_host_class_printer_interface;
+    interface_ptr = printer -> ux_host_class_printer_interface;
 
     /* Create a transfer_request for the GET_STATUS request.  */
     transfer_request -> ux_transfer_request_data_pointer =      printer_status_buffer;
@@ -160,7 +164,7 @@ UCHAR *         printer_status_buffer;
     transfer_request -> ux_transfer_request_function =          UX_HOST_CLASS_PRINTER_GET_STATUS;
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_value =             0;
-    transfer_request -> ux_transfer_request_index =             interface -> ux_interface_descriptor.bInterfaceNumber;
+    transfer_request -> ux_transfer_request_index =             interface_ptr -> ux_interface_descriptor.bInterfaceNumber;
 
 #if defined(UX_HOST_STANDALONE)
 

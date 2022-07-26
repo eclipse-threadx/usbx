@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -78,6 +78,11 @@
 /*                                            added option to validate    */
 /*                                            class code in enumeration,  */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added audio class features, */
+/*                                            added device CDC_ACM and    */
+/*                                            printer write auto ZLP,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -88,6 +93,8 @@
 /* Define various build options for the USBX port.  The application should either make changes
    here by commenting or un-commenting the conditional compilation defined OR supply the defines 
    though the compiler's equivalent of the -D option.  */
+
+/* Define USBX Generic Thread Stack Size.  */
 /* #define UX_THREAD_STACK_SIZE                                (2 * 1024) */
 
 /* Define USBX Host Enum Thread Stack Size. The default is to use UX_THREAD_STACK_SIZE */
@@ -96,7 +103,7 @@
 */
 
 
-/* Define USBX Host Thread Stack Size.  The default is to use UX_THREAD_STACK_SIZE */
+/* Define USBX Host HCD Thread Stack Size.  The default is to use UX_THREAD_STACK_SIZE */
 /*
 #define UX_HOST_HCD_THREAD_STACK_SIZE                       UX_THREAD_STACK_SIZE
 */
@@ -369,13 +376,22 @@
 
 /* #define UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE  */
 
+/* Defined, device HID interrupt OUT transfer is supported.  */
+
+/* #define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT  */
+
 /* defined, this macro enables device audio feedback endpoint support.  */
 
 /* #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT  */
 
-/* Defined, device HID interrupt OUT transfer is supported.  */
+/* Defined, class _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
 
-/* #define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT  */
+/* #define UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP  */
+/* #define UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP  */
+
+/* defined, this macro enables device audio interrupt endpoint support.  */
+
+/* define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT  */
 
 /* Defined, this macro enables device bi-directional-endpoint support.  */
 
@@ -401,6 +417,15 @@
    The default is 10000 milliseconds.  */
 
 /* #define UX_HOST_CLASS_HID_REPORT_TRANSFER_TIMEOUT               10000 */
+
+/* Defined, host audio UAC 2.0 is supported.  */
+/* #define UX_HOST_CLASS_AUDIO_2_SUPPORT  */
+
+/* Defined, host audio optional feedback endpoint is supported.  */
+/* #define UX_HOST_CLASS_AUDIO_FEEDBACK_SUPPORT  */
+
+/* Defined, host audio optional interrupt endpoint is support.  */
+/* #define UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT  */
 
 /* Defined, this value will only enable the host side of usbx.  */
 /* #define UX_HOST_SIDE_ONLY   */

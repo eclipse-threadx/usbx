@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_activate                         PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +84,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_activate(UX_HOST_CLASS_COMMAND *command)
@@ -113,12 +116,31 @@ UINT                status;
     /* Store the class container into this instance.  */
     hub -> ux_host_class_hub_class =  command -> ux_host_class_command_class_ptr;
 
-    /* Store the class container into this instance.  */
-    hub -> ux_host_class_hub_class =  command -> ux_host_class_command_class_ptr;
-    
     /* Store the device container instance in the HUB instance, this is for 
        the class instance when it needs to talk to the USBX stack.  */
     hub -> ux_host_class_hub_device =  device;
+
+#if defined(UX_HOST_STANDALONE)
+
+    /* Store the instance in the device container, this is for the USBX stack
+        when it needs to invoke the class.  */        
+    device -> ux_device_class_instance =  (VOID *) hub;
+
+    /* Store the hub interface.  */
+    hub -> ux_host_class_hub_interface = device ->
+            ux_device_first_configuration -> ux_configuration_first_interface;
+
+    /* Store the class task function.  */
+    hub -> ux_host_class_hub_class -> ux_host_class_task_function = _ux_host_class_hub_tasks_run;
+
+    /* During activation and tasks, control transfer is used for requests.  */
+    hub -> ux_host_class_hub_transfer = &device -> ux_device_control_endpoint.ux_endpoint_transfer_request;
+
+    /* The HUB is configured and activated in ACTIVATE_WAIT.  */
+    hub -> ux_host_class_hub_run_status = UX_SUCCESS;
+    hub -> ux_host_class_hub_enum_state = UX_HOST_CLASS_HUB_ENUM_GET_STATUS;
+    status = UX_SUCCESS;
+#else
 
     /* Configure the HUB.  */
     status =  _ux_host_class_hub_configure(hub);     
@@ -175,7 +197,8 @@ UINT                status;
     /* If trace is enabled, register this object.  */
     UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, hub, 0, 0, 0)
 
+#endif
+
     /* Return completion status.  */
     return(status);    
 }
-

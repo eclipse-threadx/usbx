@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_write                      PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -48,7 +48,8 @@
 /*    printer                               Address of printer class      */
 /*                                            instance                    */
 /*    buffer                                Pointer to data to write      */
-/*    requested_length                      Length of bytes to write      */
+/*    requested_length                      Length of bytes to write,     */
+/*                                            set to 0 to issue ZLP       */
 /*    actual_length                         Pointer to save number of     */
 /*                                            bytes written               */
 /*                                                                        */
@@ -75,6 +76,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added auto ZLP support,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_printer_write(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
@@ -85,6 +89,7 @@ UX_SLAVE_ENDPOINT           *endpoint;
 UX_SLAVE_DEVICE             *device;
 UX_SLAVE_TRANSFER           *transfer_request;
 ULONG                       local_requested_length;
+ULONG                       local_host_length;
 UINT                        status = 0;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -138,6 +143,7 @@ UINT                        status = 0;
     }
 
     /* Check if we need more transactions.  */
+    local_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
     while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED &&
             requested_length != 0)
     {
@@ -149,9 +155,21 @@ UINT                        status = 0;
             local_requested_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
 
         else
+        {
 
             /* We can proceed with the demanded length.  */
             local_requested_length = requested_length;
+
+#if !defined(UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP)
+
+            /* Assume expected length matches.  */
+            local_host_length = requested_length;
+#else
+
+            /* Assume expected more so stack appends ZLP if needed.  */
+            local_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH + 1;
+#endif
+        }
 
         /* On a out, we copy the buffer to the caller. Not very efficient but it makes the API
             easier.  */
@@ -160,7 +178,7 @@ UINT                        status = 0;
 
         /* Send the request to the device controller.  */
         status =  _ux_device_stack_transfer_request(transfer_request,
-                                local_requested_length, local_requested_length);
+                                local_requested_length, local_host_length);
 
         /* Check the status */
         if (status == UX_SUCCESS)

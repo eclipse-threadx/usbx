@@ -34,7 +34,7 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_ecm_initialize                 PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,10 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -96,12 +100,12 @@ UINT  _ux_device_class_cdc_ecm_initialize(UX_SLAVE_CLASS_COMMAND *command)
 
 UX_SLAVE_CLASS_CDC_ECM                          *cdc_ecm;
 UX_SLAVE_CLASS_CDC_ECM_PARAMETER                *cdc_ecm_parameter;
-UX_SLAVE_CLASS                                  *class;
+UX_SLAVE_CLASS                                  *class_ptr;
 UINT                                            status;
 
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Create an instance of the device cdc_ecm class.  */
     cdc_ecm =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_CDC_ECM));
@@ -178,14 +182,14 @@ UINT                                            status;
     {
         status =  _ux_device_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread , "ux_slave_class_cdc_ecm_interrupt_thread",
                     _ux_device_class_cdc_ecm_interrupt_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack ,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
         if (status != UX_SUCCESS)
             status = (UX_THREAD_ERROR);
     }
 
-    UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread), class)
+    UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread), class_ptr)
 
     /* Check the creation of this thread.  */
     if (status == UX_SUCCESS)
@@ -196,7 +200,7 @@ UINT                                            status;
         does not start until we have a instance of the class. */
         status =  _ux_device_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread , "ux_slave_class_cdc_ecm_bulkout_thread",
                     _ux_device_class_cdc_ecm_bulkout_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack ,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
         if (status != UX_SUCCESS)
@@ -204,14 +208,14 @@ UINT                                            status;
         else
         {
 
-            UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread), class)
+            UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread), class_ptr)
 
             /* Bulk endpoint treatment needs to be running in a different thread. So start
             a new thread. We pass a pointer to the cdc_ecm instance to the new thread.  This thread
             does not start until we have a instance of the class. */
             status =  _ux_device_thread_create(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread , "ux_slave_class_cdc_ecm_bulkin_thread",
                         _ux_device_class_cdc_ecm_bulkin_thread,
-                        (ULONG) (ALIGN_TYPE) class, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack ,
+                        (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack ,
                         UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                         UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
             if (status != UX_SUCCESS)
@@ -219,7 +223,7 @@ UINT                                            status;
             else
             {
 
-                UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread), class)
+                UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread), class_ptr)
 
                 /* Create a event flag group for the cdc_ecm class to synchronize with the event interrupt thread.  */
                 status =  _ux_utility_event_flags_create(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, "ux_device_class_cdc_ecm_event_flag");
@@ -229,7 +233,7 @@ UINT                                            status;
                 {
 
                     /* Save the address of the CDC_ECM instance inside the CDC_ECM container.  */
-                    class -> ux_slave_class_instance = (VOID *) cdc_ecm;
+                    class_ptr -> ux_slave_class_instance = (VOID *) cdc_ecm;
 
                     /* Get the pointer to the application parameters for the cdc_ecm class.  */
                     cdc_ecm_parameter =  command -> ux_slave_class_command_parameter;

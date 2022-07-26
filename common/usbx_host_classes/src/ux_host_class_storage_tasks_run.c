@@ -53,7 +53,7 @@ static inline UINT _ux_host_class_storage_transport_sense_check(UX_HOST_CLASS_ST
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_tasks_run                    PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -95,6 +95,10 @@ static inline UINT _ux_host_class_storage_transport_sense_check(UX_HOST_CLASS_ST
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_tasks_run(UX_HOST_CLASS *storage_class)
@@ -127,7 +131,7 @@ UCHAR           state;
 ULONG           tick_now, tick_elapsed;
 UINT            status;
 UX_TRANSFER     *trans;
-UX_INTERFACE    *interface;
+UX_INTERFACE    *interface_ptr;
 
     /* If storage not live, start initialize.  */
     if (storage -> ux_host_class_storage_state == UX_HOST_CLASS_INSTANCE_MOUNTING)
@@ -202,10 +206,10 @@ UX_INTERFACE    *interface;
             {
 
                 /* This fails storage activation.  */
-                interface = storage -> ux_host_class_storage_interface;
+                interface_ptr = storage -> ux_host_class_storage_interface;
                 _ux_host_stack_class_instance_destroy(
                     storage -> ux_host_class_storage_class, (VOID *) storage);
-                interface -> ux_interface_class_instance =  (VOID *) UX_NULL;
+                interface_ptr -> ux_interface_class_instance =  (VOID *) UX_NULL;
                 _ux_utility_memory_free(storage);
                 return;
             }

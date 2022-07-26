@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_ioctl                          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            reset indexes of requests   */
+/*                                            ring when it is aborted,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_ioctl(UX_HOST_CLASS_VIDEO *video, ULONG ioctl_function,
@@ -195,6 +199,10 @@ UX_HOST_CLASS_VIDEO_PARAMETER_FRAME_INTERVAL    *interval_parameter;
 
         /* We need to abort transactions on the bulk In pipe.  */
         _ux_host_stack_endpoint_transfer_abort(video -> ux_host_class_video_isochronous_endpoint);
+
+        /* All linked requests are aborted, reset indexes.  */
+        video -> ux_host_class_video_transfer_request_start_index = 0;
+        video -> ux_host_class_video_transfer_request_end_index = 0;
         
         /* Status is successful.  */
         status = UX_SUCCESS;

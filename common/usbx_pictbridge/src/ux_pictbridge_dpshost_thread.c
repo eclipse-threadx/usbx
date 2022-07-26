@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_thread                       PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*  04-25-2022     Yajun Xia                Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            cleared compile warning,    */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_pictbridge_dpshost_thread(ULONG parameter)
@@ -91,7 +95,7 @@ UINT                    status;
     {   
 
         /* Wait for the semaphore to be put by the root hub or a regular hub.  */
-        _ux_utility_semaphore_get(&pictbridge -> ux_pictbridge_notification_semaphore, UX_WAIT_FOREVER);
+        _ux_system_semaphore_get_norc(&pictbridge -> ux_pictbridge_notification_semaphore, UX_WAIT_FOREVER);
 
         /* Check if there is an event. Normally there should be at least one since we got awaken. */
         if (pictbridge -> ux_pictbridge_event_array_tail != pictbridge -> ux_pictbridge_event_array_head)
@@ -126,7 +130,7 @@ UINT                    status;
                         pictbridge -> ux_pictbridge_host_client_state_machine |= UX_PICTBRIDGE_STATE_MACHINE_CLIENT_REQUEST_PENDING;
 
                         /* Wait for the host pending request to be completed.  */
-                        status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, 
+                        status =  _ux_system_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, 
                                                 UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
                                                 UX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
@@ -137,7 +141,8 @@ UINT                    status;
                         if (status != UX_SUCCESS)
                             break;
 
-
+                        /* Status good means flag match, no need to check variable again, mark it unused.  */
+                        (void)actual_flags;
                     }
                     
                     /* Change the state machine to client request being executed. */
@@ -151,7 +156,7 @@ UINT                    status;
                     {
 
                         /* Yes, so we need to set the event that advertise the completion of the host request.  */
-                        status =  _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, 
+                        status =  _ux_system_event_flags_set_rc(&pictbridge -> ux_pictbridge_event_flags_group, 
                                                 UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
                                                 UX_AND);
                         /* Check status.  */

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_notification_callback        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_pictbridge_dpshost_notification_callback(UX_HOST_CLASS_PIMA_EVENT *pima_event)
@@ -112,7 +115,7 @@ UX_PICTBRIDGE_EVENT     *pictbridge_event;
     pictbridge -> ux_pictbridge_event_array_head    = pictbridge_next_event;
 
     /* Wake up the Pictbridge notification handler thread.  */
-    _ux_utility_semaphore_put(&pictbridge -> ux_pictbridge_notification_semaphore);
+    _ux_system_semaphore_put(&pictbridge -> ux_pictbridge_notification_semaphore);
     
     /* We are done.  */
     return;

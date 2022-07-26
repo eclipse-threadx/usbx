@@ -37,7 +37,7 @@ VOID  _ux_device_class_dpump_thread(ULONG dpump_class);
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dpump_thread                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,16 +79,20 @@ VOID  _ux_device_class_dpump_thread(ULONG dpump_class);
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_dpump_thread(ULONG dpump_class)
 {
 
-UX_SLAVE_CLASS              *class;
+UX_SLAVE_CLASS              *class_ptr;
+UX_SLAVE_INTERFACE          *interface_ptr;
 UX_SLAVE_CLASS_DPUMP        *dpump;
 UX_SLAVE_TRANSFER           *transfer_request;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_INTERFACE          *interface;
 UX_SLAVE_ENDPOINT           *endpoint_in;
 UX_SLAVE_ENDPOINT           *endpoint_out;
 UINT                        status;
@@ -99,19 +103,19 @@ ULONG                       length;
     {
 
         /* Cast properly the dpump instance.  */
-        UX_THREAD_EXTENSION_PTR_GET(class, UX_SLAVE_CLASS, dpump_class)
+        UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, dpump_class)
         
         /* Get the dpump instance from this class container.  */
-        dpump =  (UX_SLAVE_CLASS_DPUMP *) class -> ux_slave_class_instance;
+        dpump =  (UX_SLAVE_CLASS_DPUMP *) class_ptr -> ux_slave_class_instance;
     
         /* Get the pointer to the device.  */
         device =  &_ux_system_slave -> ux_system_slave_device;
         
         /* This is the first time we are activated. We need the interface to the class.  */
-        interface =  dpump -> ux_slave_class_dpump_interface;
+        interface_ptr =  dpump -> ux_slave_class_dpump_interface;
         
         /* Locate the endpoints.  */
-        endpoint_in =  interface -> ux_slave_interface_first_endpoint;
+        endpoint_in =  interface_ptr -> ux_slave_interface_first_endpoint;
         
         /* Check the endpoint direction, if IN we have the correct endpoint.  */
         if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
@@ -168,7 +172,7 @@ ULONG                       length;
 
         /* We need to suspend ourselves. We will be resumed by the 
            device enumeration module.  */
-        _ux_device_thread_suspend(&class -> ux_slave_class_thread);
+        _ux_device_thread_suspend(&class_ptr -> ux_slave_class_thread);
     }
 }
 

@@ -696,6 +696,6 @@ UINT    _ux_host_class_storage_read_write_run(UX_HOST_CLASS_STORAGE *storage,
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif

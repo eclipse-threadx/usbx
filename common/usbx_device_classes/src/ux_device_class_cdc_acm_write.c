@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_write                      PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -51,7 +51,8 @@
 /*    cdc_acm                               Address of cdc_acm class      */ 
 /*                                                instance                */ 
 /*    buffer                                Pointer to data to write      */
-/*    requested_length                      Length of bytes to write      */
+/*    requested_length                      Length of bytes to write,     */
+/*                                                set to 0 to issue ZLP   */
 /*    actual_length                         Pointer to save number of     */
 /*                                                bytes written           */
 /*                                                                        */ 
@@ -82,10 +83,15 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile issue,        */
 /*                                            resulting in version 6.1.9  */
-/*  01-31-2022x    Chaoqiong Xiao           Modified comment(s),          */
+/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.10 */
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            added auto ZLP support,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
@@ -94,9 +100,10 @@ UINT _ux_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buff
 
 UX_SLAVE_ENDPOINT           *endpoint;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_INTERFACE          *interface;
+UX_SLAVE_INTERFACE          *interface_ptr;
 UX_SLAVE_TRANSFER           *transfer_request;
 ULONG                       local_requested_length;
+ULONG                       local_host_length;
 UINT                        status = 0;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -129,10 +136,10 @@ UINT                        status = 0;
     }
         
     /* We need the interface to the class.  */
-    interface =  cdc_acm -> ux_slave_class_cdc_acm_interface;
+    interface_ptr =  cdc_acm -> ux_slave_class_cdc_acm_interface;
     
     /* Locate the endpoints.  */
-    endpoint =  interface -> ux_slave_interface_first_endpoint;
+    endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
     
     /* Check the endpoint direction, if IN we have the correct endpoint.  */
     if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
@@ -169,6 +176,7 @@ UINT                        status = 0;
     else
     {    
         /* Check if we need more transactions.  */
+        local_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED && requested_length != 0)
         { 
     
@@ -179,9 +187,21 @@ UINT                        status = 0;
                 local_requested_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
                 
             else
-            
+            {
+
                 /* We can proceed with the demanded length.  */
                 local_requested_length = requested_length;
+
+#if !defined(UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP)
+
+                /* Assume the length match expectation.  */
+                local_host_length = requested_length;
+#else
+
+                /* Assume expecting more, so ZLP is appended in stack.  */
+                local_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH + 1;
+#endif
+            }
                             
             /* On a out, we copy the buffer to the caller. Not very efficient but it makes the API
                easier.  */
@@ -189,7 +209,7 @@ UINT                        status = 0;
                                 buffer, local_requested_length); /* Use case of memcpy is verified. */
         
             /* Send the request to the device controller.  */
-            status =  _ux_device_stack_transfer_request(transfer_request, local_requested_length, local_requested_length);
+            status =  _ux_device_stack_transfer_request(transfer_request, local_requested_length, local_host_length);
         
             /* Check the status */    
             if (status == UX_SUCCESS)

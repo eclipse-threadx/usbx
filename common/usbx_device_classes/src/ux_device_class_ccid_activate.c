@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_activate                      PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -63,14 +63,18 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_ccid_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
 
-UX_SLAVE_INTERFACE                      *interface;
-UX_DEVICE_CLASS_CCID                    *ccid;
+UX_SLAVE_INTERFACE                      *ccid_interface;
 UX_SLAVE_CLASS                          *ccid_class;
+UX_DEVICE_CLASS_CCID                    *ccid;
 UX_SLAVE_ENDPOINT                       *endpoint;
 ULONG                                   endpoint_type;
 UINT                                    i;
@@ -82,17 +86,17 @@ UINT                                    i;
     ccid = (UX_DEVICE_CLASS_CCID *) ccid_class -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    ccid_interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
 
     /* Store the class instance into the interface.  */
-    interface -> ux_slave_interface_class_instance =  (VOID *)ccid;
+    ccid_interface -> ux_slave_interface_class_instance =  (VOID *)ccid;
 
     /* Now the opposite, store the interface in the class instance.  */
-    ccid -> ux_device_class_ccid_interface =  interface;
+    ccid -> ux_device_class_ccid_interface =  ccid_interface;
 
     /* Save endpoints.  */
     ccid -> ux_device_class_ccid_endpoint_notify = UX_NULL;
-    endpoint = interface -> ux_slave_interface_first_endpoint;
+    endpoint = ccid_interface -> ux_slave_interface_first_endpoint;
     while(endpoint)
     {
         endpoint_type = endpoint -> ux_slave_endpoint_descriptor.bmAttributes;

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_info_send           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed string length check,  */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_info_send(UX_SLAVE_CLASS_PIMA *pima, UX_SLAVE_CLASS_PIMA_OBJECT *object, 
@@ -108,7 +112,7 @@ UINT                            length, length1;
         {
 
             /* Yes this is a script. We need to search for the HDISCVRY.DPS file name.
-               Get the file name length (without null-terminator).  */
+               Get the file name length (with null-terminator).  */
             length1 = (UINT)(*object_info -> ux_device_class_pima_object_filename);
 
             /* Now, compare it to the HDISCVRY.DPS file name.  Check length first.  */
@@ -118,7 +122,7 @@ UINT                            length, length1;
                 /* Invalidate length, on error it's untouched.  */
                 length = UX_PICTBRIDGE_MAX_FILE_NAME_SIZE + 1;
                 _ux_utility_string_length_check(_ux_pictbridge_hdiscovery_name, &length, UX_PICTBRIDGE_MAX_FILE_NAME_SIZE);
-                if (length == length1)
+                if ((length + 1) == length1)
                 {
 
                     /* Get the file name in a ascii format (with null-terminator). */
@@ -134,7 +138,7 @@ UINT                            length, length1;
                         pictbridge -> ux_pictbridge_discovery_state = UX_PICTBRIDGE_DPSCLIENT_DISCOVERY_COMPLETE;
                         
                         /* Set an event flag if the application is listening.  */
-                        _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_DISCOVERY, UX_OR);
+                        _ux_system_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_DISCOVERY, UX_OR);
                         
                         /* There is no object during the discovery cycle.  */
                         return(UX_SUCCESS);

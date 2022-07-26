@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_printer.h                           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -42,6 +42,8 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -57,6 +59,10 @@
 extern   "C" {
 
 #endif
+
+/* Defined, _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
+
+/* #define UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP  */
 
 
 /* Define Printer Class USB Class constants.  */

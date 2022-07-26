@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_info_get            PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added no-callback handling, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, 
@@ -74,7 +77,6 @@ UINT  _ux_pictbridge_dpsclient_object_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG 
 
 UX_PICTBRIDGE               *pictbridge;
 UX_SLAVE_CLASS_PIMA_OBJECT   *object_info;
-
 
     /* Get the pointer to the Pictbridge instance.  */
     pictbridge = (UX_PICTBRIDGE *)pima -> ux_device_class_pima_application;
@@ -89,11 +91,28 @@ UX_SLAVE_CLASS_PIMA_OBJECT   *object_info;
         else        
             object_info = (UX_SLAVE_CLASS_PIMA_OBJECT *) pictbridge -> ux_pictbridge_object_client;
     }        
-    
     else
+    {
 
-        /* Get the object info from the application.  */
-        return pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object_info_get(pima, object_handle, object);
+        /* Get the object info from the application (if there is callback).  */
+        if (pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object_info_get)
+            return pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object_info_get(pima, object_handle, object);
+        else
+        {
+
+            /* Get the object info from job.  */
+            object_info = pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object;
+
+            /* Object info not available.  */
+            if (object_info == UX_NULL)
+            {
+
+                /* Error trap.  */
+                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_PICTBRIDGE_ERROR_NO_VALID_OBJECT_INFO);
+                return(UX_PICTBRIDGE_ERROR_NO_VALID_OBJECT_INFO);
+            }
+        }
+    }
 
     /* Return the pointer to this object.  */
     *object = object_info;

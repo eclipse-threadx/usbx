@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_network_driver.h                                 PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -48,6 +48,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  07-29-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed ipv6 support issue,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -75,7 +78,7 @@ extern   "C" {
 #define NX_ETHERNET_ARP                     0x0806
 #define NX_ETHERNET_RARP                    0x0835
 #define NX_ETHERNET_IP                      0x0800
-#define NX_ETHERNET_IPV6                    0x08DD
+#define NX_ETHERNET_IPV6                    0x86DD
 #define NX_ETHERNET_MTU                     1514
 
 typedef struct USB_NETWORK_DEVICE_STRUCT

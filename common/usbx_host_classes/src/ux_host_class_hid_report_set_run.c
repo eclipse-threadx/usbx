@@ -42,7 +42,7 @@ extern UINT ux_host_class_hid_report_set_buffer_allocate(
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hid_report_set_run                   PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@ extern UINT ux_host_class_hid_report_set_buffer_allocate(
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added interrupt OUT support,*/
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report)
@@ -129,9 +132,23 @@ UINT                        status;
         return(UX_STATE_EXIT);
     }
 
-    /* We need to get the default control endpoint transfer request pointer.  */
-    control_endpoint =  &device -> ux_device_control_endpoint;
-    transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
+#if defined(UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT)
+
+    /* Check if there is an interrupt OUT endpoint.  */
+    if (hid -> ux_host_class_hid_interrupt_out_endpoint != UX_NULL)
+    {
+
+        /* Transfer the report by using the interrupt OUT endpoint.  */
+        transfer_request = &hid -> ux_host_class_hid_interrupt_out_endpoint -> ux_endpoint_transfer_request;
+    }
+    else
+#endif
+    {
+
+        /* We need to get the default control endpoint transfer request pointer.  */
+        control_endpoint =  &device -> ux_device_control_endpoint;
+        transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
+    }
 
     /* Waiting transfer done.  */
     if (hid -> ux_host_class_hid_cmd_state == UX_STATE_WAIT)

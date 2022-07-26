@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_change                       PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,12 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            rx full packet for          */
+/*                                            feedback,                   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -82,8 +88,8 @@ UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
 
 UX_DEVICE_CLASS_AUDIO                   *audio;
 UX_DEVICE_CLASS_AUDIO_STREAM            *stream;
-UX_SLAVE_CLASS                          *class;
-UX_SLAVE_INTERFACE                      *interface;
+UX_SLAVE_CLASS                          *class_ptr;
+UX_SLAVE_INTERFACE                      *interface_ptr;
 UX_SLAVE_ENDPOINT                       *endpoint;
 UCHAR                                   *frame_buffer;
 ULONG                                    stream_index;
@@ -91,20 +97,20 @@ ULONG                                    endpoint_dir;
 
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
-    audio = (UX_DEVICE_CLASS_AUDIO *) class -> ux_slave_class_instance;
+    audio = (UX_DEVICE_CLASS_AUDIO *) class_ptr -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
 
     /* Get the interface number (base 0).  */
     if (audio -> ux_device_class_audio_interface)
     {
 
         /* If IAD used, calculate stream index based on interface number.  */
-        stream_index  = interface -> ux_slave_interface_descriptor.bInterfaceNumber;
+        stream_index  = interface_ptr -> ux_slave_interface_descriptor.bInterfaceNumber;
         stream_index -= audio -> ux_device_class_audio_interface -> ux_slave_interface_descriptor.bInterfaceNumber;
         stream_index --;
     }
@@ -117,16 +123,16 @@ ULONG                                    endpoint_dir;
     stream = &audio -> ux_device_class_audio_streams[stream_index];
 
     /* Update the interface.  */
-    stream -> ux_device_class_audio_stream_interface = interface;
+    stream -> ux_device_class_audio_stream_interface = interface_ptr;
 
     /* If the interface to mount has a non zero alternate setting, the class is really active with
        the endpoints active.  If the interface reverts to alternate setting 0, it needs to have
        the pending transactions terminated.  */
-    if (interface -> ux_slave_interface_descriptor.bAlternateSetting != 0)
+    if (interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting != 0)
     {
 
         /* Locate the endpoints.  ISO IN(write)/OUT(read) for Streaming Interface.  */
-        endpoint = interface -> ux_slave_interface_first_endpoint;
+        endpoint = interface_ptr -> ux_slave_interface_first_endpoint;
 
         /* Parse all endpoints.  */
 #if defined(UX_DEVICE_STANDALONE)
@@ -187,9 +193,12 @@ ULONG                                    endpoint_dir;
                         return(UX_MEMORY_INSUFFICIENT);
                     }
 
-                    /* Set request length.  */
+                    /* Set request length, uses full packet for OUT to avoid possible overflow.  */
                     endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_requested_length =
-                        (_ux_system_slave -> ux_system_slave_speed == UX_HIGH_SPEED_DEVICE) ? 4 : 3;
+                        endpoint_dir == UX_ENDPOINT_OUT ?
+                        endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_transfer_length :
+                        ((_ux_system_slave -> ux_system_slave_speed == UX_HIGH_SPEED_DEVICE) ?
+                         UX_FEEDBACK_SIZE_HIGH_SPEED : UX_FEEDBACK_SIZE_FULL_SPEED);
 
                     /* Save it.  */
                     stream -> ux_device_class_audio_stream_feedback = endpoint;
@@ -259,7 +268,7 @@ ULONG                                    endpoint_dir;
 
     /* Invoke stream change callback.  */
     if (stream -> ux_device_class_audio_stream_callbacks.ux_device_class_audio_stream_change)
-        stream -> ux_device_class_audio_stream_callbacks.ux_device_class_audio_stream_change(stream, interface -> ux_slave_interface_descriptor.bAlternateSetting);
+        stream -> ux_device_class_audio_stream_callbacks.ux_device_class_audio_stream_change(stream, interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting);
 
     /* Return completion status.  */
     return(UX_SUCCESS);

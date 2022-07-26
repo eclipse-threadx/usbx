@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_interface_setting_select             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,6 +57,8 @@
 /*    _ux_host_stack_interface_instance_create  Create interface instance */ 
 /*    _ux_host_stack_interface_instance_delete  Delete interface instance */ 
 /*    _ux_host_stack_interface_set              Set interface instance    */ 
+/*    _ux_host_semaphore_get                    Get semaphore             */
+/*    _ux_host_semaphore_put                    Put semaphore             */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -70,9 +72,12 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            protected control request,  */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_stack_interface_setting_select(UX_INTERFACE *interface)
+UINT  _ux_host_stack_interface_setting_select(UX_INTERFACE *interface_ptr)
 {
 
 UX_CONFIGURATION    *configuration;
@@ -84,22 +89,22 @@ UINT                current_alternate_setting;
 UINT                status;
     
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_INTERFACE_SETTING_SELECT, interface, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_INTERFACE_SETTING_SELECT, interface_ptr, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
     /* Check this alternate setting container. It must be valid before
        we continue.  */
-    if (interface -> ux_interface_handle != (ULONG) (ALIGN_TYPE) interface)
+    if (interface_ptr -> ux_interface_handle != (ULONG) (ALIGN_TYPE) interface_ptr)
     {
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface_ptr, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_INTERFACE_HANDLE_UNKNOWN);
     }
 
     /* From the interface, get the configuration container and the first
        interface hooked to this configuration.  */    
-    configuration =             interface -> ux_interface_configuration;
-    current_interface_number =  interface -> ux_interface_descriptor.bInterfaceNumber;
+    configuration =             interface_ptr -> ux_interface_configuration;
+    current_interface_number =  interface_ptr -> ux_interface_descriptor.bInterfaceNumber;
     current_interface =         configuration -> ux_configuration_first_interface;
 
     /* Remember the main interface to store the next alternate setting.  We set the main interface
@@ -157,17 +162,17 @@ UINT                status;
     }
 
     /* Remember the new alternate setting.  */
-    main_interface -> ux_interface_current_alternate_setting =  interface -> ux_interface_descriptor.bAlternateSetting;
+    main_interface -> ux_interface_current_alternate_setting =  interface_ptr -> ux_interface_descriptor.bAlternateSetting;
 
     /* Now, the interface must be created with the new alternate setting.  */
-    status =  _ux_host_stack_interface_instance_create(interface);
+    status =  _ux_host_stack_interface_instance_create(interface_ptr);
 
     /* If we could not create it, we return to the default one.  */
     if (status != UX_SUCCESS)
     {
 
         /* Then delete the failed interface.  */
-        _ux_host_stack_interface_instance_delete(interface);
+        _ux_host_stack_interface_instance_delete(interface_ptr);
 
         /* Error, reset the main interface alternate setting to the default.  */
         main_interface -> ux_interface_current_alternate_setting =  current_alternate_setting;
@@ -179,8 +184,14 @@ UINT                status;
         return(status);
     }
 
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
+       transfer request function.  */
+    status =  _ux_host_semaphore_get(&configuration -> ux_configuration_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
+    if (status != UX_SUCCESS)
+        return(status);
+
     /* Issue a SET_INTERFACE command to the target device.  */
-    status =  _ux_host_stack_interface_set(interface);
+    status =  _ux_host_stack_interface_set(interface_ptr);
 
     /* Check completion status.  */
     if (status != UX_SUCCESS)
@@ -190,12 +201,13 @@ UINT                status;
         main_interface -> ux_interface_current_alternate_setting =  current_alternate_setting;
 
         /* Delete the current interface.  */
-        _ux_host_stack_interface_instance_delete(interface);
+        _ux_host_stack_interface_instance_delete(interface_ptr);
 
         /* Re-create the previous interface with the old alternate setting.  */
         _ux_host_stack_interface_instance_create(previous_interface);
 
         /* Return error status.  */
+        _ux_host_semaphore_put(&configuration -> ux_configuration_device -> ux_device_protection_semaphore);
         return(status);
     }
     

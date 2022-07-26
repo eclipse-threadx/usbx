@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_transfer_request               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            set pending on endpoint,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_request(UX_HOST_CLASS_VIDEO *video,
@@ -80,12 +83,16 @@ UINT  _ux_host_class_video_transfer_request(UX_HOST_CLASS_VIDEO *video,
 {
 
 UINT            status;
+UX_ENDPOINT     *endpoint;
 UX_TRANSFER     *transfer_list;
 UX_TRANSFER     *transfer_request;
 UX_TRANSFER     *previous_transfer;
 
     /* Get transfer request list head.  */
     transfer_list = &video_transfer_request -> ux_host_class_video_transfer_request;
+
+    /* Get endpoint.  */
+    endpoint = video -> ux_host_class_video_isochronous_endpoint;
 
     /* Process the transfer request list (if multiple found).  */
     previous_transfer = UX_NULL;
@@ -100,7 +107,7 @@ UX_TRANSFER     *previous_transfer;
             ux_endpoint_descriptor.bEndpointAddress & UX_REQUEST_DIRECTION;
 
         /* Fill the transfer request with all the required fields.  */
-        transfer_request -> ux_transfer_request_endpoint =             video -> ux_host_class_video_isochronous_endpoint;
+        transfer_request -> ux_transfer_request_endpoint =             endpoint;
         transfer_request -> ux_transfer_request_data_pointer =         video_transfer_request -> ux_host_class_video_transfer_request_data_pointer;
         transfer_request -> ux_transfer_request_requested_length =     video_transfer_request -> ux_host_class_video_transfer_request_requested_length;
         transfer_request -> ux_transfer_request_completion_function =  _ux_host_class_video_transfer_request_completed;
@@ -123,10 +130,12 @@ UX_TRANSFER     *previous_transfer;
         video_transfer_request = video_transfer_request -> ux_host_class_video_transfer_request_next_video_transfer_request;
     }
 
+    /* Set endpoint status to pending, for callback and abort to check.  */
+    endpoint -> ux_endpoint_transfer_request.ux_transfer_request_completion_code = UX_TRANSFER_STATUS_PENDING;
+
     /* Transfer the transfer request (list).  */
     status =  _ux_host_stack_transfer_request(transfer_list);
 
     /* Return completion status.  */
     return(status);
 }
-

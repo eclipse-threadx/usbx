@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_response_get                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed string length check,  */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_response_get(UX_PICTBRIDGE *pictbridge)
@@ -93,7 +97,7 @@ UINT                                length, length1;
     pima_object =  (UX_HOST_CLASS_PIMA_OBJECT *) pictbridge -> ux_pictbridge_object_host;
 
     /* Wait for the semaphore to be put by the root hub or a regular hub.  */
-    _ux_utility_semaphore_get(&pictbridge -> ux_pictbridge_notification_semaphore, UX_WAIT_FOREVER);
+    _ux_system_semaphore_get_norc(&pictbridge -> ux_pictbridge_notification_semaphore, UX_WAIT_FOREVER);
 
     /* Check if there is an event. Normally there should be at least one since we got awaken. */
     if (pictbridge -> ux_pictbridge_event_array_tail != pictbridge -> ux_pictbridge_event_array_head)
@@ -155,7 +159,7 @@ UINT                                length, length1;
     {
 
         /* Yes this is a script. We need to search for the DRSPONSE.DPS file name.
-           Get the file name length (without null-terminator).  */
+           Get the file name length (with null-terminator).  */
         length1 = (UINT)(*pima_object -> ux_host_class_pima_object_filename);
 
         /* Check the file name from this script. It should be in the form DRSPONSE.DPS.  */
@@ -165,7 +169,7 @@ UINT                                length, length1;
             /* Invalidate length, on error it's untouched.  */
             length = UX_PICTBRIDGE_MAX_FILE_NAME_SIZE + 1;
             _ux_utility_string_length_check(_ux_pictbridge_drsponse_name, &length, UX_PICTBRIDGE_MAX_FILE_NAME_SIZE);
-            if (length == length1)
+            if ((length + 1) == length1)
             {
 
                 /* Get the file name in a ascii format (with null-terminator).   */

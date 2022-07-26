@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_thread                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_pictbridge_dpsclient_thread(ULONG parameter)
@@ -96,7 +99,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *pima_object;
             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, status);
 
         /* We should wait for the host to send a script with a command.  */
-        status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, (UX_PICTBRIDGE_EVENT_FLAG_NOTIFY_JOB_STATUS | 
+        status =  _ux_system_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, (UX_PICTBRIDGE_EVENT_FLAG_NOTIFY_JOB_STATUS | 
                                                                                                 UX_PICTBRIDGE_EVENT_FLAG_NOTIFY_DEVICE_STATUS), 
                                                                                                 UX_OR_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 

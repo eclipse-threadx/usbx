@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_write_run                  PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,11 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            added auto ZLP support,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
@@ -86,7 +91,7 @@ UINT _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
 
 UX_SLAVE_ENDPOINT           *endpoint;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_INTERFACE          *interface;
+UX_SLAVE_INTERFACE          *interface_ptr;
 UX_SLAVE_TRANSFER           *transfer_request;
 UINT                        zlp = UX_FALSE;
 UINT                        status = 0;
@@ -124,10 +129,10 @@ UINT                        status = 0;
     }
 
     /* We need the interface to the class.  */
-    interface =  cdc_acm -> ux_slave_class_cdc_acm_interface;
+    interface_ptr =  cdc_acm -> ux_slave_class_cdc_acm_interface;
 
     /* Locate the endpoints.  */
-    endpoint =  interface -> ux_slave_interface_first_endpoint;
+    endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
 
     /* Check the endpoint direction, if IN we have the correct endpoint.  */
     if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
@@ -149,6 +154,7 @@ UINT                        status = 0;
         cdc_acm -> ux_device_class_cdc_acm_write_buffer = buffer;
         cdc_acm -> ux_device_class_cdc_acm_write_requested_length = requested_length;
         cdc_acm -> ux_device_class_cdc_acm_write_actual_length = 0;
+        cdc_acm -> ux_device_class_cdc_acm_write_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
         if (requested_length == 0)
             zlp = UX_TRUE;
 
@@ -176,9 +182,22 @@ UINT                        status = 0;
                                             UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
 
         else
+        {
 
             /* We can proceed with the demanded length.  */
             cdc_acm -> ux_device_class_cdc_acm_write_transfer_length = requested_length;
+
+#if !defined(UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP)
+
+            /* Assume expected length and transfer length match.  */
+            cdc_acm -> ux_device_class_cdc_acm_write_host_length = requested_length;
+#else
+
+            /* Assume expected more than transfer to let stack append ZLP if needed.  */
+            cdc_acm -> ux_device_class_cdc_acm_write_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH + 1;
+#endif
+        }
+
 
         /* On a out, we copy the buffer to the caller. Not very efficient but it makes the API
            easier.  */
@@ -196,7 +215,7 @@ UINT                        status = 0;
         /* Send the request to the device controller.  */
         status =  _ux_device_stack_transfer_run(transfer_request,
                             cdc_acm -> ux_device_class_cdc_acm_write_transfer_length,
-                            cdc_acm -> ux_device_class_cdc_acm_write_transfer_length);
+                            cdc_acm -> ux_device_class_cdc_acm_write_host_length);
 
         /* Error case.  */
         if (status < UX_STATE_NEXT)

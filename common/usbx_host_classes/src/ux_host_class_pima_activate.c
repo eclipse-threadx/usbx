@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_activate                        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,18 +72,22 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_activate(UX_HOST_CLASS_COMMAND *command)
 {
 
-UX_INTERFACE                        *interface;
-UX_HOST_CLASS_PIMA                   *pima;
-UINT                                   status;
+UX_INTERFACE                        *interface_ptr;
+UX_HOST_CLASS_PIMA                  *pima;
+UINT                                 status;
 
     /* The PIMA class is always activated by the interface descriptor and not the
        device descriptor.  */
-    interface =  (UX_INTERFACE *) command -> ux_host_class_command_container;
+    interface_ptr =  (UX_INTERFACE *) command -> ux_host_class_command_container;
 
     /* Obtain memory for this class instance.  */
     pima =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_HOST_CLASS_PIMA));
@@ -114,13 +118,13 @@ UINT                                   status;
         pima -> ux_host_class_pima_class =  command -> ux_host_class_command_class_ptr;
 
         /* Store the interface container into the pima class instance.  */
-        pima -> ux_host_class_pima_interface =  interface;
+        pima -> ux_host_class_pima_interface =  interface_ptr;
 
         /* Store the device container into the pima class instance.  */
-        pima -> ux_host_class_pima_device =  interface -> ux_interface_configuration -> ux_configuration_device;
+        pima -> ux_host_class_pima_device =  interface_ptr -> ux_interface_configuration -> ux_configuration_device;
 
         /* This instance of the device must also be stored in the interface container.  */
-        interface -> ux_interface_class_instance =  (VOID *) pima;
+        interface_ptr -> ux_interface_class_instance =  (VOID *) pima;
 
         /* Create this class instance.  */
         _ux_host_stack_class_instance_create(pima -> ux_host_class_pima_class, (VOID *) pima);
@@ -163,7 +167,7 @@ UINT                                   status;
     if (pima -> ux_host_class_pima_event_buffer)
     {
         _ux_host_stack_class_instance_destroy(pima -> ux_host_class_pima_class, (VOID *) pima);
-        interface -> ux_interface_class_instance = UX_NULL;
+        interface_ptr -> ux_interface_class_instance = UX_NULL;
         _ux_utility_memory_free(pima -> ux_host_class_pima_event_buffer);
     }
 

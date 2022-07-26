@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_interrupt_endpoint_search        PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,20 +75,24 @@
 /*                                            added interrupt OUT support,*/
 /*                                            added timeout initialize,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_interrupt_endpoint_search(UX_HOST_CLASS_HID *hid)
 {
 
 UINT            status = UX_ENDPOINT_HANDLE_UNKNOWN;
-UX_INTERFACE    *interface;
+UX_INTERFACE    *interface_ptr;
 UX_ENDPOINT     *endpoint;
 UX_TRANSFER     *transfer_request;
 
 
     /* Search the interrupt endpoint. It is attached to the interface container.  */
-    interface = hid -> ux_host_class_hid_interface;
-    endpoint = interface -> ux_interface_first_endpoint;
+    interface_ptr = hid -> ux_host_class_hid_interface;
+    endpoint = interface_ptr -> ux_interface_first_endpoint;
     while(endpoint != UX_NULL)
     {
 

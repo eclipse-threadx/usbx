@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_alternate_setting_set              PORTABLE C      */
-/*                                                           6.1.9        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,13 +81,17 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            calculated payload size,    */
 /*                                            resulting in version 6.1.9  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_alternate_setting_set(ULONG interface_value, ULONG alternate_setting_value)
 {
 
 UX_SLAVE_DEVICE                 *device;
-UX_SLAVE_INTERFACE              *interface;
+UX_SLAVE_INTERFACE              *interface_ptr;
 #if !defined(UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE)
 UX_SLAVE_DCD                    *dcd;
 UX_SLAVE_TRANSFER               *transfer_request;
@@ -102,7 +106,7 @@ UX_SLAVE_ENDPOINT               *next_endpoint;
 UX_SLAVE_ENDPOINT               *endpoint_link;
 ULONG                            endpoints_pool_number;
 UX_SLAVE_CLASS_COMMAND          class_command;
-UX_SLAVE_CLASS                  *class;
+UX_SLAVE_CLASS                  *class_ptr;
 UINT                            status;
 ULONG                           max_transfer_length, n_trans;
 #endif
@@ -118,40 +122,40 @@ ULONG                           max_transfer_length, n_trans;
         return(UX_FUNCTION_NOT_SUPPORTED);
 
     /* Find the current interface.  */
-    interface =  device -> ux_slave_device_first_interface;
+    interface_ptr =  device -> ux_slave_device_first_interface;
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
     /* Scan all interfaces if any. */
-    while (interface != UX_NULL)
+    while (interface_ptr != UX_NULL)
     {
 
-        if (interface -> ux_slave_interface_descriptor.bInterfaceNumber == interface_value)
+        if (interface_ptr -> ux_slave_interface_descriptor.bInterfaceNumber == interface_value)
             break;
         else
-            interface =  interface -> ux_slave_interface_next_interface;
+            interface_ptr =  interface_ptr -> ux_slave_interface_next_interface;
     }
 #else
-    if (interface -> ux_slave_interface_descriptor.bInterfaceNumber != interface_value)
-        interface = UX_NULL;
+    if (interface_ptr -> ux_slave_interface_descriptor.bInterfaceNumber != interface_value)
+        interface_ptr = UX_NULL;
 #endif
 
     /* We must have found the interface pointer for the interface value
        requested by the caller.  */
-    if (interface == UX_NULL)
+    if (interface_ptr == UX_NULL)
     {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_INTERFACE_HANDLE_UNKNOWN);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface_ptr, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_INTERFACE_HANDLE_UNKNOWN);
     }
 
     /* If the host is requesting a change of alternate setting to the current one,
        we do not need to do any work.  */
-    if (interface -> ux_slave_interface_descriptor.bAlternateSetting == alternate_setting_value)
+    if (interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting == alternate_setting_value)
         return(UX_SUCCESS);       
 
 #if defined(UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE)
@@ -160,7 +164,7 @@ ULONG                           max_transfer_length, n_trans;
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_FUNCTION_NOT_SUPPORTED);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, interface_ptr, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
     return(UX_FUNCTION_NOT_SUPPORTED);
 #else
@@ -230,7 +234,7 @@ ULONG                           max_transfer_length, n_trans;
                             /* We have found the right interface and alternate setting. Before
                                we mount all the endpoints for this interface, we need to
                                unmount the endpoints associated with the previous alternate setting.  */
-                            endpoint =  interface -> ux_slave_interface_first_endpoint;
+                            endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
                             while (endpoint != UX_NULL)
                             {
 
@@ -257,7 +261,7 @@ ULONG                           max_transfer_length, n_trans;
                             }
 
                             /* Now clear the interface endpoint entry.  */
-                            interface -> ux_slave_interface_first_endpoint = UX_NULL;
+                            interface_ptr -> ux_slave_interface_first_endpoint = UX_NULL;
 
                             /* Point beyond the interface descriptor.  */
                             device_framework_length -=  (ULONG) *device_framework;
@@ -344,7 +348,7 @@ ULONG                           max_transfer_length, n_trans;
                                     transfer_request -> ux_slave_transfer_request_timeout = UX_WAIT_FOREVER;
                                     
                                     /* Attach the interface to the endpoint.  */
-                                    endpoint -> ux_slave_endpoint_interface =  interface;
+                                    endpoint -> ux_slave_endpoint_interface =  interface_ptr;
                                         
                                     /* Attach the device to the endpoint.  */
                                     endpoint -> ux_slave_endpoint_device =  device;
@@ -362,15 +366,15 @@ ULONG                           max_transfer_length, n_trans;
                                     }
 
                                     /* Attach this endpoint to the end of the endpoint chain.  */
-                                    if (interface -> ux_slave_interface_first_endpoint == UX_NULL)
+                                    if (interface_ptr -> ux_slave_interface_first_endpoint == UX_NULL)
                                     {
                         
-                                        interface -> ux_slave_interface_first_endpoint =  endpoint;
+                                        interface_ptr -> ux_slave_interface_first_endpoint =  endpoint;
                                     }
                                     else
                                     {
                                         /* Multiple endpoints exist, so find the end of the chain.  */
-                                        endpoint_link =  interface -> ux_slave_interface_first_endpoint;
+                                        endpoint_link =  interface_ptr -> ux_slave_interface_first_endpoint;
                                         while (endpoint_link -> ux_slave_endpoint_next_endpoint != UX_NULL)
                                             endpoint_link =  endpoint_link -> ux_slave_endpoint_next_endpoint;
                                         endpoint_link -> ux_slave_endpoint_next_endpoint =  endpoint;
@@ -403,13 +407,13 @@ ULONG                           max_transfer_length, n_trans;
                             }
 
                             /* The interface descriptor in the current class must be changed to the new alternate setting.  */
-                            _ux_utility_memory_copy(&interface -> ux_slave_interface_descriptor, &interface_descriptor, sizeof(UX_INTERFACE_DESCRIPTOR)); /* Use case of memcpy is verified. */
+                            _ux_utility_memory_copy(&interface_ptr -> ux_slave_interface_descriptor, &interface_descriptor, sizeof(UX_INTERFACE_DESCRIPTOR)); /* Use case of memcpy is verified. */
                             
                             /* Get the class for the interface.  */
-                            class =  _ux_system_slave -> ux_system_slave_interface_class_array[interface -> ux_slave_interface_descriptor.bInterfaceNumber];
+                            class_ptr =  _ux_system_slave -> ux_system_slave_interface_class_array[interface_ptr -> ux_slave_interface_descriptor.bInterfaceNumber];
 
                             /* Check if class driver is available. */
-                            if (class == UX_NULL || class -> ux_slave_class_status == UX_UNUSED)
+                            if (class_ptr == UX_NULL || class_ptr -> ux_slave_class_status == UX_UNUSED)
                             {
 
                                 return (UX_NO_CLASS_MATCH);
@@ -418,16 +422,16 @@ ULONG                           max_transfer_length, n_trans;
                             /* The interface attached to this configuration must be changed at the class
                                level.  */
                             class_command.ux_slave_class_command_request   =    UX_SLAVE_CLASS_COMMAND_CHANGE;
-                            class_command.ux_slave_class_command_interface =   (VOID *) interface;
+                            class_command.ux_slave_class_command_interface =   (VOID *) interface_ptr;
 
                             /* And store it.  */
-                            class_command.ux_slave_class_command_class_ptr =  class;
+                            class_command.ux_slave_class_command_class_ptr =  class_ptr;
                             
                             /* We can now memorize the interface pointer associated with this class.  */
-                            class -> ux_slave_class_interface = interface;
+                            class_ptr -> ux_slave_class_interface = interface_ptr;
                             
                             /* We have found a potential candidate. Call this registered class entry function to change the alternate setting.  */
-                            status = class -> ux_slave_class_entry_function(&class_command);
+                            status = class_ptr -> ux_slave_class_entry_function(&class_command);
 
                             /* We are done here.  */
                             return(status); 

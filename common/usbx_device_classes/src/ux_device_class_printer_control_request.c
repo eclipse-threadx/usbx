@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_control_request            PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,13 +69,17 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_control_request(UX_SLAVE_CLASS_COMMAND *command)
 {
 UX_DEVICE_CLASS_PRINTER                 *printer;
 UX_SLAVE_CLASS                          *printer_class;
-UX_SLAVE_INTERFACE                      *interface;
+UX_SLAVE_INTERFACE                      *printer_interface;
 UX_SLAVE_TRANSFER                       *transfer_request;
 UX_SLAVE_DEVICE                         *device;
 ULONG                                   request;
@@ -96,7 +100,7 @@ UCHAR                                   found;
     printer = (UX_DEVICE_CLASS_PRINTER *) printer_class -> ux_slave_class_instance;
 
     /* Get the interface.  */
-    interface = printer_class -> ux_slave_class_interface;
+    printer_interface = printer_class -> ux_slave_class_interface;
 
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
@@ -127,7 +131,7 @@ UCHAR                                   found;
            - wIndex_high == interface (already checked before entry, index of
                                        interface should equal to interface number)
            - wIndex_low == alternate  */
-        if (index_low != (UCHAR)interface -> ux_slave_interface_descriptor.bAlternateSetting)
+        if (index_low != (UCHAR)printer_interface -> ux_slave_interface_descriptor.bAlternateSetting)
             return(UX_ERROR);
 
         /* Check config index.  */

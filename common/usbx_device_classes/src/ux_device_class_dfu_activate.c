@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_activate                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,29 +76,33 @@
 /*                                            resulting in version 6.1.6  */
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
                                           
-UX_SLAVE_INTERFACE                      *interface;         
+UX_SLAVE_INTERFACE                      *interface_ptr;         
+UX_SLAVE_CLASS                          *class_ptr;
 UX_SLAVE_CLASS_DFU                      *dfu;
-UX_SLAVE_CLASS                          *class;
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
-    dfu = (UX_SLAVE_CLASS_DFU *) class -> ux_slave_class_instance;
+    dfu = (UX_SLAVE_CLASS_DFU *) class_ptr -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
     
     /* Store the class instance into the interface.  */
-    interface -> ux_slave_interface_class_instance =  (VOID *)dfu;
+    interface_ptr -> ux_slave_interface_class_instance =  (VOID *)dfu;
          
     /* Now the opposite, store the interface in the class instance.  */
-    dfu -> ux_slave_class_dfu_interface =  interface;
+    dfu -> ux_slave_class_dfu_interface =  interface_ptr;
 
     /* Check the protocol activation field to determine in which state of the DFU class
        we are.  */

@@ -220,7 +220,7 @@ UINT                            inst_index;
                     _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_INSERTION,
                                         storage -> ux_host_class_storage_class, (VOID *) storage_media);
                 }
-                
+
                 /* Media inserted in slot, done.  */
                 break;
             }

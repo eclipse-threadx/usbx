@@ -260,7 +260,7 @@ VOID    _ux_host_class_hid_keyboard_tasks_run(UX_HOST_CLASS_HID_CLIENT *client);
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif
 

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_initialize                    PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -88,10 +92,10 @@ UINT  _ux_device_class_pima_initialize(UX_SLAVE_CLASS_COMMAND *command)
 UINT                                    status;
 UX_SLAVE_CLASS_PIMA                     *pima;
 UX_SLAVE_CLASS_PIMA_PARAMETER           *pima_parameter;
-UX_SLAVE_CLASS                          *class;
+UX_SLAVE_CLASS                          *class_ptr;
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Create an instance of the device pima class.  */
     pima =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_PIMA));
@@ -101,14 +105,14 @@ UX_SLAVE_CLASS                          *class;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Save the address of the PIMA instance inside the PIMA container.  */
-    class -> ux_slave_class_instance = (VOID *) pima;
+    class_ptr -> ux_slave_class_instance = (VOID *) pima;
 
     /* Allocate some memory for the thread stack. */
-    class -> ux_slave_class_thread_stack =  
+    class_ptr -> ux_slave_class_thread_stack =  
             _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
     
     /* Check for successful allocation.  */
-    if (class -> ux_slave_class_thread_stack == UX_NULL)
+    if (class_ptr -> ux_slave_class_thread_stack == UX_NULL)
         status = UX_MEMORY_INSUFFICIENT;
     else
         status = UX_SUCCESS;
@@ -118,9 +122,9 @@ UX_SLAVE_CLASS                          *class;
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_device_thread_create(&class -> ux_slave_class_thread, "ux_slave_class_thread", 
+        status =  _ux_device_thread_create(&class_ptr -> ux_slave_class_thread, "ux_slave_class_thread", 
                     _ux_device_class_pima_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) class -> ux_slave_class_thread_stack,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) class_ptr -> ux_slave_class_thread_stack,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
                     
@@ -129,7 +133,7 @@ UX_SLAVE_CLASS                          *class;
             status = UX_THREAD_ERROR;
     }
 
-    UX_THREAD_EXTENSION_PTR_SET(&(class -> ux_slave_class_thread), class)
+    UX_THREAD_EXTENSION_PTR_SET(&(class_ptr -> ux_slave_class_thread), class_ptr)
 
     /* There is error, free resources and return error.  */
     if (status != UX_SUCCESS)
@@ -138,11 +142,11 @@ UX_SLAVE_CLASS                          *class;
         /* The last resource, thread is not created or created error,
            no need to free.  */
 
-        if (class -> ux_slave_class_thread_stack)
-            _ux_utility_memory_free(class -> ux_slave_class_thread_stack);
+        if (class_ptr -> ux_slave_class_thread_stack)
+            _ux_utility_memory_free(class_ptr -> ux_slave_class_thread_stack);
 
         /* Detach instance and free memory.  */
-        class -> ux_slave_class_instance = UX_NULL;
+        class_ptr -> ux_slave_class_instance = UX_NULL;
         _ux_utility_memory_free(pima);
 
         /* Return completion status.  */

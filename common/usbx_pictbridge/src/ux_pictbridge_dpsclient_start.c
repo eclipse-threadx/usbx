@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_start                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_start(UX_PICTBRIDGE *pictbridge)
@@ -129,7 +132,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
     /* Create a event flag group for the client to communicate with the application.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_event_flags_create(&pictbridge -> ux_pictbridge_event_flags_group, "ux_pictbridge_client_event_flag");
+        status =  _ux_system_event_flags_create(&pictbridge -> ux_pictbridge_event_flags_group, "ux_pictbridge_client_event_flag");
 
         /* Check status.  */
         if (status != UX_SUCCESS)
@@ -141,7 +144,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
     /* Create the semaphore to wake up the thread.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_semaphore_create(&pictbridge -> ux_pictbridge_notification_semaphore, "ux_pictbridge_client_semaphore", 0);
+        status =  _ux_system_semaphore_create(&pictbridge -> ux_pictbridge_notification_semaphore, "ux_pictbridge_client_semaphore", 0);
         if (status != UX_SUCCESS)
 
             /* Do not proceed if error.  */
@@ -164,7 +167,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
     /* Create the pictbridge class thread.  */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_utility_thread_create(&pictbridge -> ux_pictbridge_thread,
+        status =  _ux_system_thread_create(&pictbridge -> ux_pictbridge_thread,
                                 "ux_pictbridge_thread", _ux_pictbridge_dpsclient_thread,
                                 (ULONG)(ALIGN_TYPE) pictbridge, 
                                 pictbridge -> ux_pictbridge_thread_stack,
@@ -241,14 +244,14 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
     {
             
         /* Free resources allocated so far.  */
-        if (pictbridge -> ux_pictbridge_thread.tx_thread_id != UX_EMPTY)
-            _ux_utility_thread_delete(&pictbridge -> ux_pictbridge_thread);
+        if (_ux_system_thread_created(&pictbridge -> ux_pictbridge_thread))
+            _ux_system_thread_delete(&pictbridge -> ux_pictbridge_thread);
         if (pictbridge -> ux_pictbridge_thread_stack)
             _ux_utility_memory_free(pictbridge -> ux_pictbridge_thread_stack);
-        if (pictbridge -> ux_pictbridge_notification_semaphore.tx_semaphore_id != UX_EMPTY)
-            _ux_utility_semaphore_delete(&pictbridge -> ux_pictbridge_notification_semaphore);
-        if (pictbridge -> ux_pictbridge_event_flags_group.tx_event_flags_group_id != UX_EMPTY)
-            _ux_utility_event_flags_delete(&pictbridge -> ux_pictbridge_event_flags_group);
+        if (_ux_system_semaphore_created(&pictbridge -> ux_pictbridge_notification_semaphore))
+            _ux_system_semaphore_delete(&pictbridge -> ux_pictbridge_notification_semaphore);
+        if (_ux_system_event_flags_created(&pictbridge -> ux_pictbridge_event_flags_group))
+            _ux_system_event_flags_delete(&pictbridge -> ux_pictbridge_event_flags_group);
         if (pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object)
         {
             _ux_utility_memory_free(pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object);

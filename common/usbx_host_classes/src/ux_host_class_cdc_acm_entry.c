@@ -52,7 +52,7 @@ static inline UINT  _ux_host_class_cdc_acm_activate_wait(UX_HOST_CLASS_COMMAND *
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_acm_entry                        PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -95,6 +95,10 @@ static inline UINT  _ux_host_class_cdc_acm_activate_wait(UX_HOST_CLASS_COMMAND *
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_entry(UX_HOST_CLASS_COMMAND *command)
@@ -184,7 +188,7 @@ static inline VOID  _ux_host_class_cdc_acm_descriptors_parse(UX_HOST_CLASS_CDC_A
 
 UX_ENDPOINT                 *control_endpoint;
 UX_TRANSFER                 *transfer_request;
-UX_INTERFACE                *interface;
+UX_INTERFACE                *interface_ptr;
 UCHAR                       *descriptor;
 ULONG                       total_descriptor_length;
 UCHAR                       descriptor_length;
@@ -209,7 +213,7 @@ UCHAR                       offset;
     }
 
     /* Get the interface.  */
-    interface = cdc_acm -> ux_host_class_cdc_acm_interface;
+    interface_ptr = cdc_acm -> ux_host_class_cdc_acm_interface;
 
     /* Parse the descriptor.  */
     total_descriptor_length = transfer_request -> ux_transfer_request_actual_length;
@@ -238,7 +242,7 @@ UCHAR                       offset;
         case UX_INTERFACE_DESCRIPTOR_ITEM:
 
             /* Check if interface is what we expected.  */
-            if (interface -> ux_interface_descriptor.bInterfaceNumber == descriptor_byte2)
+            if (interface_ptr -> ux_interface_descriptor.bInterfaceNumber == descriptor_byte2)
             {
 
                 /* Mark found.  */
@@ -331,7 +335,7 @@ static inline UINT  _ux_host_class_cdc_acm_activate_wait(UX_HOST_CLASS_COMMAND *
 
 UX_HOST_CLASS               *cdc_acm_class;
 UX_HOST_CLASS_CDC_ACM       *cdc_acm_inst;
-UX_INTERFACE                *interface;
+UX_INTERFACE                *interface_ptr;
 UX_HOST_CLASS_CDC_ACM       *cdc_acm;
 UX_ENDPOINT                 *control_endpoint;
 UX_TRANSFER                 *transfer;
@@ -341,8 +345,8 @@ UINT                        status;
 ULONG                       tick, diff;
 
     /* Get the instance for this class.  */
-    interface = (UX_INTERFACE *)command -> ux_host_class_command_container;
-    cdc_acm =  (UX_HOST_CLASS_CDC_ACM *) interface -> ux_interface_class_instance;
+    interface_ptr = (UX_INTERFACE *)command -> ux_host_class_command_container;
+    cdc_acm =  (UX_HOST_CLASS_CDC_ACM *) interface_ptr -> ux_interface_class_instance;
 
     /* Run initialize state machine.  */
     switch(cdc_acm -> ux_host_class_cdc_acm_cmd_state)
@@ -500,11 +504,11 @@ ULONG                       tick, diff;
             {
 
                 /* Get interface of the instance.  */
-                interface = cdc_acm_inst -> ux_host_class_cdc_acm_interface;
+                interface_ptr = cdc_acm_inst -> ux_host_class_cdc_acm_interface;
 
                 /* If this data interface is inside the associate list, link it.  */
                 if (cdc_acm -> ux_host_class_cdc_acm_interfaces_bitmap &
-                    (1ul << interface -> ux_interface_descriptor.bInterfaceNumber))
+                    (1ul << interface_ptr -> ux_interface_descriptor.bInterfaceNumber))
                 {
 
                     /* Save control instance and we are done.  */
@@ -556,8 +560,8 @@ ULONG                       tick, diff;
             _ux_host_stack_class_instance_destroy(cdc_acm -> ux_host_class_cdc_acm_class, (VOID *) cdc_acm);
 
             /* Unmount instance. */
-            interface = cdc_acm -> ux_host_class_cdc_acm_interface;
-            interface -> ux_interface_class_instance = UX_NULL;
+            interface_ptr = cdc_acm -> ux_host_class_cdc_acm_interface;
+            interface_ptr -> ux_interface_class_instance = UX_NULL;
 
             /* Free instance. */
             _ux_utility_memory_free(cdc_acm);

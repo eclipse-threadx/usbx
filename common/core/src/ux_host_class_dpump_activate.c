@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_dpump_activate                       PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,19 +78,23 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_activate(UX_HOST_CLASS_COMMAND *command)
 {
 
-UX_INTERFACE                *interface;
+UX_INTERFACE                *interface_ptr;
 UX_HOST_CLASS_DPUMP         *dpump;
 UINT                        status;
     
 
     /* The data pump is always activated by the interface descriptor and not the
        device descriptor.  */
-    interface =  (UX_INTERFACE *) command -> ux_host_class_command_container;
+    interface_ptr =  (UX_INTERFACE *) command -> ux_host_class_command_container;
 
     /* Obtain memory for this class instance.  */
     dpump =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_HOST_CLASS_DPUMP));
@@ -101,13 +105,13 @@ UINT                        status;
     dpump -> ux_host_class_dpump_class =  command -> ux_host_class_command_class_ptr;
 
     /* Store the interface container into the dpump class instance.  */
-    dpump -> ux_host_class_dpump_interface =  interface;
+    dpump -> ux_host_class_dpump_interface =  interface_ptr;
 
     /* Store the device container into the dpump class instance.  */
-    dpump -> ux_host_class_dpump_device =  interface -> ux_interface_configuration -> ux_configuration_device;
+    dpump -> ux_host_class_dpump_device =  interface_ptr -> ux_interface_configuration -> ux_configuration_device;
 
     /* This instance of the device must also be stored in the interface container.  */
-    interface -> ux_interface_class_instance =  (VOID *) dpump;
+    interface_ptr -> ux_interface_class_instance =  (VOID *) dpump;
 
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(dpump -> ux_host_class_dpump_class, (VOID *) dpump);

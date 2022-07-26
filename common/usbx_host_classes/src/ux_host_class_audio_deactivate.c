@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_deactivate                     PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,8 +58,8 @@
 /*                                                                        */ 
 /*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
 /*    _ux_host_stack_endpoint_transfer_abort Abort outstanding transfer   */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_host_semaphore_delete             Delete semaphore              */ 
+/*    _ux_host_mutex_on                     Get mutex                     */
+/*    _ux_host_mutex_delete                 Delete mutex                  */
 /*    _ux_utility_memory_free               Release memory block          */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
@@ -76,39 +76,75 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added interrupt support,    */
+/*                                            protect reentry with mutex, */
+/*                                            added feedback support,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_deactivate(UX_HOST_CLASS_COMMAND *command)
 {
 
 UX_HOST_CLASS_AUDIO     *audio;
-UINT                    status;
+#if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
+UX_HOST_CLASS_AUDIO_AC  *ac;
+#endif
 
     /* Get the instance for this class.  */
-    audio= (UX_HOST_CLASS_AUDIO *) command -> ux_host_class_command_instance;
+    audio = (UX_HOST_CLASS_AUDIO *) command -> ux_host_class_command_instance;
 
-    /* The audio is being shut down.  */
-    audio -> ux_host_class_audio_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
+#if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
+    if (_ux_host_class_audio_subclass_get(audio) == UX_HOST_CLASS_AUDIO_SUBCLASS_CONTROL)
+    {
+        ac = (UX_HOST_CLASS_AUDIO_AC *)audio;
 
-    /* Protect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_get(&audio -> ux_host_class_audio_semaphore, UX_WAIT_FOREVER);
-    if (status != UX_SUCCESS)
+        /* Stop interrupt and free allocated buffer for it.  */
+        if (ac -> ux_host_class_audio_interrupt_endpoint)
+        {
+            _ux_host_stack_endpoint_transfer_abort(ac -> ux_host_class_audio_interrupt_endpoint);
+            _ux_utility_memory_free(ac -> ux_host_class_audio_interrupt_endpoint ->
+                                    ux_endpoint_transfer_request.ux_transfer_request_data_pointer);
+        }
 
-        /* Return error.  */
-        return(status);
-    
-    /* We need to abort transactions on the iso out pipe.  */
-    _ux_host_stack_endpoint_transfer_abort(audio -> ux_host_class_audio_isochronous_endpoint);
+        /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
+        endpoints to exit properly.  */
+        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
-    /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
-       endpoints to exit properly.  */
-    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+        /* Destroy the instance.  */
+        _ux_host_stack_class_instance_destroy(audio -> ux_host_class_audio_class, (VOID *) audio);
+    }
+    else
+#endif
+    {
 
-    /* Destroy the instance.  */
-    _ux_host_stack_class_instance_destroy(audio -> ux_host_class_audio_class, (VOID *) audio);
+        /* The audio is being shut down.  */
+        audio -> ux_host_class_audio_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
 
-    /* Destroy the semaphore.  */
-    _ux_host_semaphore_delete(&audio -> ux_host_class_audio_semaphore);
+        /* Protect thread reentry to this instance.  */
+        _ux_host_mutex_on(&audio -> ux_host_class_audio_mutex);
+        
+        /* We need to abort transactions on the iso pipe.  */
+        if (audio -> ux_host_class_audio_isochronous_endpoint)
+            _ux_host_stack_endpoint_transfer_abort(audio -> ux_host_class_audio_isochronous_endpoint);
+#if defined(UX_HOST_CLASS_AUDIO_FEEDBACK_SUPPORT)
+    if (audio -> ux_host_class_audio_feedback_endpoint)
+    {
+        _ux_host_stack_endpoint_transfer_abort(audio -> ux_host_class_audio_feedback_endpoint);
+        _ux_utility_memory_free(audio -> ux_host_class_audio_feedback_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_data_pointer);
+    }
+#endif
+
+        /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
+        endpoints to exit properly.  */
+        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+
+        /* Destroy the instance.  */
+        _ux_host_stack_class_instance_destroy(audio -> ux_host_class_audio_class, (VOID *) audio);
+
+        /* Destroy the semaphore.  */
+        _ux_host_mutex_delete(&audio -> ux_host_class_audio_mutex);
+    }
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

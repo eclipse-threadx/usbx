@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_activate                     PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,19 +77,23 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support.   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_activate(UX_HOST_CLASS_COMMAND *command)
 {
 
-UX_INTERFACE            *interface;
+UX_INTERFACE            *interface_ptr;
 UX_HOST_CLASS_STORAGE   *storage;
 UINT                    status;
 
 
     /* The storage is always activated by the interface descriptor and not the
        device descriptor.  */
-    interface =  (UX_INTERFACE *) command -> ux_host_class_command_container;
+    interface_ptr =  (UX_INTERFACE *) command -> ux_host_class_command_container;
 
     /* Obtain memory for this class instance.  The memory used MUST BE allocated from a CACHE SAFE memory
        since the buffer for the CSW is an array contained within each storage instance. */
@@ -101,16 +105,16 @@ UINT                    status;
     storage -> ux_host_class_storage_class =  command -> ux_host_class_command_class_ptr;
 
     /* Store the interface container into the storage class instance.  */
-    storage -> ux_host_class_storage_interface =  interface;
+    storage -> ux_host_class_storage_interface =  interface_ptr;
 
     /* Store the device container into the storage class instance.  */
-    storage -> ux_host_class_storage_device =  interface -> ux_interface_configuration -> ux_configuration_device;
+    storage -> ux_host_class_storage_device =  interface_ptr -> ux_interface_configuration -> ux_configuration_device;
 
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(command -> ux_host_class_command_class_ptr, (VOID *) storage);
 
     /* This instance of the device must also be stored in the interface container.  */
-    interface -> ux_interface_class_instance =  (VOID *) storage;
+    interface_ptr -> ux_interface_class_instance =  (VOID *) storage;
 
 #if defined(UX_HOST_STANDALONE)
 
@@ -162,7 +166,7 @@ UINT                    status;
         _ux_host_stack_class_instance_destroy(storage -> ux_host_class_storage_class, (VOID *) storage);
 
         /* This instance of the device must also be removed in the interface container.  */
-        interface -> ux_interface_class_instance =  (VOID *) UX_NULL;
+        interface_ptr -> ux_interface_class_instance =  (VOID *) UX_NULL;
 
         /* Free memory for class instance.  */
         _ux_utility_memory_free(storage);

@@ -39,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_inquiry                    PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            updated dCSWDataResidue,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -195,7 +198,7 @@ UCHAR                   *inquiry_buffer;
         break;
 
     default:
-            
+
 #if !defined(UX_DEVICE_STANDALONE)
         /* The page code is not supported.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
@@ -238,6 +241,7 @@ UCHAR                   *inquiry_buffer;
     /* Check length.  */
     if (storage -> ux_slave_class_storage_host_length != inquiry_length)
     {
+        storage -> ux_slave_class_storage_csw_residue = storage -> ux_slave_class_storage_host_length - inquiry_length;
         _ux_device_stack_endpoint_stall(endpoint_in);
     }
 #endif

@@ -83,17 +83,17 @@
 VOID  _ux_device_class_dfu_thread(ULONG dfu_class)
 {
 
-UX_SLAVE_CLASS                  *class;
+UX_SLAVE_CLASS                  *class_ptr;
 UX_SLAVE_CLASS_DFU              *dfu;
 UX_SLAVE_DCD                    *dcd;
 UINT                            status;
 ULONG                           actual_flags;
 
     /* Cast properly the dfu instance.  */
-    UX_THREAD_EXTENSION_PTR_GET(class, UX_SLAVE_CLASS, dfu_class)
+    UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, dfu_class)
     
     /* Get the dfu instance from this class container.  */
-    dfu =  (UX_SLAVE_CLASS_DFU *) class -> ux_slave_class_instance;
+    dfu =  (UX_SLAVE_CLASS_DFU *) class_ptr -> ux_slave_class_instance;
     
     /* This thread runs forever.  */
     while(1)

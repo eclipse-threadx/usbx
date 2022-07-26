@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_feature                          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,10 @@
 /*                                                                        */ 
 /*    This function will send a command to the HUB on a specific port.    */
 /*    The commands can be SET_FEATURE or CLEAR_FEATURE.                   */ 
+/*                                                                        */
+/*    In standalone mode, this functioin prepares the control transfer    */
+/*    request context of specific command, for host stack transfer        */
+/*    function to process, in next steps.                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -71,6 +75,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_feature(UX_HOST_CLASS_HUB *hub, UINT port, UINT command, UINT function)
@@ -99,10 +106,17 @@ UINT            status;
     transfer_request -> ux_transfer_request_value =             function;
     transfer_request -> ux_transfer_request_index =             port;
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Reset transfer state for _run.  */
+    UX_TRANSFER_STATE_RESET(transfer_request);
+    status = UX_SUCCESS;
+#else
+
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
-    
+#endif
+
     /* Return completion status.  */
     return(status);
 }
-

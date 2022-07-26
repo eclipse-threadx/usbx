@@ -30,12 +30,20 @@
 #include "ux_host_stack.h"
 
 
+#if defined(UX_HOST_CLASS_AUDIO_2_SUPPORT)
+static inline UINT _ux_host_class_audio_alternate_setting_locate_2(
+    UX_HOST_CLASS_AUDIO *audio,
+    UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling,
+    UINT *alternate_setting);
+#endif
+
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_alternate_setting_locate       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,11 +79,17 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
-/*                                                                        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added audio 2.0 support,    */
+/*                                            resulting in version 6.1.12 */
 /**************************************************************************/
 UINT  _ux_host_class_audio_alternate_setting_locate(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling,
                                                     UINT *alternate_setting)
 {
+
+#if defined(UX_HOST_CLASS_AUDIO_2_SUPPORT)
+    return(_ux_host_class_audio_alternate_setting_locate_2(audio, audio_sampling, alternate_setting));
+#else
 
 UCHAR *                                  descriptor;
 UX_INTERFACE_DESCRIPTOR                  interface_descriptor;
@@ -191,6 +205,7 @@ UINT                                     specific_frequency_count;
                     {
 
                         /* We have found the right alternate setting.  */
+                        audio -> ux_host_class_audio_sampling_descriptor = descriptor;
                         return(UX_SUCCESS);
                     }
                 }
@@ -211,6 +226,7 @@ UINT                                     specific_frequency_count;
                         {
 
                             /* We have found the right alternate setting.  */
+                            audio -> ux_host_class_audio_sampling_descriptor = descriptor;
                             return(UX_SUCCESS);
                         }
                     }
@@ -242,5 +258,106 @@ UINT                                     specific_frequency_count;
     /* We get here when either the report descriptor has a problem or we could
        not find the right audio device.  */
     return(UX_NO_ALTERNATE_SETTING);
+#endif
 }
 
+#if defined(UX_HOST_CLASS_AUDIO_2_SUPPORT)
+struct UX_HOST_CLASS_AUDIO_ALT_LOCATE_PARSER {
+    UX_HOST_CLASS_AUDIO_SAMPLING    *sampling;
+    UCHAR                           *clock_descriptor;
+    ULONG                           alt;
+    UINT                            status;
+};
+static UINT _ux_host_class_audio_alt_locate_parse(VOID *arg,
+                        UCHAR *packed_interface_descriptor,
+                        UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS *sam_attr)
+{
+struct UX_HOST_CLASS_AUDIO_ALT_LOCATE_PARSER    *parser = (struct UX_HOST_CLASS_AUDIO_ALT_LOCATE_PARSER *)arg;
+UX_HOST_CLASS_AUDIO_SAMPLING                    *sampling = parser -> sampling;
+ULONG                                           frequency_low, frequency_high;
+
+    /* Check bNrChannels.  */
+    if (sampling -> ux_host_class_audio_sampling_channels !=
+        sam_attr -> ux_host_class_audio_sampling_characteristics_channels)
+        return(0);
+
+    /* Check bBitResolution.  */
+    if (sampling -> ux_host_class_audio_sampling_resolution !=
+        sam_attr -> ux_host_class_audio_sampling_characteristics_resolution)
+        return(0);
+
+    /* Calculate frequency low.  */
+    frequency_low = sam_attr -> ux_host_class_audio_sampling_characteristics_frequency_low;
+    if (UX_OVERFLOW_CHECK_MULV_ULONG(frequency_low, sam_attr -> ux_host_class_audio_sampling_characteristics_clock_mul))
+    {
+
+        /* Math error.  */
+        parser -> status = UX_MATH_OVERFLOW;
+        return(1);
+    }
+    frequency_low *= sam_attr -> ux_host_class_audio_sampling_characteristics_clock_mul;
+    frequency_low /= sam_attr -> ux_host_class_audio_sampling_characteristics_clock_div;
+
+    /* Calculate frequency high.  */
+    frequency_high = sam_attr -> ux_host_class_audio_sampling_characteristics_frequency_high;
+    if (UX_OVERFLOW_CHECK_MULV_ULONG(frequency_high, sam_attr -> ux_host_class_audio_sampling_characteristics_clock_mul))
+    {
+
+        /* Math error.  */
+        parser -> status = UX_MATH_OVERFLOW;
+        return(1);
+    }
+    frequency_high *= sam_attr -> ux_host_class_audio_sampling_characteristics_clock_mul;
+    frequency_high /= sam_attr -> ux_host_class_audio_sampling_characteristics_clock_div;
+
+    /* Check frequency in [low, high].  */
+    if ((frequency_low <= sampling -> ux_host_class_audio_sampling_frequency) &&
+        (frequency_high >= sampling -> ux_host_class_audio_sampling_frequency))
+    {
+
+        /* Save bAlternateSetting @ 3.  */
+        parser -> alt = (ULONG)packed_interface_descriptor[3];
+
+        /* Save UAC 1.0 FormatTypeI or UAC 2.0 CSD.  */
+        parser -> clock_descriptor =
+            sam_attr -> ux_host_class_audio_sampling_characteristics_descriptor;
+        return(1);
+    }
+
+    /* Continue parsing.  */
+    return(0);
+}
+static inline UINT _ux_host_class_audio_alternate_setting_locate_2(
+    UX_HOST_CLASS_AUDIO *audio,
+    UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling,
+    UINT *alternate_setting)
+{
+struct UX_HOST_CLASS_AUDIO_ALT_LOCATE_PARSER    parser;
+UINT                                            status;
+
+    /* Parse specific sampling setting to get alt setting.  */
+    parser.sampling = audio_sampling;
+    parser.clock_descriptor = UX_NULL;
+    parser.alt = 0xFF;
+    parser.status = UX_SUCCESS;
+    status = _ux_host_class_audio_raw_sampling_parse(audio, _ux_host_class_audio_alt_locate_parse, (VOID*)&parser);
+
+    /* Check descriptor error.  */
+    if (status != UX_SUCCESS)
+        return(status);
+
+    /* Check if valid alternate setting is found.  */
+    if (parser.alt == 0xFF)
+    {
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_NO_ALTERNATE_SETTING, audio, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        return(UX_NO_ALTERNATE_SETTING);
+    }
+
+    /* Save alternate setting.  */
+    *alternate_setting = parser.alt;
+    audio -> ux_host_class_audio_sampling_descriptor = parser.clock_descriptor;
+    return(parser.status);
+}
+#endif

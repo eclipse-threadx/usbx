@@ -40,7 +40,7 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_dfu_control_request                PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -92,6 +92,14 @@ static inline VOID _ux_device_class_dfu_status_get(UX_SLAVE_CLASS_DFU *,
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            checked r/w callback status,*/
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            added UPLOAD length check   */
+/*                                            in _UPLOAD_IDLE state,      */
+/*                                            added DNLOAD REQ            */
+/*                                            validation,                 */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -99,10 +107,11 @@ UINT  _ux_device_class_dfu_control_request(UX_SLAVE_CLASS_COMMAND *command)
 
 UX_SLAVE_TRANSFER       *transfer_request;
 UX_SLAVE_DEVICE         *device;
-UX_SLAVE_CLASS          *class;
+UX_SLAVE_CLASS          *class_ptr;
 UX_SLAVE_CLASS_DFU      *dfu;
 
 ULONG                   request;
+ULONG                   request_type;
 ULONG                   request_value;
 ULONG                   request_length;
 ULONG                   actual_length;
@@ -116,10 +125,10 @@ ULONG                   media_status;
     device =  &_ux_system_slave -> ux_system_slave_device;
 
      /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the storage instance from this class container.  */
-    dfu =  (UX_SLAVE_CLASS_DFU *) class -> ux_slave_class_instance;
+    dfu =  (UX_SLAVE_CLASS_DFU *) class_ptr -> ux_slave_class_instance;
 
     /* Get the pointer to the transfer request associated with the control endpoint.  */
     transfer_request =  &device -> ux_slave_device_control_endpoint.ux_slave_endpoint_transfer_request;
@@ -143,6 +152,7 @@ ULONG                   media_status;
 
     /* Extract all necessary fields of the request.  */
     request =  *(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_REQUEST);
+    request_type = *(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_REQUEST_TYPE);
 
     /* Pickup the request wValue.  */
     request_value =    _ux_utility_short_get(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_VALUE);
@@ -287,8 +297,20 @@ ULONG                   media_status;
 
                 case UX_SLAVE_CLASS_DFU_COMMAND_DOWNLOAD :
 
+                    /* Command verify: check bmRequestType and data length.  */
+                    if ((request_type != UX_DEVICE_CLASS_DFU_REQTYPE_INTERFACE_SET) ||
+                        (request_length != transfer_request -> ux_slave_transfer_request_actual_length))
+                    {
+
+                        /* Zero length download is not accepted. Stall the endpoint.  */
+                        _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
+
+                        /* In the system, state the DFU state machine to dfu ERROR.  */
+                        _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_ERROR;
+                    }
+
                     /* We received a DOWNLOAD command. Check the length field of the request. It cannot be 0.  */
-                    if (request_length == 0)
+                    else if (request_length == 0)
                     {
 
                         /* Zero length download is not accepted. Stall the endpoint.  */
@@ -540,9 +562,21 @@ ULONG                   media_status;
 
                 case UX_SLAVE_CLASS_DFU_COMMAND_DOWNLOAD :
 
+                    /* Command verify: check bmRequestType and data length.  */
+                    if ((request_type != UX_DEVICE_CLASS_DFU_REQTYPE_INTERFACE_SET) ||
+                        (request_length != transfer_request -> ux_slave_transfer_request_actual_length))
+                    {
+
+                        /* Zero length download is not accepted. Stall the endpoint.  */
+                        _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
+
+                        /* In the system, state the DFU state machine to dfu ERROR.  */
+                        _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_ERROR;
+                    }
+
                     /* We received a DOWNLOAD command. Check the length field of the request. If it is 0,
                        we are done with the transfer.  */
-                    if (request_length == 0)
+                    else if (request_length == 0)
                     {
 
                         /* Send the notification of end of download to application.  */
@@ -795,13 +829,21 @@ ULONG                   media_status;
             break;
 
 #ifndef UX_DEVICE_CLASS_DFU_UPLOAD_DISABLE
-        case UX_SLAVE_CLASS_DFU_STATUS_STATE_DFU_UPLOAD_IDLE:
+        case UX_SLAVE_CLASS_DFU_STATUS_STATE_DFU_UPLOAD_IDLE: /* bitCanUpload == 1.  */
 
             /* Here we process only the request we can accept in the DFU mode UPLOAD IDLE state.  */
             switch (request)
             {
 
             case UX_SLAVE_CLASS_DFU_COMMAND_UPLOAD:
+
+                /* Check if length > wTransferSize (we can support max of control buffer size).  */
+                if (request_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
+                {
+                    _ux_device_stack_endpoint_stall(&device -> ux_slave_device_control_endpoint);
+                    _ux_system_slave -> ux_system_slave_device_dfu_state_machine = UX_SYSTEM_DFU_STATE_DFU_ERROR;
+                    break;
+                }
 
                 /* Length 0 case undefined, just keep state.  */
                 if (request_length == 0)

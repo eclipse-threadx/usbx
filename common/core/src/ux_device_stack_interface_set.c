@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_interface_set                      PORTABLE C      */
-/*                                                           6.1.9        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,10 @@
 /*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            calculated payload size,    */
 /*                                            resulting in version 6.1.9  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_interface_set(UCHAR * device_framework, ULONG device_framework_length,
@@ -88,7 +92,7 @@ UINT  _ux_device_stack_interface_set(UCHAR * device_framework, ULONG device_fram
 UX_SLAVE_DCD            *dcd;
 UX_SLAVE_DEVICE         *device;
 UX_SLAVE_TRANSFER       *transfer_request;
-UX_SLAVE_INTERFACE      *interface;
+UX_SLAVE_INTERFACE      *interface_ptr;
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 UX_SLAVE_INTERFACE      *interface_link;
 ULONG                   interfaces_pool_number;
@@ -114,18 +118,18 @@ ULONG                   max_transfer_length, n_trans;
 
     /* Find a free interface in the pool and hook it to the 
        existing interface.  */
-    interface = device -> ux_slave_device_interfaces_pool;
+    interface_ptr = device -> ux_slave_device_interfaces_pool;
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
     interfaces_pool_number = device -> ux_slave_device_interfaces_pool_number;
     while (interfaces_pool_number != 0)
     {
         /* Check if this interface is free.  */
-        if (interface -> ux_slave_interface_status == UX_UNUSED)
+        if (interface_ptr -> ux_slave_interface_status == UX_UNUSED)
             break;
     
         /* Try the next interface.  */
-        interface++;
+        interface_ptr++;
         
         /* Decrement the number of interfaces left to scan in the pool.  */
         interfaces_pool_number--;
@@ -137,22 +141,22 @@ ULONG                   max_transfer_length, n_trans;
 #else
 
     /* Check if this interface is free.  */
-    if (interface -> ux_slave_interface_status != UX_UNUSED)
+    if (interface_ptr -> ux_slave_interface_status != UX_UNUSED)
         return(UX_MEMORY_INSUFFICIENT);
     
 #endif
 
     /* Mark this interface as used now.  */
-    interface -> ux_slave_interface_status = UX_USED;
+    interface_ptr -> ux_slave_interface_status = UX_USED;
 
     /* If trace is enabled, register this object.  */
-    UX_TRACE_OBJECT_REGISTER(UX_TRACE_DEVICE_OBJECT_TYPE_INTERFACE, interface, 0, 0, 0)
+    UX_TRACE_OBJECT_REGISTER(UX_TRACE_DEVICE_OBJECT_TYPE_INTERFACE, interface_ptr, 0, 0, 0)
 
     /* Parse the descriptor in something more readable.  */
     _ux_utility_descriptor_parse(device_framework,
                 _ux_system_interface_descriptor_structure,
                 UX_INTERFACE_DESCRIPTOR_ENTRIES,
-                (UCHAR *) &interface -> ux_slave_interface_descriptor);
+                (UCHAR *) &interface_ptr -> ux_slave_interface_descriptor);
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 
@@ -160,7 +164,7 @@ ULONG                   max_transfer_length, n_trans;
     if (device -> ux_slave_device_first_interface == UX_NULL)
     {
 
-        device -> ux_slave_device_first_interface =  interface;
+        device -> ux_slave_device_first_interface =  interface_ptr;
     }
     else
     {
@@ -168,12 +172,12 @@ ULONG                   max_transfer_length, n_trans;
         interface_link =  device -> ux_slave_device_first_interface;
         while (interface_link -> ux_slave_interface_next_interface != UX_NULL)
             interface_link =  interface_link -> ux_slave_interface_next_interface;
-        interface_link -> ux_slave_interface_next_interface =  interface;
+        interface_link -> ux_slave_interface_next_interface =  interface_ptr;
     }
 #else
 
     /* It must be very first one.  */
-    device -> ux_slave_device_first_interface = interface;
+    device -> ux_slave_device_first_interface = interface_ptr;
 #endif
 
     /* Point beyond the interface descriptor.  */
@@ -261,7 +265,7 @@ ULONG                   max_transfer_length, n_trans;
             transfer_request -> ux_slave_transfer_request_timeout = UX_WAIT_FOREVER;
             
             /* Attach the interface to the endpoint.  */
-            endpoint -> ux_slave_endpoint_interface =  interface;
+            endpoint -> ux_slave_endpoint_interface =  interface_ptr;
                 
             /* Attach the device to the endpoint.  */
             endpoint -> ux_slave_endpoint_device =  device;
@@ -279,15 +283,15 @@ ULONG                   max_transfer_length, n_trans;
             }
 
             /* Attach this endpoint to the end of the endpoint chain.  */
-            if (interface -> ux_slave_interface_first_endpoint == UX_NULL)
+            if (interface_ptr -> ux_slave_interface_first_endpoint == UX_NULL)
             {
 
-                interface -> ux_slave_interface_first_endpoint =  endpoint;
+                interface_ptr -> ux_slave_interface_first_endpoint =  endpoint;
             }
             else
             {
                 /* Multiple endpoints exist, so find the end of the chain.  */
-                endpoint_link =  interface -> ux_slave_interface_first_endpoint;
+                endpoint_link =  interface_ptr -> ux_slave_interface_first_endpoint;
                 while (endpoint_link -> ux_slave_endpoint_next_endpoint != UX_NULL)
                     endpoint_link =  endpoint_link -> ux_slave_endpoint_next_endpoint;
                 endpoint_link -> ux_slave_endpoint_next_endpoint =  endpoint;
@@ -300,7 +304,7 @@ ULONG                   max_transfer_length, n_trans;
             /* If the descriptor is a configuration or interface,
                we have parsed and mounted all endpoints. 
                The interface attached to this configuration must be started at the class level.  */
-            status =  _ux_device_stack_interface_start(interface);
+            status =  _ux_device_stack_interface_start(interface_ptr);
 
             /* Return the status to the caller.  */
             return(status);
@@ -318,7 +322,7 @@ ULONG                   max_transfer_length, n_trans;
 
     /* The interface attached to this configuration must be started at the class
        level.  */
-    status =  _ux_device_stack_interface_start(interface);
+    status =  _ux_device_stack_interface_start(interface_ptr);
 
     /* Return the status to the caller.  */
     return(status);

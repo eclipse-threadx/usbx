@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_control_request                PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,6 +86,10 @@
 /*                                            resulting in version 6.1.10 */
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -93,7 +97,7 @@ UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)
 
 UX_SLAVE_TRANSFER           *transfer_request;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_CLASS              *class;
+UX_SLAVE_CLASS              *class_ptr;
 ULONG                       request;
 ULONG                       request_value;
 ULONG                       request_index;
@@ -118,10 +122,10 @@ UX_SLAVE_CLASS_HID          *hid;
     duration       =   *(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_VALUE + 1);
     
      /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
     
     /* Get the storage instance from this class container.  */
-    hid =  (UX_SLAVE_CLASS_HID *) class -> ux_slave_class_instance;
+    hid =  (UX_SLAVE_CLASS_HID *) class_ptr -> ux_slave_class_instance;
 
     /* Here we proceed only the standard request we know of at the device level.  */
     switch (request)

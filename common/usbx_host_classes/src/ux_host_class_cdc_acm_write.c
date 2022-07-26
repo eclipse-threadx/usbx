@@ -122,7 +122,7 @@ ULONG           transfer_flags;
 
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     }
-    
+
 #if defined(UX_HOST_STANDALONE)
     if (cdc_acm -> ux_host_class_cdc_acm_write_state == UX_STATE_WAIT)
         return(UX_BUSY);
@@ -134,7 +134,7 @@ ULONG           transfer_flags;
 
     /* Get the pointer to the bulk out endpoint transfer request.  */
     transfer_request =  &cdc_acm -> ux_host_class_cdc_acm_bulk_out_endpoint -> ux_endpoint_transfer_request;
-    
+
 #if defined(UX_HOST_STANDALONE)
 
     /* Enable auto wait.  */
@@ -163,7 +163,7 @@ ULONG           transfer_flags;
         /* If the transfer is successful, we need to wait for the transfer request to be completed.  */
         if (status == UX_SUCCESS)
         {
-            
+
 #if !defined(UX_HOST_STANDALONE)
             /* Wait for the completion of the transfer request.  */
             status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore,
@@ -191,7 +191,7 @@ ULONG           transfer_flags;
         
                 /* There was an error, return to the caller.  */
                 return(UX_TRANSFER_TIMEOUT);
-            }            
+            }
 #endif
         }
         else

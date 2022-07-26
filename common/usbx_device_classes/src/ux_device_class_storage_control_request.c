@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_control_request            PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -83,13 +87,13 @@ UINT  _ux_device_class_storage_control_request(UX_SLAVE_CLASS_COMMAND *command)
 
 UX_SLAVE_TRANSFER           *transfer_request;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_CLASS              *class;
+UX_SLAVE_CLASS              *class_ptr;
 ULONG                       request;
 ULONG                       request_value;
 ULONG                       request_length;
 UX_SLAVE_CLASS_STORAGE      *storage;
 #if !defined(UX_DEVICE_STANDALONE)
-UX_SLAVE_INTERFACE          *interface;
+UX_SLAVE_INTERFACE          *interface_ptr;
 #endif
 UX_SLAVE_ENDPOINT           *endpoint_in;
 UX_SLAVE_ENDPOINT           *endpoint_out;
@@ -111,10 +115,10 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
         return(UX_ERROR);
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
     
     /* Get the storage instance from this class container.  */
-    storage =  (UX_SLAVE_CLASS_STORAGE *) class -> ux_slave_class_instance;
+    storage =  (UX_SLAVE_CLASS_STORAGE *) class_ptr -> ux_slave_class_instance;
 
     /* Here we proceed only the standard request we know of at the device level.  */
     switch (request)
@@ -132,10 +136,10 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
 #else
 
         /* We need the interface to the class.  */
-        interface =  storage -> ux_slave_class_storage_interface;
-        
+        interface_ptr =  storage -> ux_slave_class_storage_interface;
+
         /* Locate the endpoints.  */
-        endpoint_in =  interface -> ux_slave_interface_first_endpoint;
+        endpoint_in =  interface_ptr -> ux_slave_interface_first_endpoint;
         
         /* Check the endpoint direction, if IN we have the correct endpoint.  */
         if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
@@ -154,7 +158,7 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
             endpoint_out =  endpoint_in -> ux_slave_endpoint_next_endpoint;
         }
 #endif
-            
+
         /* First cancel any transfer on the endpoint OUT, from the host.  */
         transfer_request =  &endpoint_out -> ux_slave_endpoint_transfer_request;
         _ux_device_stack_transfer_abort(transfer_request, UX_TRANSFER_APPLICATION_RESET);

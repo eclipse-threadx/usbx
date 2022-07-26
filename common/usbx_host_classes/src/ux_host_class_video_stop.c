@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_stop                           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_stop(UX_HOST_CLASS_VIDEO *video)
@@ -85,7 +89,7 @@ UINT  _ux_host_class_video_stop(UX_HOST_CLASS_VIDEO *video)
 
 UINT                    status;
 UX_CONFIGURATION        *configuration;
-UX_INTERFACE            *interface;
+UX_INTERFACE            *interface_ptr;
 UINT                    streaming_interface;
 
 
@@ -106,27 +110,27 @@ UINT                    streaming_interface;
     /* We found the alternate setting for the sampling values demanded, now we need
         to search its container.  */
     configuration =        video -> ux_host_class_video_streaming_interface -> ux_interface_configuration;
-    interface =            configuration -> ux_configuration_first_interface;
+    interface_ptr =        configuration -> ux_configuration_first_interface;
 
     /* Scan all interfaces.  */
-    while (interface != UX_NULL)
+    while (interface_ptr != UX_NULL)
     {
 
         /* We search for both the right interface and alternate setting.  */
-        if ((interface -> ux_interface_descriptor.bInterfaceNumber == streaming_interface) &&
-            (interface -> ux_interface_descriptor.bAlternateSetting == 0))
+        if ((interface_ptr -> ux_interface_descriptor.bInterfaceNumber == streaming_interface) &&
+            (interface_ptr -> ux_interface_descriptor.bAlternateSetting == 0))
         {
 
             /* We have found the right interface/alternate setting combination
                The stack will select it for us.  */
-            status =  _ux_host_stack_interface_setting_select(interface);
+            status =  _ux_host_stack_interface_setting_select(interface_ptr);
 
             /* If the alternate setting for the streaming interface could be selected, we memorize it.  */
             if (status == UX_SUCCESS)
             {
 
                 /* Memorize the interface.  */
-                video -> ux_host_class_video_streaming_interface =  interface;
+                video -> ux_host_class_video_streaming_interface =  interface_ptr;
 
                 /* There is no endpoint for the alternate setting 0.  */
                 video -> ux_host_class_video_isochronous_endpoint = UX_NULL;
@@ -140,7 +144,7 @@ UINT                    streaming_interface;
         }
 
         /* Move to next interface.  */
-        interface =  interface -> ux_interface_next_interface;
+        interface_ptr =  interface_ptr -> ux_interface_next_interface;
     }
 
     /* Unprotect thread reentry to this instance.  */

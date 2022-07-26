@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_activate                   PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,14 +64,18 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
 
-UX_SLAVE_INTERFACE                      *interface;
-UX_DEVICE_CLASS_PRINTER                 *printer;
+UX_SLAVE_INTERFACE                      *printer_interface;
 UX_SLAVE_CLASS                          *printer_class;
+UX_DEVICE_CLASS_PRINTER                 *printer;
 UX_SLAVE_ENDPOINT                       *endpoint;
 
     /* Get the class container.  */
@@ -81,18 +85,18 @@ UX_SLAVE_ENDPOINT                       *endpoint;
     printer = (UX_DEVICE_CLASS_PRINTER *) printer_class -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    printer_interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
 
     /* Store the class instance into the interface.  */
-    interface -> ux_slave_interface_class_instance =  (VOID *)printer;
+    printer_interface -> ux_slave_interface_class_instance =  (VOID *)printer;
 
     /* Now the opposite, store the interface in the class instance.  */
-    printer -> ux_device_class_printer_interface =  interface;
+    printer -> ux_device_class_printer_interface =  printer_interface;
 
     /* Save endpoints for future use.  */
     printer -> ux_device_class_printer_endpoint_in = UX_NULL;
     printer -> ux_device_class_printer_endpoint_out = UX_NULL;
-    endpoint = interface -> ux_slave_interface_first_endpoint;
+    endpoint = printer_interface -> ux_slave_interface_first_endpoint;
     while(endpoint)
     {
         if (endpoint -> ux_slave_endpoint_descriptor.bmAttributes == UX_BULK_ENDPOINT)

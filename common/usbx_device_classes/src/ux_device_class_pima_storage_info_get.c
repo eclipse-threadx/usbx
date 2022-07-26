@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_storage_info_get              PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved sanity checks,     */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added no-callback handling, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_storage_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG storage_id)
@@ -95,8 +98,16 @@ UCHAR                   *storage_info_pointer;
     storage_info =  transfer_request -> ux_slave_transfer_request_data_pointer;
     
     /* Update the storage information. We get the volatile parameters from the application.  */
-    status = pima -> ux_device_class_pima_storage_info_get(pima, storage_id);
-    
+    if (pima -> ux_device_class_pima_storage_info_get)
+        status = pima -> ux_device_class_pima_storage_info_get(pima, storage_id);
+    else
+    {
+        if (storage_id == pima -> ux_device_class_pima_storage_id)
+            status = UX_SUCCESS;
+        else
+            status = UX_DEVICE_CLASS_PIMA_RC_INVALID_STORAGE_ID;
+    }
+
     /* Check for error.  */
     if (status != UX_SUCCESS)
 

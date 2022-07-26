@@ -50,7 +50,7 @@ static inline UINT _ux_host_class_printer_activate_wait(UX_HOST_CLASS_COMMAND *c
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_printer_entry                        PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,11 @@ static inline UINT _ux_host_class_printer_activate_wait(UX_HOST_CLASS_COMMAND *c
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed compile warning,    */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_entry(UX_HOST_CLASS_COMMAND *command)
@@ -143,20 +148,20 @@ UINT    status;
 #if defined(UX_HOST_STANDALONE)
 static inline UINT _ux_host_class_printer_activate_wait(UX_HOST_CLASS_COMMAND *command)
 {
-UX_INTERFACE                    *interface;
+UX_INTERFACE                    *interface_ptr;
 UX_HOST_CLASS_PRINTER           *printer;
 UX_ENDPOINT                     *control_endpoint;
 UX_TRANSFER                     *transfer;
 UINT                            status;
 
     /* Get the instance for this class.  */
-    interface = (UX_INTERFACE *)command -> ux_host_class_command_container;
+    interface_ptr = (UX_INTERFACE *)command -> ux_host_class_command_container;
 
     /* Sanity check.  */
-    if (interface == UX_NULL)
+    if (interface_ptr == UX_NULL)
         return(UX_STATE_EXIT);
 
-    printer =  (UX_HOST_CLASS_PRINTER *) interface -> ux_interface_class_instance;
+    printer =  (UX_HOST_CLASS_PRINTER *) interface_ptr -> ux_interface_class_instance;
 
     /* Sanity check.  */
     if (printer == UX_NULL)
@@ -250,7 +255,7 @@ UINT                            status;
             /* On error, free resources.  */
             _ux_host_stack_class_instance_destroy(
                     printer -> ux_host_class_printer_class, (VOID *) printer);
-            interface -> ux_interface_class_instance = UX_NULL;
+            interface_ptr -> ux_interface_class_instance = UX_NULL;
             _ux_utility_memory_free(printer);
             return(UX_STATE_ERROR);
         }
@@ -280,9 +285,10 @@ UINT                            status;
         return(UX_STATE_NEXT);
 
     default: /* reset, idle, error ...   */
-        return(UX_STATE_NEXT);
+        break;
     }
 
+    /* Just next phase.  */
     return(UX_STATE_NEXT);
 }
 #endif

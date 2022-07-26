@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_transfer_request_callback      PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,12 +69,16 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked pending state,      */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_video_transfer_request_callback(UX_TRANSFER *transfer_request)
 {
 
 UX_HOST_CLASS_VIDEO *video;
+UX_ENDPOINT         *endpoint;
 ULONG               transfer_index;
 
 
@@ -83,6 +87,11 @@ ULONG               transfer_index;
 
     /* Do a sanity check on the transfer request, if NULL something is wrong.  */
     if (video == UX_NULL)
+        return;
+
+    /* Check endpoint status.  */
+    endpoint = video -> ux_host_class_video_isochronous_endpoint;
+    if (endpoint -> ux_endpoint_transfer_request.ux_transfer_request_completion_code != UX_TRANSFER_STATUS_PENDING)
         return;
 
     /* The caller's transfer request needs to be updated.  */
@@ -101,4 +110,3 @@ ULONG               transfer_index;
     /* Return to caller.  */
     return;
 }
-

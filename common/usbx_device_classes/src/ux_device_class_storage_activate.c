@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_activate                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,45 +70,49 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
                                           
 UINT                                    status = UX_SUCCESS;
-UX_SLAVE_INTERFACE                      *interface;
+UX_SLAVE_INTERFACE                      *interface_ptr;
+UX_SLAVE_CLASS                          *class_ptr;
 UX_SLAVE_CLASS_STORAGE                  *storage;
-UX_SLAVE_CLASS                          *class_inst;
 #if defined(UX_DEVICE_STANDALONE)
 UX_SLAVE_ENDPOINT                       *endpoint;
 #endif
 
 
     /* Get the class container.  */
-    class_inst =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
-    storage = (UX_SLAVE_CLASS_STORAGE *)class_inst -> ux_slave_class_instance;
+    storage = (UX_SLAVE_CLASS_STORAGE *)class_ptr -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
     
     /* Store the class instance into the interface.  */
-    interface -> ux_slave_interface_class_instance =  (VOID *)storage;
+    interface_ptr -> ux_slave_interface_class_instance =  (VOID *)storage;
          
     /* Now the opposite, store the interface in the class instance.  */
-    storage -> ux_slave_class_storage_interface =  interface;
+    storage -> ux_slave_class_storage_interface =  interface_ptr;
 
 #if !defined(UX_DEVICE_STANDALONE)
 
     /* Resume thread.  */
-    _ux_device_thread_resume(&class_inst -> ux_slave_class_thread); 
+    _ux_device_thread_resume(&class_ptr -> ux_slave_class_thread); 
 
 #else
 
     /* Locate the endpoints.  */
     /* Check the first endpoint direction, if IN we have the correct endpoint.  */
-    endpoint = interface -> ux_slave_interface_first_endpoint;
+    endpoint = interface_ptr -> ux_slave_interface_first_endpoint;
     if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
     {
 

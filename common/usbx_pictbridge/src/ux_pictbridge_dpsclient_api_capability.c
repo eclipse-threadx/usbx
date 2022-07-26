@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_api_capability             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,7 +59,7 @@
 /*                                                                        */ 
 /*    _ux_utility_delay_ms                  Delay ms                      */ 
 /*    _ux_pictbridge_dps_client_input_object_prepare                      */
-/*    _ux_utility_event_flags_get                                         */
+/*    _ux_system_event_flags_get                                         */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -75,6 +75,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_pictbridge_dpsclient_api_capability(UX_PICTBRIDGE *pictbridge, ULONG capability_code, 
@@ -95,7 +98,7 @@ ULONG                               actual_flags;
         return(status);
 
     /* We should wait for the host to send a script with the response.  */
-    status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_CAPABILITY, 
+    status =  _ux_system_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_CAPABILITY, 
                                         UX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
     /* Check status.  */

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_interrupt_thread              PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed event message size,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_pima_interrupt_thread(ULONG pima_class)
@@ -167,8 +170,8 @@ UCHAR                       *buffer;
                 _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_2, pima_event.ux_device_class_pima_event_parameter_3);
                 
                 /* Send the request to the device controller.  */
-                status =  _ux_device_stack_transfer_request(transfer_request_in, UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH + 1, UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH);
-                
+                status =  _ux_device_stack_transfer_request(transfer_request_in, UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH, UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH);
+
                 /* Check error code. */
                 if (status != UX_SUCCESS)
 

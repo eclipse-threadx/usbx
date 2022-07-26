@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_port_reset                             PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,14 +70,17 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed OHCI PRSC issue,      */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_port_reset(UX_HCD_OHCI *hcd_ohci, ULONG port_index)
 {
 
 ULONG       ohci_register_port_status;
-UINT        index_loop;
-
+UINT        status;
+ULONG       actual_flags = 0;
 
     /* Check to see if this port is valid on this controller.  */
     if (hcd_ohci -> ux_hcd_ohci_nb_root_hubs < port_index)
@@ -112,29 +115,12 @@ UINT        index_loop;
     /* Now we can safely issue a RESET command to this port.  */
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index, OHCI_HC_PS_PRS);
 
-    /* Normally, a port reset lasts for around 10ms. When the reset is completed
-       the controller will set the PRSC bit. We need to invert this bit by rewriting 
-       a 1 to the PRSC field.  */
-    for (index_loop = 0; index_loop < UX_OHCI_PORT_RESET_RETRY; index_loop++)
-    {
-
-        /* Perform the necessary delay to let the port reset properly.  */
-        _ux_utility_delay_ms(UX_OHCI_PORT_RESET_DELAY);
-        
-        /* Read the root HUB status change register.  */
-        ohci_register_port_status =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index);
-
-        /* Reset completed? */
-        if (ohci_register_port_status & OHCI_HC_PS_PRSC)
-        {
-
-            /* The reset phase is complete, rewrite that bit to clear it and
-               return to the root HUB driver.  */
-            _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index, OHCI_HC_PS_PRSC);
-
-            /* Return successful completion.  */
-            return(UX_SUCCESS);
-        }
+    /* Wait for the port reset complete event */
+    status = _ux_host_event_flags_get(&hcd_ohci -> ux_hcd_ohci_event_flags_group,
+                                        (UX_OHCI_PRSC_EVENT), UX_OR_CLEAR, &actual_flags,
+                                        UX_MS_TO_TICK(UX_OHCI_PRSC_EVENT_TIMEOUT));
+    if ((status != UX_NO_EVENTS) && (actual_flags & UX_OHCI_PRSC_EVENT)) {
+        return(UX_SUCCESS);
     }
 
     /* If trace is enabled, insert this event into the trace buffer.  */

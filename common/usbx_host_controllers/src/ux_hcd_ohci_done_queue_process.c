@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_done_queue_process                     PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed an addressing issue,  */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_done_queue_process(UX_HCD_OHCI *hcd_ohci)
@@ -117,7 +120,7 @@ ULONG               current_frame;
 
         td =                        next_td;
         next_td =                   _ux_utility_virtual_address(td -> ux_ohci_td_next_td);
-        td -> ux_ohci_td_next_td =  previous_td;
+        td -> ux_ohci_td_next_td =  _ux_utility_physical_address(previous_td);
         previous_td =               td;
     }
 
@@ -333,7 +336,7 @@ ULONG               current_frame;
         td -> ux_ohci_td_status =  UX_UNUSED;
 
         /* And continue the TD loop.  */
-        td =  td -> ux_ohci_td_next_td;
+        td =  _ux_utility_virtual_address(td -> ux_ohci_td_next_td);
     }
 
     /* The OHCI controller is now ready to receive the next done queue. We need to 

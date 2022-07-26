@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_data_get            PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*  04-25-2022     Yajun Xia                Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_data_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, UCHAR *object_buffer, ULONG object_offset,
@@ -118,7 +121,7 @@ UINT                            status;
                 if (pictbridge -> ux_pictbridge_host_client_state_machine & UX_PICTBRIDGE_STATE_MACHINE_CLIENT_REQUEST_PENDING)
                 
                     /* Yes we are pending, send an event to release the pending request.  */
-                    _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, UX_OR);                
+                    _ux_system_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, UX_OR);                
 
                 /* Since we are in host request, this indicates we are done with the cycle.  */
                 pictbridge -> ux_pictbridge_host_client_state_machine = UX_PICTBRIDGE_STATE_MACHINE_IDLE;

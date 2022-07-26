@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_api_abort_job              PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*                                                                        */ 
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -70,6 +70,9 @@
 /*                                            TX symbols instead of using */
 /*                                            them directly,              */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_pictbridge_dpsclient_api_abort_job(UX_PICTBRIDGE *pictbridge)
@@ -85,7 +88,7 @@ ULONG                               actual_flags;
         return(status);
 
     /* We should wait for the host to send a script with the response.  */
-    status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_ABORT_JOB, 
+    status =  _ux_system_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_ABORT_JOB, 
                                         UX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
     /* Check status.  */

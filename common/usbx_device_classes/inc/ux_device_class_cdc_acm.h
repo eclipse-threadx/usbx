@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,6 +55,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added write auto ZLP,       */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -71,6 +74,9 @@ extern   "C" {
 
 #endif  
 
+/* Defined, _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
+
+/* #define UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP  */
 
 /* Define CDC Class USB Class constants.  */
 #define UX_SLAVE_CLASS_CDC_ACM_CLASS                                    10
@@ -187,6 +193,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
 
     UCHAR                               *ux_device_class_cdc_acm_write_buffer;
     ULONG                               ux_device_class_cdc_acm_write_transfer_length;
+    ULONG                               ux_device_class_cdc_acm_write_host_length;
     ULONG                               ux_device_class_cdc_acm_write_requested_length;
     ULONG                               ux_device_class_cdc_acm_write_actual_length;
     UINT                                ux_device_class_cdc_acm_write_status;
@@ -318,7 +325,7 @@ UINT  _ux_device_class_cdc_acm_tasks_run(VOID *instance);
 /* Define Device CDC Class API prototypes.  */
 
 #define ux_device_class_cdc_acm_entry               _ux_device_class_cdc_acm_entry
-#define ux_device_class_cdc_acm_read                _ux_device_class_cdc_acm_read 
+#define ux_device_class_cdc_acm_read                _ux_device_class_cdc_acm_read
 #define ux_device_class_cdc_acm_write               _ux_device_class_cdc_acm_write
 #define ux_device_class_cdc_acm_ioctl               _ux_device_class_cdc_acm_ioctl
 #define ux_device_class_cdc_acm_write_with_callback _ux_device_class_cdc_acm_write_with_callback

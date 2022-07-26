@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_entry                          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added audio 2.0 support,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_entry(UX_HOST_CLASS_COMMAND *command)
@@ -90,7 +93,14 @@ UINT        status;
         /* The query command is used to let the stack enumeration process know if we want to own
            this device or not.  */
         if ((command -> ux_host_class_command_usage == UX_HOST_CLASS_COMMAND_USAGE_CSP) &&
-            (command -> ux_host_class_command_class == UX_HOST_CLASS_AUDIO_CLASS))
+            (command -> ux_host_class_command_class == UX_HOST_CLASS_AUDIO_CLASS) &&
+#if defined(UX_HOST_CLASS_AUDIO_2_SUPPORT)
+            ((command -> ux_host_class_command_protocol == UX_HOST_CLASS_AUDIO_PROTOCOL_IP_VERSION_01_00) ||
+             (command -> ux_host_class_command_protocol == UX_HOST_CLASS_AUDIO_PROTOCOL_IP_VERSION_02_00))
+#else
+            (command -> ux_host_class_command_protocol == UX_HOST_CLASS_AUDIO_PROTOCOL_IP_VERSION_01_00)
+#endif
+            )
             return(UX_SUCCESS);                        
         else            
             return(UX_NO_CLASS_MATCH);                        

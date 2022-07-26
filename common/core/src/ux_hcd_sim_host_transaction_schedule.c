@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_sim_host_transaction_schedule               PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -91,6 +91,11 @@
 /*                                            before semaphore wakeup to  */
 /*                                            avoid a race condition,     */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined device ZLP flow,    */
+/*                                            adjusted control request    */
+/*                                            data length handling,       */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_transaction_schedule(UX_HCD_SIM_HOST *hcd_sim_host, UX_HCD_SIM_HOST_ED *ed)
@@ -174,8 +179,11 @@ UX_SLAVE_DCD            *dcd;
         /* For control transfer, stall is for protocol error and it's cleared any time when SETUP is received */
         slave_ed -> ux_sim_slave_ed_status &= ~(ULONG)UX_DCD_SIM_SLAVE_ED_STATUS_STALLED;
 
-        /* Set the length to the setup transaction buffer.  */
-        slave_transfer_request -> ux_slave_transfer_request_actual_length =  td -> ux_sim_host_td_length;
+        /* Validate the length to the setup transaction buffer.  */
+        UX_ASSERT(td -> ux_sim_host_td_length == 8);
+
+        /* Reset actual data length (not including SETUP received) so far.  */
+        slave_transfer_request -> ux_slave_transfer_request_actual_length =  0;
 
         /* Move the buffer from the host TD to the device TD.  */
         _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_setup,
@@ -215,9 +223,6 @@ UX_SLAVE_DCD            *dcd;
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_DCD, UX_TRANSFER_BUFFER_OVERFLOW);
                 slave_transfer_request -> ux_slave_transfer_request_requested_length = UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH;
             }
-
-            /* Reset what we have received so far.  */
-            slave_transfer_request -> ux_slave_transfer_request_actual_length =  0;
 
             /* And reprogram the current buffer address to the beginning of the buffer.  */
             slave_transfer_request -> ux_slave_transfer_request_current_data_pointer =  slave_transfer_request -> ux_slave_transfer_request_data_pointer;
@@ -404,17 +409,22 @@ UX_SLAVE_DCD            *dcd;
             else
                 transaction_length =  td -> ux_sim_host_td_length;
 
-            if (td -> ux_sim_host_td_direction == UX_HCD_SIM_HOST_TD_OUT)
+            if (transaction_length)
+            {
+                if (td -> ux_sim_host_td_direction == UX_HCD_SIM_HOST_TD_OUT)
 
-                /* Send the requested host data to the device.  */
-                _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_current_data_pointer, td -> ux_sim_host_td_buffer,
-                                        transaction_length); /* Use case of memcpy is verified. */
+                    /* Send the requested host data to the device.  */
+                    _ux_utility_memory_copy(slave_transfer_request -> ux_slave_transfer_request_current_data_pointer,
+                                            td -> ux_sim_host_td_buffer,
+                                            transaction_length); /* Use case of memcpy is verified. */
 
-            else
+                else
 
-                /* Send the requested host data to the device.  */
-                _ux_utility_memory_copy(td -> ux_sim_host_td_buffer, slave_transfer_request -> ux_slave_transfer_request_current_data_pointer,
-                                        transaction_length); /* Use case of memcpy is verified. */
+                    /* Send the requested host data to the device.  */
+                    _ux_utility_memory_copy(td -> ux_sim_host_td_buffer,
+                                            slave_transfer_request -> ux_slave_transfer_request_current_data_pointer,
+                                            transaction_length); /* Use case of memcpy is verified. */
+            }
 
             /* Update buffers.  */
             td -> ux_sim_host_td_buffer +=  transaction_length;
@@ -454,12 +464,11 @@ UX_SLAVE_DCD            *dcd;
                 wake_host =  UX_TRUE;
                 wake_slave =  UX_TRUE;
             }
-            else if ((slave_transfer_request -> ux_slave_transfer_request_actual_length == slave_transfer_request -> ux_slave_transfer_request_requested_length &&
-                 slave_transfer_request -> ux_slave_transfer_request_force_zlp == UX_TRUE) ||
-                (transaction_length == 0) ||
-                (transaction_length % slave_endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize))
+            else if ((transaction_length == 0) ||
+                     (transaction_length % slave_endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize))
             {
 
+                /* Host got ZLP or short packet.  */
                 wake_host =  UX_TRUE;
                 wake_slave =  UX_TRUE;
             }
@@ -471,8 +480,15 @@ UX_SLAVE_DCD            *dcd;
                     wake_host = UX_TRUE;
 
                 /* Is the slaves's transfer completed?  */
-                if (slave_transfer_request -> ux_slave_transfer_request_actual_length == slave_transfer_request -> ux_slave_transfer_request_requested_length)
-                    wake_slave = UX_TRUE;
+                if (slave_transfer_request -> ux_slave_transfer_request_actual_length ==
+                    slave_transfer_request -> ux_slave_transfer_request_requested_length)
+                {
+                    if (slave_transfer_request -> ux_slave_transfer_request_requested_length == 0 ||
+                        slave_transfer_request -> ux_slave_transfer_request_force_zlp == 0)
+                        wake_slave = UX_TRUE;
+                    else
+                        slave_transfer_request -> ux_slave_transfer_request_force_zlp = 0;
+                }
             }
 
             if (wake_slave == UX_TRUE)

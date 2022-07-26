@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_activate                     PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,53 +65,67 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            added interrupt support,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
 
 UX_SLAVE_DEVICE                         *device;
-UX_SLAVE_INTERFACE                      *interface;
+UX_SLAVE_INTERFACE                      *audio_interface;
 UX_SLAVE_INTERFACE                      *control_interface;
 UX_SLAVE_INTERFACE                      *stream_interface;
 UX_DEVICE_CLASS_AUDIO                   *audio;
 UX_DEVICE_CLASS_AUDIO_STREAM            *stream;
-UX_SLAVE_CLASS                          *class;
+UX_SLAVE_CLASS                          *audio_class;
 ULONG                                    stream_index;
 
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    audio_class =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
-    audio = (UX_DEVICE_CLASS_AUDIO *) class -> ux_slave_class_instance;
+    audio = (UX_DEVICE_CLASS_AUDIO *) audio_class -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    audio_interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
 
     /* Get the device instance.  */
     device = &_ux_system_slave -> ux_system_slave_device;
     audio -> ux_device_class_audio_device = device;
 
     /* We only support audio interface here.  */
-    if (interface -> ux_slave_interface_descriptor.bInterfaceClass != UX_DEVICE_CLASS_AUDIO_CLASS)
+    if (audio_interface -> ux_slave_interface_descriptor.bInterfaceClass != UX_DEVICE_CLASS_AUDIO_CLASS)
         return(UX_NO_CLASS_MATCH);
 
     /* It's control interface?  */
-    if (interface -> ux_slave_interface_descriptor.bInterfaceSubClass == UX_DEVICE_CLASS_AUDIO_SUBCLASS_CONTROL)
+    if (audio_interface -> ux_slave_interface_descriptor.bInterfaceSubClass == UX_DEVICE_CLASS_AUDIO_SUBCLASS_CONTROL)
     {
 
         /* Store the interface in the class instance.  */
-        audio -> ux_device_class_audio_interface = interface;
+        audio -> ux_device_class_audio_interface = audio_interface;
 
         /* Store the class instance into the interface.  */
-        interface -> ux_slave_interface_class_instance = (VOID *)audio;
+        audio_interface -> ux_slave_interface_class_instance = (VOID *)audio;
+
+#if defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
+
+        /* Find interrupt endpoint (only endpoint in this AC interface).  */
+        audio -> ux_device_class_audio_interrupt = audio_interface -> ux_slave_interface_first_endpoint;
+        audio -> ux_device_class_audio_status_queued = 0;
+        audio -> ux_device_class_audio_status_head = audio -> ux_device_class_audio_status_queue;
+        audio -> ux_device_class_audio_status_tail = audio -> ux_device_class_audio_status_queue;
+#endif
     }
     else
     {
 
         /* It's streaming interface.  */
-        stream_interface = interface;
+        stream_interface = audio_interface;
 
         /* Separate driver for each interface (IAD not used)?  */
         if (audio -> ux_device_class_audio_interface == UX_NULL)

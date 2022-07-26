@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_initialize                             PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed OHCI PRSC issue,      */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_initialize(UX_HCD *hcd)
@@ -231,6 +234,11 @@ UINT            status;
     if (hcd -> ux_hcd_nb_root_hubs > UX_MAX_ROOTHUB_PORT)
         hcd -> ux_hcd_nb_root_hubs = UX_MAX_ROOTHUB_PORT;
     hcd_ohci -> ux_hcd_ohci_nb_root_hubs =  hcd -> ux_hcd_nb_root_hubs;
+
+    /* Create HCD event flags */
+    status = _ux_host_event_flags_create(&hcd_ohci -> ux_hcd_ohci_event_flags_group, "ux_hcd_ohci_event_flags_group");
+    if (status != UX_SUCCESS)
+        return(status);
 
     /* All ports must now be powered to pick up device insertion.  */
     _ux_hcd_ohci_power_root_hubs(hcd_ohci);

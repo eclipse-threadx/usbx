@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_initialize                 PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,10 @@
 /*                                            resulting in version 6.1.10 */
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -90,13 +94,13 @@ UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command)
                                           
 UX_SLAVE_CLASS_CDC_ACM                  *cdc_acm;
 UX_SLAVE_CLASS_CDC_ACM_PARAMETER        *cdc_acm_parameter;
-UX_SLAVE_CLASS                          *class;
+UX_SLAVE_CLASS                          *class_ptr;
 #if !defined(UX_DEVICE_STANDALONE)
 UINT                                    status;
 #endif
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Create an instance of the device cdc_acm class.  */
     cdc_acm =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_CDC_ACM));
@@ -106,7 +110,7 @@ UINT                                    status;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Save the address of the CDC instance inside the CDC container.  */
-    class -> ux_slave_class_instance = (VOID *) cdc_acm;
+    class_ptr -> ux_slave_class_instance = (VOID *) cdc_acm;
 
     /* Get the pointer to the application parameters for the cdc_acm class.  */
     cdc_acm_parameter =  command -> ux_slave_class_command_parameter;
@@ -148,7 +152,7 @@ UINT                                    status;
         /* Return fatal error.  */
         return(UX_MUTEX_ERROR);
     }        
-    
+
 #endif
 
     /* Update the line coding fields with default values.  */
@@ -162,7 +166,7 @@ UINT                                    status;
 #if defined(UX_DEVICE_STANDALONE)
 
     /* Set task function.  */
-    class -> ux_slave_class_task_function = _ux_device_class_cdc_acm_tasks_run;
+    class_ptr -> ux_slave_class_task_function = _ux_device_class_cdc_acm_tasks_run;
 #else
 
     /* We need to prepare the 2 threads for sending and receiving.  */

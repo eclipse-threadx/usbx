@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_channel_start                  PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_channel_start(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_PARAMETER_CHANNEL *video_parameter)
@@ -99,7 +103,7 @@ UINT                    status;
 UCHAR                   *control_buffer;
 UINT                    alternate_setting;
 UX_CONFIGURATION        *configuration;
-UX_INTERFACE            *interface;
+UX_INTERFACE            *interface_ptr;
 UX_ENDPOINT             *endpoint;
 ULONG                   endpoint_index;
 UINT                    streaming_interface;
@@ -207,31 +211,31 @@ UINT                    max_payload_size;
                         /* Now the Commit has been done, the alternate setting can be requested.  */
                         /* We found the alternate setting for the sampling values demanded, now we need 
                             to search its container.  */
-                        configuration = video -> ux_host_class_video_streaming_interface -> ux_interface_configuration;
-                        interface =     configuration -> ux_configuration_first_interface;  
+                        configuration =        video -> ux_host_class_video_streaming_interface -> ux_interface_configuration;
+                        interface_ptr =        configuration -> ux_configuration_first_interface;  
 
                         /* Scan all interfaces.  */
-                        while (interface != UX_NULL)     
+                        while (interface_ptr != UX_NULL)     
                         {
                     
                             /* We search for both the right interface and alternate setting.  */
-                            if ((interface -> ux_interface_descriptor.bInterfaceNumber == streaming_interface) &&
-                                (interface -> ux_interface_descriptor.bAlternateSetting == alternate_setting))
+                            if ((interface_ptr -> ux_interface_descriptor.bInterfaceNumber == streaming_interface) &&
+                                (interface_ptr -> ux_interface_descriptor.bAlternateSetting == alternate_setting))
                             {
                                 
                                 /* We have found the right interface/alternate setting combination 
                                 The stack will select it for us.  */
-                                status =  _ux_host_stack_interface_setting_select(interface);
+                                status =  _ux_host_stack_interface_setting_select(interface_ptr);
                                 
                                 /* If the alternate setting for the streaming interface could be selected, we memorize it.  */
                                 if (status == UX_SUCCESS)
                                 {
                     
                                     /* Memorize the interface.  */
-                                    video -> ux_host_class_video_streaming_interface =  interface;
+                                    video -> ux_host_class_video_streaming_interface =  interface_ptr;
                     
                                     /* We need to research the isoch endpoint now.  */
-                                    for (endpoint_index = 0; endpoint_index < interface -> ux_interface_descriptor.bNumEndpoints; endpoint_index++)
+                                    for (endpoint_index = 0; endpoint_index < interface_ptr -> ux_interface_descriptor.bNumEndpoints; endpoint_index++)
                                     {                        
                     
                                         /* Get the list of endpoints one by one.  */
@@ -248,12 +252,12 @@ UINT                    max_payload_size;
                     
                                                 /* We have found the isoch endpoint, save it.  */
                                                 video -> ux_host_class_video_isochronous_endpoint =  endpoint;
-
+                    
                                                 /* Save the max payload size.
                                                 It's not exceeding endpoint bandwidth since the interface alternate
                                                 setting is located by max payload size.  */
                                                 video -> ux_host_class_video_current_max_payload_size = max_payload_size;
-                    
+                        
                                                 /* Free all used resources.  */
                                                 _ux_utility_memory_free(control_buffer);
 
@@ -269,7 +273,7 @@ UINT                    max_payload_size;
                             }
                     
                             /* Move to next interface.  */
-                            interface =  interface -> ux_interface_next_interface;
+                            interface_ptr =  interface_ptr -> ux_interface_next_interface;
                         }
                     }
                 }

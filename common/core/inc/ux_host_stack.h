@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_stack.h                                     PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,6 +60,11 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            added standalone HUB,       */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -82,25 +87,26 @@ extern   "C" {
 #define UX_HOST_STACK_ENUM_PORT_ENABLE          (UX_STATE_STEP + 0)
 #define UX_HOST_STACK_ENUM_PORT_RESET           (UX_STATE_STEP + 1)
 #define UX_HOST_STACK_ENUM_PORT_RESET_WAIT      (UX_STATE_STEP + 2)
-#define UX_HOST_STACK_ENUM_DEVICE_ADDR_SET      (UX_STATE_STEP + 3)
-#define UX_HOST_STACK_ENUM_DEVICE_ADDR_SENT     (UX_STATE_STEP + 4)
-#define UX_HOST_STACK_ENUM_DEVICE_DESCR_READ    (UX_STATE_STEP + 5)
-#define UX_HOST_STACK_ENUM_DEVICE_DESCR_PARSE   (UX_STATE_STEP + 6)
-#define UX_HOST_STACK_ENUM_CONFIG_DESCR_READ    (UX_STATE_STEP + 7)
-#define UX_HOST_STACK_ENUM_CONFIG_DESCR_PARSE   (UX_STATE_STEP + 8)
-#define UX_HOST_STACK_ENUM_CONFIG_DESCR_NEXT    (UX_STATE_STEP + 9)
-#define UX_HOST_STACK_ENUM_CONFIG_SET           (UX_STATE_STEP + 10)
-#define UX_HOST_STACK_ENUM_CONFIG_ACTIVATE      (UX_STATE_STEP + 11)
-#define UX_HOST_STACK_ENUM_ACTIVATE             (UX_STATE_STEP + 12)
-#define UX_HOST_STACK_ENUM_ACTIVATE_WAIT        (UX_STATE_STEP + 13)
-#define UX_HOST_STACK_ENUM_RETRY                (UX_STATE_STEP + 14)
-#define UX_HOST_STACK_ENUM_NEXT                 (UX_STATE_STEP + 15)
-#define UX_HOST_STACK_ENUM_TRANS_LOCK_WAIT      (UX_STATE_STEP + 16)
-#define UX_HOST_STACK_ENUM_TRANS_WAIT           (UX_STATE_STEP + 17)
-#define UX_HOST_STACK_ENUM_WAIT                 (UX_STATE_STEP + 18)
-#define UX_HOST_STACK_ENUM_FAIL                 (UX_STATE_STEP + 19)
-#define UX_HOST_STACK_ENUM_DONE                 (UX_STATE_STEP + 20)
-#define UX_HOST_STACK_ENUM_IDLE                 (UX_STATE_STEP + 21)
+#define UX_HOST_STACK_ENUM_HUB_OPERATION_WAIT   (UX_STATE_STEP + 3)
+#define UX_HOST_STACK_ENUM_DEVICE_ADDR_SET      (UX_STATE_STEP + 4)
+#define UX_HOST_STACK_ENUM_DEVICE_ADDR_SENT     (UX_STATE_STEP + 5)
+#define UX_HOST_STACK_ENUM_DEVICE_DESCR_READ    (UX_STATE_STEP + 6)
+#define UX_HOST_STACK_ENUM_DEVICE_DESCR_PARSE   (UX_STATE_STEP + 7)
+#define UX_HOST_STACK_ENUM_CONFIG_DESCR_READ    (UX_STATE_STEP + 8)
+#define UX_HOST_STACK_ENUM_CONFIG_DESCR_PARSE   (UX_STATE_STEP + 9)
+#define UX_HOST_STACK_ENUM_CONFIG_DESCR_NEXT    (UX_STATE_STEP + 10)
+#define UX_HOST_STACK_ENUM_CONFIG_SET           (UX_STATE_STEP + 11)
+#define UX_HOST_STACK_ENUM_CONFIG_ACTIVATE      (UX_STATE_STEP + 12)
+#define UX_HOST_STACK_ENUM_ACTIVATE             (UX_STATE_STEP + 13)
+#define UX_HOST_STACK_ENUM_ACTIVATE_WAIT        (UX_STATE_STEP + 14)
+#define UX_HOST_STACK_ENUM_RETRY                (UX_STATE_STEP + 15)
+#define UX_HOST_STACK_ENUM_NEXT                 (UX_STATE_STEP + 16)
+#define UX_HOST_STACK_ENUM_TRANS_LOCK_WAIT      (UX_STATE_STEP + 17)
+#define UX_HOST_STACK_ENUM_TRANS_WAIT           (UX_STATE_STEP + 18)
+#define UX_HOST_STACK_ENUM_WAIT                 (UX_STATE_STEP + 19)
+#define UX_HOST_STACK_ENUM_FAIL                 (UX_STATE_STEP + 20)
+#define UX_HOST_STACK_ENUM_DONE                 (UX_STATE_STEP + 21)
+#define UX_HOST_STACK_ENUM_IDLE                 (UX_STATE_STEP + 22)
 
 
 /* Define Host Stack component function prototypes.  */
@@ -117,7 +123,7 @@ UINT    _ux_host_stack_bandwidth_check(UX_HCD *hcd, UX_ENDPOINT *endpoint);
 
 UX_HOST_CLASS * _ux_host_stack_class_call(UX_HOST_CLASS_COMMAND *class_command);
 UINT    _ux_host_stack_class_device_scan(UX_DEVICE *device);
-UINT    _ux_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **class);
+UINT    _ux_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **ux_class);
 UINT    _ux_host_stack_class_instance_destroy(UX_HOST_CLASS *class, VOID *class_instance);
 UINT    _ux_host_stack_class_instance_create(UX_HOST_CLASS *class, VOID *class_instance);
 UINT    _ux_host_stack_class_instance_get(UX_HOST_CLASS *class, UINT class_index, VOID **class_instance);
@@ -132,7 +138,7 @@ UINT    _ux_host_stack_configuration_instance_create(UX_CONFIGURATION *configura
 VOID    _ux_host_stack_configuration_instance_delete(UX_CONFIGURATION *configuration);
 UINT    _ux_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
                                                 UINT interface_index, UINT alternate_setting_index,
-                                                UX_INTERFACE **interface);
+                                                UX_INTERFACE **ux_interface);
 UINT    _ux_host_stack_configuration_interface_scan(UX_CONFIGURATION *configuration);
 UINT    _ux_host_stack_configuration_set(UX_CONFIGURATION *configuration);
 VOID    _ux_host_stack_delay_ms(ULONG time);
@@ -160,11 +166,11 @@ VOID    _ux_host_stack_hcd_thread_entry(ULONG input);
 UINT    _ux_host_stack_hcd_transfer_request(UX_TRANSFER *transfer_request);
 UINT    _ux_host_stack_initialize(UINT (*ux_system_host_change_function)(ULONG, UX_HOST_CLASS *, VOID *));
 UINT    _ux_host_stack_uninitialize(VOID);
-UINT    _ux_host_stack_interface_endpoint_get(UX_INTERFACE *interface, UINT endpoint_index, UX_ENDPOINT **endpoint);
-UINT    _ux_host_stack_interface_instance_create(UX_INTERFACE *interface);
-VOID    _ux_host_stack_interface_instance_delete(UX_INTERFACE *interface);
-UINT    _ux_host_stack_interface_set(UX_INTERFACE *interface);
-UINT    _ux_host_stack_interface_setting_select(UX_INTERFACE *interface);
+UINT    _ux_host_stack_interface_endpoint_get(UX_INTERFACE *ux_interface, UINT endpoint_index, UX_ENDPOINT **endpoint);
+UINT    _ux_host_stack_interface_instance_create(UX_INTERFACE *ux_interface);
+VOID    _ux_host_stack_interface_instance_delete(UX_INTERFACE *ux_interface);
+UINT    _ux_host_stack_interface_set(UX_INTERFACE *ux_interface);
+UINT    _ux_host_stack_interface_setting_select(UX_INTERFACE *ux_interface);
 UINT    _ux_host_stack_interfaces_scan(UX_CONFIGURATION *configuration, UCHAR * descriptor);
 VOID    _ux_host_stack_new_configuration_create(UX_DEVICE *device, UX_CONFIGURATION *configuration);
 UX_DEVICE  *_ux_host_stack_new_device_get(VOID);
@@ -172,7 +178,7 @@ UINT    _ux_host_stack_new_device_create(UX_HCD *hcd, UX_DEVICE *device_owner,
                                 UINT port_index, UINT device_speed,
                                 UINT port_max_power,
                                 UX_DEVICE **created_device);
-UINT    _ux_host_stack_new_endpoint_create(UX_INTERFACE *interface, UCHAR * interface_endpoint);
+UINT    _ux_host_stack_new_endpoint_create(UX_INTERFACE *ux_interface, UCHAR * interface_endpoint);
 UINT    _ux_host_stack_new_interface_create(UX_CONFIGURATION *configuration, UCHAR * descriptor, ULONG length);
 VOID    _ux_host_stack_rh_change_process(VOID);
 UINT    _ux_host_stack_rh_device_extraction(UX_HCD *hcd, UINT port_index);
@@ -192,7 +198,7 @@ UINT    _ux_host_stack_transfer_run(UX_TRANSFER *transfer_request);
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif
 

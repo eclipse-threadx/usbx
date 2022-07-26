@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_device_type_get                PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,21 +67,25 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed protocol store,     */
+/*                                            added audio 2.0 support,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_device_type_get(UX_HOST_CLASS_AUDIO *audio)
 {
 
-UCHAR *                                         descriptor;
-UX_INTERFACE_DESCRIPTOR                         interface_descriptor;
-UX_HOST_CLASS_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR  output_interface_descriptor;
-UX_HOST_CLASS_AUDIO_INPUT_TERMINAL_DESCRIPTOR   input_interface_descriptor;
+UCHAR                                           *iad;
+UCHAR                                           *descriptor;
+UCHAR                                           *interface_descriptor;
 ULONG                                           total_descriptor_length;
 ULONG                                           descriptor_length;
 ULONG                                           descriptor_type;
 ULONG                                           descriptor_subtype;
 ULONG                                           descriptor_found;
-    
+ULONG                                           interface_number;
+UINT                                            i;
 
     /* Get the descriptor to the entire configuration.  */
     descriptor =               audio -> ux_host_class_audio_configuration_descriptor;
@@ -89,6 +93,10 @@ ULONG                                           descriptor_found;
     
     /* Default is Interface descriptor not yet found.  */    
     descriptor_found =  UX_FALSE;
+    iad = UX_NULL;
+    interface_descriptor = UX_NULL;
+    interface_number = audio -> ux_host_class_audio_streaming_interface
+                                    -> ux_interface_descriptor.bInterfaceNumber;
     
     /* Scan the descriptor for the Audio Streaming interface.  */
     while (total_descriptor_length)
@@ -116,79 +124,110 @@ ULONG                                           descriptor_found;
         switch (descriptor_type)
         {
 
+        /* There is IAD in case UAC 1.0 with IAD or UAC 2.0/3.0.  */
+        case UX_INTERFACE_ASSOCIATION_DESCRIPTOR_ITEM:
+
+            /* Ensure we have the correct IAD that includes the interface.  */
+            if ((descriptor[4] == UX_HOST_CLASS_AUDIO_CLASS) &&
+                (descriptor[2] <= interface_number) &&
+                (descriptor[2] + descriptor[3] > interface_number))
+            {
+                iad = descriptor;
+
+                /* Control interface must be the first interface (UAC 2.0/3.0).  */
+                audio -> ux_host_class_audio_control_interface_number = descriptor[2];
+            }
+            else
+                iad = UX_NULL;
+            break;
 
         case UX_INTERFACE_DESCRIPTOR_ITEM:
 
-            /* Parse the interface descriptor and make it machine independent.  */
-            _ux_utility_descriptor_parse(descriptor, _ux_system_interface_descriptor_structure,
-                                            UX_INTERFACE_DESCRIPTOR_ENTRIES, (UCHAR *) &interface_descriptor);
-
             /* Ensure we have the correct interface for Audio Control.  */
-            if ((interface_descriptor.bInterfaceClass == UX_HOST_CLASS_AUDIO_CLASS) &&
-                (interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_AUDIO_SUBCLASS_CONTROL))
-            {
-
-                /* Mark we have found it.  */
-                descriptor_found =  UX_TRUE;
-
-                /* Get the interface number of this descriptor and save it in the audio 
-                   instance. This will be useful to program the audio controls.  */
-                audio -> ux_host_class_audio_control_interface_number =  interface_descriptor.bInterfaceNumber;
-            }
+            if ((descriptor[5] == UX_HOST_CLASS_AUDIO_CLASS) &&
+                (descriptor[6] == UX_HOST_CLASS_AUDIO_SUBCLASS_CONTROL))
+                interface_descriptor = descriptor;
             else
             {
+                interface_descriptor = UX_NULL;
+                descriptor_found = UX_FALSE;
+            }
 
-                descriptor_found =  UX_FALSE;
+            /* Check IAD.  */
+            if (iad)
+            {
+
+                /* Check if interface is out of IAD.  */
+                if ((iad[2] > interface_descriptor[2]) ||
+                    (iad[2] + iad[3] <= interface_descriptor[2]))
+                    iad = UX_NULL;
             }
             break;
-                
 
         case UX_HOST_CLASS_AUDIO_CS_INTERFACE:
 
             /* First make sure we have found the correct generic interface descriptor.  */
-            if (descriptor_found == UX_TRUE)
+            if (interface_descriptor != UX_NULL)
             {
 
                 /* Check the sub type.  */
                 switch (descriptor_subtype)
                 {
 
+                /* UAC 1.0, AC interface contains AS interface information.  */
+                case UX_HOST_CLASS_AUDIO_CS_HEADER:
 
-                case UX_HOST_CLASS_AUDIO_CS_INPUT_TERMINAL:
-                                        
-                    /* Make the descriptor machine independent.  */
-                    _ux_utility_descriptor_parse(descriptor, _ux_system_class_audio_input_terminal_descriptor_structure,
-                                            UX_HOST_CLASS_AUDIO_INPUT_TERMINAL_DESCRIPTOR_ENTRIES, (UCHAR *) &input_interface_descriptor);
-                                                        
-                    /* Make sure we have the right terminal link.  */
-                    if (input_interface_descriptor.bTerminalID == audio -> ux_host_class_audio_terminal_link)
+                    if (interface_descriptor[7] == UX_HOST_CLASS_AUDIO_PROTOCOL_IP_VERSION_01_00)
                     {
 
-                        audio -> ux_host_class_audio_type =  UX_HOST_CLASS_AUDIO_OUTPUT;
-
-                        /* Return successful completion.  */
-                        return(UX_SUCCESS);
+                        /* Check baInterfaceNr@8 to see if it's the right interface.  */
+                        for (i = 0; i < descriptor[7]; i ++)
+                        {
+                            if (descriptor[8 + i] == interface_number)
+                            {
+                                descriptor_found = UX_TRUE;
+                                break;
+                            }
+                        }
                     }
+                    else if (iad)
+                    {
 
+                        /* UAC 2.0 or 3.0 IAD first interface indicates AC.  */
+                        descriptor_found = UX_TRUE;
+                    }
                     break;
 
+                case UX_HOST_CLASS_AUDIO_CS_INPUT_TERMINAL:
                 case UX_HOST_CLASS_AUDIO_CS_OUTPUT_TERMINAL:
 
-                    /* Make the descriptor machine independent.  */
-                    _ux_utility_descriptor_parse(descriptor, _ux_system_class_audio_output_terminal_descriptor_structure,
-                                            UX_HOST_CLASS_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR_ENTRIES, (UCHAR *) &output_interface_descriptor);
-                                                        
-                    /* Make sure we have the right terminal link.  */
-                    if (output_interface_descriptor.bTerminalID == audio -> ux_host_class_audio_terminal_link)
+                    /* Ensure it's right AC ITT/OTT.  */
+                    if (descriptor_found)
                     {
 
-                        audio -> ux_host_class_audio_type =  UX_HOST_CLASS_AUDIO_INPUT;
+                        /* In UAC 1.0/2.0/3.0, bTerminalID at 3, wTerminalType at 4.  */
+                        if (descriptor[3] == audio -> ux_host_class_audio_terminal_link)
+                        {
 
-                        /* Return successful completion.  */
-                        return(UX_SUCCESS);
+                            /* Connect to ITT, it's output, connect to OTT it's input.  */
+                            if (descriptor_subtype == UX_HOST_CLASS_AUDIO_CS_INPUT_TERMINAL)
+                                audio -> ux_host_class_audio_type = UX_HOST_CLASS_AUDIO_OUTPUT;
+                            else
+                                audio -> ux_host_class_audio_type = UX_HOST_CLASS_AUDIO_INPUT;
+
+                            /* Return successful completion.  */
+                            return(UX_SUCCESS);
+                        }
                     }
+                    break;
+
+                default:
+                    break;
                 }
             }
+            break;
+
+        default:
             break;
         }       
 

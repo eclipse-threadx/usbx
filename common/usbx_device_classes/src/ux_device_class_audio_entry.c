@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_entry                        PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            returned request status,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -146,10 +149,7 @@ UINT        status;
     case UX_SLAVE_CLASS_COMMAND_REQUEST:
 
         /* The request command is used when the host sends a command on the control endpoint.  */
-        _ux_device_class_audio_control_request(command);
-
-        /* Return the completion status.  */
-        return(UX_SUCCESS);
+        return _ux_device_class_audio_control_request(command);
 
     default:
 

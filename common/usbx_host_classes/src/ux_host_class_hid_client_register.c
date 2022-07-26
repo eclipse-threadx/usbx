@@ -36,7 +36,7 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(UX_HOST_CLASS_HID_MAX_CLIEN
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_client_register                  PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,13 +87,17 @@ UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(UX_HOST_CLASS_HID_MAX_CLIEN
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_client_register(UCHAR *hid_client_name,
                                 UINT (*hid_client_handler)(struct UX_HOST_CLASS_HID_CLIENT_COMMAND_STRUCT *))
 {
 
-UX_HOST_CLASS               *class;
+UX_HOST_CLASS               *class_ptr;
 ULONG                       hid_client_index;
 UINT                        status;
 UX_HOST_CLASS_HID_CLIENT    *hid_client;
@@ -108,7 +112,7 @@ UINT                        client_name_length =  0;
         return(status);
 
     /* We need to locate our class container.  */
-    status =  _ux_host_stack_class_get(_ux_system_host_class_hid_name, &class);
+    status =  _ux_host_stack_class_get(_ux_system_host_class_hid_name, &class_ptr);
 
     /* If we cannot get the class container, it means the HID class was not registered.  */
     if (status != UX_SUCCESS)
@@ -116,22 +120,22 @@ UINT                        client_name_length =  0;
 
     /* From the class container, we get the client pointer which has the list of 
        HID clients. If the pointer is NULL, the client list was not assigned.  */
-    if (class -> ux_host_class_client == UX_NULL)
+    if (class_ptr -> ux_host_class_client == UX_NULL)
     {
 
         /* Allocate memory for the class client.
          * Allocate size overflow static checked outside the function.
          */
-        class -> ux_host_class_client =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
+        class_ptr -> ux_host_class_client =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
                                             sizeof(UX_HOST_CLASS_HID_CLIENT)*UX_HOST_CLASS_HID_MAX_CLIENTS);
         
         /* Check for successful allocation.  */
-        if (class -> ux_host_class_client == UX_NULL)
+        if (class_ptr -> ux_host_class_client == UX_NULL)
             return(UX_MEMORY_INSUFFICIENT);
     }
 
     /* De-reference the client pointer into a HID client array pointer.  */
-    hid_client =  (UX_HOST_CLASS_HID_CLIENT *) class -> ux_host_class_client;
+    hid_client =  (UX_HOST_CLASS_HID_CLIENT *) class_ptr -> ux_host_class_client;
 
     /* We need to parse the HID client handler table to find an empty spot.  */
     for (hid_client_index = 0; hid_client_index < UX_HOST_CLASS_HID_MAX_CLIENTS; hid_client_index++)

@@ -97,7 +97,7 @@ extern   "C" {
 
 /* Define Printer Class string constants.  */
 
-#define    UX_HOST_CLASS_PRINTER_GENERIC_NAME                   "USB PRINTER"
+#define UX_HOST_CLASS_PRINTER_GENERIC_NAME                      "USB PRINTER"
 
 
 /* Define Printer flag constants.  */

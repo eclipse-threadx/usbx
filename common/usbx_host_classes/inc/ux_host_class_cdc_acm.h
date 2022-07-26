@@ -378,11 +378,11 @@ VOID  _ux_host_class_cdc_acm_transmission_callback(UX_TRANSFER *transfer_request
 #define ux_host_class_cdc_acm_reception_stop            _ux_host_class_cdc_acm_reception_stop
 
 #define ux_host_class_cdc_acm_write_with_callback       _ux_host_class_cdc_acm_write_with_callback
-                                    
+
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif

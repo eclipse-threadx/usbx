@@ -16,15 +16,27 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_alternate_setting_locate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_configure.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_control_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_control_request.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_control_value_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_control_value_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_deactivate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_descriptor_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_descriptors_parse.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_device_controls_list_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_device_type_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_endpoints_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_entity_control_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_entity_control_value_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_entity_control_value_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_feedback_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_feedback_set.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_feedback_transfer_completed.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_interrupt_notification.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_interrupt_start.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_raw_sampling_parse.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_read.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_stop.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_streaming_sampling_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_streaming_sampling_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_audio_streaming_terminal_get.c
@@ -140,6 +152,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hub_port_reset.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hub_ports_power.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hub_status_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hub_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hub_transfer_request_completed.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_pima_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_pima_command.c

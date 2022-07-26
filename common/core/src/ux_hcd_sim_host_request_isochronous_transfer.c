@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_sim_host_request_isochronous_transfer       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed partial transfer,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_request_isochronous_transfer(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request)
@@ -170,15 +173,15 @@ ULONG                       n_trans, packet_size;
         data_td -> ux_sim_host_iso_td_buffer =  data_pointer;
 
         /* Update the length of the transfer for this TD.  */
-        data_td -> ux_sim_host_iso_td_length =  isoch_packet_payload_length;
+        data_td -> ux_sim_host_iso_td_length = UX_MIN(transfer_request_payload_length, isoch_packet_payload_length);
 
         /* Attach the endpoint and transfer request to the TD.  */
         data_td -> ux_sim_host_iso_td_transfer_request =  transfer_request;
         data_td -> ux_sim_host_iso_td_ed =  ed;
 
         /* Adjust the data payload length and the data payload pointer.  */
-        transfer_request_payload_length -=  isoch_packet_payload_length;
-        data_pointer +=  isoch_packet_payload_length;
+        transfer_request_payload_length -= data_td -> ux_sim_host_iso_td_length;
+        data_pointer += data_td -> ux_sim_host_iso_td_length;
 
         /* Prepare the next frame for the next TD in advance.  */
         current_frame_number++;

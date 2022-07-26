@@ -12,6 +12,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_frame_write.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_interrupt_send.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_interrupt_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_ioctl.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_read_frame_free.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_read_frame_get.c
@@ -90,9 +92,11 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_interrupt_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_read.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_read_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_event_free.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_event_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_receiver_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_report_get.c

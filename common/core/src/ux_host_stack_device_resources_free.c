@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_device_resources_free                PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,13 +81,20 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            fixed standalone enum free, */
+/*                                            freed shared device config  */
+/*                                            descriptor for enum scan,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_resources_free(UX_DEVICE *device)
 {
 
 UX_CONFIGURATION        *configuration;
-UX_INTERFACE            *interface;
+UX_INTERFACE            *interface_ptr;
 UX_ENDPOINT             *endpoint;
 VOID                    *container;
 ULONG                   current_alternate_setting;
@@ -96,6 +103,9 @@ UX_HCD                  *hcd;
 UINT                    device_address_byte_index;
 UINT                    device_address_bit_index;
 UCHAR                   device_address_byte;
+#endif
+#if defined(UX_HOST_STANDALONE)
+UX_DEVICE               *enum_next;
 #endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
@@ -145,26 +155,26 @@ UCHAR                   device_address_byte;
     {
         
         /* We have the correct configuration, search the interface(s).  */
-        interface =  configuration -> ux_configuration_first_interface;
+        interface_ptr =  configuration -> ux_configuration_first_interface;
 
         /* Parse all the interfaces.  */
-        while (interface != UX_NULL)
+        while (interface_ptr != UX_NULL)
         {
 
             /* The alternate setting 0 has the selected alternate setting value.  */
-            if (interface -> ux_interface_descriptor.bAlternateSetting == 0)
-                current_alternate_setting = interface -> ux_interface_current_alternate_setting;
+            if (interface_ptr -> ux_interface_descriptor.bAlternateSetting == 0)
+                current_alternate_setting = interface_ptr -> ux_interface_current_alternate_setting;
 
             /* If this is the selected interface, we need to free all the endpoints 
             attached to the alternate setting for this interface.  */
-            endpoint =  interface -> ux_interface_first_endpoint;
+            endpoint =  interface_ptr -> ux_interface_first_endpoint;
             
             /* Parse all the endpoints.  */
             while (endpoint != UX_NULL)
             {
 
                 /* Check if this is the selected interface.  */
-                if (interface -> ux_interface_descriptor.bAlternateSetting == current_alternate_setting)
+                if (interface_ptr -> ux_interface_descriptor.bAlternateSetting == current_alternate_setting)
                 {
 
                     /* Delete the endpoint instance first.  */
@@ -183,10 +193,10 @@ UCHAR                   device_address_byte;
             
             
             /* Memorize the interface container address.  */
-            container =  (VOID *) interface;                  
+            container =  (VOID *) interface_ptr;                  
                 
             /* Get the next interface.  */      
-            interface =  interface -> ux_interface_next_interface;
+            interface_ptr =  interface_ptr -> ux_interface_next_interface;
 
             /* Delete the interface container.  */
             _ux_utility_memory_free(container);
@@ -201,6 +211,14 @@ UCHAR                   device_address_byte;
         /* Free the configuration.  */
         _ux_utility_memory_free(container);
     }                       
+
+    /* If there was a copy of packed descriptor, free it.  */
+    if (device -> ux_device_packed_configuration)
+    {
+        _ux_utility_memory_free(device -> ux_device_packed_configuration);
+
+        /* Pointer and keep count is set NULL later while reseting instance memory.  */
+    }
 
     /* We need the HCD address for the control endpoint removal and to free
        the device address.  */
@@ -250,7 +268,14 @@ UCHAR                   device_address_byte;
     _ux_host_semaphore_delete(&device -> ux_device_protection_semaphore);
 
     /* Now this device can be free and its container return to the pool.  */
+#if defined(UX_HOST_STANDALONE)
+    enum_next = device -> ux_device_enum_next;
     _ux_utility_memory_set(device, 0, sizeof(UX_DEVICE)); /* Use case of memset is verified. */
+    device -> ux_device_enum_next = enum_next;
+#else
+
+    _ux_utility_memory_set(device, 0, sizeof(UX_DEVICE)); /* Use case of memset is verified. */
+#endif
 
     /* Mark the device handle as unused.  */
     device -> ux_device_handle =  UX_UNUSED;

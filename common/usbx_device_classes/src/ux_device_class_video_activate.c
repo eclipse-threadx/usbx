@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_activate                     PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -63,53 +63,57 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
 
 UX_SLAVE_DEVICE                         *device;
-UX_SLAVE_INTERFACE                      *interface;
+UX_SLAVE_INTERFACE                      *interface_ptr;
+UX_SLAVE_CLASS                          *class_ptr;
 UX_SLAVE_INTERFACE                      *control_interface;
 UX_SLAVE_INTERFACE                      *stream_interface;
 UX_DEVICE_CLASS_VIDEO                   *video;
 UX_DEVICE_CLASS_VIDEO_STREAM            *stream;
-UX_SLAVE_CLASS                          *class_inst;
 ULONG                                    stream_index;
 
 
     /* Get the class container.  */
-    class_inst =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
-    video = (UX_DEVICE_CLASS_VIDEO *) class_inst -> ux_slave_class_instance;
+    video = (UX_DEVICE_CLASS_VIDEO *) class_ptr -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
 
     /* Get the device instance.  */
     device = &_ux_system_slave -> ux_system_slave_device;
     video -> ux_device_class_video_device = device;
 
     /* We only support video interface here.  */
-    if (interface -> ux_slave_interface_descriptor.bInterfaceClass != UX_DEVICE_CLASS_VIDEO_CLASS)
+    if (interface_ptr -> ux_slave_interface_descriptor.bInterfaceClass != UX_DEVICE_CLASS_VIDEO_CLASS)
         return(UX_NO_CLASS_MATCH);
 
     /* It's control interface?  */
-    if (interface -> ux_slave_interface_descriptor.bInterfaceSubClass == UX_DEVICE_CLASS_VIDEO_SUBCLASS_CONTROL)
+    if (interface_ptr -> ux_slave_interface_descriptor.bInterfaceSubClass == UX_DEVICE_CLASS_VIDEO_SUBCLASS_CONTROL)
     {
 
         /* Store the interface in the class instance.  */
-        video -> ux_device_class_video_interface = interface;
+        video -> ux_device_class_video_interface = interface_ptr;
 
         /* Store the class instance into the interface.  */
-        interface -> ux_slave_interface_class_instance = (VOID *)video;
+        interface_ptr -> ux_slave_interface_class_instance = (VOID *)video;
     }
     else
     {
 
         /* It's streaming interface.  */
-        stream_interface = interface;
+        stream_interface = interface_ptr;
 
         /* Separate driver for each interface (IAD not used)?  */
         if (video -> ux_device_class_video_interface == UX_NULL)

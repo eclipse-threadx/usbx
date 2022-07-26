@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_bulkin_thread              PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,6 +87,11 @@
 /*                                            used whole buffer for write,*/
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            added auto ZLP support,     */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_acm_bulkin_thread(ULONG cdc_acm_class)
@@ -95,11 +100,12 @@ VOID  _ux_device_class_cdc_acm_bulkin_thread(ULONG cdc_acm_class)
 UX_SLAVE_CLASS_CDC_ACM          *cdc_acm;
 UX_SLAVE_DEVICE                 *device;
 UX_SLAVE_ENDPOINT               *endpoint;
-UX_SLAVE_INTERFACE              *interface;
+UX_SLAVE_INTERFACE              *interface_ptr;
 UX_SLAVE_TRANSFER               *transfer_request;
 UINT                            status;
 ULONG                           actual_flags;
 ULONG                           transfer_length;
+ULONG                           host_length;
 ULONG                           total_length;
 ULONG                           sent_length;
 
@@ -111,10 +117,10 @@ ULONG                           sent_length;
     device =  &_ux_system_slave -> ux_system_slave_device;
 
     /* This is the first time we are activated. We need the interface to the class.  */
-    interface =  cdc_acm -> ux_slave_class_cdc_acm_interface;
+    interface_ptr =  cdc_acm -> ux_slave_class_cdc_acm_interface;
 
     /* Locate the endpoints.  */
-    endpoint =  interface -> ux_slave_interface_first_endpoint;
+    endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
 
     /* Check the endpoint direction, if IN we have the correct endpoint.  */
     if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
@@ -162,6 +168,7 @@ ULONG                           sent_length;
                 {
 
                     /* We should send the total length.  But we may have a case of ZLP. */
+                    host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
                     while (total_length)
                     {
 
@@ -172,9 +179,21 @@ ULONG                           sent_length;
                             transfer_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
 
                         else
+                        {
 
                             /* We can send everything.  */
                             transfer_length =  total_length;
+
+#if !defined(UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP)
+
+                            /* Assume expected length matches length to send.  */
+                            host_length = total_length;
+#else
+
+                            /* Assume expected more to let stack append ZLP if needed.  */
+                            host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH + 1;
+#endif
+                        }
 
                         /* Copy the payload locally.  */
                         _ux_utility_memory_copy (transfer_request -> ux_slave_transfer_request_data_pointer,
@@ -182,7 +201,7 @@ ULONG                           sent_length;
                                                 transfer_length); /* Use case of memcpy is verified. */
 
                         /* Send the acm payload to the host.  */
-                        status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, transfer_length);
+                        status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, host_length);
 
                         /* Check the status.  */
                         if (status != UX_SUCCESS)

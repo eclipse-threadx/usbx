@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_change_detect                    PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,9 @@
 /*                                                                        */ 
 /*    This function is called by the enumeration thread when there has    */ 
 /*    been activity on the HUB.                                           */ 
+/*                                                                        */
+/*    In standalone mode there is nothing to do here, activities are      */
+/*    processed in hub tasks function.                                    */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -70,10 +73,17 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_change_detect(VOID)
 {
+#if defined(UX_HOST_STANDALONE)
+
+    /* Things are done in hub task nothing to do here.  */
+#else
 
 UX_HOST_CLASS           *class;
 UX_HOST_CLASS_HUB       *hub;
@@ -116,5 +126,5 @@ UINT                    class_index;
 
     /* We have parsed all the HUB instances.  */
     return;
+#endif
 }
-

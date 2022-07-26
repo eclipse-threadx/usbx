@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_request_isochronous_transfer           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,6 +86,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved iso start up,      */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_request_isochronous_transfer(UX_HCD_EHCI *hcd_ehci, UX_TRANSFER *transfer_request)
@@ -141,6 +144,8 @@ UCHAR                           start = UX_FALSE;
         if (ied -> ux_ehci_hsiso_ed_frstart == 0xFF)
         {
             ied -> ux_ehci_hsiso_ed_frstart = 0xFE;
+            ied -> ux_ehci_hsiso_ed_fr_sw = 0;
+            ied -> ux_ehci_hsiso_ed_fr_hc = 0;
             start = UX_TRUE;
         }
     }

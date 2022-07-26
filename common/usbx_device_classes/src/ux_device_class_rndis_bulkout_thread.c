@@ -89,7 +89,7 @@
 VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class)
 {
 
-UX_SLAVE_CLASS                  *class;
+UX_SLAVE_CLASS                  *class_ptr;
 UX_SLAVE_CLASS_RNDIS            *rndis;
 UX_SLAVE_DEVICE                 *device;
 UX_SLAVE_TRANSFER               *transfer_request;
@@ -99,10 +99,10 @@ ULONG                           ip_given_length;
 ULONG                           packet_payload;
 
     /* Cast properly the rndis instance.  */
-    UX_THREAD_EXTENSION_PTR_GET(class, UX_SLAVE_CLASS, rndis_class)
+    UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, rndis_class)
     
     /* Get the rndis instance from this class container.  */
-    rndis =  (UX_SLAVE_CLASS_RNDIS *) class -> ux_slave_class_instance;
+    rndis =  (UX_SLAVE_CLASS_RNDIS *) class_ptr -> ux_slave_class_instance;
     
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;

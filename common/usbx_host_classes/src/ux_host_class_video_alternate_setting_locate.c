@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_alternate_setting_locate       PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,13 +73,17 @@
 /*                                            use pre-calculated value    */
 /*                                            instead of wMaxPacketSize,  */
 /*                                            resulting in version 6.1.9  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_alternate_setting_locate(UX_HOST_CLASS_VIDEO *video, UINT max_payload_size, UINT *alternate_setting)
 {
 
 UX_CONFIGURATION        *configuration;
-UX_INTERFACE            *interface;
+UX_INTERFACE            *interface_ptr;
 UX_ENDPOINT             *endpoint;
 UINT                    streaming_interface;
 UINT                    payload_size;
@@ -88,22 +92,22 @@ UINT                    alternate_setting_found;
 
 
     configuration =        video -> ux_host_class_video_streaming_interface -> ux_interface_configuration;
-    interface =            configuration -> ux_configuration_first_interface;
+    interface_ptr =            configuration -> ux_configuration_first_interface;
     streaming_interface =  video -> ux_host_class_video_streaming_interface -> ux_interface_descriptor.bInterfaceNumber;
 
     alternate_setting_found = UX_FALSE;
 
     /* Scan all interfaces.  */
-    while (interface != UX_NULL)
+    while (interface_ptr != UX_NULL)
     {
 
         /* Search for the streaming interface with a endpoint.  */
-        if ((interface -> ux_interface_descriptor.bInterfaceNumber == streaming_interface) &&
-            (interface -> ux_interface_first_endpoint != 0))
+        if ((interface_ptr -> ux_interface_descriptor.bInterfaceNumber == streaming_interface) &&
+            (interface_ptr -> ux_interface_first_endpoint != 0))
         {
             
             /* Get the max packet size of the endpoint.  */
-            endpoint = interface -> ux_interface_first_endpoint;
+            endpoint = interface_ptr -> ux_interface_first_endpoint;
             payload_size = endpoint -> ux_endpoint_transfer_request.ux_transfer_request_packet_length;
 
             /* Check if the payload size is equal or greater than the required payload size.  */
@@ -119,7 +123,7 @@ UINT                    alternate_setting_found;
                     current_payload_size = payload_size;
 
                     /* Save the found alternate setting number.  */
-                    *alternate_setting = interface -> ux_interface_descriptor.bAlternateSetting;
+                    *alternate_setting = interface_ptr -> ux_interface_descriptor.bAlternateSetting;
                 }
                 else
                 {
@@ -132,14 +136,14 @@ UINT                    alternate_setting_found;
                         current_payload_size = payload_size;
 
                         /* Save the found alternate setting number.  */
-                        *alternate_setting = interface -> ux_interface_descriptor.bAlternateSetting;
+                        *alternate_setting = interface_ptr -> ux_interface_descriptor.bAlternateSetting;
                     }
                 }
             }
         }
 
         /* Move to next interface.  */
-        interface =  interface -> ux_interface_next_interface;
+        interface_ptr =  interface_ptr -> ux_interface_next_interface;
     }
 
     /* Check if we found the alternate setting.  */

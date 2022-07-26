@@ -89,7 +89,7 @@
 VOID  _ux_device_class_hid_interrupt_thread(ULONG hid_class)
 {
 
-UX_SLAVE_CLASS              *class;
+UX_SLAVE_CLASS              *class_ptr;
 UX_SLAVE_CLASS_HID          *hid;
 UX_SLAVE_DEVICE             *device;
 UX_SLAVE_TRANSFER           *transfer_request_in;
@@ -100,10 +100,10 @@ ULONG                       actual_flags;
 
 
     /* Cast properly the hid instance.  */
-    UX_THREAD_EXTENSION_PTR_GET(class, UX_SLAVE_CLASS, hid_class)
+    UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, hid_class)
     
     /* Get the hid instance from this class container.  */
-    hid =  (UX_SLAVE_CLASS_HID *) class -> ux_slave_class_instance;
+    hid =  (UX_SLAVE_CLASS_HID *) class_ptr -> ux_slave_class_instance;
     
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
@@ -197,7 +197,7 @@ ULONG                       actual_flags;
         }
              
         /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
-        _ux_device_thread_suspend(&class -> ux_slave_class_thread);
+        _ux_device_thread_suspend(&class_ptr -> ux_slave_class_thread);
     }
 }
 #endif

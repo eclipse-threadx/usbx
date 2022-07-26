@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_media_get                    PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined media to search,    */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            cleared CSTAT warning,      */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT    _ux_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage,
@@ -88,6 +91,7 @@ UINT    _ux_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage,
 #else
 
 UX_HOST_CLASS_STORAGE_MEDIA     *storage_medias;
+UX_HOST_CLASS_STORAGE_MEDIA     *storage_media_inst;
 UX_HOST_CLASS                   *class_inst;
 UINT                            scan_index;
 
@@ -105,23 +109,26 @@ UINT                            scan_index;
     /* Search media to find the right one.  */
     for(scan_index = 0; scan_index < UX_HOST_CLASS_STORAGE_MAX_MEDIA; scan_index ++)
     {
+        storage_media_inst = &storage_medias[scan_index];
 
         /* Skip storage media not used.  */
-        if (storage_medias[scan_index].ux_host_class_storage_media_status != UX_USED)
+        if (storage_media_inst -> ux_host_class_storage_media_status != UX_USED)
             continue;
 
         /* Skip storage media not belong to the storage.  */
-        if (storage_medias[scan_index].ux_host_class_storage_media_storage != storage)
+        if (storage_media_inst -> ux_host_class_storage_media_storage != storage)
             continue;
 
         /* Skip storage media with different LUN.  */
-        if (storage_medias[scan_index].ux_host_class_storage_media_lun != media_lun)
+        if (storage_media_inst -> ux_host_class_storage_media_lun != media_lun)
             continue;
 
         /* Store the media instance.  */
-            *storage_media = &storage_medias[scan_index];
+        {
+            *storage_media = storage_media_inst;
             return(UX_SUCCESS);
         }
+    }
 
     /* Media not found.  */
     return(UX_ERROR);

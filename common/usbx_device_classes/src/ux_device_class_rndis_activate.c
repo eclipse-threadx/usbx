@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_activate                     PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -84,31 +88,31 @@ UINT  _ux_device_class_rndis_activate(UX_SLAVE_CLASS_COMMAND *command)
     return(UX_FUNCTION_NOT_SUPPORTED);
 #else
 
-UX_SLAVE_INTERFACE          *interface;            
+UX_SLAVE_INTERFACE          *interface_ptr;            
+UX_SLAVE_CLASS              *class_ptr;
 UX_SLAVE_CLASS_RNDIS        *rndis;
-UX_SLAVE_CLASS              *class;
 UX_SLAVE_ENDPOINT           *endpoint;
 ULONG                       physical_address_msw;
 ULONG                       physical_address_lsw;
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Get the class instance in the container.  */
-    rndis = (UX_SLAVE_CLASS_RNDIS *) class -> ux_slave_class_instance;
+    rndis = (UX_SLAVE_CLASS_RNDIS *) class_ptr -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
     
     /* Check if this is the Control or Data interface.  */
     if (command -> ux_slave_class_command_class == UX_DEVICE_CLASS_RNDIS_CLASS_COMMUNICATION_CONTROL)
     {
 
         /* Store the class instance into the interface.  */
-        interface -> ux_slave_interface_class_instance =  (VOID *)rndis;
+        interface_ptr -> ux_slave_interface_class_instance =  (VOID *)rndis;
          
         /* Now the opposite, store the interface in the class instance.  */
-        rndis -> ux_slave_class_rndis_interface =  interface;
+        rndis -> ux_slave_class_rndis_interface =  interface_ptr;
 
         /* If there is a activate function call it.  */
         if (rndis -> ux_slave_class_rndis_parameter.ux_slave_class_rndis_instance_activate != UX_NULL)
@@ -119,10 +123,10 @@ ULONG                       physical_address_lsw;
     else
     
         /* This is the DATA Class, only store the rndis instance in the interface.  */
-        interface -> ux_slave_interface_class_instance =  (VOID *)rndis;
+        interface_ptr -> ux_slave_interface_class_instance =  (VOID *)rndis;
 
     /* Locate the endpoints.  Interrupt for Control and Bulk in/out for Data.  */
-    endpoint =  interface -> ux_slave_interface_first_endpoint;
+    endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
     
     /* Parse all endpoints.  */
     while (endpoint != UX_NULL)

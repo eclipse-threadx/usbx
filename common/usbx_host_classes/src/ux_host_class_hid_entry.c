@@ -51,7 +51,7 @@ static inline UINT _ux_host_class_hid_activate_wait(UX_HOST_CLASS_COMMAND *comma
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hid_entry                            PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -92,6 +92,11 @@ static inline UINT _ux_host_class_hid_activate_wait(UX_HOST_CLASS_COMMAND *comma
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed uninited variable,    */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_entry(UX_HOST_CLASS_COMMAND *command)
@@ -186,7 +191,7 @@ UX_HOST_CLASS_HID_CLIENT_COMMAND    client_command;
 #if defined(UX_HOST_STANDALONE)
 static inline VOID _ux_host_class_hid_descriptor_read(UX_HOST_CLASS_HID *hid)
 {
-UX_INTERFACE                    *interface;
+UX_INTERFACE                    *interface_ptr;
 UX_CONFIGURATION                *configuration;
 UX_ENDPOINT                     *control_endpoint;
 UX_TRANSFER                     *transfer_request;
@@ -196,8 +201,8 @@ UX_TRANSFER                     *transfer_request;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
     /* Need to allocate memory for the descriptor.  */
-    interface = hid -> ux_host_class_hid_interface;
-    configuration = interface -> ux_interface_configuration;
+    interface_ptr = hid -> ux_host_class_hid_interface;
+    configuration = interface_ptr -> ux_interface_configuration;
     hid -> ux_host_class_hid_allocated = _ux_utility_memory_allocate(
                     UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY,
                     configuration -> ux_configuration_descriptor.wTotalLength);
@@ -355,7 +360,7 @@ UX_TRANSFER             *transfer;
 UCHAR                   *descriptor;
 ULONG                   length;
 UX_HOST_CLASS_HID_ITEM  item;
-UINT                    status;
+UINT                    status = UX_SUCCESS;
 
     /* Get transfer.  */
     device = hid -> ux_host_class_hid_device;
@@ -487,15 +492,15 @@ UINT                                status;
 static inline UINT _ux_host_class_hid_activate_wait(UX_HOST_CLASS_COMMAND *command)
 {
 
-UX_INTERFACE            *interface;
+UX_INTERFACE            *interface_ptr;
 UX_ENDPOINT             *control_endpoint;
 UX_TRANSFER             *transfer;
 UX_HOST_CLASS_HID       *hid;
 UINT                    status;
 
     /* Get the instance for this class.  */
-    interface = (UX_INTERFACE *)command -> ux_host_class_command_container;
-    hid =  (UX_HOST_CLASS_HID *) interface -> ux_interface_class_instance;
+    interface_ptr = (UX_INTERFACE *)command -> ux_host_class_command_container;
+    hid =  (UX_HOST_CLASS_HID *) interface_ptr -> ux_interface_class_instance;
 
     /* Run initialize state machine.  */
     switch(hid -> ux_host_class_hid_enum_state)
@@ -579,7 +584,7 @@ UINT                    status;
         _ux_host_stack_class_instance_destroy(hid -> ux_host_class_hid_class, (VOID *) hid);
 
         /* Unmount instance. */
-        interface -> ux_interface_class_instance = UX_NULL;
+        interface_ptr -> ux_interface_class_instance = UX_NULL;
 
         /* Free memory.  */
         if (hid -> ux_host_class_hid_allocated)

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_disconnect                         PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_disconnect(VOID)
@@ -80,11 +84,11 @@ UINT  _ux_device_stack_disconnect(VOID)
 
 UX_SLAVE_DCD                *dcd;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_INTERFACE          *interface; 
+UX_SLAVE_INTERFACE          *interface_ptr; 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 UX_SLAVE_INTERFACE          *next_interface; 
 #endif
-UX_SLAVE_CLASS              *class;
+UX_SLAVE_CLASS              *class_ptr;
 UX_SLAVE_CLASS_COMMAND      class_command;
 UINT                        status = UX_ERROR;
                         
@@ -105,41 +109,41 @@ UINT                        status = UX_ERROR;
     if (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
     {
         /* Get the pointer to the first interface.  */
-        interface =  device -> ux_slave_device_first_interface;
+        interface_ptr =  device -> ux_slave_device_first_interface;
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         /* Parse all the interfaces if any.  */
-        while (interface != UX_NULL)
+        while (interface_ptr != UX_NULL)
         {
 #endif
 
             /* Build all the fields of the Class Command.  */
             class_command.ux_slave_class_command_request =   UX_SLAVE_CLASS_COMMAND_DEACTIVATE;
-            class_command.ux_slave_class_command_interface =  (VOID *) interface;
+            class_command.ux_slave_class_command_interface =  (VOID *) interface_ptr;
 
             /* Get the pointer to the class container of this interface.  */
-            class =  interface -> ux_slave_interface_class;
+            class_ptr =  interface_ptr -> ux_slave_interface_class;
             
             /* Store the class container. */
-            class_command.ux_slave_class_command_class_ptr =  class;
+            class_command.ux_slave_class_command_class_ptr =  class_ptr;
 
             /* If there is a class container for this instance, deactivate it.  */
-            if (class != UX_NULL)
+            if (class_ptr != UX_NULL)
             
                 /* Call the class with the DEACTIVATE signal.  */
-                class -> ux_slave_class_entry_function(&class_command);
+                class_ptr -> ux_slave_class_entry_function(&class_command);
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Get the next interface.  */
-            next_interface =  interface -> ux_slave_interface_next_interface;
+            next_interface =  interface_ptr -> ux_slave_interface_next_interface;
 #endif
 
             /* Remove the interface and all endpoints associated with it.  */
-            _ux_device_stack_interface_delete(interface);
+            _ux_device_stack_interface_delete(interface_ptr);
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Now we refresh the interface pointer.  */
-            interface =  next_interface;
+            interface_ptr =  next_interface;
         }
 #endif
 

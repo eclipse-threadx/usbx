@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_interface_endpoint_get               PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,32 +70,36 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_stack_interface_endpoint_get(UX_INTERFACE *interface, UINT endpoint_index, UX_ENDPOINT **endpoint)
+UINT  _ux_host_stack_interface_endpoint_get(UX_INTERFACE *interface_ptr, UINT endpoint_index, UX_ENDPOINT **endpoint)
 {
 
 UINT            current_endpoint_index;
 UX_ENDPOINT     *current_endpoint;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_INTERFACE_ENDPOINT_GET, interface, endpoint_index, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_INTERFACE_ENDPOINT_GET, interface_ptr, endpoint_index, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
     /* Do a sanity check on the interface handle.  */
-    if (interface -> ux_interface_handle != (ULONG) (ALIGN_TYPE) interface)
+    if (interface_ptr -> ux_interface_handle != (ULONG) (ALIGN_TYPE) interface_ptr)
     {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_INTERFACE_HANDLE_UNKNOWN);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface_ptr, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_INTERFACE_HANDLE_UNKNOWN);
     }
             
     /* Start with the endpoint attached to the interface.  */
-    current_endpoint =  interface -> ux_interface_first_endpoint;
+    current_endpoint =  interface_ptr -> ux_interface_first_endpoint;
 
     /* The first endpoint has the index 0.  */    
     current_endpoint_index =  0;

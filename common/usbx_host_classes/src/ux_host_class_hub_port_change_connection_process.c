@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_port_change_connection_process   PORTABLE C      */ 
-/*                                                           6.1.4        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,19 +85,24 @@
 /*                                            added disconnection check   */
 /*                                            in enumeration retries,     */
 /*                                            resulting in version 6.1.4  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_port_change_connection_process(UX_HOST_CLASS_HUB *hub, UINT port, UINT port_status)
 {
 
+UX_HCD      *hcd;
+#if !defined(UX_HOST_STANDALONE)
 UX_DEVICE   *device = UX_NULL;
 UINT        device_speed;
 UINT        device_enumeration_retry;
 USHORT      port_power;
 UINT        status;
-UX_HCD      *hcd;
 USHORT      local_port_status;
 USHORT      local_port_change;
+#endif
     
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_HUB_PORT_CHANGE_CONNECTION_PROCESS, hub, port, port_status, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
@@ -117,14 +122,18 @@ USHORT      local_port_change;
         {
 
             /* There was a device attached previously. Perform a removal.  */
-            status =  _ux_host_stack_device_remove(hcd, hub -> ux_host_class_hub_device, port);
+            _ux_host_stack_device_remove(hcd, hub -> ux_host_class_hub_device, port);
             
         }
         else
             
             /* Mark device connection.  */
             hub -> ux_host_class_hub_port_state |= (UINT)(1 << port);
-          
+
+#if defined(UX_HOST_STANDALONE)
+        /* Port operations are done outside.  */
+#else
+
         /* Tell the hub to clear the change bit for this port so that we do 
            not process the same change event again.  */
         _ux_host_class_hub_feature(hub, port, UX_CLEAR_FEATURE, UX_HOST_CLASS_HUB_C_PORT_CONNECTION);
@@ -235,6 +244,7 @@ USHORT      local_port_change;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DEVICE_ENUMERATION_FAILURE, port, 0, 0, UX_TRACE_ERRORS, 0, 0)
+#endif
     }           
     else
     {
@@ -246,8 +256,12 @@ USHORT      local_port_change;
             hub -> ux_host_class_hub_port_state &= (UINT)~(1 << port);
 
             /* We get here when there is a device extraction.  */
-            status =  _ux_host_stack_device_remove(hcd, hub -> ux_host_class_hub_device, port);
+            _ux_host_stack_device_remove(hcd, hub -> ux_host_class_hub_device, port);
         }
+
+#if defined(UX_HOST_STANDALONE)
+        /* Port operations are done outside.  */
+#else
 
         /* The port should be disabled now. Power is still applied.  */
         status =  _ux_host_class_hub_feature(hub, port, UX_CLEAR_FEATURE, UX_HOST_CLASS_HUB_PORT_ENABLE);
@@ -257,6 +271,7 @@ USHORT      local_port_change;
 
         /* We must clear the connection change condition so that we don't get awaken again.  */
         _ux_host_class_hub_feature(hub, port, UX_CLEAR_FEATURE, UX_HOST_CLASS_HUB_C_PORT_CONNECTION);
+#endif
     }        
 
     /* Return to caller.  */

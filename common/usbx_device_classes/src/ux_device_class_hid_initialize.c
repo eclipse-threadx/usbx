@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_initialize                     PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,11 @@
 /*                                            resulting in version 6.1.10 */
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone receiver,  */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -87,12 +92,12 @@ UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command)
                                           
 UX_SLAVE_CLASS_HID                      *hid;
 UX_SLAVE_CLASS_HID_PARAMETER            *hid_parameter;
-UX_SLAVE_CLASS                          *class;
+UX_SLAVE_CLASS                          *class_ptr;
 UINT                                    status = UX_SUCCESS;
 
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Create an instance of the device hid class.  */
     hid =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_HID));
@@ -102,31 +107,31 @@ UINT                                    status = UX_SUCCESS;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Save the address of the HID instance inside the HID container.  */
-    class -> ux_slave_class_instance = (VOID *) hid;
+    class_ptr -> ux_slave_class_instance = (VOID *) hid;
 
 #if !defined(UX_DEVICE_STANDALONE)
 
     /* Allocate some memory for the thread stack. */
-    class -> ux_slave_class_thread_stack =  
+    class_ptr -> ux_slave_class_thread_stack =  
             _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_DEVICE_CLASS_HID_THREAD_STACK_SIZE);
     
     /* Check for successful allocation.  */
-    if (class -> ux_slave_class_thread_stack == UX_NULL)
+    if (class_ptr -> ux_slave_class_thread_stack == UX_NULL)
         status = UX_MEMORY_INSUFFICIENT;
 
     /* This instance needs to be running in a different thread. So start
        a new thread. We pass a pointer to the class to the new thread.  This thread
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
-        status =  _ux_device_thread_create(&class -> ux_slave_class_thread, "ux_slave_hid_thread", 
+        status =  _ux_device_thread_create(&class_ptr -> ux_slave_class_thread, "ux_slave_hid_thread", 
                     _ux_device_class_hid_interrupt_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) class -> ux_slave_class_thread_stack,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) class_ptr -> ux_slave_class_thread_stack,
                     UX_DEVICE_CLASS_HID_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
 #else
 
     /* Set task function.  */
-    class -> ux_slave_class_task_function = _ux_device_class_hid_tasks_run;
+    class_ptr -> ux_slave_class_task_function = _ux_device_class_hid_tasks_run;
 #endif
 
     /* Check the creation of this thread.  */
@@ -134,7 +139,7 @@ UINT                                    status = UX_SUCCESS;
     {
 
 #if !defined(UX_DEVICE_STANDALONE)
-        UX_THREAD_EXTENSION_PTR_SET(&(class -> ux_slave_class_thread), class)
+        UX_THREAD_EXTENSION_PTR_SET(&(class_ptr -> ux_slave_class_thread), class_ptr)
 #endif
 
         /* Get the pointer to the application parameters for the hid class.  */
@@ -169,18 +174,19 @@ UINT                                    status = UX_SUCCESS;
             /* By default no event wait timeout.  */
             hid -> ux_device_class_hid_event_wait_timeout = UX_WAIT_FOREVER;
 
-#if defined(UX_DEVICE_STANDALONE)
-
-            return(UX_SUCCESS);
-#else
+#if !defined(UX_DEVICE_STANDALONE)
 
             /* Create a event flag group for the hid class to synchronize with the event interrupt thread.  */
             status =  _ux_utility_event_flags_create(&hid -> ux_device_class_hid_event_flags_group, "ux_device_class_hid_event_flag");
 
             /* Check status.  */
-            if (status == UX_SUCCESS)
+            if (status != UX_SUCCESS)
+                status = UX_EVENT_ERROR;
+            else
+#endif
             {
 #if defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
+
 #if !defined(UX_DEVICE_STANDALONE)
 
                 /* Create a mutex for reading reentry check.  */
@@ -221,14 +227,10 @@ UINT                                    status = UX_SUCCESS;
 #endif
 
             }
-            else
-
-                /* It's event error. */
-                status =  UX_EVENT_ERROR;
 
             /* Free allocated event array memory.  */
             _ux_utility_memory_free(hid -> ux_device_class_hid_event_array);
-#endif
+
         }
         else
             status =  UX_MEMORY_INSUFFICIENT;
@@ -236,7 +238,7 @@ UINT                                    status = UX_SUCCESS;
 #if !defined(UX_DEVICE_STANDALONE)
 
         /* Delete thread.  */
-        _ux_device_thread_delete(&class -> ux_slave_class_thread);
+        _ux_device_thread_delete(&class_ptr -> ux_slave_class_thread);
 #endif
     }
     else
@@ -245,12 +247,12 @@ UINT                                    status = UX_SUCCESS;
 #if !defined(UX_DEVICE_STANDALONE)
 
     /* Free stack. */
-    if (class -> ux_slave_class_thread_stack)
-        _ux_utility_memory_free(class -> ux_slave_class_thread_stack);
+    if (class_ptr -> ux_slave_class_thread_stack)
+        _ux_utility_memory_free(class_ptr -> ux_slave_class_thread_stack);
 #endif
 
     /* Unmount instance. */
-    class -> ux_slave_class_instance =  UX_NULL;
+    class_ptr -> ux_slave_class_instance =  UX_NULL;
 
     /* Free HID instance. */
     _ux_utility_memory_free(hid);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_cdc_acm_activate                     PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,12 +82,17 @@
 /*                                            used defined line coding    */
 /*                                            instead of magic number,    */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved error handling,    */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_activate(UX_HOST_CLASS_COMMAND *command)
 {
 
-UX_INTERFACE                        *interface;
+UX_INTERFACE                        *interface_ptr;
 UX_HOST_CLASS_CDC_ACM               *cdc_acm;
 UINT                                status;
 #if defined(UX_HOST_STANDALONE)
@@ -103,7 +108,7 @@ UX_HOST_CLASS_CDC_ACM_LINE_STATE    line_state;
 
     /* The CDC ACM class is always activated by the interface descriptor and not the
        device descriptor.  */
-    interface =  (UX_INTERFACE *) command -> ux_host_class_command_container;
+    interface_ptr =  (UX_INTERFACE *) command -> ux_host_class_command_container;
 
     /* Obtain memory for this class instance.  */
     cdc_acm =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, sizeof(UX_HOST_CLASS_CDC_ACM));
@@ -133,13 +138,13 @@ UX_HOST_CLASS_CDC_ACM_LINE_STATE    line_state;
     cdc_acm -> ux_host_class_cdc_acm_class =  command -> ux_host_class_command_class_ptr;
 
     /* Store the interface container into the cdc_acm class instance.  */
-    cdc_acm -> ux_host_class_cdc_acm_interface =  interface;
+    cdc_acm -> ux_host_class_cdc_acm_interface =  interface_ptr;
 
     /* Store the device container into the cdc_acm class instance.  */
-    cdc_acm -> ux_host_class_cdc_acm_device =  interface -> ux_interface_configuration -> ux_configuration_device;
+    cdc_acm -> ux_host_class_cdc_acm_device =  interface_ptr -> ux_interface_configuration -> ux_configuration_device;
 
     /* This instance of the device must also be stored in the interface container.  */
-    interface -> ux_interface_class_instance =  (VOID *) cdc_acm;
+    interface_ptr -> ux_interface_class_instance =  (VOID *) cdc_acm;
 
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(cdc_acm -> ux_host_class_cdc_acm_class, (VOID *) cdc_acm);
@@ -149,98 +154,101 @@ UX_HOST_CLASS_CDC_ACM_LINE_STATE    line_state;
     /* Get the cdc_acm endpoint(s). Depending on the interface type, we will need to search for
         Bulk Out and Bulk In endpoints and the optional interrupt endpoint.  */
     status =  _ux_host_class_cdc_acm_endpoints_get(cdc_acm);
-
-    /* Mark the cdc_acm as mounting.  */
-    cdc_acm -> ux_host_class_cdc_acm_state = UX_HOST_CLASS_INSTANCE_MOUNTING;
-
-    /* If we have the Control Class, we process default setup command sequence.  */
-    if (interface -> ux_interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_CONTROL_CLASS)
+    if (status == UX_SUCCESS)
     {
 
-        /* Get descriptors to see capabilities.  */
+        /* Mark the cdc_acm as mounting.  */
+        cdc_acm -> ux_host_class_cdc_acm_state = UX_HOST_CLASS_INSTANCE_MOUNTING;
 
-        /* Get default control transfer.  */
-        control_endpoint = &cdc_acm -> ux_host_class_cdc_acm_device -> ux_device_control_endpoint;
-        transfer_request = &control_endpoint -> ux_endpoint_transfer_request;
-
-        /* Allocate memory for the descriptors.  */
-        descriptors_length = interface -> ux_interface_configuration ->
-                                    ux_configuration_descriptor.wTotalLength;
-        cdc_acm -> ux_host_class_cdc_acm_allocated =
-                _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY,
-                                                           descriptors_length);
-        if (cdc_acm -> ux_host_class_cdc_acm_allocated != UX_NULL)
+        /* If we have the Control Class, we process default setup command sequence.  */
+        if (interface_ptr -> ux_interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_CONTROL_CLASS)
         {
 
-            transfer_request -> ux_transfer_request_data_pointer =
-                                        cdc_acm -> ux_host_class_cdc_acm_allocated;
+            /* Get descriptors to see capabilities.  */
 
-            /* Create transfer for GET_DESCRIPTOR.  */
-            transfer_request -> ux_transfer_request_requested_length = descriptors_length;
-            transfer_request -> ux_transfer_request_function =         UX_GET_DESCRIPTOR;
-            transfer_request -> ux_transfer_request_type =             UX_REQUEST_IN | UX_REQUEST_TYPE_STANDARD | UX_REQUEST_TARGET_DEVICE;
-            transfer_request -> ux_transfer_request_value =            UX_CONFIGURATION_DESCRIPTOR_ITEM << 8;
-            transfer_request -> ux_transfer_request_index =            0;
-            UX_TRANSFER_STATE_RESET(transfer_request);
+            /* Get default control transfer.  */
+            control_endpoint = &cdc_acm -> ux_host_class_cdc_acm_device -> ux_device_control_endpoint;
+            transfer_request = &control_endpoint -> ux_endpoint_transfer_request;
 
-            /* Set state to wait and next is "next".  */
-            cdc_acm -> ux_host_class_cdc_acm_cmd_state = UX_STATE_WAIT;
-            cdc_acm -> ux_host_class_cdc_acm_next_state = UX_STATE_NEXT;
-
-            /* ACTIVATE_WAIT will be processed to finish next steps.  */
-            return(UX_SUCCESS);
-        }
-        else
-            status = UX_MEMORY_INSUFFICIENT;
-    }
-    else
-    {
-
-        /* We scan CDC ACM instances to find the master instance.  */
-        /* Get class.  */
-        cdc_acm_class = cdc_acm -> ux_host_class_cdc_acm_class;
-
-        /* Get first instance linked to the class.  */
-        cdc_acm_inst = (UX_HOST_CLASS_CDC_ACM *)cdc_acm_class -> ux_host_class_first_instance;
-
-        /* Scan all instances.  */
-        while(cdc_acm_inst)
-        {
-
-            /* If this data interface is inside the associate list, link it.  */
-            if (cdc_acm_inst -> ux_host_class_cdc_acm_interfaces_bitmap &
-                (1ul << interface -> ux_interface_descriptor.bInterfaceNumber))
+            /* Allocate memory for the descriptors.  */
+            descriptors_length = interface_ptr -> ux_interface_configuration ->
+                                        ux_configuration_descriptor.wTotalLength;
+            cdc_acm -> ux_host_class_cdc_acm_allocated =
+                    _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY,
+                                                            descriptors_length);
+            if (cdc_acm -> ux_host_class_cdc_acm_allocated != UX_NULL)
             {
 
-                /* Save control instance and we are done.  */
-                cdc_acm -> ux_host_class_cdc_acm_control = cdc_acm_inst;
-                break;
+                transfer_request -> ux_transfer_request_data_pointer =
+                                            cdc_acm -> ux_host_class_cdc_acm_allocated;
+
+                /* Create transfer for GET_DESCRIPTOR.  */
+                transfer_request -> ux_transfer_request_requested_length = descriptors_length;
+                transfer_request -> ux_transfer_request_function =         UX_GET_DESCRIPTOR;
+                transfer_request -> ux_transfer_request_type =             UX_REQUEST_IN | UX_REQUEST_TYPE_STANDARD | UX_REQUEST_TARGET_DEVICE;
+                transfer_request -> ux_transfer_request_value =            UX_CONFIGURATION_DESCRIPTOR_ITEM << 8;
+                transfer_request -> ux_transfer_request_index =            0;
+                UX_TRANSFER_STATE_RESET(transfer_request);
+
+                /* Set state to wait and next is "next".  */
+                cdc_acm -> ux_host_class_cdc_acm_cmd_state = UX_STATE_WAIT;
+                cdc_acm -> ux_host_class_cdc_acm_next_state = UX_STATE_NEXT;
+
+                /* ACTIVATE_WAIT will be processed to finish next steps.  */
+                return(UX_SUCCESS);
             }
-
-            /* Next instance.  */
-            cdc_acm_inst = cdc_acm_inst -> ux_host_class_cdc_acm_next_instance;
+            else
+                status = UX_MEMORY_INSUFFICIENT;
         }
-
-        /* Mark the cdc_acm as live now.  Both interfaces need to be live. */
-        cdc_acm -> ux_host_class_cdc_acm_state = UX_HOST_CLASS_INSTANCE_LIVE;
-
-        /* If all is fine and the device is mounted, we may need to inform the application
-            if a function has been programmed in the system structure.  */
-        if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+        else
         {
 
-            /* Call system change function.  */
-            _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, cdc_acm -> ux_host_class_cdc_acm_class, (VOID *) cdc_acm);
+            /* We scan CDC ACM instances to find the master instance.  */
+            /* Get class.  */
+            cdc_acm_class = cdc_acm -> ux_host_class_cdc_acm_class;
+
+            /* Get first instance linked to the class.  */
+            cdc_acm_inst = (UX_HOST_CLASS_CDC_ACM *)cdc_acm_class -> ux_host_class_first_instance;
+
+            /* Scan all instances.  */
+            while(cdc_acm_inst)
+            {
+
+                /* If this data interface is inside the associate list, link it.  */
+                if (cdc_acm_inst -> ux_host_class_cdc_acm_interfaces_bitmap &
+                    (1ul << interface_ptr -> ux_interface_descriptor.bInterfaceNumber))
+                {
+
+                    /* Save control instance and we are done.  */
+                    cdc_acm -> ux_host_class_cdc_acm_control = cdc_acm_inst;
+                    break;
+                }
+
+                /* Next instance.  */
+                cdc_acm_inst = cdc_acm_inst -> ux_host_class_cdc_acm_next_instance;
+            }
+
+            /* Mark the cdc_acm as live now.  Both interfaces need to be live. */
+            cdc_acm -> ux_host_class_cdc_acm_state = UX_HOST_CLASS_INSTANCE_LIVE;
+
+            /* If all is fine and the device is mounted, we may need to inform the application
+                if a function has been programmed in the system structure.  */
+            if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+            {
+
+                /* Call system change function.  */
+                _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, cdc_acm -> ux_host_class_cdc_acm_class, (VOID *) cdc_acm);
+            }
+
+            /* If trace is enabled, insert this event into the trace buffer.  */
+            UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_CDC_ACM_ACTIVATE, cdc_acm, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
+
+            /* If trace is enabled, register this object.  */
+            UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, cdc_acm, 0, 0, 0)
+
+            /* We are done success. */
+            return(UX_SUCCESS);
         }
-
-        /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_CDC_ACM_ACTIVATE, cdc_acm, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
-
-        /* If trace is enabled, register this object.  */
-        UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, cdc_acm, 0, 0, 0)
-
-        /* We are done success. */
-        return(UX_SUCCESS);
     }
 
 #else
@@ -355,7 +363,7 @@ UX_HOST_CLASS_CDC_ACM_LINE_STATE    line_state;
 #endif
 
     /* Unmount instance. */
-    interface -> ux_interface_class_instance = UX_NULL;
+    interface_ptr -> ux_interface_class_instance = UX_NULL;
 
     /* Free instance. */
     _ux_utility_memory_free(cdc_acm);

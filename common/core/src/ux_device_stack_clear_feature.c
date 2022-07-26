@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_clear_feature                      PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_clear_feature(ULONG request_type, ULONG request_value, ULONG request_index)
@@ -78,7 +82,7 @@ UINT  _ux_device_stack_clear_feature(ULONG request_type, ULONG request_value, UL
 
 UX_SLAVE_DCD            *dcd;
 UX_SLAVE_DEVICE         *device;
-UX_SLAVE_INTERFACE      *interface;
+UX_SLAVE_INTERFACE      *interface_ptr;
 UX_SLAVE_ENDPOINT       *endpoint;
 UX_SLAVE_ENDPOINT       *endpoint_target;
                                 
@@ -127,15 +131,15 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
         /* The only clear feature for endpoint is ENDPOINT_STALL. This clears
            the endpoint of the stall situation and resets its data toggle. 
            We need to find the endpoint through the interface(s). */
-        interface =  device -> ux_slave_device_first_interface;
+        interface_ptr =  device -> ux_slave_device_first_interface;
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
-        while (interface != UX_NULL)
+        while (interface_ptr != UX_NULL)
         {
 #endif
 
             /* Get the first endpoint for this interface.  */
-            endpoint_target =  interface -> ux_slave_interface_first_endpoint;
+            endpoint_target =  interface_ptr -> ux_slave_interface_first_endpoint;
                 
             /* Parse all the endpoints.  */
             while (endpoint_target != UX_NULL)
@@ -161,7 +165,7 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Next interface.  */
-            interface =  interface -> ux_slave_interface_next_interface;
+            interface_ptr =  interface_ptr -> ux_slave_interface_next_interface;
         }
 #endif
 

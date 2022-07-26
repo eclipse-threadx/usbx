@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio.h                             PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,6 +56,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added interrupt support,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -76,6 +79,13 @@ extern   "C" {
 /* Compile option: if defined, audio feedback endpoint is supported.  */
 /* #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT  */
 
+/* Compile option: if defined, audio interrupt endpoint is supported.  */
+/* #define UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT  */
+
+
+/* Define Audio Class OS related constants.  */
+#define UX_DEVICE_CLASS_AUDIO_FEEDBACK_THREAD_STACK_SIZE            UX_THREAD_STACK_SIZE
+#define UX_DEVICE_CLASS_AUDIO_INTERRUPT_THREAD_STACK_SIZE           UX_THREAD_STACK_SIZE
 
 /* Define Audio Class function (AF) constants.  */
 
@@ -345,6 +355,11 @@ typedef struct UX_DEVICE_CLASS_AUDIO_PARAMETER_STRUCT
 
     ULONG                                         ux_device_class_audio_parameter_streams_nb;
     UX_DEVICE_CLASS_AUDIO_STREAM_PARAMETER       *ux_device_class_audio_parameter_streams;
+
+#if defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
+    ULONG                                         ux_device_class_audio_parameter_status_size;
+    ULONG                                         ux_device_class_audio_parameter_status_queue_size;
+#endif
 } UX_DEVICE_CLASS_AUDIO_PARAMETER;
 
 
@@ -400,6 +415,22 @@ typedef struct UX_DEVICE_CLASS_AUDIO_STRUCT
 
     ULONG                                    ux_device_class_audio_streams_nb;
     UX_DEVICE_CLASS_AUDIO_STREAM            *ux_device_class_audio_streams;
+
+#if defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
+    UX_SLAVE_ENDPOINT                       *ux_device_class_audio_interrupt;
+
+    ULONG                                   ux_device_class_audio_status_size;       /* in Bytes.  */
+    ULONG                                   ux_device_class_audio_status_queue_bytes;/* in Bytes.  */
+    ULONG                                   ux_device_class_audio_status_queued;     /* in Bytes.  */
+    UCHAR                                   *ux_device_class_audio_status_queue;     /* in Bytes.  */
+    UCHAR                                   *ux_device_class_audio_status_head;
+    UCHAR                                   *ux_device_class_audio_status_tail;
+
+#if !defined(UX_DEVICE_STANDALONE)
+    UX_SEMAPHORE                            ux_device_class_audio_status_semaphore;
+    UX_MUTEX                                ux_device_class_audio_status_mutex;
+#endif
+#endif
 } UX_DEVICE_CLASS_AUDIO;
 
 
@@ -442,6 +473,9 @@ UINT    _ux_device_class_audio_feedback_set(UX_DEVICE_CLASS_AUDIO_STREAM *audio,
 UINT    _ux_device_class_audio_feedback_get(UX_DEVICE_CLASS_AUDIO_STREAM *audio, UCHAR *encoded_feedback);
 ULONG   _ux_device_class_audio_speed_get(UX_DEVICE_CLASS_AUDIO_STREAM *audio);
 
+VOID    _ux_device_class_audio_interrupt_thread_entry(ULONG audio_inst);
+UINT    _ux_device_class_audio_interrupt_send(UX_DEVICE_CLASS_AUDIO *audio, UCHAR *int_data);
+
 
 /* Define Device Class Audio API prototypes.  */
 
@@ -473,6 +507,8 @@ ULONG   _ux_device_class_audio_speed_get(UX_DEVICE_CLASS_AUDIO_STREAM *audio);
 #define ux_device_class_audio_feedback_thread_entry   _ux_device_class_audio_feedback_thread_entry
 #define ux_device_class_audio_feedback_get            _ux_device_class_audio_feedback_get
 #define ux_device_class_audio_feedback_set            _ux_device_class_audio_feedback_set
+
+#define ux_device_class_audio_interrupt_send          _ux_device_class_audio_interrupt_send
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard
    C conditional started above.  */

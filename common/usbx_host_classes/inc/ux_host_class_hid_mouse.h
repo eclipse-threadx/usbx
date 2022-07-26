@@ -96,7 +96,7 @@ typedef struct UX_HOST_CLASS_HID_MOUSE_STRUCT
 
     ULONG           ux_host_class_hid_mouse_state; 
     UX_HOST_CLASS_HID   *ux_host_class_hid_mouse_hid;
-    USHORT          ux_host_class_hid_mouse_id;    
+    USHORT          ux_host_class_hid_mouse_id;
     SLONG           ux_host_class_hid_mouse_x_position;
     SLONG           ux_host_class_hid_mouse_y_position;
     ULONG           ux_host_class_hid_mouse_buttons;
@@ -105,7 +105,7 @@ typedef struct UX_HOST_CLASS_HID_MOUSE_STRUCT
     UINT            ux_host_class_hid_mouse_enum_state;
     UINT            ux_host_class_hid_mouse_status;
 #endif
-    
+
 } UX_HOST_CLASS_HID_MOUSE;
 
 typedef struct UX_HOST_CLASS_HID_CLIENT_MOUSE_STRUCT
@@ -139,6 +139,6 @@ UINT  _ux_host_class_hid_mouse_wheel_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif

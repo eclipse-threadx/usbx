@@ -82,7 +82,7 @@ extern   "C" {
 
 /* Define Data Pump Class string constants.  */
 
-#define    UX_HOST_CLASS_DPUMP_GENERIC_NAME                   "USB DPUMP"
+#define UX_HOST_CLASS_DPUMP_GENERIC_NAME                      "USB DPUMP"
 
 /* Define R/W lock bits for standalone mode.  */
 
@@ -113,6 +113,6 @@ UINT    _ux_host_class_dpump_ioctl(UX_HOST_CLASS_DPUMP *dpump, ULONG ioctl_funct
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif

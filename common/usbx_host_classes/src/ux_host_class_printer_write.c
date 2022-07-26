@@ -95,7 +95,7 @@ ULONG           transfer_flags;
 UX_TRANSFER     *transfer_request;
 UINT            status;
 ULONG           transfer_request_length;
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_PRINTER_WRITE, printer, data_pointer, requested_length, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
@@ -136,7 +136,7 @@ ULONG           transfer_request_length;
 
     /* Get the pointer to the bulk out endpoint transfer request.  */
     transfer_request =  &printer -> ux_host_class_printer_bulk_out_endpoint -> ux_endpoint_transfer_request;
-    
+
 #if defined(UX_HOST_STANDALONE)
 
     /* Enable blocking transfer flags.  */
@@ -166,7 +166,7 @@ ULONG           transfer_request_length;
         if (status == UX_SUCCESS)
         {
 #if !defined(UX_HOST_STANDALONE)
-            
+
             /* Wait for the completion of the transfer request.  */
             status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PRINTER_CLASS_TRANSFER_TIMEOUT));
 

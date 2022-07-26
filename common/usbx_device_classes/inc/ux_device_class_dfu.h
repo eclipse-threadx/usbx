@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,6 +57,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added macros for req types, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -90,6 +93,9 @@ extern   "C" {
 #define UX_DEVICE_CLASS_DFU_MODE_DFU                                2
 
 
+/* Device DFU bmRequestType.  */
+#define UX_DEVICE_CLASS_DFU_REQTYPE_INTERFACE_SET                   (UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE) /* 00100001b, 0x21   */
+#define UX_DEVICE_CLASS_DFU_REQTYPE_INTERFACE_GET                   (UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE) /* 10100001b, 0xA1  */
 
 
 /* Device DFU Requests */

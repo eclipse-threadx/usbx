@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_activate                      PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,36 +72,40 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
                                           
-UX_SLAVE_INTERFACE                      *interface;
+UX_SLAVE_INTERFACE                      *interface_ptr;
+UX_SLAVE_CLASS                          *class_ptr;
 UX_SLAVE_CLASS_PIMA                     *pima;
-UX_SLAVE_CLASS                          *class;
 UX_SLAVE_ENDPOINT                       *endpoint_in;
 UX_SLAVE_ENDPOINT                       *endpoint_out;
 UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
 
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Store the class instance in the container.  */
-    pima = (UX_SLAVE_CLASS_PIMA *) class -> ux_slave_class_instance;
+    pima = (UX_SLAVE_CLASS_PIMA *) class_ptr -> ux_slave_class_instance;
 
     /* Get the interface that owns this instance.  */
-    interface =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
+    interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
     
     /* Store the class instance into the interface.  */
-    interface -> ux_slave_interface_class_instance =  (VOID *)pima;
+    interface_ptr -> ux_slave_interface_class_instance =  (VOID *)pima;
          
     /* Now the opposite, store the interface in the class instance.  */
-    pima -> ux_slave_class_pima_interface =  interface;
+    pima -> ux_slave_class_pima_interface =  interface_ptr;
     
     /* Locate the endpoints.  */
-    endpoint_in =  interface -> ux_slave_interface_first_endpoint;
+    endpoint_in =  interface_ptr -> ux_slave_interface_first_endpoint;
     
     /* Check the endpoint direction, if IN we have the correct endpoint.  */
     if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_OUT)
@@ -138,7 +142,7 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
     pima -> ux_device_class_pima_device_status = UX_DEVICE_CLASS_PIMA_RC_OK;
 
     /* Resume thread.  */
-    _ux_device_thread_resume(&class -> ux_slave_class_thread); 
+    _ux_device_thread_resume(&class_ptr -> ux_slave_class_thread); 
     
     /* If there is a activate function call it.  */
     if (pima -> ux_device_class_pima_instance_activate != UX_NULL)

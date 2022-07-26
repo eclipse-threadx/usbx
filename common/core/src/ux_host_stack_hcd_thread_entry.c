@@ -45,7 +45,7 @@
 /*    The HCD thread is initialized at the system level and the thread    */ 
 /*    entry routine is invoked right away. This thread suspends until     */ 
 /*    one of the HCD resumes it due to HCD activities.                    */
-/*                                                                        */ 
+/*                                                                        */
 /*    It's for RTOS mode.                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio20_control_process            PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,7 +61,9 @@
 /*                                                                        */
 /*    _ux_utility_short_get                 Get 2-byte value from buffer  */
 /*    _ux_utility_short_put                 Put 2-byte value to buffer    */
+/*    _ux_utility_long_get                  Get 4-byte value from buffer  */
 /*    _ux_utility_long_put                  Put 4-byte value to buffer    */
+/*    _ux_utility_memory_copy               Copy memory                   */
 /*    _ux_device_stack_transfer_request     Issue a transfer request      */
 /*    _ux_device_stack_endpoint_stall       Endpoint stall                */
 /*                                                                        */
@@ -83,6 +85,10 @@
 /*                                            allowed answer length only  */
 /*                                            when requesting range,      */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added support of multiple   */
+/*                                            sampling frequencies,       */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio20_control_process(UX_DEVICE_CLASS_AUDIO *audio,
@@ -98,7 +104,9 @@ UCHAR                               unit_id;
 UCHAR                               control_selector;
 UCHAR                               channel_number;
 ULONG                               request_length;
+ULONG                               data_length;
 ULONG                               i;
+ULONG                               n_sub, pos, min, max, res, freq;
 
 
     /* Get instances.  */
@@ -129,6 +137,62 @@ ULONG                               i;
              * The Sampling Frequency Control must support the CUR and RANGE(MIN, MAX, RES) attributes.
              */
 
+            /* Sampling frequency control, SET request.  */
+            if ((request_type & UX_REQUEST_DIRECTION) == UX_REQUEST_OUT &&
+                (control_selector == UX_DEVICE_CLASS_AUDIO20_CS_SAM_FREQ_CONTROL))
+            {
+                switch(request)
+                {
+                case UX_DEVICE_CLASS_AUDIO20_CUR:
+
+                    /* Check request parameter.  */
+                    if (request_length != 4)
+                        break;
+
+                    /* Check if multiple frequency supported.  */
+                    if (control -> ux_device_class_audio20_control_sampling_frequency != 0)
+                        break;
+
+                    /* Sanity check.  */
+                    UX_ASSERT(control -> ux_device_class_audio20_control_sampling_frequency_range != UX_NULL);
+
+                    /* Get wNumSubRanges.  */
+                    n_sub = _ux_utility_short_get(control -> ux_device_class_audio20_control_sampling_frequency_range);
+
+                    /* Get first RES.  */
+                    res = _ux_utility_long_get(control -> ux_device_class_audio20_control_sampling_frequency_range + 2 + 8);
+
+                    /* Check if it's fixed single frequency.  */
+                    if (n_sub <= 1 && res == 0)
+                        break;
+
+                    /* Get frequency to set.  */
+                    freq = _ux_utility_long_get(transfer -> ux_slave_transfer_request_data_pointer);
+
+                    /* Check if frequency to set is inside range.  */
+                    for (pos = 2; pos < (2 + n_sub * 12); pos += 12)
+                    {
+                        min = _ux_utility_long_get(control -> ux_device_class_audio20_control_sampling_frequency_range + pos);
+                        max = _ux_utility_long_get(control -> ux_device_class_audio20_control_sampling_frequency_range + pos + 4);
+                        if (freq >= min && freq <= max)
+                        {
+
+                            /* SET_CUR is accepted.  */
+                            if (control -> ux_device_class_audio20_control_sampling_frequency_cur != freq)
+                            {
+                                control -> ux_device_class_audio20_control_sampling_frequency_cur = freq;
+                                control -> ux_device_class_audio20_control_changed = UX_DEVICE_CLASS_AUDIO20_CONTROL_FREQUENCY_CHANGED;
+                            }
+                            return(UX_SUCCESS);
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+
             /* We just support sampling frequency control, GET request.  */
             if ((request_type & UX_REQUEST_DIRECTION) == UX_REQUEST_IN &&
                 (control_selector == UX_DEVICE_CLASS_AUDIO20_CS_SAM_FREQ_CONTROL))
@@ -142,10 +206,11 @@ ULONG                               i;
                     if (request_length < 4)
                         break;
 
-                    /* Send sampling frequency.
-                     * We only support one here (from extension data).
-                     */
-                    _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer, control -> ux_device_class_audio20_control_sampling_frequency);
+                    /* Send sampling frequency.  */
+                    if (control -> ux_device_class_audio20_control_sampling_frequency)
+                        _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer, control -> ux_device_class_audio20_control_sampling_frequency);
+                    else
+                        _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer, control -> ux_device_class_audio20_control_sampling_frequency_cur);
                     _ux_device_stack_transfer_request(transfer, 4, request_length);
                     return(UX_SUCCESS);
 
@@ -155,18 +220,45 @@ ULONG                               i;
                     if (request_length < 2)
                         break;
 
-                    /* Send range parameters.
-                     * We only support one here (from extension data).
-                     * wNumSubRanges : 1
-                     * dMIN          : sampling frequency
-                     * dMAX          : sampling frequency
-                     * dRES          : 1
-                     */
-                    _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer, 1);
-                    _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 2, control -> ux_device_class_audio20_control_sampling_frequency);
-                    _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 6, control -> ux_device_class_audio20_control_sampling_frequency);
-                    _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 10, 0);
-                    _ux_device_stack_transfer_request(transfer, UX_MIN(14, request_length), request_length);
+                    if (control -> ux_device_class_audio20_control_sampling_frequency == 0)
+                    {
+
+                        /* Send range parameters, RANGE is customized.  */
+                        UX_ASSERT(control -> ux_device_class_audio20_control_sampling_frequency_range != UX_NULL);
+
+                        /* Get wNumSubRanges.  */
+                        n_sub = _ux_utility_short_get(control -> ux_device_class_audio20_control_sampling_frequency_range);
+                        UX_ASSERT(n_sub > 0);
+
+                        /* Calculate length, n_sub is 16-bit width, result not overflows ULONG.  */
+                        data_length = 2 + n_sub * 12;
+                        UX_ASSERT(data_length <= UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH);
+
+                        /* Copy data.  */
+                        data_length = UX_MIN(data_length, request_length);
+                        _ux_utility_memory_copy(transfer -> ux_slave_transfer_request_data_pointer,
+                                control -> ux_device_class_audio20_control_sampling_frequency_range,
+                                data_length); /* Use case of memcpy is verified. */
+                    }
+                    else
+                    {
+
+                        /* Send range parameters.
+                         * We only support one here (from extension data).
+                         * wNumSubRanges : 1
+                         * dMIN          : sampling frequency
+                         * dMAX          : sampling frequency
+                         * dRES          : 1
+                         */
+                        _ux_utility_short_put(transfer -> ux_slave_transfer_request_data_pointer, 1);
+                        _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 2, control -> ux_device_class_audio20_control_sampling_frequency);
+                        _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 6, control -> ux_device_class_audio20_control_sampling_frequency);
+                        _ux_utility_long_put(transfer -> ux_slave_transfer_request_data_pointer + 10, 0);
+                        data_length = UX_MIN(14, request_length);
+                    }
+
+                    /* Send data.  */
+                    _ux_device_stack_transfer_request(transfer, data_length, request_length);
                     return(UX_SUCCESS);
 
                 default:

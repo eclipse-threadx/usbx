@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio20.h                           PORTABLE C      */
-/*                                                           6.1.8        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,11 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added support of multiple   */
+/*                                            sampling frequencies,       */
+/*                                            added clock multiplier DEFs,*/
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -138,6 +143,14 @@ extern   "C" {
 
 #define UX_DEVICE_CLASS_AUDIO20_CX_CONTROL_UNDEFINED              0x00
 #define UX_DEVICE_CLASS_AUDIO20_CX_CLOCK_SELECTOR_CONTROL         0x01
+
+
+/* Define Audio Class specific clock multiplier control selectors.  */
+
+
+#define UX_DEVICE_CLASS_AUDIO20_CM_CONTROL_UNDEFINED              0x00
+#define UX_DEVICE_CLASS_AUDIO20_CM_NUMERATOR_CONTROL              0x01
+#define UX_DEVICE_CLASS_AUDIO20_CM_DENOMINATOR_CONTROL            0x02
 
 /* Define Audio Class specific terminal control selectors.  */
 
@@ -406,12 +419,14 @@ typedef struct UX_DEVICE_CLASS_AUDIO20_AS_DATA_ENDPOINT_DESCRIPTOR_STRUCT
 
 typedef struct UX_DEVICE_CLASS_AUDIO20_CONTROL_STRUCT
 {
-    ULONG           ux_device_class_audio20_control_cs_id;
-    ULONG           ux_device_class_audio20_control_fu_id;
-    ULONG           ux_device_class_audio20_control_sampling_frequency;
-
     ULONG           ux_device_class_audio20_control_changed;
 
+    ULONG           ux_device_class_audio20_control_cs_id;
+    ULONG           ux_device_class_audio20_control_sampling_frequency;         /* Set to 0 to customize frequencies (with following two fields).  */
+    ULONG           ux_device_class_audio20_control_sampling_frequency_cur;     /* Current selected frequency.  */
+    UCHAR           *ux_device_class_audio20_control_sampling_frequency_range;  /* UAC 2.0 Layer 3 parameter block of RANGE.  */
+
+    ULONG           ux_device_class_audio20_control_fu_id;
     USHORT          ux_device_class_audio20_control_mute[1];
     SHORT           ux_device_class_audio20_control_volume_min[1];
     SHORT           ux_device_class_audio20_control_volume_max[1];
@@ -419,8 +434,9 @@ typedef struct UX_DEVICE_CLASS_AUDIO20_CONTROL_STRUCT
     SHORT           ux_device_class_audio20_control_volume[1];
 } UX_DEVICE_CLASS_AUDIO20_CONTROL;
 
-#define UX_DEVICE_CLASS_AUDIO20_CONTROL_MUTE_CHANGED   1
-#define UX_DEVICE_CLASS_AUDIO20_CONTROL_VOLUME_CHANGED 2
+#define UX_DEVICE_CLASS_AUDIO20_CONTROL_MUTE_CHANGED                1u
+#define UX_DEVICE_CLASS_AUDIO20_CONTROL_VOLUME_CHANGED              2u
+#define UX_DEVICE_CLASS_AUDIO20_CONTROL_FREQUENCY_CHANGED           4u
 
 typedef struct UX_DEVICE_CLASS_AUDIO20_CONTROL_GROUP_STRUCT
 {

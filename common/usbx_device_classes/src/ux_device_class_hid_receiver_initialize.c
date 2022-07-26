@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_receiver_initialize            PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added receiver callback,    */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone receiver,  */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
@@ -90,7 +93,9 @@ ULONG                                   memory_size;
 ULONG                                   events_size;
 UCHAR                                   *memory_receiver;
 UCHAR                                   *memory_events;
+#if !defined(UX_DEVICE_STANDALONE)
 UCHAR                                   *memory_stack;
+#endif
 UINT                                    status = UX_SUCCESS;
 
 
@@ -120,8 +125,12 @@ UINT                                    status = UX_SUCCESS;
     memory_receiver = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, memory_size);
     if (memory_receiver == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
+#if !defined(UX_DEVICE_STANDALONE)
     memory_stack = memory_receiver + sizeof(UX_DEVICE_CLASS_HID_RECEIVER);
     memory_events = memory_stack + UX_DEVICE_CLASS_HID_RECEIVER_THREAD_STACK_SIZE;
+#else
+    memory_events = memory_receiver + sizeof(UX_DEVICE_CLASS_HID_RECEIVER);
+#endif
 
     /* Store receiver instance pointer.  */
     (*receiver) = (UX_DEVICE_CLASS_HID_RECEIVER *)memory_receiver;
@@ -147,7 +156,8 @@ UINT                                    status = UX_SUCCESS;
 #if !defined(UX_DEVICE_STANDALONE)
         UX_THREAD_EXTENSION_PTR_SET(&((*receiver) -> ux_device_class_hid_receiver_thread), hid)
 #else
-        /* TODO: initialize read state for receiver.  */
+        hid -> ux_device_class_hid_read_state = UX_DEVICE_CLASS_HID_RECEIVER_START;
+        (*receiver) -> ux_device_class_hid_receiver_tasks_run = _ux_device_class_hid_receiver_tasks_run;
 #endif
 
         /* Initialize event buffer size.  */

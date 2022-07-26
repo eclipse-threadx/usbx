@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_configuration_set                  PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,10 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_configuration_set(ULONG configuration_value)
@@ -88,7 +92,7 @@ ULONG                           descriptor_length;
 UCHAR                           descriptor_type;
 UX_CONFIGURATION_DESCRIPTOR     configuration_descriptor = { 0 };
 UX_INTERFACE_DESCRIPTOR         interface_descriptor;
-UX_SLAVE_INTERFACE              *interface; 
+UX_SLAVE_INTERFACE              *interface_ptr; 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
 UX_SLAVE_INTERFACE              *next_interface; 
 #endif
@@ -165,19 +169,19 @@ ULONG                           class_index;
     {
 
         /* Get the pointer to the first interface.  */
-        interface =  device -> ux_slave_device_first_interface;
+        interface_ptr =  device -> ux_slave_device_first_interface;
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
         /* Deactivate all the interfaces if any.  */
-        while (interface != UX_NULL)
+        while (interface_ptr != UX_NULL)
         {
 #endif
             /* Build all the fields of the Class Command.  */
             class_command.ux_slave_class_command_request =   UX_SLAVE_CLASS_COMMAND_DEACTIVATE;
-            class_command.ux_slave_class_command_interface =  (VOID *) interface;
+            class_command.ux_slave_class_command_interface =  (VOID *) interface_ptr;
 
             /* Get the pointer to the class container of this interface.  */
-            class_inst =  interface -> ux_slave_interface_class;
+            class_inst =  interface_ptr -> ux_slave_interface_class;
 
             /* Store the class container. */
             class_command.ux_slave_class_command_class_ptr =  class_inst;
@@ -190,15 +194,15 @@ ULONG                           class_index;
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Get the next interface.  */
-            next_interface =  interface -> ux_slave_interface_next_interface;
+            next_interface =  interface_ptr -> ux_slave_interface_next_interface;
 #endif
 
             /* Remove the interface and all endpoints associated with it.  */
-            _ux_device_stack_interface_delete(interface);
+            _ux_device_stack_interface_delete(interface_ptr);
 
 #if !defined(UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE) || UX_MAX_DEVICE_INTERFACES > 1
             /* Now we refresh the interface pointer.  */
-            interface =  next_interface;
+            interface_ptr =  next_interface;
         }
 #endif
 

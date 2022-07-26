@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_asynchronous_endpoint_create           PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed an addressing issue,  */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed addressing issues,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_asynchronous_endpoint_create(UX_HCD_OHCI *hcd_ohci, UX_ENDPOINT *endpoint)
@@ -139,7 +142,7 @@ ULONG           ohci_register;
 
         head_ed =  (UX_OHCI_ED *) _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_CONTROL_HEAD_ED);
         ed -> ux_ohci_ed_next_ed =  head_ed;
-        _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL_HEAD_ED, (ULONG) ed);
+        _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL_HEAD_ED, (ULONG) _ux_utility_physical_address(ed));
         ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_CONTROL);
         ohci_register |=  OHCI_HC_CR_CLE;
         _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL, ohci_register);
@@ -150,7 +153,7 @@ ULONG           ohci_register;
 
         head_ed =  (UX_OHCI_ED *) _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_BULK_HEAD_ED);
         ed -> ux_ohci_ed_next_ed =  head_ed;
-        _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_BULK_HEAD_ED, (ULONG) ed);
+        _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_BULK_HEAD_ED, (ULONG) _ux_utility_physical_address(ed));
         ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_CONTROL);
         ohci_register |=  OHCI_HC_CR_BLE;
         _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL, ohci_register);
@@ -165,7 +168,7 @@ ULONG           ohci_register;
        inserted ED. */
     if (head_ed != UX_NULL)
     {
-        head_ed = _ux_utility_physical_address(head_ed);
+        head_ed = _ux_utility_virtual_address(head_ed);
         head_ed -> ux_ohci_ed_previous_ed =  ed;
     }
 

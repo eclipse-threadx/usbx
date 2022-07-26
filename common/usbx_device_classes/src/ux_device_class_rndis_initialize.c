@@ -78,7 +78,7 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_initialize                   PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -132,6 +132,10 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -143,11 +147,11 @@ UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
 
 UX_SLAVE_CLASS_RNDIS                        *rndis;
 UX_SLAVE_CLASS_RNDIS_PARAMETER              *rndis_parameter;
-UX_SLAVE_CLASS                              *class;
+UX_SLAVE_CLASS                              *class_ptr;
 UINT                                        status;
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Create an instance of the device rndis class.  */
     rndis =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_RNDIS));
@@ -157,7 +161,7 @@ UINT                                        status;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Save the address of the RNDIS instance inside the RNDIS container.  */
-    class -> ux_slave_class_instance = (VOID *) rndis;
+    class_ptr -> ux_slave_class_instance = (VOID *) rndis;
 
     /* Get the pointer to the application parameters for the rndis class.  */
     rndis_parameter =  command -> ux_slave_class_command_parameter;
@@ -211,7 +215,7 @@ UINT                                        status;
     {
         status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_interrupt_thread , "ux_slave_class_rndis_interrupt_thread", 
                     _ux_device_class_rndis_interrupt_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) rndis -> ux_slave_class_rndis_interrupt_thread_stack ,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) rndis -> ux_slave_class_rndis_interrupt_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
                     
@@ -220,7 +224,7 @@ UINT                                        status;
             status = UX_THREAD_ERROR;
     }
 
-    UX_THREAD_EXTENSION_PTR_SET(&(rndis -> ux_slave_class_rndis_interrupt_thread), class)
+    UX_THREAD_EXTENSION_PTR_SET(&(rndis -> ux_slave_class_rndis_interrupt_thread), class_ptr)
 
     /* Allocate some memory for the bulk out thread stack. */
     if (status == UX_SUCCESS)
@@ -240,7 +244,7 @@ UINT                                        status;
     {
         status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_bulkout_thread , "ux_slave_class_rndis_bulkout_thread", 
                     _ux_device_class_rndis_bulkout_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) rndis -> ux_slave_class_rndis_bulkout_thread_stack ,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) rndis -> ux_slave_class_rndis_bulkout_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
                     
@@ -249,7 +253,7 @@ UINT                                        status;
             status = UX_THREAD_ERROR;
     }
 
-    UX_THREAD_EXTENSION_PTR_SET(&(rndis -> ux_slave_class_rndis_bulkout_thread), class)
+    UX_THREAD_EXTENSION_PTR_SET(&(rndis -> ux_slave_class_rndis_bulkout_thread), class_ptr)
 
     /* Allocate some memory for the bulk in thread stack. */
     if (status == UX_SUCCESS)
@@ -269,7 +273,7 @@ UINT                                        status;
     {
         status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_bulkin_thread , "ux_slave_class_rndis_bulkin_thread", 
                     _ux_device_class_rndis_bulkin_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) rndis -> ux_slave_class_rndis_bulkin_thread_stack ,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) rndis -> ux_slave_class_rndis_bulkin_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
 
@@ -278,7 +282,7 @@ UINT                                        status;
             status = UX_THREAD_ERROR;
     }
 
-    UX_THREAD_EXTENSION_PTR_SET(&(rndis -> ux_slave_class_rndis_bulkin_thread), class)
+    UX_THREAD_EXTENSION_PTR_SET(&(rndis -> ux_slave_class_rndis_bulkin_thread), class_ptr)
 
     /* Create a event flag group for the rndis class to synchronize with the event interrupt thread.  */
     if (status == UX_SUCCESS)

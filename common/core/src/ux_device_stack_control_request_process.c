@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_control_request_process            PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,6 +87,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added printer support,      */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_control_request_process(UX_SLAVE_TRANSFER *transfer_request)
@@ -94,7 +98,7 @@ UINT  _ux_device_stack_control_request_process(UX_SLAVE_TRANSFER *transfer_reque
 
 UX_SLAVE_DCD                *dcd;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_CLASS              *class;
+UX_SLAVE_CLASS              *class_ptr;
 UX_SLAVE_CLASS_COMMAND      class_command;
 ULONG                       request_type;
 ULONG                       request;
@@ -196,10 +200,10 @@ ULONG                       application_data_length;
             {
 
                 /* Get the class for the interface.  */
-                class =  _ux_system_slave -> ux_system_slave_interface_class_array[class_index];
+                class_ptr =  _ux_system_slave -> ux_system_slave_interface_class_array[class_index];
 
                 /* If class is not ready, try next.  */
-                if (class == UX_NULL)
+                if (class_ptr == UX_NULL)
                     continue;
 
                 /* Is the request target to an interface?  */
@@ -213,17 +217,17 @@ ULONG                       application_data_length;
                        wIndex is interface index (for recommended index sequence the interface
                        number is same as interface index inside configuration).  */
                     if (((request_index & 0xFF) != class_index) ||
-                        ((class -> ux_slave_class_interface -> ux_slave_interface_descriptor.bInterfaceClass == 0x07) &&
+                        ((class_ptr -> ux_slave_class_interface -> ux_slave_interface_descriptor.bInterfaceClass == 0x07) &&
                          (request == 0x00) &&
                          *(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_INDEX + 1) != class_index))
                         continue;
                 }
 
                 /* Memorize the class in the command.  */
-                class_command.ux_slave_class_command_class_ptr = class;
+                class_command.ux_slave_class_command_class_ptr = class_ptr;
 
                 /* We have found a potential candidate. Call this registered class entry function.  */
-                status = class -> ux_slave_class_entry_function(&class_command);
+                status = class_ptr -> ux_slave_class_entry_function(&class_command);
 
                 /* The status simply tells us if the registered class handled the 
                    command - if there was an issue processing the command, it would've 

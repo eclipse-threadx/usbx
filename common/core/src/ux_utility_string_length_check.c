@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_utility_string_length_check                     PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -46,6 +46,9 @@
 /*    On success the actual length of C string is written back to UINT    */ 
 /*    variable pointed by string_length_ptr (if not NULL).                */ 
 /*    Otherwise the variable keeps untouched.                             */ 
+/*                                                                        */
+/*    Note NULL terminator is not counted in string length                */
+/*    (same as C strlen).                                                 */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -74,6 +77,8 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_utility_string_length_check(UCHAR *string, UINT *string_length_ptr, UINT max_string_length)

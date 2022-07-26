@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_write                          PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -43,6 +43,9 @@
 /*  DESCRIPTION                                                           */
 /*                                                                        */ 
 /*    This function writes to the audio streaming interface.              */ 
+/*                                                                        */
+/*    Note the request packet size should not exceed endpoint max packet  */
+/*    size, and the request length should be aligned with packet size.    */
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -57,8 +60,8 @@
 /*                                                                        */ 
 /*    _ux_host_class_audio_transfer_request Start audio transfer request  */ 
 /*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_host_semaphore_put                Put semaphore                 */ 
+/*    _ux_host_mutex_on                     Get mutex                     */
+/*    _ux_host_mutex_off                    Release mutex                 */
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -78,12 +81,19 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined packet size manage, */
+/*                                            protect reentry with mutex, */
+/*                                            refined transfer implement, */
+/*                                            fixed error return code,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_write(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST *audio_transfer_request)
 {
 
 UINT        status;
+ULONG       mps;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_AUDIO_WRITE, audio, audio_transfer_request -> ux_host_class_audio_transfer_request_data_pointer, 
@@ -103,19 +113,14 @@ UINT        status;
     }
 
     /* Protect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_get(&audio -> ux_host_class_audio_semaphore, UX_WAIT_FOREVER);
-    if (status != UX_SUCCESS)
-        return(status);
+    _ux_host_mutex_on(&audio -> ux_host_class_audio_mutex);
 
-    /* By default the transmission will be successful.  */
-    status =  UX_SUCCESS;
-    
     /* Ensure we have a selected interface that allows isoch transmission.  */
     if (audio -> ux_host_class_audio_isochronous_endpoint -> ux_endpoint_descriptor.wMaxPacketSize == 0)
     {
 
         /* Unprotect thread reentry to this instance.  */
-        _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+        _ux_host_mutex_off(&audio -> ux_host_class_audio_mutex);
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_AUDIO_WRONG_INTERFACE);
@@ -123,23 +128,19 @@ UINT        status;
         /* Return error status.  */
         return(UX_HOST_CLASS_AUDIO_WRONG_INTERFACE);
     }
-    
-    /* Hook the audio transfer request to the chain of transfer requests in the audio instance.
-       We hook the transfer request to the tail transfer request.  */
-    audio_transfer_request -> ux_host_class_audio_transfer_request_next_audio_transfer_request =  audio -> ux_host_class_audio_tail_transfer_request;
-    audio -> ux_host_class_audio_tail_transfer_request =  audio_transfer_request;
 
-    /* Check if this is the first time we have a transfer request, if so update the head as well.  */
-    if (audio -> ux_host_class_audio_head_transfer_request == UX_NULL)
-        audio -> ux_host_class_audio_head_transfer_request =  audio_transfer_request;
+    /* Correct packet size to apply (not exceeding endpoint max packet size).  */
+    mps = _ux_host_class_audio_max_packet_size_get(audio);
+    if ((audio_transfer_request -> ux_host_class_audio_transfer_request_packet_size == 0) ||
+        (audio_transfer_request -> ux_host_class_audio_transfer_request_packet_size > mps))
+        audio_transfer_request -> ux_host_class_audio_transfer_request_packet_size = mps;
 
-    /* Ask the stack to hook this transfer request to the iso ED.  */
+     /* Ask the stack to hook this transfer request to the iso ED.  */
     status =  _ux_host_class_audio_transfer_request(audio, audio_transfer_request);
 
     /* Unprotect thread reentry to this instance.  */
-    _ux_host_semaphore_put(&audio -> ux_host_class_audio_semaphore);
+    _ux_host_mutex_off(&audio -> ux_host_class_audio_mutex);
 
     /* Return completion status.  */
     return(status);
 }
-

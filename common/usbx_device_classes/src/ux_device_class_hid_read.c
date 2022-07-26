@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_read                           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,7 @@
 /*                                                                        */
 /*    This function reads from the HID class.                             */
 /*    This function must not be used with receiver related functions.     */
+/*    This function is for RTOS mode.                                     */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
@@ -67,7 +68,7 @@
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    ThreadX                                                             */
+/*    Application                                                         */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
@@ -77,6 +78,8 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_hid_read(UX_SLAVE_CLASS_HID *hid, UCHAR *buffer,

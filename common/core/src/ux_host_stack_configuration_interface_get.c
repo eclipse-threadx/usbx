@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_configuration_interface_get          PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,11 +73,15 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
                                                 UINT interface_index, UINT alternate_setting_index,
-                                                UX_INTERFACE **interface)
+                                                UX_INTERFACE **ux_interface)
 {
     
 UINT                current_interface_number;
@@ -128,7 +132,7 @@ UX_INTERFACE        *current_interface;
 
                     /* We have found the right interface/alternate setting combination. Set the
                        interface return pointer.  */
-                    *interface =  current_interface;
+                    *ux_interface =  current_interface;
 
                     /* Return success to caller.  */
                     return(UX_SUCCESS);
@@ -153,7 +157,7 @@ UX_INTERFACE        *current_interface;
                         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_INTERFACE_HANDLE_UNKNOWN);
 
                         /* If trace is enabled, insert this event into the trace buffer.  */
-                        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
+                        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, ux_interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
                         return(UX_INTERFACE_HANDLE_UNKNOWN);
                     }                    
@@ -177,7 +181,7 @@ UX_INTERFACE        *current_interface;
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_INTERFACE_HANDLE_UNKNOWN);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, ux_interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
     /* Didn't find the right interface/alternate setting, return an error!  */
     return(UX_INTERFACE_HANDLE_UNKNOWN);

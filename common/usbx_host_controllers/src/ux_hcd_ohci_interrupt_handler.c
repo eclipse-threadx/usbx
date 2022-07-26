@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ohci_interrupt_handler                      PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed OHCI PRSC issue,      */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_interrupt_handler(VOID)
@@ -164,9 +167,14 @@ ULONG           port_index;
                             root_hub_thread_wakeup ++;
                         }
                         
-                        /* Clear the root hub interrupt signal.  We do not turn off Port Reset status change here.
-                           This will be done when the root hub requests a Port Reset.  */
-                        _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index, (OHCI_HC_PS_CSC | OHCI_HC_PS_PESC | OHCI_HC_PS_PSSC | OHCI_HC_PS_OCIC ));
+                        if (ohci_register_port_status &  OHCI_HC_PS_PRSC)
+                        {
+                            _ux_host_event_flags_set(&hcd_ohci -> ux_hcd_ohci_event_flags_group, UX_OHCI_PRSC_EVENT, UX_OR);
+                        }
+
+                        /* Clear the root hub interrupt signal. */
+                        _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index,
+                                                    (OHCI_HC_PS_CSC | OHCI_HC_PS_PESC | OHCI_HC_PS_PSSC | OHCI_HC_PS_OCIC | OHCI_HC_PS_PRSC));
                     }
 
                     /* We only wake up the root hub thread if there has been device insertion/extraction.  */

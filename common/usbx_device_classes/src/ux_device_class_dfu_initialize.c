@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_dfu_initialize                     PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -90,7 +94,7 @@ UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)
                                           
 UX_SLAVE_CLASS_DFU                      *dfu;
 UX_SLAVE_CLASS_DFU_PARAMETER            *dfu_parameter;
-UX_SLAVE_CLASS                          *class;
+UX_SLAVE_CLASS                          *class_ptr;
 UINT                                    status = UX_DESCRIPTOR_CORRUPTED;
 UX_DFU_FUNCTIONAL_DESCRIPTOR            dfu_functional_descriptor;
 UCHAR                                   *dfu_framework; 
@@ -99,7 +103,7 @@ UCHAR                                   descriptor_type;
 ULONG                                   descriptor_length;
 
     /* Get the class container.  */
-    class =  command -> ux_slave_class_command_class_ptr;
+    class_ptr =  command -> ux_slave_class_command_class_ptr;
 
     /* Create an instance of the device dfu class.  */
     dfu =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_DFU));
@@ -109,7 +113,7 @@ ULONG                                   descriptor_length;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Save the address of the DFU instance inside the DFU container.  */
-    class -> ux_slave_class_instance = (VOID *) dfu;
+    class_ptr -> ux_slave_class_instance = (VOID *) dfu;
 
     /* Get the pointer to the application parameters for the dfu class.  */
     dfu_parameter =  command -> ux_slave_class_command_parameter;
@@ -196,7 +200,7 @@ ULONG                                   descriptor_length;
     /* Check status.  */
     if (status != UX_SUCCESS)
         status = UX_EVENT_ERROR;
-    
+
     /* Allocate some memory for the dfu thread stack. */
     if (status == UX_SUCCESS)
     {
@@ -213,7 +217,7 @@ ULONG                                   descriptor_length;
     {
         status =  _ux_device_thread_create(&dfu -> ux_slave_class_dfu_thread , "ux_slave_class_dfu_thread", 
                     _ux_device_class_dfu_thread,
-                    (ULONG) (ALIGN_TYPE) class, (VOID *) dfu -> ux_slave_class_dfu_thread_stack,
+                    (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) dfu -> ux_slave_class_dfu_thread_stack,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_AUTO_START);
 
@@ -222,11 +226,11 @@ ULONG                                   descriptor_length;
             status = UX_THREAD_ERROR;
     }
 
-    UX_THREAD_EXTENSION_PTR_SET(&(dfu -> ux_slave_class_dfu_thread), class)
+    UX_THREAD_EXTENSION_PTR_SET(&(dfu -> ux_slave_class_dfu_thread), class_ptr)
 #else
 
     /* Set task function.  */
-    class -> ux_slave_class_task_function = _ux_device_class_dfu_tasks_run;
+    class_ptr -> ux_slave_class_task_function = _ux_device_class_dfu_tasks_run;
 #endif
 
     /* Return completion status.  */
@@ -245,7 +249,7 @@ ULONG                                   descriptor_length;
 #endif
 
     /* Detach from container and free instance memory.  */
-    class -> ux_slave_class_instance = UX_NULL;
+    class_ptr -> ux_slave_class_instance = UX_NULL;
     _ux_utility_memory_free(dfu);
 
     return(status);

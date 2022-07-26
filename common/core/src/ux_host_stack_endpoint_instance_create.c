@@ -154,6 +154,8 @@ UCHAR           endpoint_type;
         /* If trace is enabled, register this object.  */
         UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_ENDPOINT, endpoint, 0, 0, 0)
 
+        /* By default transfer request contained is for endpoint itself.  */
+        endpoint -> ux_endpoint_transfer_request.ux_transfer_request_endpoint = endpoint;
     }
 
     /* Return completion status.  */

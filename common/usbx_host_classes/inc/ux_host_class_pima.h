@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_pima.h                                PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved internal checks,   */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -78,8 +81,11 @@ extern   "C" {
 #define UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH                     256
 #define UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH          64 
 #define UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS                      64
-#define UX_HOST_CLASS_PIMA_STORAGE_IDS_LENGTH                   (UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS * sizeof(ULONG))
-#define UX_HOST_CLASS_PIMA_STORAGE_IDS_LENGTH_ASSERT            UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(ULONG), UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS), UX_HOST_CLASS_PIMA_STORAGE_IDS_LENGTH_calc_ovf)
+#if (UX_OVERFLOW_CHECK_ADD_ULONG(UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS, 1) || \
+    UX_OVERFLOW_CHECK_MULC_ULONG(UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS + 1, 4))
+#error UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS too large, please decrease
+#endif
+#define UX_HOST_CLASS_PIMA_STORAGE_IDS_LENGTH                   ((UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS + 1) * 4)
 #define UX_HOST_CLASS_PIMA_MAX_PAYLOAD                          1024
 #define UX_HOST_CLASS_PIMA_ZLP_NONE                             0
 #define UX_HOST_CLASS_PIMA_ZLP_IN                               1
@@ -444,10 +450,10 @@ typedef struct UX_HOST_CLASS_PIMA_OBJECT_STRUCT
     ULONG           ux_host_class_pima_object_association_type;
     ULONG           ux_host_class_pima_object_association_desc;
     ULONG           ux_host_class_pima_object_sequence_number;
-    UCHAR           ux_host_class_pima_object_filename[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH];
+    UCHAR           ux_host_class_pima_object_filename[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
     UCHAR           ux_host_class_pima_object_capture_date[UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
     UCHAR           ux_host_class_pima_object_modification_date[UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
-    UCHAR           ux_host_class_pima_object_keywords[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH];
+    UCHAR           ux_host_class_pima_object_keywords[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
     ULONG           ux_host_class_pima_object_state;
     ULONG           ux_host_class_pima_object_offset;
     ULONG           ux_host_class_pima_object_transfer_status;
@@ -471,17 +477,17 @@ typedef struct UX_HOST_CLASS_PIMA_DEVICE_STRUCT
     ULONG            ux_host_class_pima_device_standard_version;
     ULONG            ux_host_class_pima_device_vendor_extension_id;
     ULONG            ux_host_class_pima_device_vendor_extension_version;
-    UCHAR            ux_host_class_pima_device_vendor_extension_desc[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH];
+    UCHAR            ux_host_class_pima_device_vendor_extension_desc[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
     ULONG            ux_host_class_pima_device_functional_mode;
     UCHAR            ux_host_class_pima_device_operations_supported[UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH];
     UCHAR            ux_host_class_pima_device_events_supported[UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH];
     UCHAR            ux_host_class_pima_device_properties_supported[UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH];
     UCHAR            ux_host_class_pima_device_capture_formats[UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH];
     UCHAR            ux_host_class_pima_device_image_formats[UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH];
-    UCHAR            ux_host_class_pima_device_manufacturer[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH];
+    UCHAR            ux_host_class_pima_device_manufacturer[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
     UCHAR            ux_host_class_pima_device_model[UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
     UCHAR            ux_host_class_pima_device_version[UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
-    UCHAR            ux_host_class_pima_device_serial_number[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH];
+    UCHAR            ux_host_class_pima_device_serial_number[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
     
 } UX_HOST_CLASS_PIMA_DEVICE;
 
@@ -506,8 +512,8 @@ typedef struct UX_HOST_CLASS_PIMA_STORAGE_STRUCT
     ULONG            ux_host_class_pima_storage_free_space_bytes_low;
     ULONG            ux_host_class_pima_storage_free_space_bytes_high;
     ULONG            ux_host_class_pima_storage_free_space_images;
-    UCHAR            ux_host_class_pima_storage_description[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH];
-    UCHAR            ux_host_class_pima_storage_volume_label[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH];
+    UCHAR            ux_host_class_pima_storage_description[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
+    UCHAR            ux_host_class_pima_storage_volume_label[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
     
 } UX_HOST_CLASS_PIMA_STORAGE;
 
@@ -578,7 +584,6 @@ UINT  _ux_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima,
 #define ux_host_class_pima_object_delete            _ux_host_class_pima_object_delete
 #define ux_host_class_pima_object_transfer_abort    _ux_host_class_pima_object_transfer_abort
 #define ux_host_class_pima_object_close             _ux_host_class_pima_object_close         
-#define ux_host_class_pima_num_objects_get          _ux_host_class_pima_num_objects_get         
 #define ux_host_class_pima_session_open             _ux_host_class_pima_session_open    
 #define ux_host_class_pima_session_close            _ux_host_class_pima_session_close   
 #define ux_host_class_pima_storage_ids_get          _ux_host_class_pima_storage_ids_get 

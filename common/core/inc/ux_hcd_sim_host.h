@@ -272,7 +272,7 @@ UINT    _ux_hcd_sim_host_transfer_run(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif
 

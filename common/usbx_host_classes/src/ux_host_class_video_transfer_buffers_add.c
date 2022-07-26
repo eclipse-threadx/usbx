@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_transfer_buffers_add           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -94,6 +94,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            set pending on endpoint,    */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_buffers_add(UX_HOST_CLASS_VIDEO *video, UCHAR** buffers, ULONG num_buffers)
@@ -102,6 +105,7 @@ UINT  _ux_host_class_video_transfer_buffers_add(UX_HOST_CLASS_VIDEO *video, UCHA
 UINT            status;
 UX_TRANSFER     *transfer_request;
 UX_TRANSFER     *previous_transfer;
+UX_ENDPOINT     *endpoint;
 ULONG           transfer_index;
 ULONG           packet_size;
 UINT            i;
@@ -122,9 +126,12 @@ UINT            i;
     if (status != UX_SUCCESS)
         return(status);
 
+    /* Get endpoint.  */
+    endpoint = video -> ux_host_class_video_isochronous_endpoint;
+
     /* Ensure we have a selected interface that allows isoch transmission.  */
-    if ((video -> ux_host_class_video_isochronous_endpoint == UX_NULL) ||
-        (video -> ux_host_class_video_isochronous_endpoint -> ux_endpoint_descriptor.wMaxPacketSize == 0))
+    if ((endpoint == UX_NULL) ||
+        (endpoint -> ux_endpoint_descriptor.wMaxPacketSize == 0))
     {
 
         /* Unprotect thread reentry to this instance.  */
@@ -177,11 +184,11 @@ UINT            i;
         transfer_request = &video->ux_host_class_video_transfer_requests[transfer_index];
 
         /* Select the direction. We do this by taking the endpoint direction.  */
-        transfer_request -> ux_transfer_request_type =  video -> ux_host_class_video_isochronous_endpoint ->
-            ux_endpoint_descriptor.bEndpointAddress & UX_REQUEST_DIRECTION;
+        transfer_request -> ux_transfer_request_type =  endpoint ->
+                ux_endpoint_descriptor.bEndpointAddress & UX_REQUEST_DIRECTION;
 
         /* Fill the transfer request with all the required fields.  */
-        transfer_request -> ux_transfer_request_endpoint =             video -> ux_host_class_video_isochronous_endpoint;
+        transfer_request -> ux_transfer_request_endpoint =             endpoint;
         transfer_request -> ux_transfer_request_data_pointer =         buffers[i];
         transfer_request -> ux_transfer_request_requested_length =     packet_size;
         transfer_request -> ux_transfer_request_completion_function =  _ux_host_class_video_transfer_request_callback;
@@ -207,7 +214,10 @@ UINT            i;
     transfer_request = &video -> ux_host_class_video_transfer_requests[video->ux_host_class_video_transfer_request_start_index];
 
     /* Move request index.  */
-    video->ux_host_class_video_transfer_request_start_index = transfer_index;
+    video -> ux_host_class_video_transfer_request_start_index = transfer_index;
+
+    /* Set endpoint to pending state, for callback and abort to check.  */
+    endpoint -> ux_endpoint_transfer_request.ux_transfer_request_completion_code = UX_TRANSFER_STATUS_PENDING;
 
     /* Transfer the transfer request (list).  */
     status =  _ux_host_stack_transfer_request(transfer_request);
@@ -218,4 +228,3 @@ UINT            i;
     /* Return completion status.  */
     return(status);
 }
-

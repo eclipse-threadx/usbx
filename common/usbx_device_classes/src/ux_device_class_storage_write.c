@@ -294,7 +294,7 @@ ULONG                   done_length;
 
     /* Now we set the CSW with success.  */
     storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
-                                    
+
     /* Return completion status.  */
     return(status);
 }

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_control_request                PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_host_class_video_control_request(UX_HOST_CLASS_VIDEO *video,
@@ -93,7 +97,7 @@ UX_TRANSFER     *transfer_request;
 UINT            status;
 UCHAR           *control_buffer;
 UCHAR           request_direction;
-UX_INTERFACE    *interface;
+UX_INTERFACE    *interface_ptr;
 UCHAR           interface_number;
 
 
@@ -155,8 +159,8 @@ UCHAR           interface_number;
     {
 
         /* Only one streaming interface is supported now.  */
-        interface = video -> ux_host_class_video_streaming_interface;
-        interface_number = (UCHAR)interface -> ux_interface_descriptor.bInterfaceNumber;
+        interface_ptr = video -> ux_host_class_video_streaming_interface;
+        interface_number = (UCHAR)interface_ptr -> ux_interface_descriptor.bInterfaceNumber;
     }
 
     /* Create a transfer request for the request.  */

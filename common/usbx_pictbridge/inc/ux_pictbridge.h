@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_pictbridge.h                                     PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*                                            added extern "C" keyword    */
 /*                                            for compatibility with C++, */
 /*                                            resulting in version 6.1.8  */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added magic number defines, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -98,6 +101,8 @@ struct UX_PICTBRIDGE_STRUCT;
 #define UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER                1024
 #define UX_PICTBRIDGE_MAX_EVENT_NUMBER                      8
 #define UX_PICTBRIDGE_MAX_DEVINFO_ARRAY_SIZE                16
+#define UX_PICTBRIDGE_MAX_NUMBER_STORAGE_IDS                64
+#define UX_PICTBRIDGE_MAX_NUMBER_OBJECT_HANDLES             64
 #define UX_PICTBRIDGE_OBJECT_SCRIPT                         0x3002
 #define UX_PICTBRIDGE_THREAD_STACK_SIZE                     2048
 #define UX_PICTBRIDGE_THREAD_PRIORITY_CLASS                 20
@@ -636,8 +641,8 @@ typedef struct UX_PICTBRIDGE_STRUCT
 {
 
     VOID                                                    *ux_pictbridge_pima;
-    ULONG                                                   ux_pictbridge_storage_ids[64];
-    ULONG                                                   ux_pictbridge_object_handles_array[64];
+    ULONG                                                   ux_pictbridge_storage_ids[UX_PICTBRIDGE_MAX_NUMBER_STORAGE_IDS];
+    ULONG                                                   ux_pictbridge_object_handles_array[UX_PICTBRIDGE_MAX_NUMBER_OBJECT_HANDLES];
     UX_PICTBRIDGE_EVENT                                     ux_pictbridge_event_array[UX_PICTBRIDGE_MAX_EVENT_NUMBER];
     UX_PICTBRIDGE_EVENT                                     *ux_pictbridge_event_array_head;
     UX_PICTBRIDGE_EVENT                                     *ux_pictbridge_event_array_tail;

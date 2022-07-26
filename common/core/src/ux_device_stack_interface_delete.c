@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_interface_delete                   PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,9 +69,13 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed parameter/variable    */
+/*                                            names conflict C++ keyword, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_stack_interface_delete(UX_SLAVE_INTERFACE *interface)
+UINT  _ux_device_stack_interface_delete(UX_SLAVE_INTERFACE *interface_ptr)
 {
 
 UX_SLAVE_DCD            *dcd;
@@ -80,16 +84,16 @@ UX_SLAVE_ENDPOINT       *endpoint;
 UX_SLAVE_ENDPOINT       *next_endpoint;
 
     /* If trace is enabled, register this object.  */
-    UX_TRACE_OBJECT_UNREGISTER(interface);
+    UX_TRACE_OBJECT_UNREGISTER(interface_ptr);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_STACK_INTERFACE_DELETE, interface, 0, 0, 0, UX_TRACE_DEVICE_STACK_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_STACK_INTERFACE_DELETE, interface_ptr, 0, 0, 0, UX_TRACE_DEVICE_STACK_EVENTS, 0, 0)
 
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
 
     /* Find the first endpoints associated with this interface.  */    
-    next_endpoint =  interface -> ux_slave_interface_first_endpoint;        
+    next_endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;        
     
     /* Parse all the endpoints.  */    
     while (next_endpoint != UX_NULL)
@@ -119,14 +123,14 @@ UX_SLAVE_ENDPOINT       *next_endpoint;
 
     /* It's always from first one (to delete).  */
     /* Rebuild the first link.  */
-    device -> ux_slave_device_first_interface =  interface -> ux_slave_interface_next_interface;
+    device -> ux_slave_device_first_interface =  interface_ptr -> ux_slave_interface_next_interface;
 
     /* The interface is removed from the link, its memory must be cleaned and returned to the pool.  */
-    interface -> ux_slave_interface_class          =  UX_NULL;
-    interface -> ux_slave_interface_class_instance =  UX_NULL;
-    interface -> ux_slave_interface_next_interface =  UX_NULL;
-    interface -> ux_slave_interface_first_endpoint =  UX_NULL;
-    interface -> ux_slave_interface_status         =  UX_UNUSED;
+    interface_ptr -> ux_slave_interface_class          =  UX_NULL;
+    interface_ptr -> ux_slave_interface_class_instance =  UX_NULL;
+    interface_ptr -> ux_slave_interface_next_interface =  UX_NULL;
+    interface_ptr -> ux_slave_interface_first_endpoint =  UX_NULL;
+    interface_ptr -> ux_slave_interface_status         =  UX_UNUSED;
 
     /* Return successful completion.  */    
     return(UX_SUCCESS);       

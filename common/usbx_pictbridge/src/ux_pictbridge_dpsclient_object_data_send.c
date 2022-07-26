@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_object_data_send           PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_object_data_send(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, 
@@ -224,7 +227,7 @@ UCHAR                           *pima_object_buffer;
             }    
             
             /* Send event to the application. */
-            _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, event_flag, UX_OR);
+            _ux_system_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, event_flag, UX_OR);
                         
 
         }
@@ -232,7 +235,7 @@ UCHAR                           *pima_object_buffer;
         {
 
             /* We have an error of some kind. Wake up the application with error event.  */
-            _ux_utility_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_ERROR, UX_OR);
+            _ux_system_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_ERROR, UX_OR);
             
         }
         

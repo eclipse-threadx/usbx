@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpshost_start                        PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,12 @@
 /*  04-25-2022     Yajun Xia                Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed string length check,  */
+/*                                            fixed possible overflow,    */
+/*                                            used define instead of num, */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_start(UX_PICTBRIDGE *pictbridge, UX_HOST_CLASS_PIMA *pima)
@@ -148,7 +154,7 @@ UINT                                length, length1;
         pictbridge -> ux_pictbridge_host_client_state_machine = UX_PICTBRIDGE_STATE_MACHINE_IDLE;
         
         /* Create the semaphore to wake up the thread.  */
-        status =  _ux_utility_semaphore_create(&pictbridge -> ux_pictbridge_notification_semaphore, "ux_pictbridge_notification_semaphore", 0);
+        status =  _ux_system_semaphore_create(&pictbridge -> ux_pictbridge_notification_semaphore, "ux_pictbridge_notification_semaphore", 0);
         if (status != UX_SUCCESS)
             status = (UX_SEMAPHORE_ERROR);
     }
@@ -171,7 +177,7 @@ UINT                                length, length1;
     {
 
         /* Create the pictbridge class thread.  */
-        status =  _ux_utility_thread_create(&pictbridge -> ux_pictbridge_thread,
+        status =  _ux_system_thread_create(&pictbridge -> ux_pictbridge_thread,
                                 "ux_pictbridge_thread", _ux_pictbridge_dpshost_thread,
                                 (ULONG)(ALIGN_TYPE) pictbridge, 
                                 pictbridge -> ux_pictbridge_thread_stack,
@@ -192,16 +198,16 @@ UINT                                length, length1;
     {
 
         /* Check and free pictbridge -> ux_pictbridge_thread.  */
-        if (pictbridge -> ux_pictbridge_thread.tx_thread_id != UX_EMPTY)
-            _ux_utility_thread_delete(&pictbridge -> ux_pictbridge_thread);
+        if (_ux_system_thread_created(&pictbridge -> ux_pictbridge_thread))
+            _ux_system_thread_delete(&pictbridge -> ux_pictbridge_thread);
 
         /* Check and free pictbridge -> ux_pictbridge_thread_stack.  */
         if (pictbridge -> ux_pictbridge_thread_stack)
             _ux_utility_memory_free(pictbridge -> ux_pictbridge_thread_stack);
 
         /* Check and free pictbridge -> ux_pictbridge_notification_semaphore.  */
-        if (pictbridge -> ux_pictbridge_notification_semaphore.tx_semaphore_id != UX_EMPTY)
-            _ux_utility_semaphore_delete(&pictbridge -> ux_pictbridge_notification_semaphore);
+        if (_ux_system_semaphore_created(&pictbridge -> ux_pictbridge_notification_semaphore))
+            _ux_system_semaphore_delete(&pictbridge -> ux_pictbridge_notification_semaphore);
 
         /* Check and free pictbridge -> ux_pictbridge_device.  */
         if (pictbridge -> ux_pictbridge_device)
@@ -253,7 +259,7 @@ UINT                                length, length1;
     /* Get the number of storage IDs.  */
     status = _ux_host_class_pima_storage_ids_get(pima, pima_session, 
                                                  pictbridge -> ux_pictbridge_storage_ids,
-                                                 64);
+                                                 UX_PICTBRIDGE_MAX_NUMBER_STORAGE_IDS);
     if (status != UX_SUCCESS)
     {
         /* Close the pima session.  */
@@ -286,9 +292,13 @@ UINT                                length, length1;
     }        
 
     /* Get the array of objects handles on the container.  */
+    if (pima_session -> ux_host_class_pima_session_nb_objects > UX_PICTBRIDGE_MAX_NUMBER_OBJECT_HANDLES)
+        length = UX_PICTBRIDGE_MAX_NUMBER_OBJECT_HANDLES;
+    else
+        length = pima_session -> ux_host_class_pima_session_nb_objects;
     status = _ux_host_class_pima_object_handles_get(pima, pima_session, 
                                                  pictbridge -> ux_pictbridge_object_handles_array, 
-                                                 4 * pima_session -> ux_host_class_pima_session_nb_objects,
+                                                 length,
                                                  UX_PICTBRIDGE_ALL_CONTAINERS, UX_PICTBRIDGE_OBJECT_SCRIPT, 0);
     if (status != UX_SUCCESS)
     {
@@ -314,13 +324,12 @@ UINT                                length, length1;
             return(UX_PICTBRIDGE_ERROR_INVALID_OBJECT_HANDLE );
         }        
 
-        
         /* Check if this is a script.  */        
         if (pima_object -> ux_host_class_pima_object_format == UX_HOST_CLASS_PIMA_OFC_SCRIPT)
         {
 
             /* Yes this is a script. We need to search for the DDISCVRY.DPS file name.
-               Get the file name length (without null-terminator).  */
+               Get the file name length (with null-terminator).  */
             length1 = (UINT)(*pima_object -> ux_host_class_pima_object_filename);
 
             /* Now, compare it to the DDISCVRY.DPS file name.  Check length first (excluding null-terminator).  */
@@ -330,7 +339,7 @@ UINT                                length, length1;
                 /* Invalidate length, on error it's untouched.  */
                 length = UX_PICTBRIDGE_MAX_FILE_NAME_SIZE + 1;
                 _ux_utility_string_length_check(_ux_pictbridge_ddiscovery_name, &length, UX_PICTBRIDGE_MAX_FILE_NAME_SIZE);
-                if (length == length1)
+                if ((length + 1) == length1)
                 {
 
                     /* Get the file name in a ascii format (with null-terminator).  */

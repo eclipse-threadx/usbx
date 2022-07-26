@@ -168,7 +168,7 @@ UINT    _ux_dcd_sim_slave_transfer_abort(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLA
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif
 

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_input_object_prepare       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,10 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            cleared compile warning,    */
+/*                                            used macros for RTOS calls, */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_input_object_prepare(UX_PICTBRIDGE *pictbridge, 
@@ -96,13 +100,15 @@ ULONG                               actual_flags;
         pictbridge -> ux_pictbridge_host_client_state_machine |= UX_PICTBRIDGE_STATE_MACHINE_CLIENT_REQUEST_PENDING;
     
         /* We should wait for the state machine to allow our operation.  */
-        status =  _ux_utility_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
+        status =  _ux_system_event_flags_get(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_STATE_MACHINE_READY, 
                                         UX_AND_CLEAR, &actual_flags, UX_PICTBRIDGE_EVENT_TIMEOUT);
 
         /* Check status.  */
         if (status != UX_SUCCESS)
             return(UX_EVENT_ERROR);
 
+        /* Status good means flag match, no need to check variable again, mark it unused.  */
+        (void)actual_flags;
     }
 
     /* Change the state machine to client request.  */

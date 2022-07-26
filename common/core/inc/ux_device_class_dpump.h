@@ -139,6 +139,6 @@ UINT    _ux_device_class_dpump_change(UX_SLAVE_CLASS_COMMAND *command);
    C conditional started above.  */   
 #ifdef __cplusplus
 } 
-#endif 
+#endif
 
 #endif

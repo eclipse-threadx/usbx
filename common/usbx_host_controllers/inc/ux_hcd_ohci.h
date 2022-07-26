@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_hcd_ohci.h                                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,6 +53,9 @@
 /*  01-31-2022     Xiuwen Cai               Modified comment(s),          */
 /*                                            fixed HcPeriodicStart value,*/
 /*                                            resulting in version 6.1.10 */
+/*  07-29-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed OHCI PRSC issue,      */
+/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -225,6 +228,9 @@ extern   "C" {
 #define UX_OHCI_ERROR_BUFFER_UNDERRUN                       0x0d
 #define UX_OHCI_NOT_ACCESSED                                0x0e
 
+#define UX_OHCI_PRSC_EVENT                                  0x1u
+
+#define UX_OHCI_PRSC_EVENT_TIMEOUT                          100
 
 /* Define OHCI HCCA structure.  */
 
@@ -260,6 +266,8 @@ typedef struct UX_HCD_OHCI_STRUCT
                     *ux_hcd_ohci_td_list;
     struct UX_OHCI_ISO_TD_STRUCT       
                     *ux_hcd_ohci_iso_td_list;
+    UX_EVENT_FLAGS_GROUP
+                    ux_hcd_ohci_event_flags_group;
 } UX_HCD_OHCI;
 
 

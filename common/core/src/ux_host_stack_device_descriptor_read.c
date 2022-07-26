@@ -167,7 +167,7 @@ UX_ENDPOINT     *control_endpoint;
 #endif
 
     /* Update the max packet size value for the endpoint.  */
-    control_endpoint -> ux_endpoint_descriptor.wMaxPacketSize = device -> ux_device_descriptor.bMaxPacketSize0;
+    control_endpoint -> ux_endpoint_descriptor.wMaxPacketSize =  device -> ux_device_descriptor.bMaxPacketSize0;
 
     /* Create a transfer_request for the GET_DESCRIPTOR request. This time, we have the complete length */
     transfer_request -> ux_transfer_request_data_pointer =      descriptor;
@@ -206,7 +206,7 @@ UX_ENDPOINT     *control_endpoint;
     _ux_utility_memory_free(descriptor);
 
     /* Return completion status.  */
-    return(status);             
+    return(status);
 #endif
 }
 
