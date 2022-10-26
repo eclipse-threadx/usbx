@@ -44,7 +44,7 @@ static inline VOID _ux_host_stack_pending_transfers_run(VOID);
 /*  FUNCTION                                                 RELEASE      */
 /*                                                                        */
 /*    _ux_host_stack_tasks_run                              PORTABLE C    */
-/*                                                             6.1.12     */
+/*                                                             6.2.0      */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -105,6 +105,11 @@ static inline VOID _ux_host_stack_pending_transfers_run(VOID);
 /*                                            used shared descriptor in   */
 /*                                            device instance for enum,   */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved internal logic,    */
+/*                                            fixed activation issue on   */
+/*                                            no class linked interfaces, */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_host_stack_tasks_run(VOID)
@@ -376,7 +381,12 @@ UX_INTERFACE    *interface_inst;
                 device -> ux_device_class :
                 device -> ux_device_enum_inst.interface -> ux_interface_class;
     command -> ux_host_class_command_request = UX_HOST_CLASS_COMMAND_ACTIVATE_WAIT;
-    status = command -> ux_host_class_command_class_ptr -> ux_host_class_entry_function(command);
+
+    /* If there is no class linked, just next state.  */
+    if (command -> ux_host_class_command_class_ptr != UX_NULL)
+        status = command -> ux_host_class_command_class_ptr -> ux_host_class_entry_function(command);
+    else
+        status = UX_STATE_NEXT;
 
     /* No wait command or ready for next state.  */
     if (status == UX_FUNCTION_NOT_SUPPORTED ||
@@ -435,6 +445,7 @@ UX_TRANSFER             *trans;
 UX_CONFIGURATION        *configuration;
 UX_HOST_CLASS_COMMAND   class_command;
 UCHAR                   *buffer;
+INT                     immediate_state = UX_TRUE;
 
     /* Check if the device enumeration should be processed.  */
     if ((device -> ux_device_flags & UX_DEVICE_FLAG_ENUM) == 0)
@@ -457,7 +468,7 @@ UCHAR                   *buffer;
     }
     UX_RESTORE
 
-    while (1)
+    while (immediate_state)
     {
         switch (device -> ux_device_enum_state)
         {
@@ -911,12 +922,17 @@ UCHAR                   *buffer;
                 class_command.ux_host_class_command_class_ptr =
                                     device -> ux_device_enum_inst.interface -> ux_interface_class;
             }
-            status = class_command.ux_host_class_command_class_ptr ->
-                                ux_host_class_entry_function(&class_command);
-            if (status != UX_SUCCESS)
+
+            /* If there class linked, start activation.  */
+            if (class_command.ux_host_class_command_class_ptr != UX_NULL)
             {
-                device -> ux_device_enum_state = UX_HOST_STACK_ENUM_RETRY;
-                continue;
+                status = class_command.ux_host_class_command_class_ptr ->
+                                    ux_host_class_entry_function(&class_command);
+                if (status != UX_SUCCESS)
+                {
+                    device -> ux_device_enum_state = UX_HOST_STACK_ENUM_RETRY;
+                    continue;
+                }
             }
 
             /* Class activate execute wait.  */
@@ -1078,8 +1094,11 @@ UCHAR                   *buffer;
             device -> ux_device_enum_state = UX_STATE_RESET;
         }
 
-        /* Run once anyway.  */
-        break;
+        /* Invalid unhandled state.  */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HOST_STACK, UX_INVALID_STATE);
+
+        /* Break the immediate state loop.  */
+        immediate_state = UX_FALSE;
     }
 }
 

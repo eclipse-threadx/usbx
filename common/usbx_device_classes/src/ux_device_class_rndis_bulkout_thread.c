@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkout_thread               PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +84,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used NX API to copy data,   */
+/*                                            used linked NX IP pool,     */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class)
@@ -95,8 +99,8 @@ UX_SLAVE_DEVICE                 *device;
 UX_SLAVE_TRANSFER               *transfer_request;
 UINT                            status;
 NX_PACKET                       *packet;
-ULONG                           ip_given_length;
 ULONG                           packet_payload;
+USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
 
     /* Cast properly the rndis instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, rndis_class)
@@ -117,16 +121,39 @@ ULONG                           packet_payload;
         /* As long as the device is in the CONFIGURED state.  */
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
         { 
-            
+
+            /* Check if packet pool is ready.  */
+            if (rndis -> ux_slave_class_rndis_packet_pool == UX_NULL)
+            {
+
+                /* Get the network device handle.  */
+                ux_nx_device = (USB_NETWORK_DEVICE_TYPE *)(rndis -> ux_slave_class_rndis_network_handle);
+
+                /* Get packet pool from IP instance (if available).  */
+                if (ux_nx_device -> ux_network_device_ip_instance != UX_NULL)
+                {
+                    rndis -> ux_slave_class_rndis_packet_pool = ux_nx_device -> ux_network_device_ip_instance -> nx_ip_default_packet_pool;
+                }
+                else
+                {
+
+                    /* Error trap.  */
+                    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_ETH_PACKET_POOL_ERROR);
+
+                    _ux_utility_delay_ms(UX_DEVICE_CLASS_RNDIS_PACKET_POOL_INST_WAIT);
+                    continue;
+                }
+            }
+
             /* We can accept new reception. Get a NX Packet.  */
-            status =  nx_packet_allocate(&rndis -> ux_slave_class_rndis_packet_pool, &packet, 
+            status =  nx_packet_allocate(rndis -> ux_slave_class_rndis_packet_pool, &packet, 
                                          NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_DEVICE_CLASS_RNDIS_PACKET_POOL_WAIT));
 
             if (status == NX_SUCCESS)
             {
 
                 /* And length.  */
-                transfer_request -> ux_slave_transfer_request_requested_length =  UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH;
+                transfer_request -> ux_slave_transfer_request_requested_length =  UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH;
                 transfer_request -> ux_slave_transfer_request_actual_length =     0;
             
                 /* Memorize this packet at the beginning of the queue.  */
@@ -136,8 +163,8 @@ ULONG                           packet_payload;
                 packet -> nx_packet_queue_next = UX_NULL;
                         
                 /* Send the request to the device controller.  */
-                status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH,
-                                                                UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH);
+                status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH,
+                                                                UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH);
 
                 /* Check the completion code. */
                 if (status == UX_SUCCESS)
@@ -147,63 +174,71 @@ ULONG                           packet_payload;
                     /* If trace is enabled, insert this event into the trace buffer.  */
                     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_RNDIS_PACKET_RECEIVE, rndis, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
-                    /* Check the state of the transfer.  If there is an error, we do not proceed with this report.  Also ensure the header has a valid ID of 1.  */
-                    if (_ux_utility_long_get(transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_TYPE) == UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_MSG)
+                    /* Check the state of the transfer.  If there is an error, we do not proceed with this report.
+                       Ensure this packet is at least larger than the header.
+                       Also ensure the header has a valid ID of 1.  */
+                    if (transfer_request -> ux_slave_transfer_request_actual_length > UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH &&
+                        _ux_utility_long_get(transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_TYPE) == UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_MSG)
                     {
 
-                        /* Ensure this packet is at least larger than the header.  */
-                        if (transfer_request -> ux_slave_transfer_request_actual_length > UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
+                        /* Get the size of the payload.  */
+                        packet_payload =  _ux_utility_long_get(transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_DATA_LENGTH);
+
+                        /* Ensure the length reported in the RNDIS header is not larger than it actually is.
+                            The reason we can't check to see if the length reported in the header and the
+                            actual length are exactly equal is because there might other data after the payload 
+                            (padding, or even a message). */
+                        if (packet_payload <= transfer_request -> ux_slave_transfer_request_actual_length - UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
                         {
-                
-                            /* Get the size of the payload.  */
-                            packet_payload =  _ux_utility_long_get(transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_DATA_LENGTH);
 
-                            /* Ensure the length reported in the RNDIS header is not larger than it actually is.
-                               The reason we can't check to see if the length reported in the header and the
-                               actual length are exactly equal is because there might other data after the payload 
-                               (padding, or even a message). */
-                            if (packet_payload <= transfer_request -> ux_slave_transfer_request_actual_length - UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
+                            /* Adjust the prepend pointer to take into account the non 3 bit alignment of the ethernet header.  */
+                            packet -> nx_packet_prepend_ptr += sizeof(USHORT);
+                            packet -> nx_packet_append_ptr += sizeof(USHORT);
+
+                            /* Copy the received packet in the IP packet data area.  */
+                            status = nx_packet_data_append(packet,
+                                    transfer_request -> ux_slave_transfer_request_data_pointer +
+                                                            UX_DEVICE_CLASS_RNDIS_PACKET_BUFFER,
+                                    packet_payload,
+                                    rndis -> ux_slave_class_rndis_packet_pool,
+                                    UX_MS_TO_TICK(UX_DEVICE_CLASS_RNDIS_PACKET_POOL_WAIT));
+                            if (status == UX_SUCCESS)
                             {
-
-                                /* Adjust the prepend pointer to take into account the non 3 bit alignment of the ethernet header.  */
-                                packet -> nx_packet_prepend_ptr += sizeof(USHORT);
-                    
-                                /* Adjust the prepend, length, and append fields.  */ 
-                                packet -> nx_packet_length = packet_payload;
-                                packet -> nx_packet_append_ptr = packet -> nx_packet_prepend_ptr + packet_payload;
-                                
-
-                                /* Copy the received packet in the IP packet data area.  */
-                                _ux_utility_memory_copy(packet -> nx_packet_prepend_ptr, transfer_request -> ux_slave_transfer_request_data_pointer + UX_DEVICE_CLASS_RNDIS_PACKET_BUFFER, packet_payload); /* Use case of memcpy is verified. */
-                        
-                                /* Calculate the accurate packet length from ip header */ 
-                                if((*(packet -> nx_packet_prepend_ptr + 12) == 0x08) && 
-                                   (*(packet -> nx_packet_prepend_ptr + 13) == 0))
-                                {
-
-                                    ip_given_length = _ux_utility_short_get_big_endian(packet -> nx_packet_prepend_ptr + 16) + UX_DEVICE_CLASS_RNDIS_ETHERNET_SIZE;
-                                    packet -> nx_packet_length =  ip_given_length ;
-                                    packet -> nx_packet_append_ptr =  packet -> nx_packet_prepend_ptr + ip_given_length;
-                                }
 
                                 /* Send that packet to the NetX USB broker.  */
                                 _ux_network_driver_packet_received(rndis -> ux_slave_class_rndis_network_handle, packet);
                             }
                             else
+                            {
 
-                                /* We received a malformed packet. Report to application.  */
-                                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_MALFORMED_PACKET_RECEIVED_ERROR);
+                                /* Error.  */
+                                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_ETH_PACKET_ERROR);
+                                nx_packet_release(packet);
+                            }
                         }
                         else
+                        {
 
                             /* We received a malformed packet. Report to application.  */
                             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_MALFORMED_PACKET_RECEIVED_ERROR);
+                            nx_packet_release(packet);
+                        }
+                    }
+                    else
+                    {
+
+                        /* We received a malformed packet. Report to application.  */
+                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_MALFORMED_PACKET_RECEIVED_ERROR);
+                        nx_packet_release(packet);
                     }
                 }
                 else
+                {
 
                     /* Free the packet that was not successfully received.  */
                     nx_packet_release(packet);
+                }
+
             }
             else
             {

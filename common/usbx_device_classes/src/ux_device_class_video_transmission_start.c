@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_transmission_start           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,14 +65,13 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_video_transmission_start(UX_DEVICE_CLASS_VIDEO_STREAM *stream)
 {
-#if defined(UX_DEVICE_STANDALONE)
-    UX_PARAMETER_NOT_USED(stream);
-    return(UX_FUNCTION_NOT_SUPPORTED);
-#else
 
 UX_SLAVE_ENDPOINT           *endpoint;
 UX_SLAVE_DEVICE             *device;
@@ -102,8 +101,17 @@ UX_SLAVE_DEVICE             *device;
     if (stream -> ux_device_class_video_stream_transfer_pos -> ux_device_class_video_payload_length == 0)
         return(UX_BUFFER_OVERFLOW);
 
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Start write task.  */
+    if (stream -> ux_device_class_video_stream_task_state == UX_DEVICE_CLASS_VIDEO_STREAM_RW_STOP)
+        stream -> ux_device_class_video_stream_task_state = UX_DEVICE_CLASS_VIDEO_STREAM_RW_START;
+
+#else
+
     /* Start write thread.  */
-    _ux_utility_thread_resume(&stream -> ux_device_class_video_stream_thread);
-    return(UX_SUCCESS);
+    _ux_device_thread_resume(&stream -> ux_device_class_video_stream_thread);
 #endif
+
+    return(UX_SUCCESS);
 }

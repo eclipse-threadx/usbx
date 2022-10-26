@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_deactivate                   PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -89,6 +89,10 @@
 /*                                            internal clean up,          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            deprecated ECM pool option, */
+/*                                            supported NX packet chain,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -191,13 +195,16 @@ UX_TRANSFER                 *transfer_request;
 
     /* Destroy the notification semaphore.  */
     _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
-#ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
-    /* Delete the packet pool.  */
-    nx_packet_pool_delete(&cdc_ecm -> ux_host_class_cdc_ecm_packet_pool);
 
-    /* Free this pool of packets.  */
-    _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_pool_memory);
+#ifdef UX_HOST_CLASS_CDC_ECM_PACKET_CHAIN_SUPPORT
+
+    /* Free packet transmission memories.  */
+    if (cdc_ecm -> ux_host_class_cdc_ecm_receive_buffer)
+        _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_receive_buffer);
+    if (cdc_ecm -> ux_host_class_cdc_ecm_xmit_buffer)
+        _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_xmit_buffer);
 #endif
+
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)

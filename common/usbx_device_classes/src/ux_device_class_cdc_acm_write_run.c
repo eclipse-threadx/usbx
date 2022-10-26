@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_write_run                  PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,9 @@
 /*                                            names conflict C++ keyword, */
 /*                                            added auto ZLP support,     */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed return code,          */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
@@ -125,7 +128,7 @@ UINT                        status = 0;
         cdc_acm -> ux_device_class_cdc_acm_write_state = UX_STATE_RESET;
         cdc_acm -> ux_device_class_cdc_acm_write_status = UX_CONFIGURATION_HANDLE_UNKNOWN;
 
-        return(UX_CONFIGURATION_HANDLE_UNKNOWN);
+        return(UX_STATE_EXIT);
     }
 
     /* We need the interface to the class.  */
@@ -224,7 +227,7 @@ UINT                        status = 0;
             cdc_acm -> ux_device_class_cdc_acm_write_state = UX_STATE_RESET;
             cdc_acm -> ux_device_class_cdc_acm_write_status =
                 transfer_request -> ux_slave_transfer_request_completion_code;
-            return(UX_STATE_EXIT);
+            return(UX_STATE_ERROR);
         }
 
         /* Success case.  */

@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_transmission_start           PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio_transmission_start(UX_DEVICE_CLASS_AUDIO_STREAM *stream)
@@ -103,7 +106,15 @@ UX_SLAVE_DEVICE             *device;
     if (stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_length == 0)
         return(UX_BUFFER_OVERFLOW);
 
+#if defined(UX_DEVICE_STANDALONE)
+
+    /* Start write task.  */
+    if (stream -> ux_device_class_audio_stream_task_state == UX_DEVICE_CLASS_AUDIO_STREAM_RW_STOP)
+        stream -> ux_device_class_audio_stream_task_state = UX_DEVICE_CLASS_AUDIO_STREAM_RW_START;
+#else
+
     /* Start write thread.  */
     _ux_device_thread_resume(&stream -> ux_device_class_audio_stream_thread);
+#endif
     return(UX_SUCCESS);
 }

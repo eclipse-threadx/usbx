@@ -63,7 +63,7 @@ static inline VOID _ux_host_class_storage_transport_ep_reset(UX_HOST_CLASS_STORA
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_transport_run                PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -101,13 +101,18 @@ static inline VOID _ux_host_class_storage_transport_ep_reset(UX_HOST_CLASS_STORA
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved internal logic,    */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_transport_run(UX_HOST_CLASS_STORAGE *storage)
 {
 UINT                    status;
 UCHAR                   state;
-    while(1)
+INT                     immediate_state = UX_TRUE;
+
+    while(immediate_state)
     {
         state = storage -> ux_host_class_storage_trans_state;
         switch(state)
@@ -192,7 +197,9 @@ UCHAR                   state;
         default:
             break;
         }
-        break;
+
+        /* Invalid unhandled state, break the loop.  */
+        immediate_state = UX_FALSE;
     }
 
     /* Unexpected state, fatal error.  */

@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_write                        PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported NX packet chain,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_write(VOID *cdc_ecm_class, NX_PACKET *packet)
@@ -92,6 +95,9 @@ UX_TRANSFER             *transfer_request;
 UINT                    status;
 UCHAR                   *packet_header;
 UX_HOST_CLASS_CDC_ECM   *cdc_ecm;
+#ifdef UX_HOST_CLASS_CDC_ECM_PACKET_CHAIN_SUPPORT
+ULONG                   copied;
+#endif
 
     /* Get the instance.  */
     cdc_ecm = (UX_HOST_CLASS_CDC_ECM *) cdc_ecm_class;
@@ -124,6 +130,22 @@ UX_HOST_CLASS_CDC_ECM   *cdc_ecm;
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     }
 
+    /* Validate packet length.  */
+    if (packet -> nx_packet_length > UX_HOST_CLASS_CDC_ECM_NX_PAYLOAD_SIZE)
+    {
+
+        /* Restore interrupts.  */
+        UX_RESTORE
+
+        /* Error trap.  */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_ETH_SIZE_ERROR);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CLASS_ETH_SIZE_ERROR, cdc_ecm, packet -> nx_packet_length, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_CLASS_ETH_SIZE_ERROR);
+    }
+
     /* Are we in a valid state?  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_link_state == UX_HOST_CLASS_CDC_ECM_LINK_STATE_UP)
     {
@@ -147,8 +169,35 @@ UX_HOST_CLASS_CDC_ECM   *cdc_ecm;
             /* Get the pointer to the bulk out endpoint transfer request.  */
             transfer_request =  &cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_endpoint -> ux_endpoint_transfer_request;
 
-            /* Load the address of the current packet header at the physical header.  */
-            packet_header =  packet -> nx_packet_prepend_ptr;
+#ifdef UX_HOST_CLASS_CDC_ECM_PACKET_CHAIN_SUPPORT
+
+            if (packet -> nx_packet_next != UX_NULL)
+            {
+
+                /* Create buffer.  */
+                if (cdc_ecm -> ux_host_class_cdc_ecm_xmit_buffer == UX_NULL)
+                {
+                    cdc_ecm -> ux_host_class_cdc_ecm_xmit_buffer = _ux_utility_memory_allocate(UX_NO_ALIGN,
+                                        UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_CDC_ECM_NX_PAYLOAD_SIZE);
+                    if (cdc_ecm -> ux_host_class_cdc_ecm_xmit_buffer == UX_NULL)
+                    {
+                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
+                        return(UX_MEMORY_INSUFFICIENT);
+                    }
+                }
+
+                /* Put packet to continuous buffer to transfer.  */
+                packet_header = cdc_ecm -> ux_host_class_cdc_ecm_xmit_buffer;
+                nx_packet_data_extract_offset(packet, 0, packet_header, packet -> nx_packet_length, &copied);
+            }
+            else
+#endif
+            {
+
+                /* Load the address of the current packet header at the physical header.  */
+                packet_header =  packet -> nx_packet_prepend_ptr;
+
+            }
 
             /* Setup the transaction parameters.  */
             transfer_request -> ux_transfer_request_data_pointer     =  packet_header;

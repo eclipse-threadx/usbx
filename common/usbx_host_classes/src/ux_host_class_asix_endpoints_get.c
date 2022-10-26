@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_endpoints_get                   PORTABLE C      */ 
-/*                                                           6.1.9        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*                                            use pre-calculated value    */
 /*                                            instead of wMaxPacketSize,  */
 /*                                            resulting in version 6.1.9  */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed packet RX callback, */
+/*                                            refined INT EP start time,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_endpoints_get(UX_HOST_CLASS_ASIX *asix)
@@ -156,9 +160,6 @@ UX_TRANSFER     *transfer_request;
                 /* There is a callback function associated with the transfer request, so we need the class instance.  */
                 endpoint -> ux_endpoint_transfer_request.ux_transfer_request_class_instance =  (VOID *) asix;
 
-                /* The transfer request has a callback function.  */
-                endpoint -> ux_endpoint_transfer_request.ux_transfer_request_completion_function =  _ux_host_class_asix_reception_callback;
-    
                 /* We have found the bulk endpoint, save it.  */
                 asix -> ux_host_class_asix_bulk_in_endpoint =  endpoint;
                 break;
@@ -220,22 +221,8 @@ UX_TRANSFER     *transfer_request;
                 transfer_request -> ux_transfer_request_data_pointer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, 
                                                                 transfer_request -> ux_transfer_request_requested_length);
 
-                /* If the endpoint is available and we have memory, we start the interrupt endpoint.  */
-                if (transfer_request -> ux_transfer_request_data_pointer != UX_NULL)
-                {
-                    
-                    /* The transfer on the interrupt endpoint can be started.  */
-                    status =  _ux_host_stack_transfer_request(transfer_request);
-                    
-                    /* Check error, if endpoint interrupt IN transfer not successful, do not proceed. */
-                    if (status != UX_SUCCESS)
-                    
-                        /* Error, do not proceed.  */
-                        return(status);
-
-                }
-        
-                else
+                /* If the endpoint is available and we have memory, it's started later after setup.  */
+                if (transfer_request -> ux_transfer_request_data_pointer == UX_NULL)
                 {
 
                     /* Error trap. */

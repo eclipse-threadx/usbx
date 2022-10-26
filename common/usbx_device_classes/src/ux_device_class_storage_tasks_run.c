@@ -65,7 +65,7 @@ static inline VOID _ux_device_class_storage_disk_error(UX_SLAVE_CLASS_STORAGE *s
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_storage_tasks_run                  PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -125,6 +125,9 @@ static inline VOID _ux_device_class_storage_disk_error(UX_SLAVE_CLASS_STORAGE *s
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved internal logic,    */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_storage_tasks_run(VOID *instance)
@@ -148,13 +151,14 @@ static inline UINT _ux_device_class_storage_task_usb(UX_SLAVE_CLASS_STORAGE *sto
 UX_SLAVE_DEVICE             *device;
 UCHAR                       state;
 UINT                        status;
+INT                         immediate_state = UX_TRUE;
 
 
     /* Get pointer to the device.  */
     device = &_ux_system_slave -> ux_system_slave_device;
 
     /* Run states once.  */
-    while(1)
+    while(immediate_state)
     {
 
         /* General check for MSC ready.  */
@@ -301,9 +305,12 @@ UINT                        status;
             break;
         }
 
-        /* Unhandled, just do again by app call.  */
-        return(UX_STATE_EXIT);
+        /* Unhandled, just break the loop and do again by app call.  */
+        immediate_state = UX_FALSE;
     }
+
+    /* Unhandled state.  */
+    return(UX_STATE_EXIT);
 }
 
 static inline VOID _ux_device_class_storage_cbw_receive(UX_SLAVE_CLASS_STORAGE *storage)
@@ -979,9 +986,10 @@ static inline VOID _ux_device_class_storage_task_disk(UX_SLAVE_CLASS_STORAGE *st
 {
 UCHAR                   state = storage -> ux_device_class_storage_disk_state;
 UINT                    status;
+INT                     immediate_state = UX_TRUE;
 
     /* Run states once.  */
-    while(1)
+    while(immediate_state)
     {
 
         /* Update state.  */
@@ -1035,8 +1043,8 @@ UINT                    status;
             break;
         }
 
-        /* Task run once.  */
-        return;
+        /* Task run once, break the loop.  */
+        immediate_state = UX_FALSE;
     }
 }
 static inline VOID _ux_device_class_storage_disk_start(UX_SLAVE_CLASS_STORAGE *storage)
@@ -1058,6 +1066,8 @@ ULONG max_n_blocks;
     /* Max blocks for one buffer.  */
     block_size = storage -> ux_slave_class_storage_lun[storage -> ux_slave_class_storage_cbw_lun].
                                                         ux_slave_class_storage_media_block_length;
+    if (block_size == 0)
+        UX_ASSERT(UX_FALSE);
     max_n_blocks = UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE / block_size;
 
     /* Prepare next disk read.  */

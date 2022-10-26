@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid_keyboard.h                        PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,6 +56,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed clients management,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved HID OUTPUT report  */
+/*                                            handling in standalone mode,*/
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -215,6 +219,8 @@ typedef struct UX_HOST_CLASS_HID_KEYBOARD_STRUCT
     UX_THREAD       ux_host_class_hid_keyboard_thread;
     UX_SEMAPHORE    ux_host_class_hid_keyboard_semaphore;
 #else
+    UX_HOST_CLASS_HID_REPORT
+                    *ux_host_class_hid_keyboard_out_report;
     UINT            ux_host_class_hid_keyboard_status;
     UCHAR           ux_host_class_hid_keyboard_enum_state;
     UCHAR           ux_host_class_hid_keyboard_next_state;

@@ -53,7 +53,7 @@ static inline UINT _ux_host_class_storage_transport_sense_check(UX_HOST_CLASS_ST
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_tasks_run                    PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -99,6 +99,9 @@ static inline UINT _ux_host_class_storage_transport_sense_check(UX_HOST_CLASS_ST
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved internal logic,    */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_tasks_run(UX_HOST_CLASS *storage_class)
@@ -132,6 +135,7 @@ ULONG           tick_now, tick_elapsed;
 UINT            status;
 UX_TRANSFER     *trans;
 UX_INTERFACE    *interface_ptr;
+INT             immediate_state;
 
     /* If storage not live, start initialize.  */
     if (storage -> ux_host_class_storage_state == UX_HOST_CLASS_INSTANCE_MOUNTING)
@@ -187,7 +191,8 @@ UX_INTERFACE    *interface_ptr;
     }
 
     /* Handle main states.  */
-    while(1)
+    immediate_state = UX_TRUE;
+    while(immediate_state)
     {
 
         /* Get current state.  */
@@ -498,11 +503,15 @@ UX_INTERFACE    *interface_ptr;
             }
             UX_RESTORE
 
-        case UX_STATE_RESET:
+            /* Fall through.  */
+
+        case UX_STATE_RESET: /* Fall through.  */
         default:
             break;
         }
-        break;
+
+        /* Break the loop.  */
+        immediate_state = UX_FALSE;
     }
 }
 
@@ -730,30 +739,31 @@ INT                             media_index;
     {
 
         /* Skip used storage media slots.  */
-        if (storage_media -> ux_host_class_storage_media_status == UX_USED)
-            continue;
-
-        /* Use this free storage media slot.  */
-        storage_media -> ux_host_class_storage_media_status = UX_USED;
-        storage_media -> ux_host_class_storage_media_storage = storage;
-
-        /* Save media information.  */
-        storage_media -> ux_host_class_storage_media_lun = (UCHAR)storage -> ux_host_class_storage_lun;
-        storage_media -> ux_host_class_storage_media_sector_size = (USHORT)storage -> ux_host_class_storage_sector_size;
-        storage_media -> ux_host_class_storage_media_number_sectors = storage -> ux_host_class_storage_last_sector_number + 1;
-
-        /* Invoke callback for media insertion.  */
-        if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+        if (storage_media -> ux_host_class_storage_media_status != UX_USED)
         {
 
-            /* Call system change function.  */
-            /* In standalone mode, no state running (read/write) expected in callback.  */
-            _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_INSERTION,
-                                storage -> ux_host_class_storage_class, (VOID *) storage_media);
-        }
+            /* Use this free storage media slot.  */
+            storage_media -> ux_host_class_storage_media_status = UX_USED;
+            storage_media -> ux_host_class_storage_media_storage = storage;
 
-        /* Media saved OK.  */
-        return;
+            /* Save media information.  */
+            storage_media -> ux_host_class_storage_media_lun = (UCHAR)storage -> ux_host_class_storage_lun;
+            storage_media -> ux_host_class_storage_media_sector_size = (USHORT)storage -> ux_host_class_storage_sector_size;
+            storage_media -> ux_host_class_storage_media_number_sectors = storage -> ux_host_class_storage_last_sector_number + 1;
+
+            /* Invoke callback for media insertion.  */
+            if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+            {
+
+                /* Call system change function.  */
+                /* In standalone mode, no state running (read/write) expected in callback.  */
+                _ux_system_host ->  ux_system_host_change_function(UX_STORAGE_MEDIA_INSERTION,
+                                    storage -> ux_host_class_storage_class, (VOID *) storage_media);
+            }
+
+            /* Media saved OK.  */
+            return;
+        }
     }
 
     /* No free slot.  */

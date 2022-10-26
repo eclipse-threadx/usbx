@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_interrupt_notification          PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined link up/down flow,  */
+/*                                            refined interrupt flow,     */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_interrupt_notification(UX_TRANSFER *transfer_request)
@@ -127,6 +131,8 @@ UX_HOST_CLASS_ASIX                      *asix;
                     /* We need to inform the asix thread of this change.  */
                     _ux_host_semaphore_put(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
 
+                    /* Reactivate interrupt pipe after link up handled.  */
+                    return;
                 }
             }                    
             else
@@ -138,53 +144,20 @@ UX_HOST_CLASS_ASIX                      *asix;
                 {
             
                     /* Memorize the new link state.  */
-                    asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_DOWN;                    
-                    
-                    /* We may have transaction pending on bulk in. Inform the class.  */
-                    transfer_request =  &asix -> ux_host_class_asix_bulk_in_endpoint -> ux_endpoint_transfer_request;
-                    if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
-                    {
+                    asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_DOWN;
 
-                        /* Set the completion error code.  */
-                        transfer_request -> ux_transfer_request_completion_code = UX_TRANSFER_NO_ANSWER;
-                
-                        /* Error trap. */
-                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_TRANSFER_NO_ANSWER);
+                    /* Abort possible pending bulk in requests.  */
+                    _ux_host_stack_endpoint_transfer_abort(asix -> ux_host_class_asix_bulk_in_endpoint);
 
-                        /* If trace is enabled, insert this event into the trace buffer.  */
-                        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_NO_ANSWER, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
-                
-                        /* Wake up the semaphore on which the transaction is waiting. */
-                        _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
-
-                    }
-                    
-                    /* We may have transaction pending on bulk out. Inform the class.  */
-                    transfer_request =  &asix -> ux_host_class_asix_bulk_out_endpoint -> ux_endpoint_transfer_request;
-                    if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
-                    {
-
-                        /* Set the completion error code.  */
-                        transfer_request -> ux_transfer_request_completion_code = UX_TRANSFER_NO_ANSWER;
-
-                        /* Error trap. */
-                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_TRANSFER_NO_ANSWER);
-
-                        /* If trace is enabled, insert this event into the trace buffer.  */
-                        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_NO_ANSWER, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
-                
-                        /* Wake up the semaphore on which the transaction is waiting. */
-                        _ux_host_semaphore_put(&transfer_request -> ux_transfer_request_semaphore);
-
-                    }
-                    
-                    
                     /* We need to inform the asix thread of this change.  */
                     _ux_host_semaphore_put(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
+
+                    /* Reactivate interrupt pipe after link down handled.  */
+                    return;
                 }
-            }           
-        }        
-    }                    
+            }
+        }
+    }
 
     /* Reactivate the ASIX interrupt pipe.  */
     _ux_host_stack_transfer_request(transfer_request);

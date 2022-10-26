@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_transfer_request_abort               PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,8 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request)
@@ -104,14 +106,17 @@ ULONG           completion_code;
     /* Check pending transaction.  */
     if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
     {
-    
+
         /* Send the abort command to the controller.  */    
         hcd -> ux_hcd_entry_function(hcd, UX_HCD_TRANSFER_ABORT, transfer_request);
 
         /* Save the completion code since we're about to set it to ABORT. The
            reason we can't just assume its value is PENDING is that in between
            the completion code check and this line, it's possible that the transfer
-           completed, which would've changed the completion code to SUCCESS.
+           completed (by HCD function call below, or ISR), which would've
+           changed the completion code to SUCCESS and put the semaphore.
+           Even it's recommended to keep completion code untouched to let things
+           changed later here.
            Such a case is valid, and we want to make sure we don't put() the
            transfer request's semaphore again.  */
         completion_code =  transfer_request -> ux_transfer_request_completion_code;

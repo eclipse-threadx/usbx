@@ -10,14 +10,17 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_feedback_task_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_frame_write.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_interrupt_send.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_interrupt_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_interrupt_task_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_ioctl.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_read_frame_free.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_read_frame_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_read_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_read_task_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_reception_start.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_sample_read16.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_sample_read24.c
@@ -30,6 +33,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_frame_commit.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_frame_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_task_function.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_auto_seq_done.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_auto_seq_start.c
@@ -144,9 +149,11 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_ioctl.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_read.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_read_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_soft_reset.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_write.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_write_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_bulkin_thread.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_bulkout_thread.c
@@ -201,13 +208,16 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_max_payload_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_read_payload_free.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_read_payload_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_read_task_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_read_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_reception_start.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_stream_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_transmission_start.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_write_payload_commit.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_write_payload_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_write_task_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_video_write_thread_entry.c
 
     # {{END_TARGET_SOURCES}}

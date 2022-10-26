@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_initialize                 PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,19 +69,20 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
-#if defined(UX_DEVICE_STANDALONE)
-    UX_PARAMETER_NOT_USED(command);
-    return(UX_FUNCTION_NOT_SUPPORTED);
-#else
 
 UX_DEVICE_CLASS_PRINTER                 *printer;
 UX_DEVICE_CLASS_PRINTER_PARAMETER       *printer_parameter;
 UX_SLAVE_CLASS                          *printer_class;
+#if !defined(UX_DEVICE_STANDALONE)
 UINT                                    status;
+#endif
 
     /* Get the class container.  */
     printer_class =  command -> ux_slave_class_command_class_ptr;
@@ -105,6 +106,7 @@ UINT                                    status;
     printer -> ux_device_class_printer_parameter.ux_device_class_printer_instance_deactivate = printer_parameter -> ux_device_class_printer_instance_deactivate;
     printer -> ux_device_class_printer_parameter.ux_device_class_printer_soft_reset          = printer_parameter -> ux_device_class_printer_soft_reset;
 
+#if !defined(UX_DEVICE_STANDALONE)
     /* Create the Mutex for each endpoint as multiple threads cannot access each pipe at the same time.  */
     status =  _ux_utility_mutex_create(&printer -> ux_device_class_printer_endpoint_in_mutex, "ux_device_class_printer_in_mutex");
 
@@ -135,11 +137,14 @@ UINT                                    status;
         /* Return fatal error.  */
         return(UX_MUTEX_ERROR);
     }
+#else
+    printer -> ux_device_class_printer_write_state = UX_STATE_RESET;
+    printer -> ux_device_class_printer_read_state = UX_STATE_RESET;
+#endif
 
     /* Reset port status.  */
     printer -> ux_device_class_printer_port_status = 0;
 
     /* Return completion status.  */
     return(UX_SUCCESS);
-#endif
 }

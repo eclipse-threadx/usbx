@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_deactivate                      PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,11 @@
 /*                                            internal clean up,          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported NX packet chain,  */
+/*                                            added reception buffer,     */
+/*                                            removed internal NX pool,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -196,12 +201,16 @@ UINT                        status;
     /* free its stack memory.  */
     _ux_utility_memory_free(asix -> ux_host_class_asix_thread_stack);
 
-    /* We may have allocated a packet pool.  */
-    if (asix -> ux_host_class_asix_pool_memory != UX_NULL)
-    
-        /* Free this pool of packets.  */
-        _ux_utility_memory_free(asix -> ux_host_class_asix_pool_memory);
-    
+    /* Free receive buffer memory.  */
+    _ux_utility_memory_free(asix -> ux_host_class_asix_receive_buffer);
+
+#ifdef UX_HOST_CLASS_ASIX_PACKET_CHAIN_SUPPORT
+
+    /* Free transmit buffer memory.  */
+    if (asix -> ux_host_class_asix_xmit_buffer)
+        _ux_utility_memory_free(asix -> ux_host_class_asix_xmit_buffer);
+#endif
+
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)

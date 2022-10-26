@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_uninitialize               PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -89,13 +92,13 @@ UX_SLAVE_CLASS              *class_ptr;
     /* Sanity check.  */
     if (printer != UX_NULL)
     {
-
+#if !defined(UX_DEVICE_STANDALONE)
         /* Delete the IN endpoint mutex.  */
         _ux_device_mutex_delete(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
         /* Out Mutex. */
         _ux_device_mutex_delete(&printer -> ux_device_class_printer_endpoint_out_mutex);
-
+#endif
         /* Free the resources.  */
         _ux_utility_memory_free(printer);
     }

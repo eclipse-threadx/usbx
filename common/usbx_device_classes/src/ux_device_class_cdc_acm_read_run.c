@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_read_run                   PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            fixed return code,          */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
@@ -200,7 +203,7 @@ UINT                        status = UX_SUCCESS;
             cdc_acm -> ux_device_class_cdc_acm_read_state = UX_STATE_RESET;
             cdc_acm -> ux_device_class_cdc_acm_read_status =
                 transfer_request -> ux_slave_transfer_request_completion_code;
-            return(UX_STATE_EXIT);
+            return(UX_STATE_ERROR);
         }
 
         /* Success case.  */

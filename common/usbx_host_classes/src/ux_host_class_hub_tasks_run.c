@@ -40,7 +40,7 @@ static inline VOID _ux_host_class_hub_inst_tasks_run(UX_HOST_CLASS_HUB *hub);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hub_tasks_run                        PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,6 +87,9 @@ static inline VOID _ux_host_class_hub_inst_tasks_run(UX_HOST_CLASS_HUB *hub);
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  07-29-2022     Chaoqiong Xiao           Initial Version 6.1.12        */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed reset speed handling, */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_tasks_run(UX_HOST_CLASS *hub_class)
@@ -209,9 +212,11 @@ USHORT      port_change = hub -> ux_host_class_hub_run_port_change;
 }
 static inline VOID _ux_host_class_hub_inst_tasks_run(UX_HOST_CLASS_HUB *hub)
 {
+UX_HCD      *hcd;
 UX_DEVICE   *device;
 UX_DEVICE   *hub_device = hub -> ux_host_class_hub_device;
 UX_ENDPOINT *ep0 = &hub_device -> ux_device_control_endpoint;
+UX_ENDPOINT *dev_ep0;
 UX_TRANSFER *trans0 = &ep0 -> ux_endpoint_transfer_request;
 UINT        status;
 
@@ -385,15 +390,40 @@ UINT        status;
                     /* Save status and speed.  */
                     device -> ux_device_enum_port_status = (UCHAR)hub -> ux_host_class_hub_run_port_status;
 
+                    /* Append speed information.  */
+                    switch(hub -> ux_host_class_hub_run_port_status &
+                        (UX_HOST_CLASS_HUB_PORT_STATUS_LOW_SPEED | UX_HOST_CLASS_HUB_PORT_STATUS_HIGH_SPEED))
+                    {
+                    case 0: /* It's Full speed.  */
+                        device -> ux_device_enum_port_status |= UX_PS_DS_FS;
+                        device -> ux_device_speed = UX_FULL_SPEED_DEVICE;
+                        break;
+
+                    case UX_HOST_CLASS_HUB_PORT_STATUS_HIGH_SPEED: /* It's high speed.  */
+                        device -> ux_device_enum_port_status |= UX_PS_DS_HS;
+                        device -> ux_device_speed = UX_HIGH_SPEED_DEVICE;
+                        break;
+
+                    default: /* It's Low speed.  */
+                        device -> ux_device_speed = UX_LOW_SPEED_DEVICE;
+                        break;
+                    }
+
                     /* Return device address to 0.  */
+                    hcd = UX_DEVICE_HCD_GET(device);
                     if (device -> ux_device_address)
                     {
 
                         /* Free the address.  */
-                        UX_DEVICE_HCD_GET(device) ->
-                        ux_hcd_address[(device -> ux_device_address-1) >> 3] &=
+                        hcd -> ux_hcd_address[(device -> ux_device_address-1) >> 3] &=
                             (UCHAR)(1u << ((device -> ux_device_address-1) & 7u));
+
                     }
+
+                    /* Assume speed change, re-create EP0 at the HCD level.  */
+                    dev_ep0 = &device -> ux_device_control_endpoint;
+                    hcd -> ux_hcd_entry_function(hcd, UX_HCD_DESTROY_ENDPOINT, (VOID *)dev_ep0);
+                    hcd -> ux_hcd_entry_function(hcd, UX_HCD_CREATE_ENDPOINT, (VOID *)dev_ep0);
 
                     /* Wait a while and set address.  */
                     device -> ux_device_enum_next_state = UX_HOST_STACK_ENUM_DEVICE_ADDR_SET;

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_initialize                     PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -228,8 +231,13 @@ UINT                                    status = UX_SUCCESS;
 
             }
 
+#if !defined(UX_DEVICE_STANDALONE) || defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
+
+            /* There is still initialization activities after array creation,
+             * and some error occurs in this stage.  */
             /* Free allocated event array memory.  */
             _ux_utility_memory_free(hid -> ux_device_class_hid_event_array);
+#endif
 
         }
         else

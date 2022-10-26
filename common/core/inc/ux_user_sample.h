@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -83,6 +83,12 @@
 /*                                            added device CDC_ACM and    */
 /*                                            printer write auto ZLP,     */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            deprecated ECM pool option, */
+/*                                            added align minimal config, */
+/*                                            added host stack instance   */
+/*                                            creation strategy control,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -115,6 +121,10 @@
 
 /* Override various options with default values already assigned in ux_api.h or ux_port.h. Please 
    also refer to ux_port.h for descriptions on each of these options.  */
+
+/* Defined, this value represents minimal allocated memory alignment in number of bytes.
+   The default is UX_ALIGN_16 (0x0f) to align allocated memory to 16 bytes.  */
+/* #define UX_ALIGN_MIN UX_ALIGN_16  */
 
 /* Defined, this value represents how many ticks per seconds for a specific hardware platform. 
    The default is 1000 indicating 1 tick per millisecond.  */
@@ -317,7 +327,9 @@
 
 /* #define UX_HOST_CLASS_CDC_ECM_PACKET_POOL_INSTANCE_WAIT  10 */
 
-/* Defined, this enables CDC ECM class to use the packet pool from NetX instance.  */
+/* Defined, this enables CDC ECM class to use the packet pool from NetX instance.
+   It's deprecated, packet pool from NetX instance is always used now.
+ */
 
 /* #define UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX */
 
@@ -426,6 +438,15 @@
 
 /* Defined, host audio optional interrupt endpoint is support.  */
 /* #define UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT  */
+
+/* Defined, this value controls host configuration instance creation, include all
+   interfaces and endpoints physical resources.
+   Possible settings:
+    UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL (0) - The default, create all inside configuration.
+    UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED (1) - Create things owned by class driver.
+   Not defined, default setting is applied.
+ */
+/* #define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED */
 
 /* Defined, this value will only enable the host side of usbx.  */
 /* #define UX_HOST_SIDE_ONLY   */

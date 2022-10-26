@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_activate                     PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*                                            names conflict C++ keyword, */
 /*                                            added interrupt support,    */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -166,6 +169,12 @@ ULONG                                    stream_index;
 
         /* Store the class instance into the interface.  */
         stream_interface -> ux_slave_interface_class_instance = (VOID *)audio;
+#if defined(UX_DEVICE_STANDALONE)
+
+        /* Reset stream task state.  */
+        stream -> ux_device_class_audio_stream_task_state = UX_STATE_RESET;
+        stream -> ux_device_class_audio_stream_task_state = UX_SUCCESS;
+#endif
     }
 
     /* If there is a activate function call it.  */

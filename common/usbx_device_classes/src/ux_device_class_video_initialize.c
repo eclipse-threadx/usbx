@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_initialize                   PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,14 +67,13 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
-#if defined(UX_DEVICE_STANDALONE)
-    UX_PARAMETER_NOT_USED(command);
-    return(UX_FUNCTION_NOT_SUPPORTED);
-#else
 
 UINT                                    status = UX_SUCCESS;
 UX_DEVICE_CLASS_VIDEO                   *video;
@@ -163,6 +162,9 @@ ULONG                                   i;
         stream -> ux_device_class_video_stream_transfer_pos = (UX_DEVICE_CLASS_VIDEO_PAYLOAD *)stream -> ux_device_class_video_stream_buffer;
         stream -> ux_device_class_video_stream_access_pos = stream -> ux_device_class_video_stream_transfer_pos;
 
+
+#if !defined(UX_DEVICE_STANDALONE)
+
         /* Create memory block for streaming thread stack in addition.  */
         if (stream_parameter -> ux_device_class_video_stream_parameter_thread_stack_size == 0)
             memory_size = UX_DEVICE_CLASS_VIDEO_THREAD_STACK_SIZE;
@@ -189,6 +191,11 @@ ULONG                                   i;
             break;
 
         UX_THREAD_EXTENSION_PTR_SET(&(stream -> ux_device_class_video_stream_thread), stream)
+#else
+
+        /* Save task function for streaming.  */
+        stream -> ux_device_class_video_stream_task_function = stream_parameter -> ux_device_class_video_stream_parameter_task_function;
+#endif
 
         /* Save callbacks.  */
         _ux_utility_memory_copy(&stream -> ux_device_class_video_stream_callbacks,
@@ -217,6 +224,12 @@ ULONG                                   i;
             &video_parameter -> ux_device_class_video_parameter_callbacks,
             sizeof(UX_DEVICE_CLASS_VIDEO_CALLBACKS)); /* Use case of memcpy is verified. */
 
+#if defined(UX_DEVICE_STANDALONE)
+
+        /* Link task function.  */
+        class_inst -> ux_slave_class_task_function = _ux_device_class_video_tasks_run;
+#endif
+
         /* Return completion status.  */
         return(UX_SUCCESS);
     }
@@ -228,10 +241,14 @@ ULONG                                   i;
     stream = video -> ux_device_class_video_streams;
     for (i = 0; i < video -> ux_device_class_video_streams_nb; i ++)
     {
+
+#if !defined(UX_DEVICE_STANDALONE)
         if (stream -> ux_device_class_video_stream_thread.tx_thread_id)
             _ux_utility_thread_delete(&stream -> ux_device_class_video_stream_thread);
         if (stream -> ux_device_class_video_stream_thread_stack)
             _ux_utility_memory_free(stream -> ux_device_class_video_stream_thread_stack);
+#endif
+
         if (stream -> ux_device_class_video_stream_buffer)
             _ux_utility_memory_free(stream -> ux_device_class_video_stream_buffer);
         stream ++;
@@ -239,5 +256,4 @@ ULONG                                   i;
     _ux_utility_memory_free(video);
 
     return(status);
-#endif
 }

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_mac_address_get              PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            checked MAC string length,  */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked descriptor length,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_mac_address_get(UX_HOST_CLASS_CDC_ECM *cdc_ecm)
@@ -168,6 +171,20 @@ UCHAR                                       element_hexa_lower;
                 descriptor_length  =  *descriptor;
                 descriptor_type    =  *(descriptor + 1);
                 descriptor_subtype =  *(descriptor + 2);
+
+                /* Descriptor length validation.  */
+                if (descriptor_length < 3 || descriptor_length > total_configuration_length)
+                {
+
+                    /* Error trap.  */
+                    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+                    /* Free descriptor memory.  */
+                    _ux_utility_memory_free(start_descriptor);
+
+                    /* Return error.  */
+                    return(UX_DESCRIPTOR_CORRUPTED);
+                }
     
                 /* Check the type for an interface descriptor and the subtype for a ECM functional descriptor.  */
                 if ((descriptor_type == UX_HOST_CLASS_CDC_ECM_CS_INTERFACE) && (descriptor_subtype == UX_HOST_CLASS_CDC_ECM_FUNCTIONAL_DESCRIPTOR))

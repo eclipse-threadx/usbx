@@ -27,14 +27,13 @@
 #include "ux_device_class_cdc_ecm.h"
 #include "ux_device_stack.h"
 
-UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_ecm_initialize                 PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,8 +60,6 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*    _ux_utility_event_flags_delete        Delete Flag group             */
 /*    _ux_device_thread_create              Create Thread                 */
 /*    _ux_device_thread_delete              Delete Thread                 */
-/*    nx_packet_pool_create                 Create NetX packet pool       */
-/*    nx_packet_pool_delete                 Delete NetX packet pool       */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -89,6 +86,9 @@ UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed internal NX pool,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -151,28 +151,6 @@ UINT                                            status;
         /* Check for successful allocation.  */
         if (cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack == UX_NULL)
             status = (UX_MEMORY_INSUFFICIENT);
-    }
-
-    /* Allocate some packet pool for reception.  */
-    if (status == UX_SUCCESS)
-    {
-
-        /* UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE overflow has been checked by
-         * UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT outside of function.
-         */
-        cdc_ecm -> ux_slave_class_cdc_ecm_pool_memory = 
-                _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE);
-        
-        /* Check for successful allocation.  */
-        if (cdc_ecm -> ux_slave_class_cdc_ecm_pool_memory == UX_NULL)
-            status = (UX_MEMORY_INSUFFICIENT);
-        else
-        {
-            /* Create a packet pool.  */
-            status =  nx_packet_pool_create(&cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool, "CDC ECM Device Packet Pool",
-                                        UX_DEVICE_CLASS_CDC_ECM_NX_PAYLOAD_SIZE, cdc_ecm -> ux_slave_class_cdc_ecm_pool_memory,
-                                        UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE);
-        }
     }
 
     /* Interrupt endpoint treatment needs to be running in a different thread. So start
@@ -267,10 +245,6 @@ UINT                                            status;
 
     /* Free allocated resources.  */
 
-    if (cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool.nx_packet_pool_id)
-        nx_packet_pool_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool);
-    if (cdc_ecm -> ux_slave_class_cdc_ecm_pool_memory)
-        _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_pool_memory);
     if (cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack)
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread_stack);
     if (cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack)

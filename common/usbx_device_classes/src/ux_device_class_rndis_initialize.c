@@ -78,7 +78,7 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_initialize                   PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -136,6 +136,9 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed internal NX pool,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -294,31 +297,6 @@ UINT                                        status;
             status = UX_EVENT_ERROR;
     }
 
-    /* Allocate some packet pool for reception.  */
-    if (status == UX_SUCCESS)
-    {
-
-        /* UX_DEVICE_CLASS_RNDIS_NX_ETHERNET_POOL_ALLOCSIZE overflow has been checked by
-         * UX_DEVICE_CLASS_RNDIS_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT outside of function.
-         */
-        rndis -> ux_slave_class_rndis_pool_memory =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, UX_DEVICE_CLASS_RNDIS_NX_ETHERNET_POOL_ALLOCSIZE);
-        
-        /* Check the completion status.  */
-        if (rndis -> ux_slave_class_rndis_pool_memory  == UX_NULL)
-            status = UX_MEMORY_INSUFFICIENT;
-    }
-
-    /* Create a packet pool.  */
-    if (status == UX_SUCCESS)
-    {
-        status =  nx_packet_pool_create(&rndis -> ux_slave_class_rndis_packet_pool, "Rndis Device Packet Pool", 
-                                    UX_DEVICE_CLASS_RNDIS_NX_PAYLOAD_SIZE, rndis -> ux_slave_class_rndis_pool_memory, UX_DEVICE_CLASS_RNDIS_NX_ETHERNET_POOL_ALLOCSIZE);
-
-        /* Check for pool creation error.  */
-        if (status != UX_SUCCESS)
-            status = UX_MEMORY_INSUFFICIENT;
-    }
-    
     /* Create a semaphore for protecting the driver entry.  */
     if (status == UX_SUCCESS)
     {
@@ -337,14 +315,6 @@ UINT                                        status;
     /* Delete semaphore for protecting the driver entry.  */
     if (rndis -> ux_slave_class_rndis_semaphore.tx_semaphore_id != 0)
         _ux_device_semaphore_delete(&rndis -> ux_slave_class_rndis_semaphore);
-
-    /* Delete the packet pool.  */
-    if (rndis -> ux_slave_class_rndis_packet_pool.nx_packet_pool_id != 0)
-        nx_packet_pool_delete(&rndis -> ux_slave_class_rndis_packet_pool);
-    
-    /* Free rndis -> ux_slave_class_rndis_pool_memory.  */
-    if (rndis -> ux_slave_class_rndis_pool_memory)
-        _ux_utility_memory_free(rndis -> ux_slave_class_rndis_pool_memory);
 
     /* Delete rndis -> ux_slave_class_rndis_event_flags_group.  */
     if (rndis -> ux_slave_class_rndis_event_flags_group.tx_event_flags_group_id != 0)

@@ -37,7 +37,7 @@ UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_cdc_ecm_activate                     PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -100,6 +100,10 @@ UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            deprecated ECM pool option, */
+/*                                            supported NX packet chain,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_activate(UX_HOST_CLASS_COMMAND *command)
@@ -208,19 +212,7 @@ UX_INTERFACE                        *cur_interface;
         if (cdc_ecm -> ux_host_class_cdc_ecm_thread_stack == UX_NULL)
             status =  UX_MEMORY_INSUFFICIENT;
     }
-#ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
-    if (status == UX_SUCCESS)
-    {
 
-        /* Allocate some packet pool for reception.
-         * UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE overflow has been checked by
-         * UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT outside of function.
-         */
-        cdc_ecm -> ux_host_class_cdc_ecm_pool_memory =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE);
-        if (cdc_ecm -> ux_host_class_cdc_ecm_pool_memory == UX_NULL)
-            status =  UX_MEMORY_INSUFFICIENT;
-    }
-#endif
     if (status == UX_SUCCESS)
     {
 
@@ -240,126 +232,110 @@ UX_INTERFACE                        *cur_interface;
                 status =  _ux_host_semaphore_create(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore, "host CDC-ECM interrupt notification semaphore", 0);
                 if (status == UX_SUCCESS)
                 {
-#ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
-                    /* Create a packet pool.  */
-                    status =  nx_packet_pool_create(&cdc_ecm -> ux_host_class_cdc_ecm_packet_pool, "host CDC-ECM packet pool", 
-                                                UX_HOST_CLASS_CDC_ECM_NX_PAYLOAD_SIZE, cdc_ecm -> ux_host_class_cdc_ecm_pool_memory, UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE);
+
+                    /* Create the cdc_ecm class thread. We do not start it yet.  */
+                    status =  _ux_utility_thread_create(&cdc_ecm -> ux_host_class_cdc_ecm_thread,
+                                            "ux_host_cdc_ecm_thread", _ux_host_class_cdc_ecm_thread,
+                                            (ULONG) (ALIGN_TYPE) cdc_ecm, 
+                                            cdc_ecm -> ux_host_class_cdc_ecm_thread_stack,
+                                            UX_THREAD_STACK_SIZE, 
+                                            UX_THREAD_PRIORITY_CLASS,
+                                            UX_THREAD_PRIORITY_CLASS,
+                                            UX_NO_TIME_SLICE, UX_DONT_START);
                     if (status == UX_SUCCESS)
                     {
-#endif
-                        /* Create the cdc_ecm class thread. We do not start it yet.  */
-                        status =  _ux_utility_thread_create(&cdc_ecm -> ux_host_class_cdc_ecm_thread,
-                                                "ux_host_cdc_ecm_thread", _ux_host_class_cdc_ecm_thread,
-                                                (ULONG) (ALIGN_TYPE) cdc_ecm, 
-                                                cdc_ecm -> ux_host_class_cdc_ecm_thread_stack,
-                                                UX_THREAD_STACK_SIZE, 
-                                                UX_THREAD_PRIORITY_CLASS,
-                                                UX_THREAD_PRIORITY_CLASS,
-                                                UX_NO_TIME_SLICE, UX_DONT_START);
+
+                        UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_host_class_cdc_ecm_thread), cdc_ecm)
+
+                        /* We now need to retrieve the MAC address of the node which is embedded in the ECM descriptor.
+                            We will parse the entire configuration descriptor of the device and look for the ECM Ethernet Networking Functional Descriptor.  */ 
+                        status =  _ux_host_class_cdc_ecm_mac_address_get(cdc_ecm);
+
                         if (status == UX_SUCCESS)
                         {
 
-                            UX_THREAD_EXTENSION_PTR_SET(&(cdc_ecm -> ux_host_class_cdc_ecm_thread), cdc_ecm)
+                            /* Setup the physical address of this IP instance.  */
+                            physical_address_msw =  (ULONG)((cdc_ecm -> ux_host_class_cdc_ecm_node_id[0] << 8) | (cdc_ecm -> ux_host_class_cdc_ecm_node_id[1]));
+                            physical_address_lsw =  (ULONG)((cdc_ecm -> ux_host_class_cdc_ecm_node_id[2] << 24) | (cdc_ecm -> ux_host_class_cdc_ecm_node_id[3] << 16) | 
+                                                                                (cdc_ecm -> ux_host_class_cdc_ecm_node_id[4] << 8) | (cdc_ecm -> ux_host_class_cdc_ecm_node_id[5]));
 
-                            /* We now need to retrieve the MAC address of the node which is embedded in the ECM descriptor.
-                               We will parse the entire configuration descriptor of the device and look for the ECM Ethernet Networking Functional Descriptor.  */ 
-                            status =  _ux_host_class_cdc_ecm_mac_address_get(cdc_ecm);
-
-                            if (status == UX_SUCCESS)
-                            {
-
-                                /* Setup the physical address of this IP instance.  */
-                                physical_address_msw =  (ULONG)((cdc_ecm -> ux_host_class_cdc_ecm_node_id[0] << 8) | (cdc_ecm -> ux_host_class_cdc_ecm_node_id[1]));
-                                physical_address_lsw =  (ULONG)((cdc_ecm -> ux_host_class_cdc_ecm_node_id[2] << 24) | (cdc_ecm -> ux_host_class_cdc_ecm_node_id[3] << 16) | 
-                                                                                   (cdc_ecm -> ux_host_class_cdc_ecm_node_id[4] << 8) | (cdc_ecm -> ux_host_class_cdc_ecm_node_id[5]));
-
-                                /* The ethernet link is down by default.  */
-                                cdc_ecm -> ux_host_class_cdc_ecm_link_state =  UX_HOST_CLASS_CDC_ECM_LINK_STATE_DOWN;
-                            }
-
-                            if (status == UX_SUCCESS)
-                            {
-
-                                /* Register this interface to the NetX USB interface broker.  */
-                                status =  _ux_network_driver_activate((VOID *) cdc_ecm, _ux_host_class_cdc_ecm_write, 
-                                                                      &cdc_ecm -> ux_host_class_cdc_ecm_network_handle, 
-                                                                      physical_address_msw, physical_address_lsw);
-                            }
-
-                            if (status == UX_SUCCESS)
-                            {
-
-                                /* Mark the cdc_ecm data instance as live now.  */
-                                cdc_ecm -> ux_host_class_cdc_ecm_state =  UX_HOST_CLASS_INSTANCE_LIVE;
-
-                                /* This instance of the device must also be stored in the interface container.  */
-                                interface_ptr -> ux_interface_class_instance =  (VOID *) cdc_ecm;
-
-                                /* Create this class instance.  */
-                                _ux_host_stack_class_instance_create(cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
-
-                                /* Start the interrupt pipe now if it exists.  */
-                                if (cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint != UX_NULL)
-                                {
-
-                                    /* Obtain the transfer request from the interrupt endpoint.  */
-                                    transfer_request =  &cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint -> ux_endpoint_transfer_request;
-                                    status =  _ux_host_stack_transfer_request(transfer_request);
-                                }
-
-                                if (status == UX_SUCCESS)
-                                {
-
-                                    /* Activation is complete.  */
-
-                                    /* Now we can start the CDC-ECM thread.  */
-                                    _ux_utility_thread_resume(&cdc_ecm -> ux_host_class_cdc_ecm_thread);
-
-                                    /* We need to inform the application if a function has been programmed 
-                                       in the system structure. */
-                                    if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
-                                    {
-                                        
-                                        /* Call system change function. Note that the application should
-                                           wait until the link state is up until using this instance. The
-                                           link state is changed to up by the CDC-ECM thread, which isn't
-                                           started until after the data interface has been processed.  */
-                                        _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
-                                    }
-                                
-                                    /* If trace is enabled, insert this event into the trace buffer.  */
-                                    UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_CDC_ECM_ACTIVATE, cdc_ecm, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
-
-                                    /* If trace is enabled, register this object.  */
-                                    UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, cdc_ecm, 0, 0, 0)
-
-                                    /* Activation was successful.  */
-                                    return(UX_SUCCESS);
-                                }
-
-                                /* Error starting interrupt endpoint.  */
-
-                                /* Destroy this class instance.  */
-                                _ux_host_stack_class_instance_destroy(cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
-
-                                /* Unmount instance.  */
-                                interface_ptr -> ux_interface_class_instance =  UX_NULL;
-                            }
-
-                            /* Delete CDC-ECM thread.  */
-                            _ux_utility_thread_delete(&cdc_ecm -> ux_host_class_cdc_ecm_thread);
+                            /* The ethernet link is down by default.  */
+                            cdc_ecm -> ux_host_class_cdc_ecm_link_state =  UX_HOST_CLASS_CDC_ECM_LINK_STATE_DOWN;
                         }
-#ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
-                        /* Delete packet pool.  */
-                        nx_packet_pool_delete(&cdc_ecm -> ux_host_class_cdc_ecm_packet_pool);
-                    }
-                    else
-                    {
 
-                        /* Packet pool creation failed. Notify application.  */
-                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, status);
+                        if (status == UX_SUCCESS)
+                        {
+
+                            /* Register this interface to the NetX USB interface broker.  */
+                            status =  _ux_network_driver_activate((VOID *) cdc_ecm, _ux_host_class_cdc_ecm_write, 
+                                                                    &cdc_ecm -> ux_host_class_cdc_ecm_network_handle, 
+                                                                    physical_address_msw, physical_address_lsw);
+                        }
+
+                        if (status == UX_SUCCESS)
+                        {
+
+                            /* Mark the cdc_ecm data instance as live now.  */
+                            cdc_ecm -> ux_host_class_cdc_ecm_state =  UX_HOST_CLASS_INSTANCE_LIVE;
+
+                            /* This instance of the device must also be stored in the interface container.  */
+                            interface_ptr -> ux_interface_class_instance =  (VOID *) cdc_ecm;
+
+                            /* Create this class instance.  */
+                            _ux_host_stack_class_instance_create(cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
+
+                            /* Start the interrupt pipe now if it exists.  */
+                            if (cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint != UX_NULL)
+                            {
+
+                                /* Obtain the transfer request from the interrupt endpoint.  */
+                                transfer_request =  &cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint -> ux_endpoint_transfer_request;
+                                status =  _ux_host_stack_transfer_request(transfer_request);
+                            }
+
+                            if (status == UX_SUCCESS)
+                            {
+
+                                /* Activation is complete.  */
+
+                                /* Now we can start the CDC-ECM thread.  */
+                                _ux_utility_thread_resume(&cdc_ecm -> ux_host_class_cdc_ecm_thread);
+
+                                /* We need to inform the application if a function has been programmed 
+                                    in the system structure. */
+                                if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
+                                {
+                                    
+                                    /* Call system change function. Note that the application should
+                                        wait until the link state is up until using this instance. The
+                                        link state is changed to up by the CDC-ECM thread, which isn't
+                                        started until after the data interface has been processed.  */
+                                    _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
+                                }
+                            
+                                /* If trace is enabled, insert this event into the trace buffer.  */
+                                UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_CDC_ECM_ACTIVATE, cdc_ecm, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
+
+                                /* If trace is enabled, register this object.  */
+                                UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, cdc_ecm, 0, 0, 0)
+
+                                /* Activation was successful.  */
+                                return(UX_SUCCESS);
+                            }
+
+                            /* Error starting interrupt endpoint.  */
+
+                            /* Destroy this class instance.  */
+                            _ux_host_stack_class_instance_destroy(cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
+
+                            /* Unmount instance.  */
+                            interface_ptr -> ux_interface_class_instance =  UX_NULL;
+                        }
+
+                        /* Delete CDC-ECM thread.  */
+                        _ux_utility_thread_delete(&cdc_ecm -> ux_host_class_cdc_ecm_thread);
                     }
-#endif
+
                     /* Delete interrupt notification semaphore.  */
                     _ux_host_semaphore_delete(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
                 }
@@ -378,10 +354,7 @@ UX_INTERFACE                        *cur_interface;
     if (cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint != UX_NULL &&
         cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_data_pointer != UX_NULL)
         _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_data_pointer);
-#ifndef UX_HOST_CLASS_CDC_ECM_USE_PACKET_POOL_FROM_NETX
-    if (cdc_ecm -> ux_host_class_cdc_ecm_pool_memory != UX_NULL)
-        _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_pool_memory);
-#endif
+
     if (cdc_ecm -> ux_host_class_cdc_ecm_thread_stack != UX_NULL)
         _ux_utility_memory_free(cdc_ecm -> ux_host_class_cdc_ecm_thread_stack);
 

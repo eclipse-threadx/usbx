@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_uninitialize               PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed internal NX pool,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -131,14 +134,8 @@ UX_SLAVE_CLASS                          *class_ptr;
         /* Delete the interrupt thread sync event flags group.  */
         _ux_device_event_flags_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group);
 
-        /* Delete the reception packet pool.  */
-        nx_packet_pool_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool);
-
 #endif
 
-        /* Free the packet pool memory.  */
-        _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_pool_memory);
-    
         /* Free the resources.  */
         _ux_utility_memory_free(cdc_ecm);
     }

@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hid_keyboard_tasks_run               PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved HID OUTPUT report  */
+/*                                            handling in standalone mode,*/
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_keyboard_tasks_run(UX_HOST_CLASS_HID_CLIENT *client)
@@ -108,12 +112,22 @@ UINT                                    status;
                                             UX_HID_KEYBOARD_STATE_MASK_LOCK;
 
     /* We need to find the OUTPUT report for the keyboard LEDs.  */
-    report_id.ux_host_class_hid_report_get_report = UX_NULL;
-    report_id.ux_host_class_hid_report_get_type = UX_HOST_CLASS_HID_REPORT_TYPE_OUTPUT;
-    status =  _ux_host_class_hid_report_id_get(hid, &report_id);
+    if (keyboard -> ux_host_class_hid_keyboard_out_report == UX_NULL)
+    {
+
+        report_id.ux_host_class_hid_report_get_report = UX_NULL;
+        report_id.ux_host_class_hid_report_get_type = UX_HOST_CLASS_HID_REPORT_TYPE_OUTPUT;
+        status = _ux_host_class_hid_report_id_get(hid, &report_id);
+        if (status != UX_SUCCESS)
+        {
+            keyboard -> ux_host_class_hid_keyboard_status = status;
+            return;
+        }
+        keyboard -> ux_host_class_hid_keyboard_out_report = report_id.ux_host_class_hid_report_get_report;
+    }
 
     /* Build a RAW client report.  */
-    client_report.ux_host_class_hid_client_report =  report_id.ux_host_class_hid_report_get_report;
+    client_report.ux_host_class_hid_client_report = keyboard -> ux_host_class_hid_keyboard_out_report;
     client_report.ux_host_class_hid_client_report_flags = UX_HOST_CLASS_HID_REPORT_RAW;
     client_report.ux_host_class_hid_client_report_length = 1;
     client_report.ux_host_class_hid_client_report_buffer = &keyboard -> ux_host_class_hid_keyboard_led_mask;

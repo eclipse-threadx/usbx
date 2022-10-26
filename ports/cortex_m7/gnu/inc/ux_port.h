@@ -240,7 +240,7 @@ VOID    outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Cortex-M7/GNU Version 6.1.12 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX Cortex-M7/GNU Version 6.2.0 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

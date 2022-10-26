@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_rndis.h                             PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -52,6 +52,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added wait and length DEFs, */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -478,6 +481,16 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 #define UX_DEVICE_CLASS_RNDIS_PACKET_POOL_WAIT                                  10  
 #endif
 
+#ifndef UX_DEVICE_CLASS_RNDIS_PACKET_POOL_INST_WAIT
+#define UX_DEVICE_CLASS_RNDIS_PACKET_POOL_INST_WAIT                             100
+#endif
+
+/* Calculate message buffer length (not overflow).  */
+#define UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH                                    (UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
+#if UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH > UX_SLAVE_REQUEST_DATA_MAX_LENGTH
+#error "Error: the maximum-sized RNDIS response cannot fit inside the control endpoint's data buffer. Increase UX_SLAVE_REQUEST_DATA_MAX_LENGTH."
+#endif
+
 /* Calculate response buffer length.  */
 #define UX_DEVICE_CLASS_RNDIS_OID_SUPPORTED_RESPONSE_LENGTH             (UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER + UX_DEVICE_CLASS_RNDIS_OID_SUPPORTED_LIST_LENGTH * 4)
 #define UX_DEVICE_CLASS_RNDIS_VENDOR_DESCRIPTION_MAX_RESPONSE_LENGTH    (UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER + UX_DEVICE_CLASS_RNDIS_VENDOR_DESCRIPTION_MAX_LENGTH)
@@ -544,7 +557,6 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
     ULONG                                   ux_slave_class_rndis_statistics_xmit_more_collisions;
     UCHAR                                   ux_slave_class_rndis_local_node_id[UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH];
     UCHAR                                   ux_slave_class_rndis_remote_node_id[UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH];
-    UCHAR                                   *ux_slave_class_rndis_pool_memory;
     ULONG                                   ux_slave_class_rndis_nx_ip_address;
     ULONG                                   ux_slave_class_rndis_nx_ip_network_mask;
 
@@ -553,7 +565,7 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
     NX_INTERFACE                            *ux_slave_class_rndis_nx_interface;
     NX_PACKET                               *ux_slave_class_rndis_xmit_queue;
     NX_PACKET                               *ux_slave_class_rndis_receive_queue;
-    NX_PACKET_POOL                          ux_slave_class_rndis_packet_pool;
+    NX_PACKET_POOL                          *ux_slave_class_rndis_packet_pool;
 #endif
 
 #if !defined(UX_DEVICE_STANDALONE)

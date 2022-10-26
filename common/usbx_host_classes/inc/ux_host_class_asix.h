@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_asix.h                                PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,6 +53,13 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported NX packet chain,  */
+/*                                            refined VID/PID check flow, */
+/*                                            removed internal NX pool,   */
+/*                                            added some new definitions, */
+/*                                            refined reception handling, */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -93,6 +100,17 @@ extern   "C" {
 #define UX_HOST_CLASS_ASIX_VENDOR_FUJIEI_ID                 0X0B95
 #define UX_HOST_CLASS_ASIX_PRODUCT_FUJIEI_ID                0X772B
 
+#define UX_HOST_CLASS_ASIX_VENDOR_LINKSYS_ID                0X13B1
+#define UX_HOST_CLASS_ASIX_PRODUCT_LINKSYS_ID               0X0018
+
+/* Define ASIX supported VID and PID array (of 16-bits).  */
+#ifndef UX_HOST_CLASS_ASIX_VID_PID_ARRAY
+#define UX_HOST_CLASS_ASIX_VID_PID_ARRAY                                        \
+    UX_HOST_CLASS_ASIX_VENDOR_ID, UX_HOST_CLASS_ASIX_PRODUCT_ID,                \
+    UX_HOST_CLASS_ASIX_VENDOR_FUJIEI_ID, UX_HOST_CLASS_ASIX_PRODUCT_FUJIEI_ID,  \
+    UX_HOST_CLASS_ASIX_VENDOR_LINKSYS_ID, UX_HOST_CLASS_ASIX_PRODUCT_LINKSYS_ID
+#endif
+
 #define UX_HOST_CLASS_ASIX_SPEED_SELECTED_100MPBS           0x100 
 #define UX_HOST_CLASS_ASIX_SPEED_SELECTED_10MPBS            0x10 
 #define UX_HOST_CLASS_ASIX_LINK_STATE_DOWN                  0
@@ -107,14 +125,29 @@ extern   "C" {
 #define UX_HOST_CLASS_ASIX_ETHERNET_RARP                    0x8035
 #define UX_HOST_CLASS_ASIX_ETHERNET_PACKET_SIZE             1536    
 #define UX_HOST_CLASS_ASIX_NX_ALIGN_PADDING                 2
-#ifndef    UX_HOST_CLASS_ASIX_NX_PKPOOL_ENTRIES
-#define UX_HOST_CLASS_ASIX_NX_PKPOOL_ENTRIES                16  
+#define UX_HOST_CLASS_ASIX_RX_HEADER_SIZE                   4
+#define UX_HOST_CLASS_ASIX_OVERHEAD_SIZE                    (UX_HOST_CLASS_ASIX_NX_ALIGN_PADDING + UX_HOST_CLASS_ASIX_RX_HEADER_SIZE)
+
+#define UX_HOST_CLASS_ASIX_TRANSMIT_BUFFER_SIZE             UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE
+
+#ifndef UX_HOST_CLASS_ASIX_RECEIVE_BUFFER_SIZE
+#define UX_HOST_CLASS_ASIX_RECEIVE_BUFFER_SIZE              512 /* N*512.  */
+#endif
+
+#ifdef NX_DISABLE_PACKET_CHAIN
+#undef UX_HOST_CLASS_ASIX_PACKET_CHAIN_SUPPORT
+#else
+#define UX_HOST_CLASS_ASIX_PACKET_CHAIN_SUPPORT
 #endif
 
 #define UX_HOST_CLASS_ASIX_NX_PACKET_SIZE                   sizeof(NX_PACKET)
 
-#define UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE_ASSERT           UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_ADD_ULONG(UX_HOST_CLASS_ASIX_ETHERNET_PACKET_SIZE, UX_HOST_CLASS_ASIX_NX_ALIGN_PADDING), UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE_calc_ovf)
-#define UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE                  (UX_HOST_CLASS_ASIX_ETHERNET_PACKET_SIZE + UX_HOST_CLASS_ASIX_NX_ALIGN_PADDING)
+#define UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE_ASSERT                           \
+    UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_ADD_ULONG(                    \
+        UX_HOST_CLASS_ASIX_ETHERNET_PACKET_SIZE,                            \
+        UX_HOST_CLASS_ASIX_OVERHEAD_SIZE),                                  \
+        UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE_calc_ovf)
+#define UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE                  (UX_HOST_CLASS_ASIX_ETHERNET_PACKET_SIZE + UX_HOST_CLASS_ASIX_OVERHEAD_SIZE)
 
 #define UX_HOST_CLASS_ASIX_NX_BUFF_SIZE_ASSERT                              \
     UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE_ASSERT                               \
@@ -124,23 +157,14 @@ extern   "C" {
         UX_HOST_CLASS_ASIX_NX_BUFF_SIZE_calc_ovf)
 #define UX_HOST_CLASS_ASIX_NX_BUFF_SIZE                     (UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE + UX_HOST_CLASS_ASIX_NX_PACKET_SIZE)
 
-#define UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT              \
-    UX_HOST_CLASS_ASIX_NX_BUFF_SIZE_ASSERT                                \
-    UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(                 \
-        UX_HOST_CLASS_ASIX_NX_PKPOOL_ENTRIES,                             \
-        UX_HOST_CLASS_ASIX_NX_BUFF_SIZE),                                 \
-        UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_calc1_ovf)          \
-    UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_ADD_ULONG(                  \
-        UX_HOST_CLASS_ASIX_NX_PKPOOL_ENTRIES *                            \
-            UX_HOST_CLASS_ASIX_NX_BUFF_SIZE,                              \
-        32), UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_calc2_ovf)
-#define UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE       (UX_HOST_CLASS_ASIX_NX_PKPOOL_ENTRIES * UX_HOST_CLASS_ASIX_NX_BUFF_SIZE + 32)
-
 #define UX_HOST_CLASS_ASIX_ETHERNET_SIZE                    14
                                                                 
 #define UX_HOST_CLASS_ASIX_DEVICE_INIT_DELAY                (1 * UX_PERIODIC_RATE)
 #define UX_HOST_CLASS_ASIX_CLASS_TRANSFER_TIMEOUT           300000
 #define UX_HOST_CLASS_ASIX_SETUP_BUFFER_SIZE                16
+
+#define UX_HOST_CLASS_ASIX_PACKET_POOL_WAIT                 100
+#define UX_HOST_CLASS_ASIX_PACKET_ALLOCATE_WAIT             2000
 
 /* Define NetX errors inside the Asix class.  */
 #define UX_HOST_CLASS_ASIX_NX_SUCCESS                       0x00
@@ -206,6 +230,7 @@ extern   "C" {
 #define UX_HOST_CLASS_ASIX_REQ_OWN_SMI                      0x06
 #define UX_HOST_CLASS_ASIX_REQ_READ_PHY_REG                 0x07
 #define UX_HOST_CLASS_ASIX_REQ_WRITE_PHY_REG                0x08
+#define UX_HOST_CLASS_ASIX_REQ_READ_STATION_STATUS          0x09
 #define UX_HOST_CLASS_ASIX_REQ_WHO_OWNS_SMI                 0x09
 #define UX_HOST_CLASS_ASIX_REQ_RELEASE_SMI                  0x0a
 #define UX_HOST_CLASS_ASIX_REQ_READ_SROM                    0x0b
@@ -280,15 +305,24 @@ extern   "C" {
 #define UX_HOST_CLASS_ASIX_RXCR_AP                          0x0020
 #define UX_HOST_CLASS_ASIX_RXCR_SO                          0x0080
 
+/* 88772.  */
 #define UX_HOST_CLASS_ASIX_RXCR_MFB_2048                    0x0000
 #define UX_HOST_CLASS_ASIX_RXCR_MFB_4096                    0x0100
 #define UX_HOST_CLASS_ASIX_RXCR_MFB_8192                    0x0200
-#define UX_HOST_CLASS_ASIX_RXCR_MFB_16384                   0x0300
+#define UX_HOST_CLASS_ASIX_RXCR_MFB_16384                   0x0300 /* Default.  */
+
+/* 88772B.  */
+#define UX_HOST_CLASS_ASIX_RXCR_RH1M                        0x0100 /* Default 1.  */
+#define UX_HOST_CLASS_ASIX_RXCR_RH2M                        0x0200 /* Default 0.  */
+#define UX_HOST_CLASS_ASIX_RXCR_RH3M                        0x0400 /* Default 0.  */
+
 
 /* Define  ASIX Class packet equivalences.  */
 
 #define UX_HOST_CLASS_ASIX_PACKET_SIZE                      128
 #define UX_HOST_CLASS_ASIX_NODE_ID_LENGTH                   6  
+
+#define UX_HOST_CLASS_ASIX_RX_PACKET_LENGTH_MASK            0xFFF
 
 /* Define  ASIX PHY registers description. */
 
@@ -391,10 +425,14 @@ typedef struct UX_HOST_CLASS_ASIX_STRUCT
     ULONG           ux_host_class_asix_link_state;
 
     NX_PACKET       *ux_host_class_asix_xmit_queue;
+#ifdef UX_HOST_CLASS_ASIX_PACKET_CHAIN_SUPPORT
+    UCHAR           *ux_host_class_asix_xmit_buffer;
+#endif
     NX_PACKET       *ux_host_class_asix_receive_queue;
-    NX_PACKET_POOL  ux_host_class_asix_packet_pool;
+    UCHAR           *ux_host_class_asix_receive_buffer;
+    NX_PACKET_POOL  *ux_host_class_asix_packet_pool;
+    ULONG           ux_host_class_asix_packet_available_min;
 
-    UCHAR           *ux_host_class_asix_pool_memory;
     UCHAR           ux_host_class_asix_node_id[UX_HOST_CLASS_ASIX_NODE_ID_LENGTH];
     VOID            (*ux_host_class_asix_device_status_change_callback)(struct UX_HOST_CLASS_ASIX_STRUCT *asix, 
                                                                 ULONG  device_state);

@@ -29,14 +29,13 @@
 #include "ux_host_class_asix.h"
 #include "ux_host_stack.h"
 
-UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_activate                        PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,6 +86,11 @@ UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            moved NX driver activate,   */
+/*                                            added reception buffer,     */
+/*                                            removed internal NX pool,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_activate(UX_HOST_CLASS_COMMAND *command)
@@ -103,7 +107,10 @@ UX_DEVICE                           *device;
 UX_HOST_CLASS_ASIX                  *asix;
 UINT                                status;
 UX_TRANSFER                         *transfer_request;
-    
+ULONG                               physical_address_msw;
+ULONG                               physical_address_lsw;
+
+
     /* We need to make sure that the value of the NX_PHYSICAL_HEADER is at least 20.  
        This should be changed in the nx_user.h file */
 
@@ -199,27 +206,28 @@ UX_TRANSFER                         *transfer_request;
         status =  _ux_host_stack_transfer_request(transfer_request);
     }
 
-    /* Allocate some packet pool for reception.  */
+    /* Allocate some memory for reception.  */
     if (status == UX_SUCCESS)
     {
-
-        /* UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE overflow has been checked by
-         * UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT outside of function.
-         */
-        asix -> ux_host_class_asix_pool_memory =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE);
-        if (asix -> ux_host_class_asix_pool_memory  == UX_NULL)
+        asix -> ux_host_class_asix_receive_buffer = _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_ASIX_RECEIVE_BUFFER_SIZE);
+        if (asix -> ux_host_class_asix_receive_buffer == UX_NULL)
             status = UX_MEMORY_INSUFFICIENT;
     }
 
-    /* Create a packet pool.  */
+    /* Activate network driver.  */
     if (status == UX_SUCCESS)
     {
-        status =  nx_packet_pool_create(&asix -> ux_host_class_asix_packet_pool, "Asix Packet Pool", 
-                                    UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE, asix -> ux_host_class_asix_pool_memory, UX_HOST_CLASS_ASIX_NX_ETHERNET_POOL_ALLOCSIZE);
 
-        /* Check for pool creation error.  */
-        if (status)
-            status = UX_ERROR;
+        /* Setup the physical address of this IP instance.  */
+        physical_address_msw =  (ULONG)((asix -> ux_host_class_asix_node_id[0] << 8) | (asix -> ux_host_class_asix_node_id[1]));
+        physical_address_lsw =  (ULONG)((asix -> ux_host_class_asix_node_id[2] << 24) | (asix -> ux_host_class_asix_node_id[3] << 16) | 
+                                                        (asix -> ux_host_class_asix_node_id[4] << 8) | (asix -> ux_host_class_asix_node_id[5]));
+        
+        /* Register this interface to the NetX USB interface broker.  */
+        status = _ux_network_driver_activate((VOID *) asix, _ux_host_class_asix_write, 
+                                    &asix -> ux_host_class_asix_network_handle, 
+                                    physical_address_msw,
+                                    physical_address_lsw);
     }
 
     /* Do final things if success.  */
@@ -250,12 +258,9 @@ UX_TRANSFER                         *transfer_request;
 
     /* There was a problem, so free the resources.  */
 
-    /* Last resource, asix -> ux_host_class_asix_packet_pool is not created or created error,
-       no need to free.  */
-
-    /* Free asix -> ux_host_class_asix_pool_memory.  */
-    if (asix -> ux_host_class_asix_pool_memory)
-        _ux_utility_memory_free(asix -> ux_host_class_asix_pool_memory);
+    /* Free asix -> ux_host_class_asix_receive_buffer.  */
+    if (asix -> ux_host_class_asix_receive_buffer)
+        _ux_utility_memory_free(asix -> ux_host_class_asix_receive_buffer);
 
     /* Free asix -> ux_host_class_asix_thread.  */
     if (asix -> ux_host_class_asix_thread.tx_thread_id)

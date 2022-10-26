@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_change                       PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,9 @@
 /*                                            rx full packet for          */
 /*                                            feedback,                   */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -137,8 +140,9 @@ ULONG                                    endpoint_dir;
         /* Parse all endpoints.  */
 #if defined(UX_DEVICE_STANDALONE)
 
-        /* Standalone mode not supported.  */
-        endpoint_dir = 0;
+        endpoint_dir = (stream -> ux_device_class_audio_stream_task_function ==
+                        _ux_device_class_audio_read_task_function) ?
+                        UX_ENDPOINT_OUT: UX_ENDPOINT_IN;
 #else
 
         endpoint_dir = (stream -> ux_device_class_audio_stream_thread.tx_thread_entry ==
@@ -229,6 +233,15 @@ ULONG                                    endpoint_dir;
             return(UX_DESCRIPTOR_CORRUPTED);
         }
 
+#if defined(UX_DEVICE_STANDALONE)
+
+        /* Reset background transfer state.  */
+        stream -> ux_device_class_audio_stream_task_state = UX_STATE_RESET;
+#endif
+
+        /* Now reset payload buffer error count.  */
+        stream -> ux_device_class_audio_stream_buffer_error_count = 0;
+
         /* Now reset frame buffers.  */
         frame_buffer = stream -> ux_device_class_audio_stream_buffer;
         while(frame_buffer < stream -> ux_device_class_audio_stream_buffer + stream -> ux_device_class_audio_stream_buffer_size)
@@ -243,7 +256,7 @@ ULONG                                    endpoint_dir;
         }
         stream -> ux_device_class_audio_stream_transfer_pos = stream -> ux_device_class_audio_stream_access_pos;
 
-#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT) && !defined(UX_DEVICE_STANDALONE)
 
         /* If feedback supported, resume the thread.  */
         if (stream -> ux_device_class_audio_stream_feedback_thread_stack)

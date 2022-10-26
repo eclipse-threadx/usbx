@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_open                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,9 @@
 /*                                            class specific structured   */
 /*                                            data,                       */
 /*                                            resulting in version 6.1    */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added buffer size check,    */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_open(UX_HOST_CLASS_STORAGE *storage, ULONG hidden_sectors)
@@ -126,6 +129,16 @@ UX_HOST_CLASS                       *class_inst;
 
             /* Save the Sector size in the storage media instance.  */
             storage_media -> ux_host_class_storage_media_sector_size =  storage -> ux_host_class_storage_sector_size;
+
+            /* Check if media setting can support the sector size.  */
+            if (storage -> ux_host_class_storage_sector_size > UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE)
+            {
+                /* Error trap.  */
+                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_MEMORY_ERROR);
+
+                /* Required memory is over system setting.  */
+                return(UX_HOST_CLASS_MEMORY_ERROR);
+            }
 
             /* Save the storage media instance in the user reserved area in the UX_MEDIA structure.  */
             ux_media_reserved_for_user_set(media, storage_media);

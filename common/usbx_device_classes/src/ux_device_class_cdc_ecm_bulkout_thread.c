@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_bulkout_thread             PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,11 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed EP not ready issue,   */
+/*                                            used pool from NX IP inst,  */
+/*                                            used NX API to copy data,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_bulkout_thread(ULONG cdc_ecm_class)
@@ -94,7 +99,7 @@ UX_SLAVE_DEVICE                 *device;
 UX_SLAVE_TRANSFER               *transfer_request;
 UINT                            status;
 NX_PACKET                       *packet;
-ULONG                           ip_given_length;
+USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
 
     /* Cast properly the cdc_ecm instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, cdc_ecm_class)
@@ -113,8 +118,38 @@ ULONG                           ip_given_length;
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
         { 
 
+            /* Check if packet pool is ready.  */
+            if (cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool == UX_NULL)
+            {
+
+                /* Get the network device handle.  */
+                ux_nx_device = (USB_NETWORK_DEVICE_TYPE *)(cdc_ecm -> ux_slave_class_cdc_ecm_network_handle);
+
+                /* Get packet pool from IP instance (if available).  */
+                if (ux_nx_device -> ux_network_device_ip_instance != UX_NULL)
+                {
+                    cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool = ux_nx_device -> ux_network_device_ip_instance -> nx_ip_default_packet_pool;
+                }
+                else
+                {
+
+                    /* Error trap.  */
+                    _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_ETH_PACKET_POOL_ERROR);
+
+                    _ux_utility_delay_ms(UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_INST_WAIT);
+                    continue;
+                }
+            }
+
+            /* Check if Bulk OUT endpoint is ready.  */
+            if (cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint == UX_NULL)
+            {
+                _ux_utility_delay_ms(UX_DEVICE_CLASS_CDC_ECM_LINK_CHECK_WAIT);
+                continue;
+            }
+
             /* We can accept new reception. Get a NX Packet */
-            status =  nx_packet_allocate(&cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool, &packet, 
+            status =  nx_packet_allocate(cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool, &packet, 
                                          NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_WAIT));
 
             if (status == NX_SUCCESS)
@@ -136,7 +171,7 @@ ULONG                           ip_given_length;
                 /* Send the request to the device controller.  */
                 status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_CDC_ECM_MAX_PACKET_LENGTH,
                                                                     UX_DEVICE_CLASS_CDC_ECM_MAX_PACKET_LENGTH);
-    
+
                 /* Check the completion code. */
                 if (status == UX_SUCCESS)
                 {
@@ -147,26 +182,27 @@ ULONG                           ip_given_length;
 
                     /* Adjust the prepend pointer to take into account the non 3 bit alignment of the ethernet header.  */
                     packet -> nx_packet_prepend_ptr += sizeof(USHORT);
-                
-                    /* Set the prepend, length, and append fields.  */ 
-                    packet -> nx_packet_length = transfer_request -> ux_slave_transfer_request_actual_length;
-                    packet -> nx_packet_append_ptr = packet -> nx_packet_prepend_ptr + transfer_request -> ux_slave_transfer_request_actual_length;
-                        
+                    packet -> nx_packet_append_ptr += sizeof(USHORT);
+
                     /* Copy the received packet in the IP packet data area.  */
-                    _ux_utility_memory_copy(packet -> nx_packet_prepend_ptr, transfer_request -> ux_slave_transfer_request_data_pointer, packet -> nx_packet_length); /* Use case of memcpy is verified. */
-                
-                    /* Calculate the accurate packet length from ip header.  */ 
-                    if((*(packet -> nx_packet_prepend_ptr + 12) == 0x08) && 
-                        (*(packet -> nx_packet_prepend_ptr + 13) == 0))
+                    status = nx_packet_data_append(packet,
+                            transfer_request -> ux_slave_transfer_request_data_pointer,
+                            transfer_request -> ux_slave_transfer_request_actual_length,
+                            cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool,
+                            UX_MS_TO_TICK(UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_WAIT));
+                    if (status == NX_SUCCESS)
                     {
 
-                        ip_given_length = _ux_utility_short_get_big_endian(packet -> nx_packet_prepend_ptr + 16) + UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE;
-                        packet -> nx_packet_length =  ip_given_length ;
-                        packet -> nx_packet_append_ptr =  packet -> nx_packet_prepend_ptr + ip_given_length;
+                        /* Send that packet to the NetX USB broker.  */
+                        _ux_network_driver_packet_received(cdc_ecm -> ux_slave_class_cdc_ecm_network_handle, packet);
                     }
-                
-                    /* Send that packet to the NetX USB broker.  */
-                    _ux_network_driver_packet_received(cdc_ecm -> ux_slave_class_cdc_ecm_network_handle, packet);
+                    else
+                    {
+
+                        /* We received a malformed packet. Report to application.  */
+                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_MALFORMED_PACKET_RECEIVED_ERROR);
+                        nx_packet_release(packet);
+                    }
                 }
                 else
 

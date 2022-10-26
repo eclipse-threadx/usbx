@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -122,6 +122,12 @@
 /*                                            added shared device config  */
 /*                                            descriptor for enum scan,   */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added some ETH error codes, */
+/*                                            allowed align minimal def,  */
+/*                                            added interface instance    */
+/*                                            creation strategy control,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -288,8 +294,8 @@ typedef signed char               SCHAR;
 /* Define basic constants for the USBX Stack.  */
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
-#define USBX_MINOR_VERSION            1
-#define USBX_PATCH_VERSION            12
+#define USBX_MINOR_VERSION            2
+#define USBX_PATCH_VERSION            0
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
@@ -1102,7 +1108,6 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 
 #define UX_NO_ALIGN                                                     0u
 #define UX_ALIGN_16                                                     0x0fu
-#define UX_ALIGN_MIN                                                    0x0fu
 #define UX_ALIGN_32                                                     0x1fu
 #define UX_ALIGN_64                                                     0x3fu
 #define UX_ALIGN_128                                                    0x7fu 
@@ -1113,6 +1118,9 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_ALIGN_4096                                                   0xfffu
 #define UX_SAFE_ALIGN                                                   0xffffffffu
 #define UX_MAX_SCATTER_GATHER_ALIGNMENT                                 4096
+#ifndef UX_ALIGN_MIN
+#define UX_ALIGN_MIN                                                    UX_ALIGN_16
+#endif
                                                                         
 #define UX_MAX_USB_DEVICES                                              127
                                                                         
@@ -1483,6 +1491,10 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_HOST_CLASS_AUDIO_WRONG_FREQUENCY                             0x82
 
 #define UX_CLASS_CDC_ECM_LINK_STATE_DOWN_ERROR                          0x90
+#define UX_CLASS_ETH_LINK_STATE_DOWN_ERROR                              0x90
+#define UX_CLASS_ETH_PACKET_POOL_ERROR                                  0x91
+#define UX_CLASS_ETH_PACKET_ERROR                                       0x92
+#define UX_CLASS_ETH_SIZE_ERROR                                         0x93
                                                                         
                                                                         
 /* Define USBX HCD API function constants.  */                          
@@ -2048,6 +2060,12 @@ typedef struct UX_CONFIGURATION_STRUCT
     ULONG           ux_configuration_iad_subclass;
     ULONG           ux_configuration_iad_protocol;
 } UX_CONFIGURATION;
+
+#define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL     0 /* Default: all things created.  */
+#define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED   1 /* Owned: class owned things created.  */
+#ifndef UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL
+#define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_ALL
+#endif
 
 
 /* Define USBX Interface Descriptor structure.  */

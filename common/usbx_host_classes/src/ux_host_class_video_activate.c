@@ -87,6 +87,13 @@ UCHAR                                   *baInterfaceNr;
                 /* Check if this the VC interface is expected.  */
                 bInCollection = packed_entity_descriptor[11];
                 baInterfaceNr = packed_entity_descriptor + 12;
+
+                /* Validation:
+                 * baInterfaceNr not exceeding current descriptor.
+                 */
+                if (packed_entity_descriptor[0] + packed_entity_descriptor < baInterfaceNr + bInCollection)
+                    return(1);
+
                 while(bInCollection)
                 {
 
@@ -97,6 +104,10 @@ UCHAR                                   *baInterfaceNr;
                         parser -> parsed_flags |= UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_VC_HEADER;
                         return(0);
                     }
+
+                    /* Next interface number in descriptor.  */
+                    baInterfaceNr ++;
+                    bInCollection --;
                 }
             }
 
@@ -159,7 +170,7 @@ UCHAR                                   *baInterfaceNr;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_video_activate                       PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -217,6 +228,9 @@ UCHAR                                   *baInterfaceNr;
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved VC header check,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_activate(UX_HOST_CLASS_COMMAND *command)

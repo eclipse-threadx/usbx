@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_interrupt_send               PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,16 +68,14 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  07-29-2022     Chaoqiong Xiao           Initial Version 6.1.12        */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT    _ux_device_class_audio_interrupt_send(UX_DEVICE_CLASS_AUDIO *audio, UCHAR *int_data)
 {
 #if !defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
-    UX_PARAMETER_NOT_USED(audio);
-    UX_PARAMETER_NOT_USED(int_data);
-    return(UX_FUNCTION_NOT_SUPPORTED);
-#else
-#if defined(UX_DEVICE_STANDALONE)
     UX_PARAMETER_NOT_USED(audio);
     UX_PARAMETER_NOT_USED(int_data);
     return(UX_FUNCTION_NOT_SUPPORTED);
@@ -168,6 +166,5 @@ ULONG                       i;
 
     /* Return success.  */
     return(UX_SUCCESS);
-#endif
 #endif
 }

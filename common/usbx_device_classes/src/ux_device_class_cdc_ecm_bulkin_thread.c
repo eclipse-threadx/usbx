@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_bulkin_thread              PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            used NX API to copy data,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_bulkin_thread(ULONG cdc_ecm_class)
@@ -95,8 +98,8 @@ UX_SLAVE_TRANSFER               *transfer_request;
 UINT                            status;
 ULONG                           actual_flags;
 NX_PACKET                       *current_packet;
-UCHAR                           *packet_header;
 ULONG                           transfer_length;
+ULONG                           copied;
 
     /* Cast properly the cdc_ecm instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, cdc_ecm_class)
@@ -148,24 +151,26 @@ ULONG                           transfer_length;
                     if (cdc_ecm -> ux_slave_class_cdc_ecm_link_state == UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_UP)
                     {
                 
-                        /* Load the address of the current packet header at the physical header.  */
-                        packet_header =  current_packet -> nx_packet_prepend_ptr;
-
                         /* Can the packet fit in the transfer requests data buffer?  */
                         if (current_packet -> nx_packet_length <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH)
                         {
 
                             /* Copy the packet in the transfer descriptor buffer.  */
-                            _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, packet_header, current_packet -> nx_packet_length); /* Use case of memcpy is verified. */
+                            status = nx_packet_data_extract_offset(current_packet, 0,
+                                    transfer_request -> ux_slave_transfer_request_data_pointer,
+                                    current_packet -> nx_packet_length, &copied);
+                            if (status == UX_SUCCESS)
+                            {
 
-                            /* Calculate the transfer length.  */
-                            transfer_length =  current_packet -> nx_packet_length;
-                            
-                            /* If trace is enabled, insert this event into the trace buffer.  */
-                            UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ECM_PACKET_TRANSMIT, cdc_ecm, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
+                                /* Calculate the transfer length.  */
+                                transfer_length =  current_packet -> nx_packet_length;
+                                
+                                /* If trace is enabled, insert this event into the trace buffer.  */
+                                UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ECM_PACKET_TRANSMIT, cdc_ecm, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
-                            /* Send the request to the device controller.  */
-                            status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE);
+                                /* Send the request to the device controller.  */
+                                status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE + 1);
+                            }
 
                             /* Check error code. */
                             if (status != UX_SUCCESS)

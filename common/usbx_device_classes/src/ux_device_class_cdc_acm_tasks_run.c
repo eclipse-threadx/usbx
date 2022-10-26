@@ -31,8 +31,11 @@
 
 #if defined(UX_DEVICE_STANDALONE)
 
+
+#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 static inline VOID _ux_device_class_cdc_acm_transmission_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm);
 static inline VOID _ux_device_class_cdc_acm_transmission_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm);
+#endif
 
 
 /**************************************************************************/
@@ -40,7 +43,7 @@ static inline VOID _ux_device_class_cdc_acm_transmission_write_run(UX_SLAVE_CLAS
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_tasks_run                  PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,20 +83,22 @@ static inline VOID _ux_device_class_cdc_acm_transmission_write_run(UX_SLAVE_CLAS
 /*                                            names conflict C++ keyword, */
 /*                                            supported write auto ZLP,   */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_tasks_run(VOID *instance)
 {
 
-UX_SLAVE_DEVICE                    *device;
-UX_SLAVE_CLASS_CDC_ACM             *cdc_acm;
 UINT                                status = UX_STATE_IDLE;
 
+#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
+UX_SLAVE_DEVICE                    *device;
+UX_SLAVE_CLASS_CDC_ACM             *cdc_acm;
 
     /* Get CDC ACM instance.  */
     cdc_acm = (UX_SLAVE_CLASS_CDC_ACM*) instance;
-
-#ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 
     /* Check if transmission is started.  */
     if (!cdc_acm -> ux_slave_class_cdc_acm_transmission_status)

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_transmission_callback           PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported NX packet chain,  */
+/*                                            fixed empty queue handling, */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_transmission_callback (UX_TRANSFER *transfer_request)
@@ -89,6 +93,9 @@ UX_HOST_CLASS_ASIX              *asix;
 NX_PACKET                       *current_packet;
 NX_PACKET                       *next_packet;
 UCHAR                           *packet_header;
+#ifdef UX_HOST_CLASS_ASIX_PACKET_CHAIN_SUPPORT
+ULONG                           copied;
+#endif
     
     /* Get the class instance for this transfer request.  */
     asix =  (UX_HOST_CLASS_ASIX *) transfer_request -> ux_transfer_request_class_instance;
@@ -110,7 +117,19 @@ UCHAR                           *packet_header;
 
     /* Check if there is another transfer for this pipe.  */
     current_packet =  asix -> ux_host_class_asix_xmit_queue;
-    
+    if (current_packet == UX_NULL)
+        return;
+
+    /* Check if a ZLP is needed.  */
+    if ((transfer_request -> ux_transfer_request_actual_length > 0) &&
+        ((transfer_request -> ux_transfer_request_actual_length %
+          transfer_request -> ux_transfer_request_packet_length) == 0))
+    {
+        transfer_request -> ux_transfer_request_requested_length = 0;
+        _ux_host_stack_transfer_request(transfer_request);
+        return;
+    }
+
     /* Get the next packet associated with the first packet.  */
     next_packet = current_packet -> nx_packet_queue_next;
     
@@ -132,10 +151,33 @@ UCHAR                           *packet_header;
     
         /* Store the negative length of the payload in the first USHORT.  */
         _ux_utility_short_put(packet_header+ sizeof(USHORT), (USHORT)(~next_packet -> nx_packet_length));
-    
-        /* Prepare the values for this new transmission.  */
-        transfer_request -> ux_transfer_request_data_pointer     =  packet_header;
-        transfer_request -> ux_transfer_request_requested_length =  next_packet -> nx_packet_length + (ULONG)sizeof(USHORT) * 2;
+
+#ifdef UX_HOST_CLASS_ASIX_PACKET_CHAIN_SUPPORT
+
+        /* Check if the packets are chained.  */
+        if (next_packet -> nx_packet_next)
+        {
+
+            next_packet -> nx_packet_length += sizeof(USHORT) * 2;
+            next_packet -> nx_packet_prepend_ptr -= sizeof(USHORT) * 2;
+            nx_packet_data_extract_offset(next_packet, 0, asix -> ux_host_class_asix_xmit_buffer, next_packet -> nx_packet_length, &copied);
+
+            /* Setup the transaction parameters.  */
+            transfer_request -> ux_transfer_request_requested_length =  next_packet -> nx_packet_length;
+            transfer_request -> ux_transfer_request_data_pointer = asix -> ux_host_class_asix_xmit_buffer;
+
+            /* Restore packet status.  */
+            next_packet -> nx_packet_length -= sizeof(USHORT) * 2;
+            next_packet -> nx_packet_prepend_ptr += sizeof(USHORT) * 2;
+        }
+        else
+#endif
+        {
+
+            /* Prepare the values for this new transmission.  */
+            transfer_request -> ux_transfer_request_data_pointer     =  packet_header;
+            transfer_request -> ux_transfer_request_requested_length =  next_packet -> nx_packet_length + (ULONG)sizeof(USHORT) * 2;
+        }
         
         /* Store the packet that owns this transaction.  */
         transfer_request -> ux_transfer_request_user_specific = next_packet;

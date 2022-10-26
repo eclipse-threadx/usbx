@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_video.h                             PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -41,6 +41,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -508,6 +511,12 @@ typedef struct UX_DEVICE_CLASS_VIDEO_PAYLOAD_HEADER_STRUCT
 #define UX_DEVICE_CLASS_VIDEO_STREAM_ERROR_CODE_STILL_IMAGE_CAPTURE_ERROR                    7
 
 
+/* Define Video Class Task states.  */
+#define UX_DEVICE_CLASS_VIDEO_STREAM_RW_STOP            (UX_STATE_RESET)
+#define UX_DEVICE_CLASS_VIDEO_STREAM_RW_START           (UX_STATE_STEP + 1)
+#define UX_DEVICE_CLASS_VIDEO_STREAM_RW_WAIT            (UX_STATE_STEP + 2)
+
+
 /* Define Video Class callback structure.  */
 
 struct UX_DEVICE_CLASS_VIDEO_STREAM_STRUCT;
@@ -541,8 +550,12 @@ typedef struct UX_DEVICE_CLASS_VIDEO_PAYLOAD_STRUCT
 
 typedef struct UX_DEVICE_CLASS_VIDEO_STREAM_PARAMETER_STRUCT
 {
+#if defined(UX_DEVICE_STANDALONE)
+    UINT                                   (*ux_device_class_video_stream_parameter_task_function)(struct UX_DEVICE_CLASS_VIDEO_STREAM_STRUCT*);
+#else
     ULONG                                    ux_device_class_video_stream_parameter_thread_stack_size;
     VOID                                   (*ux_device_class_video_stream_parameter_thread_entry)(ULONG id);
+#endif
     UX_DEVICE_CLASS_VIDEO_STREAM_CALLBACKS   ux_device_class_video_stream_parameter_callbacks;
 
     ULONG                                    ux_device_class_video_stream_parameter_max_payload_buffer_size;
@@ -572,8 +585,13 @@ typedef struct UX_DEVICE_CLASS_VIDEO_STREAM_STRUCT
 #if !defined(UX_DEVICE_STANDALONE)
     UCHAR                                   *ux_device_class_video_stream_thread_stack;
     UX_THREAD                                ux_device_class_video_stream_thread;
+#else
+    UINT                                   (*ux_device_class_video_stream_task_function)(struct UX_DEVICE_CLASS_VIDEO_STREAM_STRUCT*);
+    UINT                                    ux_device_class_video_stream_task_state;
+    UINT                                    ux_device_class_video_stream_task_status;
 #endif
 
+    ULONG                                   ux_device_class_video_stream_buffer_error_count;
     UCHAR                                   *ux_device_class_video_stream_buffer;
     ULONG                                    ux_device_class_video_stream_buffer_size;
     ULONG                                    ux_device_class_video_stream_payload_buffer_size;
@@ -636,6 +654,9 @@ UINT    _ux_device_class_video_transmission_start(UX_DEVICE_CLASS_VIDEO_STREAM *
 UINT    _ux_device_class_video_write_payload_get(UX_DEVICE_CLASS_VIDEO_STREAM *video, UCHAR **buffer, ULONG *max_length);
 UINT    _ux_device_class_video_write_payload_commit(UX_DEVICE_CLASS_VIDEO_STREAM *video, ULONG length);
 
+UINT    _ux_device_class_video_tasks_run(VOID *instance);
+UINT    _ux_device_class_video_read_task_function(UX_DEVICE_CLASS_VIDEO_STREAM *stream);
+UINT    _ux_device_class_video_write_task_function(UX_DEVICE_CLASS_VIDEO_STREAM *stream);
 
 /* Define Video Class API prototypes.  */
 
@@ -662,6 +683,9 @@ UINT    _ux_device_class_video_write_payload_commit(UX_DEVICE_CLASS_VIDEO_STREAM
 #define ux_device_class_video_write_payload_commit    _ux_device_class_video_write_payload_commit
 
 #define ux_device_class_video_ioctl                   _ux_device_class_video_ioctl
+
+#define ux_device_class_video_read_task_function      _ux_device_class_video_read_task_function
+#define ux_device_class_video_write_task_function     _ux_device_class_video_write_task_function
 
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard

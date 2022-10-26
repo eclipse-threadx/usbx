@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_read_thread_entry            PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error statistics,     */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID _ux_device_class_video_read_thread_entry(ULONG video_stream)
@@ -145,6 +148,7 @@ ULONG                           actual_length;
             {
 
                 /* Error notification!  */
+                stream -> ux_device_class_video_stream_buffer_error_count ++;
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_BUFFER_OVERFLOW);
             }
             else

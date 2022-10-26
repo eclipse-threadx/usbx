@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_configuration_instance_create        PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added interface instance    */
+/*                                            creation strategy control,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_configuration_instance_create(UX_CONFIGURATION *configuration)
@@ -93,15 +97,21 @@ UINT            status;
         /* Check if we are dealing with the first alternate setting.  */
         if (interface_ptr -> ux_interface_descriptor.bAlternateSetting == 0)
         {
-            /* Create the interface. */
-            status = _ux_host_stack_interface_instance_create(interface_ptr);
 
-            /* Check status, the controller may have refused the endpoint creation.  */
-            if (status != UX_SUCCESS)
-            
-                /* An error occurred.  The interface cannot be mounted.  */
-                return(status);
-            
+#if UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL == UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED
+
+            /* Create the interface, if it's usable. */
+            if (interface_ptr -> ux_interface_class || configuration -> ux_configuration_device -> ux_device_class)
+#endif
+            {
+                status = _ux_host_stack_interface_instance_create(interface_ptr);
+
+                /* Check status, the controller may have refused the endpoint creation.  */
+                if (status != UX_SUCCESS)
+                
+                    /* An error occurred.  The interface cannot be mounted.  */
+                    return(status);
+            }
         }
 
         /* Next interface.  */

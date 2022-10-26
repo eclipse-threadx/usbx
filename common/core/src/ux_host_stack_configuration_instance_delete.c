@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_configuration_instance_delete        PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added interface instance    */
+/*                                            creation strategy control,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_configuration_instance_delete(UX_CONFIGURATION *configuration)
@@ -102,7 +106,13 @@ ULONG           current_alternate_setting;
         
         if (interface_ptr -> ux_interface_descriptor.bAlternateSetting == current_alternate_setting)
         {
-            _ux_host_stack_interface_instance_delete(interface_ptr);
+
+#if UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL == UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED
+
+            /* If interface is usable, remove physical creates.  */
+            if (interface_ptr -> ux_interface_class || configuration -> ux_configuration_device -> ux_device_class)
+#endif
+                _ux_host_stack_interface_instance_delete(interface_ptr);
         }
 
         interface_ptr =  interface_ptr -> ux_interface_next_interface;

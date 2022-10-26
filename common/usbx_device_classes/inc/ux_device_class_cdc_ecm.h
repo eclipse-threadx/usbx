@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_ecm.h                           PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -52,6 +52,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added wait definitions,     */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -274,6 +277,12 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 #define UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_WAIT                            1000
 #endif
 
+#ifndef UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_INST_WAIT
+#define UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_INST_WAIT                       1000
+#endif
+
+#define UX_DEVICE_CLASS_CDC_ECM_LINK_CHECK_WAIT                             10
+
 /* Define Slave CDC_ECM Class Calling Parameter structure */
 
 typedef struct UX_SLAVE_CLASS_CDC_ECM_PARAMETER_STRUCT
@@ -316,7 +325,6 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
     UCHAR                                   ux_slave_class_cdc_ecm_remote_node_id[UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH];
     ULONG                                   ux_slave_class_cdc_ecm_nx_ip_address;
     ULONG                                   ux_slave_class_cdc_ecm_nx_ip_network_mask;
-    UCHAR                                   *ux_slave_class_cdc_ecm_pool_memory;
 
 #if !defined(UX_DEVICE_STANDALONE)
     NX_IP                                   *ux_slave_class_cdc_ecm_nx_ip;
@@ -324,7 +332,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
     NX_PACKET                               *ux_slave_class_cdc_ecm_xmit_queue;
     NX_PACKET                               *ux_slave_class_cdc_ecm_xmit_queue_tail;
     NX_PACKET                               *ux_slave_class_cdc_ecm_receive_queue;
-    NX_PACKET_POOL                          ux_slave_class_cdc_ecm_packet_pool;
+    NX_PACKET_POOL                          *ux_slave_class_cdc_ecm_packet_pool;
 #endif
 
 #if !defined(UX_DEVICE_STANDALONE)

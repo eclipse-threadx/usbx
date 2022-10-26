@@ -41,7 +41,7 @@ static inline UINT _ux_host_class_hub_activate_wait(UX_HOST_CLASS_COMMAND *comma
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hub_entry                            PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,7 +80,10 @@ static inline UINT _ux_host_class_hub_activate_wait(UX_HOST_CLASS_COMMAND *comma
 /*                                            resulting in version 6.1    */
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
-/*                                            resulting in version 6.1    */
+/*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed power on delay calc,  */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_entry(UX_HOST_CLASS_COMMAND *command)
@@ -356,7 +359,7 @@ ULONG                   current_ms, elapsed_ms;
 
             /* Delay a while (as described by hub descriptor).  */
             hub -> ux_host_class_hub_wait_start = _ux_utility_time_get();
-            hub -> ux_host_class_hub_wait_ms = hub -> ux_host_class_hub_descriptor.bPwrOn2PwrGood;
+            hub -> ux_host_class_hub_wait_ms = UX_MS_TO_TICK_NON_ZERO(hub -> ux_host_class_hub_descriptor.bPwrOn2PwrGood << 1);
 
             hub -> ux_host_class_hub_enum_state = UX_HOST_CLASS_HUB_ENUM_TRANS_WAIT;
             hub -> ux_host_class_hub_next_state = UX_HOST_CLASS_HUB_ENUM_PORT_POWER_ON;

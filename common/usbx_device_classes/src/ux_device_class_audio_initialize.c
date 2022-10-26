@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_initialize                   PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,14 +84,13 @@
 /*                                            added interrupt support,    */
 /*                                            refined internal logic,     */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2022     Yajun Xia                Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
-#if defined(UX_DEVICE_STANDALONE)
-    UX_PARAMETER_NOT_USED(command);
-    return(UX_FUNCTION_NOT_SUPPORTED);
-#else
 
 UINT                                    status = UX_SUCCESS;
 UX_DEVICE_CLASS_AUDIO                   *audio;
@@ -153,8 +152,7 @@ ULONG                                   i;
                 audio_parameter -> ux_device_class_audio_parameter_status_size;
     audio -> ux_device_class_audio_status_queue_bytes = memory_size;
 
-#if defined(UX_DEVICE_STANDALONE)
-#else
+#if !defined(UX_DEVICE_STANDALONE)
     if (UX_OVERFLOW_CHECK_ADD_ULONG(memory_size, UX_DEVICE_CLASS_AUDIO_INTERRUPT_THREAD_STACK_SIZE))
     {
         _ux_utility_memory_free(audio);
@@ -217,6 +215,15 @@ ULONG                                   i;
     audio -> ux_device_class_audio_status_queue =
                         (UCHAR *)audio_class -> ux_slave_class_thread_stack +
                         UX_DEVICE_CLASS_AUDIO_INTERRUPT_THREAD_STACK_SIZE;
+#else
+    audio -> ux_device_class_audio_status_queue = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, memory_size);
+
+    /* Check for successful allocation.  */
+    if (audio -> ux_device_class_audio_status_queue == UX_NULL)
+    {
+        _ux_utility_memory_free(audio);
+        return(UX_MEMORY_INSUFFICIENT);
+    }
 #endif
 
 #endif
@@ -268,6 +275,8 @@ ULONG                                   i;
         stream -> ux_device_class_audio_stream_transfer_pos = (UX_DEVICE_CLASS_AUDIO_FRAME *)stream -> ux_device_class_audio_stream_buffer;
         stream -> ux_device_class_audio_stream_access_pos = stream -> ux_device_class_audio_stream_transfer_pos;
 
+#if !defined(UX_DEVICE_STANDALONE)
+
         /* Create memory block for streaming thread stack in addition.  */
         if (stream_parameter -> ux_device_class_audio_stream_parameter_thread_stack_size == 0)
             memory_size = UX_DEVICE_CLASS_AUDIO_FEEDBACK_THREAD_STACK_SIZE;
@@ -298,13 +307,19 @@ ULONG                                   i;
         }
 
         UX_THREAD_EXTENSION_PTR_SET(&(stream -> ux_device_class_audio_stream_thread), stream)
+#else
+
+        /* Save task function for streaming.  */
+        stream -> ux_device_class_audio_stream_task_function = stream_parameter -> ux_device_class_audio_stream_parameter_task_function;
+#endif
 
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+
+#if !defined(UX_DEVICE_STANDALONE)
 
         /* Check entry to confirm feedback is supported.  */
         if (stream_parameter -> ux_device_class_audio_stream_parameter_feedback_thread_entry)
         {
-
             /* Create memory block for streaming thread stack in addition.  */
             if (stream_parameter -> ux_device_class_audio_stream_parameter_feedback_thread_stack_size == 0)
                 memory_size = UX_THREAD_STACK_SIZE;
@@ -336,6 +351,14 @@ ULONG                                   i;
 
             UX_THREAD_EXTENSION_PTR_SET(&(stream -> ux_device_class_audio_stream_feedback_thread), stream)
         }
+#else
+        if (stream_parameter -> ux_device_class_audio_stream_parameter_feedback_task_function)
+        {
+
+            /* Save task function for streaming.  */
+            stream -> ux_device_class_audio_stream_feedback_task_function = stream_parameter -> ux_device_class_audio_stream_parameter_feedback_task_function;
+        }
+#endif
 #endif
 
         /* Save callbacks.  */
@@ -365,6 +388,12 @@ ULONG                                   i;
             &audio_parameter -> ux_device_class_audio_parameter_callbacks,
             sizeof(UX_DEVICE_CLASS_AUDIO_CALLBACKS)); /* Use case of memcpy is verified. */
 
+#if defined(UX_DEVICE_STANDALONE)
+
+        /* Link task function.  */
+        audio_class -> ux_slave_class_task_function = _ux_device_class_audio_tasks_run;
+#endif
+
         /* Return completion status.  */
         return(UX_SUCCESS);
     }
@@ -377,24 +406,27 @@ ULONG                                   i;
     for (i = 0; i < audio -> ux_device_class_audio_streams_nb; i ++)
     {
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+#if !defined(UX_DEVICE_STANDALONE)
         if (stream -> ux_device_class_audio_stream_feedback_thread_stack)
         {
             _ux_device_thread_delete(&stream -> ux_device_class_audio_stream_feedback_thread);
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_feedback_thread_stack);
         }
 #endif
+#endif
+#if !defined(UX_DEVICE_STANDALONE)
         if (stream -> ux_device_class_audio_stream_thread_stack)
         {
             _ux_device_thread_delete(&stream -> ux_device_class_audio_stream_thread);
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_thread_stack);
         }
+#endif
         if (stream -> ux_device_class_audio_stream_buffer)
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_buffer);
         stream ++;
     }
 #if defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
-#if defined(UX_DEVICE_STANDALONE)
-#else
+#if !defined(UX_DEVICE_STANDALONE)
     if (audio_class -> ux_slave_class_thread_stack)
     {
         _ux_device_thread_delete(&audio_class -> ux_slave_class_thread);
@@ -403,10 +435,14 @@ ULONG                                   i;
         _ux_device_semaphore_delete(&audio -> ux_device_class_audio_status_semaphore);
         _ux_device_mutex_delete(&audio -> ux_device_class_audio_status_mutex);
     }
+#else
+    if (audio -> ux_device_class_audio_status_queue)
+    {
+        _ux_utility_memory_free(audio -> ux_device_class_audio_status_queue);
+    }
 #endif
 #endif
     _ux_utility_memory_free(audio);
 
     return(status);
-#endif
 }

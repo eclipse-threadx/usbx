@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_reception_callback              PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -45,6 +45,8 @@
 /*    This function is the callback from the USBX transfer functions,     */ 
 /*    it is called when a full or partial transfer has been done for a    */ 
 /*    bulk in transfer. It calls back the application.                    */
+/*                                                                        */
+/*    It's deprecated.                                                    */
 /*                                                                        */
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
@@ -76,6 +78,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            deprecated, no RX callback, */
+/*                                            modified pool reference,    */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_reception_callback (UX_TRANSFER *transfer_request)
@@ -125,7 +131,7 @@ UINT                            status;
         nx_packet_transmit_release(packet);
     
     /* We can accept new reception. Get a NX Packet */
-    if (nx_packet_allocate(&asix -> ux_host_class_asix_packet_pool, &packet, 
+    if (nx_packet_allocate(asix -> ux_host_class_asix_packet_pool, &packet, 
                             NX_RECEIVE_PACKET, NX_NO_WAIT) == NX_SUCCESS)            
     {
 
