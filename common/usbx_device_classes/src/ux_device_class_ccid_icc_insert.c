@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_icc_insert                    PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -67,6 +67,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_ccid_icc_insert(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG seq_start)
@@ -83,12 +86,12 @@ UX_DEVICE_CLASS_CCID_SLOT       *ccid_slot;
     ccid_slot += slot;
 
     /* Lock states.  */
-    _ux_device_mutex_on(&ccid -> ux_device_class_ccid_mutex);
+    _ux_device_class_ccid_lock(ccid);
 
     /* Return success if already card inserted.  */
     if (ccid_slot -> ux_device_class_ccid_slot_icc_status != UX_DEVICE_CLASS_CCID_ICC_NOT_PRESENT)
     {
-        _ux_device_mutex_off(&ccid -> ux_device_class_ccid_mutex);
+        _ux_device_class_ccid_unlock(ccid);
         return(UX_SUCCESS);
     }
 
@@ -105,15 +108,20 @@ UX_DEVICE_CLASS_CCID_SLOT       *ccid_slot;
         ccid_slot -> ux_device_class_ccid_slot_flags |= UX_DEVICE_CLASS_CCID_FLAG_NOTIFY_CHANGE;
 
         /* Unlock states.  */
-        _ux_device_mutex_off(&ccid -> ux_device_class_ccid_mutex);
+        _ux_device_class_ccid_unlock(ccid);
 
         /* Wakeup interrupt notification.  */
         _ux_device_semaphore_put(&ccid -> ux_device_class_ccid_notify_semaphore);
+
+#if defined(UX_DEVICE_STANDALONE)
+        if (ccid -> ux_device_class_ccid_notify_state == UX_DEVICE_CLASS_CCID_NOTIFY_IDLE)
+            ccid -> ux_device_class_ccid_notify_state = UX_DEVICE_CLASS_CCID_NOTIFY_LOCK;
+#endif
         return(UX_SUCCESS);
     }
 
     /* Unlock states.  */
-    _ux_device_mutex_off(&ccid -> ux_device_class_ccid_mutex);
+    _ux_device_class_ccid_unlock(ccid);
 
     /* Return transfer status.  */
     return(UX_SUCCESS);

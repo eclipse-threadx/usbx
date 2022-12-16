@@ -40,7 +40,7 @@ static inline VOID _ux_host_class_hub_inst_tasks_run(UX_HOST_CLASS_HUB *hub);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hub_tasks_run                        PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -90,6 +90,10 @@ static inline VOID _ux_host_class_hub_inst_tasks_run(UX_HOST_CLASS_HUB *hub);
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed reset speed handling, */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile issue if only */
+/*                                            one device is supported,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_tasks_run(UX_HOST_CLASS *hub_class)
@@ -262,7 +266,7 @@ UINT        status;
 
                 /* Check if a device is waiting on the port for reset.  */
                 if ((device -> ux_device_flags & UX_DEVICE_FLAG_RESET) &&
-                    (device -> ux_device_parent == hub_device) &&
+                    UX_DEVICE_PARENT_MATCH(device, hub_device) &&
                     (device -> ux_device_port_location == hub -> ux_host_class_hub_run_port))
                 {
                     device -> ux_device_flags &= ~UX_DEVICE_FLAG_RESET;
@@ -383,7 +387,7 @@ UINT        status;
             {
 
                 /* If there is a device connected to the port, put its state to ADDR_SET.  */
-                if ((device -> ux_device_parent == hub -> ux_host_class_hub_device) &&
+                if (UX_DEVICE_PARENT_MATCH(device, hub -> ux_host_class_hub_device) &&
                     (device -> ux_device_port_location == hub -> ux_host_class_hub_run_port))
                 {
 
@@ -411,6 +415,8 @@ UINT        status;
 
                     /* Return device address to 0.  */
                     hcd = UX_DEVICE_HCD_GET(device);
+
+#if UX_MAX_DEVICES > 1
                     if (device -> ux_device_address)
                     {
 
@@ -419,6 +425,7 @@ UINT        status;
                             (UCHAR)(1u << ((device -> ux_device_address-1) & 7u));
 
                     }
+#endif
 
                     /* Assume speed change, re-create EP0 at the HCD level.  */
                     dev_ep0 = &device -> ux_device_control_endpoint;

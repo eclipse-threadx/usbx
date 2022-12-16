@@ -398,7 +398,7 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_entry                            PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -438,6 +438,9 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 /*  07-29-2022     Yajun Xia                Modified comment(s),          */
 /*                                            fixed ipv6 support issue,   */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            fixed build issue with NETX,*/
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -626,12 +629,13 @@ UINT                            i;
                 }
                 else
                 {
+#ifdef FEATURE_NX_IPV6
                     if (packet_ptr -> nx_packet_ip_version == NX_IP_VERSION_V4)
+#endif /* FEATURE_NX_IPV6 */
                         *(ethernet_frame_ptr+3) |= NX_ETHERNET_IP;
 #ifdef FEATURE_NX_IPV6
                     else if (packet_ptr -> nx_packet_ip_version == NX_IP_VERSION_V6)
                         *(ethernet_frame_ptr+3) |= NX_ETHERNET_IPV6;
-#endif /* FEATURE_NX_IPV6 */
                     else 
                     {
                         /* Unknown IP version */
@@ -640,6 +644,7 @@ UINT                            i;
                         nx_ip_driver  -> nx_ip_driver_status =  NX_NOT_SUCCESSFUL;        
                         break;
                     }
+#endif /* FEATURE_NX_IPV6 */
                 }
 
                 /* Endian swapping if NX_LITTLE_ENDIAN is defined.  */

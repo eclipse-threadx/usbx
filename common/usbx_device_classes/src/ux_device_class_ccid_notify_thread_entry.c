@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_notify_thread_entry           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,6 +68,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_ccid_notify_thread_entry(ULONG ccid_inst)
@@ -135,7 +138,7 @@ UINT                                                status;
         /* Build slot hardware error message.  */
         parameter = &ccid -> ux_device_class_ccid_parameter;
 
-        _ux_device_mutex_on(&ccid -> ux_device_class_ccid_mutex);
+        _ux_device_class_ccid_lock(ccid);
 
         slot = ccid -> ux_device_class_ccid_slots;
         for (i = 0; i < parameter -> ux_device_class_ccid_max_n_slots; i ++)
@@ -214,7 +217,7 @@ UINT                                                status;
             length = byte_pos + 1;
         }
 
-        _ux_device_mutex_off(&ccid -> ux_device_class_ccid_mutex);
+        _ux_device_class_ccid_unlock(ccid);
 
         /* Check message to see if there is message to send.  */
         if (buffer[UX_DEVICE_CLASS_CCID_OFFSET_MESSAGE_TYPE] == 0)

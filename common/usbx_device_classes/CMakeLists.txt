@@ -46,9 +46,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_icc_insert.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_icc_remove.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_initialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_notify_task_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_notify_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_response.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_runner_task_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_runner_thread_entry.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_thread_entry.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_time_extension.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_ccid_uninitialize.c

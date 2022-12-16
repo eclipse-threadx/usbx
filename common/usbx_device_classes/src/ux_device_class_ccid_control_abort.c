@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_control_abort                 PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,6 +64,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_ccid_control_abort(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG seq)
@@ -130,6 +133,13 @@ UX_DEVICE_CLASS_CCID_MESSAGE_HEADER         *msg;
             }
         }
     }
+
+#if defined(UX_DEVICE_STANDALONE)
+    if (ccid -> ux_device_class_ccid_cmd_state == UX_DEVICE_CLASS_CCID_CMD_WAIT)
+        ccid -> ux_device_class_ccid_cmd_state = UX_DEVICE_CLASS_CCID_CMD_START;
+    if (ccid -> ux_device_class_ccid_rsp_state == UX_DEVICE_CLASS_CCID_RSP_WAIT)
+        ccid -> ux_device_class_ccid_rsp_state = UX_DEVICE_CLASS_CCID_RSP_IDLE;
+#endif
 
     /* Set aborting state.  */
     ccid_slot -> ux_device_class_ccid_slot_aborting = UX_TRUE;

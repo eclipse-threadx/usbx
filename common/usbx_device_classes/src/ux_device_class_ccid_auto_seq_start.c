@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_auto_seq_start                PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -63,6 +63,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added standalone support,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_ccid_auto_seq_start(UX_DEVICE_CLASS_CCID *ccid, ULONG slot)
@@ -79,13 +82,13 @@ UX_DEVICE_CLASS_CCID_SLOT       *ccid_slot;
     ccid_slot += slot;
 
     /* Lock states.  */
-    _ux_device_mutex_on(&ccid -> ux_device_class_ccid_mutex);
+    _ux_device_class_ccid_lock(ccid);
 
     /* Set state of auto sequencing.  */
     ccid_slot -> ux_device_class_ccid_slot_flags |= UX_DEVICE_CLASS_CCID_FLAG_AUTO_SEQUENCING;
 
     /* Unlock states.  */
-    _ux_device_mutex_off(&ccid -> ux_device_class_ccid_mutex);
+    _ux_device_class_ccid_unlock(ccid);
 
     /* Return transfer status.  */
     return(UX_SUCCESS);
