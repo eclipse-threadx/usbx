@@ -43,7 +43,7 @@ extern VOID _ux_host_class_storage_write_initialize(UX_HOST_CLASS_STORAGE *stora
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_read_write_run               PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -93,12 +93,17 @@ extern VOID _ux_host_class_storage_write_initialize(UX_HOST_CLASS_STORAGE *stora
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked device state,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_read_write_run(UX_HOST_CLASS_STORAGE *storage,
                 ULONG read_write,
                 ULONG sector_start, ULONG sector_count, UCHAR *data_pointer)
 {
+
+UX_DEVICE           *device;
 
 #if defined UX_HOST_CLASS_STORAGE_STATE_CHECK_ENABLE
 UX_INTERRUPT_SAVE_AREA
@@ -125,6 +130,9 @@ UX_INTERRUPT_SAVE_AREA
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_STORAGE_MEDIA_READ, storage, sector_start, sector_count, data_pointer, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
+    /* Get device.  */
+    device = storage -> ux_host_class_storage_device;
+
     switch(storage -> ux_host_class_storage_op_state)
     {
     case UX_STATE_IDLE:     /* Fall through.  */
@@ -149,6 +157,14 @@ UX_INTERRUPT_SAVE_AREA
 
         /* Run tasks, including transport task.  */
         _ux_system_host_tasks_run();
+
+        /* Check if device is still available.  */
+        if (device -> ux_device_state != UX_DEVICE_CONFIGURED)
+        {
+
+            /* Instance should have been destroyed, just return.  */
+            return(UX_STATE_EXIT);
+        }
 
         /* Fatal error.  */
         if (storage -> ux_host_class_storage_op_state < UX_STATE_IDLE)

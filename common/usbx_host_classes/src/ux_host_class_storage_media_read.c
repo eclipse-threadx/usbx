@@ -82,7 +82,7 @@ ULONG       command_length;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_media_read                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -123,6 +123,9 @@ ULONG       command_length;
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked device removal,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_read(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
@@ -134,6 +137,8 @@ UINT            status;
         status = _ux_host_class_storage_read_write_run(storage, UX_TRUE,
                                     sector_start, sector_count, data_pointer);
     } while(status == UX_STATE_WAIT);
+    if (status < UX_STATE_IDLE)
+        return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     return(storage -> ux_host_class_storage_status);
 #else
 UINT            status;

@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_check_run                    PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,10 +79,14 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked device state,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_check_run(UX_HOST_CLASS_STORAGE *storage)
 {
+UX_DEVICE   *device;
 
 #if defined UX_HOST_CLASS_STORAGE_STATE_CHECK_ENABLE
 UX_INTERRUPT_SAVE_AREA
@@ -107,6 +111,9 @@ UX_INTERRUPT_SAVE_AREA
     UX_RESTORE
 #endif
 
+    /* Get device.  */
+    device = storage -> ux_host_class_storage_device;
+
     switch(storage -> ux_host_class_storage_op_state)
     {
     case UX_STATE_IDLE:
@@ -129,6 +136,14 @@ UX_INTERRUPT_SAVE_AREA
 
         /* Run tasks, including transport task.  */
         _ux_system_host_tasks_run();
+
+        /* Check if device is still available.  */
+        if (device -> ux_device_state != UX_DEVICE_CONFIGURED)
+        {
+
+            /* Instance should have been destroyed, just return.  */
+            return(UX_STATE_EXIT);
+        }
 
         /* In case state is not idle, check if it changes back.  */
         if (storage -> ux_host_class_storage_state_state == UX_STATE_IDLE)

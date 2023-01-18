@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_lock                         PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,12 +71,19 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked device state,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT    _ux_host_class_storage_lock(UX_HOST_CLASS_STORAGE *storage, ULONG wait)
 {
 UX_INTERRUPT_SAVE_AREA
 ULONG           t0, t1;
+UX_DEVICE       *device;
+
+    /* Get device.  */
+    device = storage -> ux_host_class_storage_device;
 
     t0 = _ux_utility_time_get();
     while(1)
@@ -129,6 +136,14 @@ ULONG           t0, t1;
 
         /* Run stack tasks.  */
         _ux_system_host_tasks_run();
+
+        /* Check if device is still available.  */
+        if (device -> ux_device_state != UX_DEVICE_CONFIGURED)
+        {
+
+            /* Instance should have been destroyed, just return.  */
+            return(UX_STATE_EXIT);
+        }
     }
 
     /* Lock storage.  */
