@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_audio_streaming_sampling_set         PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -96,6 +96,9 @@
 /*                                            fixed error return code,    */
 /*                                            used endpoints get API,     */
 /*                                            resulting in version 6.1.12 */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved frequency check,   */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_streaming_sampling_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling)
@@ -305,10 +308,10 @@ ULONG                   res_bytes;
                         transfer -> ux_transfer_request_value =             UX_CLASS_AUDIO10_EP_SAMPLING_FREQ_CONTROL << 8;
                         transfer -> ux_transfer_request_index =             audio -> ux_host_class_audio_isochronous_endpoint -> ux_endpoint_descriptor.bEndpointAddress;
                         status = _ux_host_stack_transfer_request(transfer);
-                    }
 
-                    /* Free buffer.  */
-                    _ux_utility_memory_free(control_buffer);
+                        /* Clear 4th byte in case it's changed occasionally.  */
+                        control_buffer[3] = 0;
+                    }
 
                     /* Check frequency.  */
                     if (status == UX_SUCCESS)
@@ -317,18 +320,24 @@ ULONG                   res_bytes;
                         if (audio_sampling -> ux_host_class_audio_sampling_frequency != frequency)
                             status = UX_HOST_CLASS_AUDIO_WRONG_FREQUENCY;
                     }
+
+                    /* Free buffer.  */
+                    _ux_utility_memory_free(control_buffer);
                 }
 
                 /* Update packet processing parameters.  */
-                audio -> ux_host_class_audio_packet_freq =
-                        (device -> ux_device_speed == UX_HIGH_SPEED_DEVICE) ?
-                                        8000 : 1000;
-                audio -> ux_host_class_audio_packet_freq <<=
-                        audio -> ux_host_class_audio_isochronous_endpoint ->
-                                        ux_endpoint_descriptor.bInterval - 1;   /* Max 8000 << 15, no overflow.  */
-                res_bytes = audio_sampling -> ux_host_class_audio_sampling_resolution;
-                if (UX_OVERFLOW_CHECK_ADD_ULONG(res_bytes, 7))
-                    status = UX_MATH_OVERFLOW;
+                if (status == UX_SUCCESS)
+                {
+                    audio -> ux_host_class_audio_packet_freq =
+                            (device -> ux_device_speed == UX_HIGH_SPEED_DEVICE) ?
+                                            8000 : 1000;
+                    audio -> ux_host_class_audio_packet_freq <<=
+                            audio -> ux_host_class_audio_isochronous_endpoint ->
+                                            ux_endpoint_descriptor.bInterval - 1;   /* Max 8000 << 15, no overflow.  */
+                    res_bytes = audio_sampling -> ux_host_class_audio_sampling_resolution;
+                    if (UX_OVERFLOW_CHECK_ADD_ULONG(res_bytes, 7))
+                        status = UX_MATH_OVERFLOW;
+                }
                 if (status == UX_SUCCESS)
                 {
                     res_bytes += 7;

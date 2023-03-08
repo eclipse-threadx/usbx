@@ -148,3 +148,61 @@ UINT                                    status;
     /* Return completion status.  */
     return(UX_SUCCESS);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_printer_initialize                  PORTABLE C    */
+/*                                                           6.2.1        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer initialization function call.*/
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to printer command    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_printer_initialize   Initialize printer instance   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Stack                                                        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023     Yajun Xia                Initial Version 6.2.1         */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_class_printer_initialize(UX_SLAVE_CLASS_COMMAND *command)
+{
+UX_DEVICE_CLASS_PRINTER_PARAMETER       *printer_parameter;
+ULONG length;
+
+    /* Get the pointer to the application parameters for the printer class.  */
+    printer_parameter =  command -> ux_slave_class_command_parameter;
+
+    /* Sanity checks.  */
+
+    /* Length of data (first two bytes in big endian).  */
+    length = _ux_utility_short_get_big_endian(printer_parameter -> ux_device_class_printer_device_id);
+
+    if (length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
+    {
+        return(UX_INVALID_PARAMETER);
+    }
+
+    return (_ux_device_class_printer_initialize(command));
+}

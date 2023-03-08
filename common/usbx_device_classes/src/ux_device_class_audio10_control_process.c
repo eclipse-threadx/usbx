@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio10_control_process            PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,7 +66,7 @@
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    ThreadX                                                             */
+/*    Application                                                         */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
@@ -84,6 +84,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added sampling control,     */
 /*                                            resulting in version 6.1.12 */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed a macro name,         */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio10_control_process(UX_DEVICE_CLASS_AUDIO *audio,
@@ -180,7 +183,7 @@ ULONG                               i;
                 if (sam > max)
                     sam = max;
                 control -> ux_device_class_audio10_control_sam_freq = sam;
-                control -> ux_device_class_audio10_control_changed = UX_DEVICE_CLASS_AUDIO20_CONTROL_FREQUENCY_CHANGED;
+                control -> ux_device_class_audio10_control_changed = UX_DEVICE_CLASS_AUDIO10_CONTROL_FREQUENCY_CHANGED;
                 return(UX_SUCCESS);
 
             case UX_DEVICE_CLASS_AUDIO10_GET_CUR:
@@ -334,4 +337,59 @@ ULONG                               i;
 
     /* Done error.  */
     return(UX_ERROR);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_audio10_control_process           PORTABLE C      */
+/*                                                           6.2.1        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in control processing function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Address of audio class        */
+/*                                            instance                    */
+/*    transfer                              Address of transfer request   */
+/*                                            instance                    */
+/*    group                                 Request process data          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_audio10_control_process                            */
+/*                                          Process control requests      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023     Chaoqiong Xiao           Initial Version 6.2.1         */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_audio10_control_process(UX_DEVICE_CLASS_AUDIO *audio,
+    UX_SLAVE_TRANSFER *transfer, UX_DEVICE_CLASS_AUDIO10_CONTROL_GROUP *group)
+{
+
+    /* Sanity checks.  */
+    if (audio == UX_NULL || transfer == UX_NULL || group == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Process control request.  */
+    return(_ux_device_class_audio10_control_process(audio, transfer, group));
 }

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_transfer_request_completed       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported report IDs,       */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_transfer_request_completed(UX_TRANSFER *transfer_request)
@@ -128,15 +131,43 @@ ULONG                               field_report_count;
     /* We know this incoming report is for the Input report.  */
     hid_report =  hid -> ux_host_class_hid_parser.ux_host_class_hid_parser_input_report;
 
-    /* initialize some of the callback structure which are generic to any
-       reporting method.  */
-    callback.ux_host_class_hid_report_callback_client =  hid_client;
-    callback.ux_host_class_hid_report_callback_id =      hid_report -> ux_host_class_hid_report_id;
-    
+    /* If there are multiple HID reports, report ID must be checked.  */
+    if (hid_report -> ux_host_class_hid_report_next_report != UX_NULL)
+    {
+
+        /* Scan the reports to find the report expected. */
+        while(1)
+        {
+
+            /* Check report ID at buffer start.  */
+            if (*(UCHAR*)report_buffer == hid_report -> ux_host_class_hid_report_id)
+                break;
+
+            /* If there is no more report, it's done.  */
+            if (hid_report -> ux_host_class_hid_report_next_report == UX_NULL)
+                break;
+
+            /* There is more reports, next.  */
+            hid_report = hid_report -> ux_host_class_hid_report_next_report;
+        }
+
+        /* Check if the report is what we expected.  */
+        if (*(UCHAR*)report_buffer != hid_report -> ux_host_class_hid_report_id)
+
+            /* Report not found.  */
+            hid_report = UX_NULL;
+    }
+
     /* For this report to be used, the HID client must have registered
        the report. We check the call back function.  */
-    if (hid_report -> ux_host_class_hid_report_callback_function != UX_NULL)
+    if ((hid_report != UX_NULL) &&
+        (hid_report -> ux_host_class_hid_report_callback_function != UX_NULL))
     {
+
+        /* initialize some of the callback structure which are generic to any
+           reporting method.  */
+        callback.ux_host_class_hid_report_callback_client =  hid_client;
+        callback.ux_host_class_hid_report_callback_id =      hid_report -> ux_host_class_hid_report_id;
 
         /* The report is now in memory in a raw format the application may desire to handle it that way!  */
         if (hid_report -> ux_host_class_hid_report_callback_flags & UX_HOST_CLASS_HID_REPORT_RAW)

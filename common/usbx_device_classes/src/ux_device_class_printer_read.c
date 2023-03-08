@@ -201,3 +201,59 @@ ULONG                       local_requested_length;
         /* Simply return the last transaction result.  */
         return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_printer_read                       PORTABLE C     */
+/*                                                           6.2.1        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer class read function          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Address of printer class      */
+/*                                            instance                    */
+/*    buffer                                Pointer to buffer to save     */
+/*                                            received data               */
+/*    requested_length                      Length of bytes to read       */
+/*    actual_length                         Pointer to save number of     */
+/*                                            bytes read                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_printer_read         Printer class read function   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023     Yajun Xia                Initial Version 6.2.1         */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_printer_read(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
+                                    ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((printer == UX_NULL) || (buffer == UX_NULL) || (actual_length == UX_NULL))
+    {
+        return (UX_INVALID_PARAMETER);
+    }
+
+    return (_ux_device_class_printer_read(printer, buffer, requested_length, actual_length));
+}

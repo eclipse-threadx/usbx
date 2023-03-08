@@ -115,3 +115,55 @@ UCHAR                       *buffer;
     return(UX_SUCCESS);
 #endif
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_audio_feedback_get                PORTABLE C      */
+/*                                                           6.2.1        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in encoded feedback getting function    */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    stream                                Address of audio stream       */
+/*                                            instance                    */
+/*    encoded_feedback                      Feedback data (3 or 4 bytes)  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_audio_feedback_get  Get encoded feedback           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023     Chaoqiong Xiao           Initial Version 6.2.1         */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_audio_feedback_get(UX_DEVICE_CLASS_AUDIO_STREAM *stream,
+                                           UCHAR *encoded_feedback)
+{
+
+    /* Sanity check on input parameters.  */
+    if (stream == UX_NULL || encoded_feedback == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Get feedback.  */
+    return(_ux_device_class_audio_feedback_get(stream, encoded_feedback));
+}

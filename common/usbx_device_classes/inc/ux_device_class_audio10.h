@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio10.h                           PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,6 +53,10 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added sampling control,     */
 /*                                            resulting in version 6.1.12 */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            fixed a macro name,         */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -68,6 +72,13 @@
 extern   "C" { 
 
 #endif  
+
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_AUDIO_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_AUDIO_ENABLE_ERROR_CHECKING
+#endif
 
 
 /* Define Audio Class specific AC interface descriptor subclasses.  */
@@ -377,7 +388,7 @@ typedef struct UX_DEVICE_CLASS_AUDIO10_CONTROL_STRUCT
 
 #define UX_DEVICE_CLASS_AUDIO10_CONTROL_MUTE_CHANGED                1u
 #define UX_DEVICE_CLASS_AUDIO10_CONTROL_VOLUME_CHANGED              2u
-#define UX_DEVICE_CLASS_AUDIO20_CONTROL_FREQUENCY_CHANGED           4u
+#define UX_DEVICE_CLASS_AUDIO10_CONTROL_FREQUENCY_CHANGED           4u
 
 typedef struct UX_DEVICE_CLASS_AUDIO10_CONTROL_GROUP_STRUCT
 {
@@ -389,7 +400,19 @@ UINT _ux_device_class_audio10_control_process(UX_DEVICE_CLASS_AUDIO *audio,
                                               UX_SLAVE_TRANSFER *transfer_request,
                                               UX_DEVICE_CLASS_AUDIO10_CONTROL_GROUP *group);
 
+UINT _uxe_device_class_audio10_control_process(UX_DEVICE_CLASS_AUDIO *audio,
+                                              UX_SLAVE_TRANSFER *transfer_request,
+                                              UX_DEVICE_CLASS_AUDIO10_CONTROL_GROUP *group);
+
+#if defined(UX_DEVICE_CLASS_AUDIO_ENABLE_ERROR_CHECKING)
+
+#define ux_device_class_audio10_control_process _uxe_device_class_audio10_control_process
+
+#else
+
 #define ux_device_class_audio10_control_process _ux_device_class_audio10_control_process
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

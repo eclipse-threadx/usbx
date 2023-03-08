@@ -225,3 +225,59 @@ UINT                        status = 0;
         /* Simply return the last transaction result.  */
         return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_printer_write                       PORTABLE C    */
+/*                                                           6.2.1        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer class write function         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Address of printer class      */
+/*                                            instance                    */
+/*    buffer                                Pointer to data to write      */
+/*    requested_length                      Length of bytes to write,     */
+/*                                            set to 0 to issue ZLP       */
+/*    actual_length                         Pointer to save number of     */
+/*                                            bytes written               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_printer_write        Printer class write function  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023     Yajun Xia                Initial Version 6.2.1         */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_printer_write(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
+                                     ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((printer == UX_NULL) || (buffer == UX_NULL) || (actual_length == UX_NULL))
+    {
+        return (UX_INVALID_PARAMETER);
+    }
+
+    return (_ux_device_class_printer_write(printer, buffer, requested_length, actual_length));
+}

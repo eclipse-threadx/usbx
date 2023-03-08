@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -128,6 +128,11 @@
 /*                                            added interface instance    */
 /*                                            creation strategy control,  */
 /*                                            resulting in version 6.2.0  */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            accepted UX_MAX_CLASSES as  */
+/*                                            max class driver configure, */
+/*                                            added a new error code,     */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -255,6 +260,13 @@ typedef signed char               SCHAR;
 #define UX_MAX_SLAVE_INTERFACES                             16
 #endif
 
+/* Define USBX max number of classes (1 ~ n).  */
+#ifndef UX_MAX_CLASSES
+#define UX_MAX_CLASSES                                      2
+#endif
+#ifndef UX_MAX_CLASS_DRIVER
+#define UX_MAX_CLASS_DRIVER                                 UX_MAX_CLASSES
+#endif
 
 /* Define USBX max number of devices (1 ~ n).  */
 #ifndef UX_MAX_DEVICES
@@ -295,7 +307,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            2
-#define USBX_PATCH_VERSION            0
+#define USBX_PATCH_VERSION            1
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
@@ -1417,6 +1429,7 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_INVALID_PARAMETER                                            0xfa
 #define UX_ABORTED                                                      0xf9
 #define UX_MATH_OVERFLOW                                                0xf8
+#define UX_INVALID_BUILD_OPTION                                         0xf7
 
 #define UX_TOO_MANY_DEVICES                                             0x11
 #define UX_MEMORY_INSUFFICIENT                                          0x12

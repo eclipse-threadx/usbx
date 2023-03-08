@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_cdc_acm_capabilities_get             PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed capabilities get from */
+/*                                            multiple CDC-ACM functions, */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_capabilities_get(UX_HOST_CLASS_CDC_ACM *cdc_acm)
@@ -190,10 +194,10 @@ ULONG                       interface_found;
                     _ux_utility_descriptor_parse(descriptor, _ux_system_interface_descriptor_structure,
                                                     UX_INTERFACE_DESCRIPTOR_ENTRIES, (UCHAR *) &interface_descriptor);
 
-                    /* Ensure we have the correct interface for Audio streaming.  */
-                    if ((interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_CONTROL_CLASS) &&
-                        ((interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_CDC_ACM_SUBCLASS) ||
-                        (interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_CDC_DLC_SUBCLASS)))
+                    /* Ensure we have the correct interface for CDC control (current interface).  */
+                    if (interface_descriptor.bInterfaceNumber ==
+                                cdc_acm -> ux_host_class_cdc_acm_interface ->
+                                    ux_interface_descriptor.bInterfaceNumber)
                     {
 
                         /* Mark we have found it.  */

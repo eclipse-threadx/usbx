@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_ioctl                      PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +47,8 @@
 /*                                                                        */
 /*    printer                               Address of printer class      */
 /*                                            instance                    */
+/*    ioctl_function                        Ioctl function                */
+/*    Parameter                             Parameter of ioctl function   */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -65,6 +67,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  03-08-2023     Yajun Xia                Modified comment(s),          */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_printer_ioctl(UX_DEVICE_CLASS_PRINTER *printer, ULONG ioctl_function,
@@ -123,4 +127,57 @@ UX_SLAVE_TRANSFER                   *transfer;
     /* Return status to caller.  */
     return(status);
 
+}
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_printer_ioctl                      PORTABLE C     */
+/*                                                           6.2.1        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer class ioctl function         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Address of printer class      */
+/*                                            instance                    */
+/*    ioctl_function                        Ioctl function                */
+/*    Parameter                             Parameter of ioctl function   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_printer_ioctl        Printer class ioctl function  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023     Yajun Xia                Initial Version 6.2.1         */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_printer_ioctl(UX_DEVICE_CLASS_PRINTER *printer, ULONG ioctl_function,
+                                     VOID *parameter)
+{
+
+    /* Sanity checks.  */
+    if (printer == UX_NULL)
+    {
+        return (UX_INVALID_PARAMETER);
+    }
+
+    return (_ux_device_class_printer_ioctl(printer, ioctl_function, parameter));
 }

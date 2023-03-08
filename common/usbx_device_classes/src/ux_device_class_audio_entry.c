@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_entry                        PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            returned request status,    */
 /*                                            resulting in version 6.1.12 */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -93,7 +96,11 @@ UINT        status;
     case UX_SLAVE_CLASS_COMMAND_INITIALIZE:
 
         /* Call the init function of the Audio class.  */
+#if defined(UX_DEVICE_CLASS_AUDIO_ENABLE_ERROR_CHECKING)
+        status =  _uxe_device_class_audio_initialize(command);
+#else
         status =  _ux_device_class_audio_initialize(command);
+#endif
 
         /* Return the completion status.  */
         return(status);
@@ -157,4 +164,3 @@ UINT        status;
         return(UX_FUNCTION_NOT_SUPPORTED);
     }
 }
-

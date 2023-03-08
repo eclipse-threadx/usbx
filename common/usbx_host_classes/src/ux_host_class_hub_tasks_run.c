@@ -40,7 +40,7 @@ static inline VOID _ux_host_class_hub_inst_tasks_run(UX_HOST_CLASS_HUB *hub);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hub_tasks_run                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -90,10 +90,10 @@ static inline VOID _ux_host_class_hub_inst_tasks_run(UX_HOST_CLASS_HUB *hub);
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed reset speed handling, */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile issue if only */
 /*                                            one device is supported,    */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_tasks_run(UX_HOST_CLASS *hub_class)

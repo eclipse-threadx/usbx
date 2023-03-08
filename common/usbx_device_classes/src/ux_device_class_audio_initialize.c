@@ -446,3 +446,67 @@ ULONG                                   i;
 
     return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_audio_initialize                  PORTABLE C      */
+/*                                                           6.2.1        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in audio initialization function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to audio command      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_audio_initialize     Initialize audio instance     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Audio Class                                                  */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  03-08-2023     Chaoqiong Xiao           Initial Version 6.2.1         */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_class_audio_initialize(UX_SLAVE_CLASS_COMMAND *command)
+{
+
+UX_DEVICE_CLASS_AUDIO_PARAMETER         *audio_parameter;
+
+    /* Get the pointer to the application parameters for the audio class.  */
+    audio_parameter = (UX_DEVICE_CLASS_AUDIO_PARAMETER *)command -> ux_slave_class_command_parameter;
+
+    /* Sanity checks.  */
+
+    /* There must be at least one stream.  */
+    if (audio_parameter -> ux_device_class_audio_parameter_streams == UX_NULL ||
+        audio_parameter -> ux_device_class_audio_parameter_streams_nb < 1)
+        return(UX_INVALID_PARAMETER);
+
+#if defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
+
+    /* There must be status setting for event queue.  */
+    if (audio_parameter -> ux_device_class_audio_parameter_status_queue_size == 0 ||
+        audio_parameter -> ux_device_class_audio_parameter_status_size == 0)
+        return(UX_INVALID_PARAMETER);
+#endif
+
+    /* Do initialize.  */
+    return(_ux_device_class_audio_initialize(command));
+}

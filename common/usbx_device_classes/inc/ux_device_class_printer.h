@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_printer.h                           PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +47,9 @@
 /*  10-31-2022     Yajun xia                Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
+/*  03-08-2023     Yajun xia                Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -61,6 +64,12 @@
 /* Yes, C++ compiler is present.  Use standard C.  */
 extern   "C" {
 
+#endif
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_PRINTER_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_PRINTER_ENABLE_ERROR_CHECKING
 #endif
 
 /* Defined, _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
@@ -174,12 +183,30 @@ UINT  _ux_device_class_printer_read_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR 
                                 ULONG requested_length, ULONG *actual_length);
 #endif
 
+UINT  _uxe_device_class_printer_initialize(UX_SLAVE_CLASS_COMMAND *command);
+UINT  _uxe_device_class_printer_read(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
+                                ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_device_class_printer_write(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
+                                ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_device_class_printer_ioctl(UX_DEVICE_CLASS_PRINTER *printer, ULONG ioctl_function,
+                                    VOID *parameter);
+
 /* Define Device Printer Class API prototypes.  */
+#if defined(UX_DEVICE_CLASS_PRINTER_ENABLE_ERROR_CHECKING)
+
+#define ux_device_class_printer_entry               _ux_device_class_printer_entry
+#define ux_device_class_printer_read                _uxe_device_class_printer_read
+#define ux_device_class_printer_write               _uxe_device_class_printer_write
+#define ux_device_class_printer_ioctl               _uxe_device_class_printer_ioctl
+
+#else
 
 #define ux_device_class_printer_entry               _ux_device_class_printer_entry
 #define ux_device_class_printer_read                _ux_device_class_printer_read
 #define ux_device_class_printer_write               _ux_device_class_printer_write
 #define ux_device_class_printer_ioctl               _ux_device_class_printer_ioctl
+
+#endif
 
 #if defined(UX_DEVICE_STANDALONE)
 #define ux_device_class_printer_read_run            _ux_device_class_printer_read_run

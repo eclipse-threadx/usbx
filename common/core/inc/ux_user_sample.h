@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.2.1        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -89,6 +89,16 @@
 /*                                            added host stack instance   */
 /*                                            creation strategy control,  */
 /*                                            resulting in version 6.2.0  */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added option to disable dev */
+/*                                            alternate setting support,  */
+/*                                            added option to disable dev */
+/*                                            framework initialize scan,  */
+/*                                            added option to reference   */
+/*                                            names by pointer to chars,  */
+/*                                            added option to enable      */
+/*                                            basic USBX error checking,  */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -409,6 +419,30 @@
 
 /* #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT  */
 
+/* Defined, this macro disables interface alternate setting support.
+   Device stalls 
+ */
+/* UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE  */
+
+
+/* Defined, this macro disables device framework scan, where max number of endpoints (except EP0)
+   and max number of interfaces are calculated at runtime, as a base to allocate memory for
+   interfaces and endpoints structures and their buffers.
+   Undefined, the following two macros must be defined to initialize memory structures.
+ */
+/* #define UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE  */
+
+/* Works if UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE is defined.
+   This value represents max number of endpoints (except EP0) activated at the same time.
+ */
+/* #define UX_MAX_DEVICE_ENDPOINTS                         2  */
+
+/* Works if UX_DEVICE_INITIALIZE_FRAMEWORK_SCAN_DISABLE is defined.
+   This value represents max number of interfaces activated at the same time.
+ */
+/* #define UX_MAX_DEVICE_INTERFACES                        1  */
+
+
 /* Defined, this macro enables device/host PIMA MTP support.  */
 
 /* #define UX_PIMA_WITH_MTP_SUPPORT  */
@@ -420,6 +454,7 @@
  */
 
 /* #define UX_HOST_DEVICE_CLASS_CODE_VALIDATION_ENABLE  */
+
 
 /* Defined, host HID interrupt OUT transfer is supported.  */
 
@@ -447,6 +482,12 @@
    Not defined, default setting is applied.
  */
 /* #define UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_CONTROL UX_HOST_STACK_CONFIGURATION_INSTANCE_CREATE_OWNED */
+
+/* Defined, the _name in structs are referenced by pointer instead of by contents.
+   By default the _name is an array of string that saves characters, the contents are compared to confirm match.
+   If referenced by pointer the address pointer to const string is saved, the pointers are compared to confirm match.
+ */
+/* #define UX_NAME_REFERENCED_BY_POINTER  */
 
 /* Defined, this value will only enable the host side of usbx.  */
 /* #define UX_HOST_SIDE_ONLY   */
@@ -520,6 +561,13 @@
 /* Defined, this defines the assert action taken when failure detected. By default
    it halts without any output.  */
 /* #define UX_ASSERT_FAIL  for (;;) {tx_thread_sleep(UX_WAIT_FOREVER); }  */
+
+
+/* Defined, this option enables the basic USBX error checking. This define is typically used
+   when the application is debugging and removed after the application is fully debugged.  */
+/*
+#define UX_ENABLE_ERROR_CHECKING
+*/
 
 
 /* DEBUG includes and macros for a specific platform go here.  */

@@ -398,7 +398,7 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_entry                            PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -438,9 +438,9 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 /*  07-29-2022     Yajun Xia                Modified comment(s),          */
 /*                                            fixed ipv6 support issue,   */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*  03-08-2023     Yajun Xia                Modified comment(s),          */
 /*                                            fixed build issue with NETX,*/
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 

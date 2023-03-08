@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_runner_task_run               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,7 +70,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  03-08-2023     Chaoqiong Xiao           Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_ccid_runner_task_run(UX_DEVICE_CLASS_CCID *ccid)

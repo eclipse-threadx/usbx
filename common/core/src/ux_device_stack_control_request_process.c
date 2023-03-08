@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_control_request_process            PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -91,6 +91,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed vendor request issue, */
+/*                                            resulting in version 6.2.1  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_control_request_process(UX_SLAVE_TRANSFER *transfer_request)
@@ -144,7 +147,8 @@ ULONG                       application_data_length;
         {
 
             /* Check the request demanded and compare it to the application registered one.  */
-            if (request == _ux_system_slave -> ux_system_slave_device_vendor_request)
+            if (_ux_system_slave -> ux_system_slave_device_vendor_request_function != UX_NULL &&
+                request == _ux_system_slave -> ux_system_slave_device_vendor_request)
             {
 
                 /* This is a Microsoft extended function. It happens before the device is configured. 

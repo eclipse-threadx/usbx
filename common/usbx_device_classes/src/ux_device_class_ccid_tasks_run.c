@@ -40,7 +40,7 @@ static inline UINT _ux_device_class_ccid_rsp_task(UX_DEVICE_CLASS_CCID *ccid);
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_tasks_run                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,7 +75,7 @@ static inline UINT _ux_device_class_ccid_rsp_task(UX_DEVICE_CLASS_CCID *ccid);
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  03-08-2023     Chaoqiong Xiao           Initial Version 6.2.1         */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_ccid_tasks_run(VOID *instance)
