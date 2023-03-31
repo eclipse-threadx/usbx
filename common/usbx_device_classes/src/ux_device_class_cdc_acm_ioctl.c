@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_ioctl                      PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,7 +64,7 @@
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
-/*    ThreadX                                                             */ 
+/*    Application                                                         */
 /*                                                                        */ 
 /*  RELEASE HISTORY                                                       */ 
 /*                                                                        */ 
@@ -96,6 +96,8 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -209,7 +211,7 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
                 /* Parameter not supported. Return an error.  */
                 status =  UX_ENDPOINT_HANDLE_UNKNOWN;
             }
-        
+
             /* Get the transfer request associated with the endpoint.  */
             transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
 
@@ -351,10 +353,62 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
     
             /* Function not supported. Return an error.  */
             status =  UX_FUNCTION_NOT_SUPPORTED;
-    }   
+    }
 
     /* Return status to caller.  */
     return(status);
-          
+
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_cdc_acm_ioctl                     PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in CDC ACM class ioctl function.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_acm                               Address of cdc_acm class      */
+/*                                                instance                */
+/*    ioctl_function                        Ioctl function                */
+/*    Parameter                             Parameter of ioctl function   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_cdc_acm_ioctl        CDC ACM class ioctl function  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
+                                    VOID *parameter)
+{
+
+    /* Sanity checks.  */
+    if (cdc_acm == UX_NULL)
+    {
+        return (UX_INVALID_PARAMETER);
+    }
+
+    return (_ux_device_class_cdc_acm_ioctl(cdc_acm, ioctl_function, parameter));
+}

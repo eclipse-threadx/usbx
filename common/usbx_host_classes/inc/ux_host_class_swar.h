@@ -67,6 +67,13 @@ extern   "C" {
 #endif  
 
 
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_CLASS_SWAR_ENABLE_ERROR_CHECKING)
+#define UX_HOST_CLASS_SWAR_ENABLE_ERROR_CHECKING
+#endif
+
+
 /* Define Sierra Wireless AR Class constants.  */
 
 #define UX_HOST_CLASS_SWAR_CLASS_TRANSFER_TIMEOUT               300000
@@ -148,17 +155,41 @@ UINT    _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
 UINT    _ux_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar, 
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
-                                    
+
+
+UINT    _uxe_host_class_swar_read (UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer, 
+                                    ULONG requested_length, ULONG *actual_length);
+UINT    _uxe_host_class_swar_write(UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer, 
+                                    ULONG requested_length, ULONG *actual_length);
+UINT    _uxe_host_class_swar_ioctl(UX_HOST_CLASS_SWAR *swar, ULONG ioctl_function,
+                                    VOID *parameter);
+UINT    _uxe_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar, 
+                                    UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
+UINT    _uxe_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar, 
+                                    UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
+
 /* Define SWAR Class API prototypes.  */
 
 #define  ux_host_class_swar_entry                           _ux_host_class_swar_entry
+#define  ux_host_class_swar_setup                           _ux_host_class_swar_setup
+
+#if defined(UX_HOST_CLASS_SWAR_ENABLE_ERROR_CHECKING)
+
+#define  ux_host_class_swar_read                            _uxe_host_class_swar_read
+#define  ux_host_class_swar_write                           _uxe_host_class_swar_write
+#define  ux_host_class_swar_ioctl                           _uxe_host_class_swar_ioctl
+#define  ux_host_class_swar_reception_stop                  _uxe_host_class_swar_reception_stop
+#define  ux_host_class_swar_reception_start                 _uxe_host_class_swar_reception_start
+
+#else
+
 #define  ux_host_class_swar_read                            _ux_host_class_swar_read
 #define  ux_host_class_swar_write                           _ux_host_class_swar_write
 #define  ux_host_class_swar_ioctl                           _ux_host_class_swar_ioctl
-#define  ux_host_class_swar_command                         _ux_host_class_swar_command
 #define  ux_host_class_swar_reception_stop                  _ux_host_class_swar_reception_stop
 #define  ux_host_class_swar_reception_start                 _ux_host_class_swar_reception_start
-#define  ux_host_class_swar_setup                           _ux_host_class_swar_setup
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

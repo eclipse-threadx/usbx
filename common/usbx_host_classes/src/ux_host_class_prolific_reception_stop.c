@@ -109,3 +109,54 @@ UINT  _ux_host_class_prolific_reception_stop (UX_HOST_CLASS_PROLIFIC *prolific,
     return(UX_SUCCESS);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_prolific_reception_stop            PORTABLE C       */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in PROLIFIC reception function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    prolific                              Pointer to PROLIFIC class     */
+/*    prolific_reception                    Pointer to reception struct   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_prolific_reception_stop                              */
+/*                                          PROLIFIC reception stop       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_prolific_reception_stop (UX_HOST_CLASS_PROLIFIC *prolific, 
+                                    UX_HOST_CLASS_PROLIFIC_RECEPTION *prolific_reception)
+{
+
+    /* Sanity checks.  */
+    if ((prolific == UX_NULL) || (prolific_reception == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke PROLIFIC reception stop function.  */
+    return(_ux_host_class_prolific_reception_stop(prolific, prolific_reception));
+}

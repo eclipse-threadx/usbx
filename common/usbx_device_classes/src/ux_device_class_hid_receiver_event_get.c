@@ -109,3 +109,55 @@ UX_DEVICE_CLASS_HID_RECEIVED_EVENT      *pos;
     return(UX_ERROR);
 #endif
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_hid_receiver_event_get            PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID event get function call.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to hid instance       */
+/*    event                                 Pointer of the event          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_hid_receiver_event_get                             */
+/*                                          Get a receiver event          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
+                                UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event)
+{
+
+    /* Sanity check.  */
+    if ((hid == UX_NULL) || (event == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke function to free HID event.  */
+    return(_ux_device_class_hid_receiver_event_get(hid, event));
+}

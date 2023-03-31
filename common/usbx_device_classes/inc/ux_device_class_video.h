@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_video.h                             PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,6 +44,9 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -58,6 +61,12 @@
 /* Yes, C++ compiler is present.  Use standard C.  */
 extern   "C" {
 
+#endif
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_VIDEO_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_VIDEO_ENABLE_ERROR_CHECKING
 #endif
 
 /* Define options.  */
@@ -658,7 +667,48 @@ UINT    _ux_device_class_video_tasks_run(VOID *instance);
 UINT    _ux_device_class_video_read_task_function(UX_DEVICE_CLASS_VIDEO_STREAM *stream);
 UINT    _ux_device_class_video_write_task_function(UX_DEVICE_CLASS_VIDEO_STREAM *stream);
 
+UINT    _uxe_device_class_video_initialize(UX_SLAVE_CLASS_COMMAND *command);
+ULONG   _uxe_device_class_video_max_payload_length(UX_DEVICE_CLASS_VIDEO_STREAM *video);
+UINT    _uxe_device_class_video_reception_start(UX_DEVICE_CLASS_VIDEO_STREAM *video);
+UINT    _uxe_device_class_video_read_payload_get(UX_DEVICE_CLASS_VIDEO_STREAM *video, UCHAR **payload_data, ULONG *payload_length);
+UINT    _uxe_device_class_video_read_payload_free(UX_DEVICE_CLASS_VIDEO_STREAM *video);
+UINT    _uxe_device_class_video_transmission_start(UX_DEVICE_CLASS_VIDEO_STREAM *video);
+UINT    _uxe_device_class_video_write_payload_get(UX_DEVICE_CLASS_VIDEO_STREAM *video, UCHAR **buffer, ULONG *max_length);
+UINT    _uxe_device_class_video_write_payload_commit(UX_DEVICE_CLASS_VIDEO_STREAM *video, ULONG length);
+UINT    _uxe_device_class_video_ioctl(UX_DEVICE_CLASS_VIDEO *video, ULONG ioctl_function, VOID *parameter);
+
 /* Define Video Class API prototypes.  */
+
+#if defined(UX_DEVICE_CLASS_VIDEO_ENABLE_ERROR_CHECKING)
+
+#define ux_device_class_video_entry                   _ux_device_class_video_entry
+
+#define ux_device_class_video_read_thread_entry       _ux_device_class_video_read_thread_entry
+#define ux_device_class_video_write_thread_entry      _ux_device_class_video_write_thread_entry
+
+#define ux_device_class_video_request_error_set       _ux_device_class_video_request_error_set
+#define ux_device_class_video_stream_error_set        _ux_device_class_video_stream_error_set
+
+#define ux_device_class_video_stream_get              _ux_device_class_video_stream_get
+
+#define ux_device_class_video_max_payload_length      _uxe_device_class_video_max_payload_length
+
+#define ux_device_class_video_reception_start         _uxe_device_class_video_reception_start
+
+#define ux_device_class_video_read_payload_get        _uxe_device_class_video_read_payload_get
+#define ux_device_class_video_read_payload_free       _uxe_device_class_video_read_payload_free
+
+#define ux_device_class_video_transmission_start      _uxe_device_class_video_transmission_start
+
+#define ux_device_class_video_write_payload_get       _uxe_device_class_video_write_payload_get
+#define ux_device_class_video_write_payload_commit    _uxe_device_class_video_write_payload_commit
+
+#define ux_device_class_video_ioctl                   _uxe_device_class_video_ioctl
+
+#define ux_device_class_video_read_task_function      _ux_device_class_video_read_task_function
+#define ux_device_class_video_write_task_function     _ux_device_class_video_write_task_function
+
+#else
 
 #define ux_device_class_video_entry                   _ux_device_class_video_entry
 
@@ -687,6 +737,7 @@ UINT    _ux_device_class_video_write_task_function(UX_DEVICE_CLASS_VIDEO_STREAM 
 #define ux_device_class_video_read_task_function      _ux_device_class_video_read_task_function
 #define ux_device_class_video_write_task_function     _ux_device_class_video_write_task_function
 
+#endif  /* UX_DEVICE_CLASS_VIDEO_ENABLE_ERROR_CHECKING */
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard
    C conditional started above.  */

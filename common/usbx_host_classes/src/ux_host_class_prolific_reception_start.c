@@ -128,3 +128,54 @@ UINT            status;
     return(status); 
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_prolific_reception_start            PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in PROLIFIC reception function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    prolific                              Pointer to PROLIFIC class     */
+/*    prolific_reception                    Pointer to reception struct   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_prolific_reception_start                             */
+/*                                          PROLIFIC reception start      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_prolific_reception_start (UX_HOST_CLASS_PROLIFIC *prolific, 
+                                    UX_HOST_CLASS_PROLIFIC_RECEPTION *prolific_reception)
+{
+
+    /* Sanity checks.  */
+    if ((prolific == UX_NULL) || (prolific_reception == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke PROLIFIC reception start function.  */
+    return(_ux_host_class_prolific_reception_start(prolific, prolific_reception));
+}

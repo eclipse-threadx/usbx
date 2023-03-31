@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_hid.h                               PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.X          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,6 +64,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone int out,   */
 /*                                            resulting in version 6.1.12 */
+/*  XX-XX-XXXX     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            moved build option check,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -84,6 +87,14 @@ extern   "C" {
 
 /* If defined, interrupt OUT transfer is supported.  */
 /* #define UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT  */
+
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_HID_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_HID_ENABLE_ERROR_CHECKING
+#endif
+
 
 /* Use UX general thread stack size for receiver thread.  */
 #define UX_DEVICE_CLASS_HID_RECEIVER_THREAD_STACK_SIZE              UX_THREAD_STACK_SIZE
@@ -142,12 +153,14 @@ extern   "C" {
 
 /* Ensure the event buffer can fit inside the control endpoint's data buffer.  */
 #if UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH
-#error "Error: the event buffer cannot fit inside the control endpoint's data buffer. Reduce UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH such that it is less than or equal to UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH."
+/* #error "Error: the event buffer cannot fit inside the control endpoint's data buffer. Reduce UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH such that it is less than or equal to UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH." */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /* Ensure the event buffer can fit inside the interrupt endpoint's data buffer.  */
 #if UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH > UX_SLAVE_REQUEST_DATA_MAX_LENGTH
-#error "Error: the event buffer cannot fit inside the interrupt endpoint's data buffer. Reduce UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH such that it is less than or equal to UX_SLAVE_REQUEST_DATA_MAX_LENGTH."
+/* #error "Error: the event buffer cannot fit inside the interrupt endpoint's data buffer. Reduce UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH such that it is less than or equal to UX_SLAVE_REQUEST_DATA_MAX_LENGTH." */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 #ifndef UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE
@@ -313,7 +326,46 @@ UINT  _ux_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid,
                                 ULONG *actual_length);
 UINT  _ux_device_class_hid_receiver_tasks_run(UX_SLAVE_CLASS_HID *hid);
 
+
+UINT  _uxe_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command);
+UINT  _uxe_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
+                                      UX_SLAVE_CLASS_HID_EVENT *hid_event);
+UINT  _uxe_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid,
+                                      UX_SLAVE_CLASS_HID_EVENT *hid_event);
+UINT  _uxe_device_class_hid_read(UX_SLAVE_CLASS_HID *hid,
+                                UCHAR *buffer, ULONG requested_length,
+                                ULONG *actual_length);
+UINT  _uxe_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid,
+                                UCHAR *buffer, ULONG requested_length,
+                                ULONG *actual_length);
+UINT  _uxe_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
+                                    UX_SLAVE_CLASS_HID_PARAMETER *parameter,
+                                    UX_DEVICE_CLASS_HID_RECEIVER **receiver);
+UINT  _uxe_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
+                                UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
+UINT  _uxe_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
+
+
 /* Define Device HID Class API prototypes.  */
+
+#if defined(UX_DEVICE_CLASS_HID_ENABLE_ERROR_CHECKING)
+
+#define ux_device_class_hid_entry               _ux_device_class_hid_entry
+#define ux_device_class_hid_event_set           _uxe_device_class_hid_event_set
+#define ux_device_class_hid_event_get           _uxe_device_class_hid_event_get
+#define ux_device_class_hid_report_set          _ux_device_class_hid_report_set
+#define ux_device_class_hid_report_get          _ux_device_class_hid_report_get
+
+#define ux_device_class_hid_protocol_get(hid)   (((hid) == UX_NULL) ? UX_ERROR : (hid) -> ux_device_class_hid_protocol)
+
+#define ux_device_class_hid_read                _uxe_device_class_hid_read
+#define ux_device_class_hid_read_run            _uxe_device_class_hid_read_run
+
+#define ux_device_class_hid_receiver_initialize _ux_device_class_hid_receiver_initialize
+#define ux_device_class_hid_receiver_event_get  _uxe_device_class_hid_receiver_event_get
+#define ux_device_class_hid_receiver_event_free _uxe_device_class_hid_receiver_event_free
+
+#else
 
 #define ux_device_class_hid_entry        _ux_device_class_hid_entry
 #define ux_device_class_hid_event_set    _ux_device_class_hid_event_set
@@ -321,7 +373,7 @@ UINT  _ux_device_class_hid_receiver_tasks_run(UX_SLAVE_CLASS_HID *hid);
 #define ux_device_class_hid_report_set   _ux_device_class_hid_report_set
 #define ux_device_class_hid_report_get   _ux_device_class_hid_report_get
 
-#define ux_device_class_hid_protocol_get(hid)   (hid -> ux_device_class_hid_protocol)
+#define ux_device_class_hid_protocol_get(hid)   ((hid) -> ux_device_class_hid_protocol)
 
 #define ux_device_class_hid_read                _ux_device_class_hid_read
 #define ux_device_class_hid_read_run            _ux_device_class_hid_read_run
@@ -329,6 +381,8 @@ UINT  _ux_device_class_hid_receiver_tasks_run(UX_SLAVE_CLASS_HID *hid);
 #define ux_device_class_hid_receiver_initialize _ux_device_class_hid_receiver_initialize
 #define ux_device_class_hid_receiver_event_get  _ux_device_class_hid_receiver_event_get
 #define ux_device_class_hid_receiver_event_free _ux_device_class_hid_receiver_event_free
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard
    C conditional started above.  */

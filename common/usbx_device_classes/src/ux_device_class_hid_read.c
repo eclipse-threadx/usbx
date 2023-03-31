@@ -212,4 +212,61 @@ ULONG                       local_requested_length;
         return(status);
 #endif
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_hid_read                          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID read function call.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to hid instance       */
+/*    buffer                                Pointer to receive buffer     */
+/*    requested_length                      Receive buffer size in bytes  */
+/*    actual_length                         Actual num bytes received     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_hid_read             Read data                     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_hid_read(UX_SLAVE_CLASS_HID *hid, UCHAR *buffer,
+                                   ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((hid == UX_NULL) ||
+        (buffer == UX_NULL) || (requested_length == 0) ||
+        (actual_length == UX_NULL))
+    {
+        return(UX_INVALID_PARAMETER);
+    }
+
+    /* Invoke function to read data.  */
+    return(_ux_device_class_hid_read(hid, buffer, requested_length, actual_length));
+}
 #endif

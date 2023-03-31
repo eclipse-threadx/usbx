@@ -386,3 +386,55 @@ ULONG                   res_bytes;
     /* We get here if we could not get the right alternate setting.  */
     return(UX_NO_ALTERNATE_SETTING);
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_audio_streaming_sampling_set        PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in audio sampling characteristics set   */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio class        */ 
+/*    audio_sampling                        Pointer to audio sampling     */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_audio_streaming_sampling_set                         */
+/*                                          Set sampling characteristics  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_audio_streaming_sampling_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling)
+{
+
+    /* Sanity checks.  */
+    if ((audio == UX_NULL) || (audio_sampling == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke sampling characteristics set function.  */
+    return(_ux_host_class_audio_streaming_sampling_set(audio, audio_sampling));
+}

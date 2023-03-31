@@ -189,3 +189,52 @@ UINT                        client_name_length =  0;
     return(UX_MEMORY_ARRAY_FULL);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_hid_client_register                 PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID client register function call.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid_client_name                       Name of HID client            */
+/*    hid_client_handler                    Handler for HID client        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_client_register    Register an HID client        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_hid_client_register(UCHAR *hid_client_name,
+                                UINT (*hid_client_handler)(struct UX_HOST_CLASS_HID_CLIENT_COMMAND_STRUCT *))
+{
+
+    /* Sanity checks.  */
+    if ((hid_client_name == UX_NULL) || (hid_client_handler == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke client register function.  */
+    return(_ux_host_class_hid_client_register(hid_client_name, hid_client_handler));
+}

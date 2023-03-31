@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,6 +60,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added macros for req types, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -75,6 +78,12 @@
 extern   "C" { 
 
 #endif  
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_DFU_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_DFU_ENABLE_ERROR_CHECKING
+#endif
 
 /* Define DFU class descriptor capabilities.  */                    
 #define UX_SLAVE_CLASS_DFU_CAPABILITY_WILL_DETACH                   0x08
@@ -255,9 +264,10 @@ VOID  _ux_device_class_dfu_state_sync(UX_SLAVE_CLASS_DFU *dfu);
 
 UINT  _ux_device_class_dfu_tasks_run(VOID *class_instance);
 
-/* Define Device DFU Class API prototypes.  */
+UINT  _uxe_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command);
 
-#define ux_device_class_dfu_entry        _ux_device_class_dfu_entry   
+/* Define Device DFU Class API prototypes.  */
+#define ux_device_class_dfu_entry        _ux_device_class_dfu_entry
 #define ux_device_class_dfu_state_get    _ux_device_class_dfu_state_get
 #define ux_device_class_dfu_state_sync   _ux_device_class_dfu_state_sync
 

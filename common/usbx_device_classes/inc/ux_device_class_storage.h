@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_storage.h                           PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,6 +57,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 
@@ -72,6 +75,14 @@
 extern   "C" { 
 
 #endif  
+
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_STORAGE_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_STORAGE_ENABLE_ERROR_CHECKING
+#endif
+
 
 /* Define User configurable Storage Class constants.  */
 
@@ -641,6 +652,10 @@ UINT    _ux_device_class_storage_read_dvd_structure(UX_SLAVE_CLASS_STORAGE *stor
                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
 
 UINT    _ux_device_class_storage_tasks_run(VOID *instance);
+
+
+UINT    _uxe_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command);
+
 
 /* Define Device Storage Class API prototypes.  */
 

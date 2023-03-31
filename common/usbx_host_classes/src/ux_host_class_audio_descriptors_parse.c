@@ -35,14 +35,14 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_audio_descriptors_parse              PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function parsees all interface descriptors and their audio     */
+/*    This function parses all interface descriptors and their audio      */
 /*    class specific descriptors relates to current audio instance.       */
 /*                                                                        */
 /*    The function scans the device configuration descriptor. Once the    */
@@ -79,6 +79,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  07-29-2022     Chaoqiong Xiao           Initial Version 6.1.12        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_host_class_audio_descriptors_parse(UX_HOST_CLASS_AUDIO *audio,
@@ -203,4 +205,63 @@ UINT                                            status;
 
     /* We get here when all descriptors scanned.  */
     return(UX_SUCCESS);
+}
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_audio_descriptors_parse             PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in audio descriptors parse function     */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio instance     */
+/*    parse_function                        Parse function for each       */
+/*                                          audio class descriptor        */
+/*    arg                                   Parse function argument       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _uxe_host_class_audio_descriptors_parse                              */
+/*                                          Parse audio descriptors       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_host_class_audio_descriptors_parse(UX_HOST_CLASS_AUDIO *audio,
+        UINT(*parse_function)(VOID  *arg,
+                              UCHAR *packed_interface_descriptor,
+                              UCHAR *packed_endpoint_descriptor,
+                              UCHAR *packed_audio_descriptor),
+        VOID* arg)
+{
+
+    /* Sanity checks.  */
+    if ((audio == UX_NULL) || (parse_function == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke audio descriptor parse function.  */
+    return(_ux_host_class_audio_descriptors_parse(audio, parse_function, arg));
 }

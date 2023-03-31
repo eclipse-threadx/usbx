@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_ccid.h                              PORTABLE C      */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -42,6 +42,9 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -55,6 +58,12 @@
 
 /* Yes, C++ compiler is present.  Use standard C.  */
 extern   "C" {
+#endif
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_CCID_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_CCID_ENABLE_ERROR_CHECKING
 #endif
 
 #if !defined(UX_DEVICE_STANDALONE)
@@ -1161,9 +1170,25 @@ UINT  _ux_device_class_ccid_auto_seq_done(UX_DEVICE_CLASS_CCID *ccid, ULONG slot
 UINT  _ux_device_class_ccid_time_extension(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG wt);
 UINT  _ux_device_class_ccid_hardware_error(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG error);
 
+UINT  _uxe_device_class_ccid_icc_insert(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG seq_start);
+UINT  _uxe_device_class_ccid_icc_remove(UX_DEVICE_CLASS_CCID *ccid, ULONG slot);
+UINT  _uxe_device_class_ccid_auto_seq_done(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG icc_status);
+UINT  _uxe_device_class_ccid_time_extension(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG wt);
+UINT  _uxe_device_class_ccid_hardware_error(UX_DEVICE_CLASS_CCID *ccid, ULONG slot, ULONG error);
+
 /* Define Device CCID Class API prototypes.  */
 
 #define ux_device_class_ccid_entry               _ux_device_class_ccid_entry
+
+#if defined(UX_DEVICE_CLASS_CCID_ENABLE_ERROR_CHECKING)
+
+#define ux_device_class_ccid_icc_insert          _uxe_device_class_ccid_icc_insert
+#define ux_device_class_ccid_icc_remove          _uxe_device_class_ccid_icc_remove
+#define ux_device_class_ccid_auto_seq_done       _uxe_device_class_ccid_auto_seq_done
+#define ux_device_class_ccid_time_extension      _uxe_device_class_ccid_time_extension
+#define ux_device_class_ccid_hardware_error      _uxe_device_class_ccid_hardware_error
+
+#else
 
 #define ux_device_class_ccid_icc_insert          _ux_device_class_ccid_icc_insert
 #define ux_device_class_ccid_icc_remove          _ux_device_class_ccid_icc_remove
@@ -1171,6 +1196,7 @@ UINT  _ux_device_class_ccid_hardware_error(UX_DEVICE_CLASS_CCID *ccid, ULONG slo
 #define ux_device_class_ccid_time_extension      _ux_device_class_ccid_time_extension
 #define ux_device_class_ccid_hardware_error      _ux_device_class_ccid_hardware_error
 
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard
    C conditional started above.  */

@@ -66,6 +66,14 @@ extern   "C" {
 
 #endif  
 
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_CLASS_PROLIFIC_ENABLE_ERROR_CHECKING)
+#define UX_HOST_CLASS_PROLIFIC_ENABLE_ERROR_CHECKING
+#endif
+
+
 /* Define PROLIFIC Class constants.  */
                                                                 
 #define UX_HOST_CLASS_PROLIFIC_DEVICE_INIT_DELAY                (1 * UX_PERIODIC_RATE)
@@ -298,16 +306,45 @@ UINT  _ux_host_class_prolific_reception_start (UX_HOST_CLASS_PROLIFIC *prolific,
 VOID  _ux_host_class_prolific_reception_callback (UX_TRANSFER *transfer_request);
 UINT  _ux_host_class_prolific_setup(UX_HOST_CLASS_PROLIFIC *prolific);
 
+
+UINT  _uxe_host_class_prolific_read (UX_HOST_CLASS_PROLIFIC *prolific, UCHAR *data_pointer, 
+                                  ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_host_class_prolific_write(UX_HOST_CLASS_PROLIFIC *prolific, UCHAR *data_pointer, 
+                                  ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_host_class_prolific_ioctl(UX_HOST_CLASS_PROLIFIC *prolific, ULONG request,
+                                  VOID *parameter);
+UINT  _uxe_host_class_prolific_command(UX_HOST_CLASS_PROLIFIC *prolific, ULONG command,
+                                    ULONG value, UCHAR *data_buffer, ULONG data_length);
+UINT  _uxe_host_class_prolific_reception_stop (UX_HOST_CLASS_PROLIFIC *prolific, 
+                                    UX_HOST_CLASS_PROLIFIC_RECEPTION *prolific_reception);
+UINT  _uxe_host_class_prolific_reception_start (UX_HOST_CLASS_PROLIFIC *prolific, 
+                                    UX_HOST_CLASS_PROLIFIC_RECEPTION *prolific_reception);
+
+
 /* Define Prolific Class API prototypes.  */
 
 #define  ux_host_class_prolific_entry                           _ux_host_class_prolific_entry
+#define  ux_host_class_prolific_setup                           _ux_host_class_prolific_setup
+
+#if defined(UX_HOST_CLASS_PROLIFIC_ENABLE_ERROR_CHECKING)
+
+#define  ux_host_class_prolific_read                            _uxe_host_class_prolific_read
+#define  ux_host_class_prolific_write                           _uxe_host_class_prolific_write
+#define  ux_host_class_prolific_ioctl                           _uxe_host_class_prolific_ioctl
+#define  ux_host_class_prolific_command                         _uxe_host_class_prolific_command
+#define  ux_host_class_prolific_reception_stop                  _uxe_host_class_prolific_reception_stop
+#define  ux_host_class_prolific_reception_start                 _uxe_host_class_prolific_reception_start
+
+#else
+
 #define  ux_host_class_prolific_read                            _ux_host_class_prolific_read
 #define  ux_host_class_prolific_write                           _ux_host_class_prolific_write
 #define  ux_host_class_prolific_ioctl                           _ux_host_class_prolific_ioctl
 #define  ux_host_class_prolific_command                         _ux_host_class_prolific_command
 #define  ux_host_class_prolific_reception_stop                  _ux_host_class_prolific_reception_stop
 #define  ux_host_class_prolific_reception_start                 _ux_host_class_prolific_reception_start
-#define  ux_host_class_prolific_setup                           _ux_host_class_prolific_setup
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

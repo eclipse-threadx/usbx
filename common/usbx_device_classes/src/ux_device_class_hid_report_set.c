@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_report_set                     PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -47,6 +47,7 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
+/*    hid                                   Pointer to hid instance       */
 /*    descriptor_type                       Descriptor type               */
 /*    descriptor_index                      Index of descriptor           */
 /*    host_length                           Length requested by host      */
@@ -61,8 +62,7 @@
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
-/*    Application                                                         */ 
-/*    Device Stack                                                        */
+/*    Device HID                                                          */
 /*                                                                        */ 
 /*  RELEASE HISTORY                                                       */ 
 /*                                                                        */ 
@@ -73,6 +73,8 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_report_set(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type, 
@@ -147,4 +149,3 @@ UCHAR                           *hid_buffer;
     /* Return the status to the caller.  */
     return(UX_SUCCESS);
 }
-

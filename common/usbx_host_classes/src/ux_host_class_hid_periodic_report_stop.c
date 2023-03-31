@@ -116,3 +116,53 @@ UINT  _ux_host_class_hid_periodic_report_stop(UX_HOST_CLASS_HID *hid)
     return(UX_SUCCESS);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_hid_periodic_report_stop            PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID periodic report stop function   */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_periodic_report_stop                             */
+/*                                          Stop polling periodic report  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_hid_periodic_report_stop(UX_HOST_CLASS_HID *hid)
+{
+
+    /* Sanity check.  */
+    if (hid == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke periodic stop function.  */
+    return(_ux_host_class_hid_periodic_report_stop(hid));
+}
+

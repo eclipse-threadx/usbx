@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_printer.h                           PORTABLE C      */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*  03-08-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            fixed error checking issue, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -176,12 +179,11 @@ UINT  _ux_device_class_printer_read(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buf
 
 UINT  _ux_device_class_printer_ioctl(UX_DEVICE_CLASS_PRINTER *printer, ULONG ioctl_function,
                                     VOID *parameter);
-#if defined(UX_DEVICE_STANDALONE)
+
 UINT  _ux_device_class_printer_write_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
 UINT  _ux_device_class_printer_read_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
-#endif
 
 UINT  _uxe_device_class_printer_initialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _uxe_device_class_printer_read(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
@@ -190,6 +192,10 @@ UINT  _uxe_device_class_printer_write(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *b
                                 ULONG requested_length, ULONG *actual_length);
 UINT  _uxe_device_class_printer_ioctl(UX_DEVICE_CLASS_PRINTER *printer, ULONG ioctl_function,
                                     VOID *parameter);
+UINT  _uxe_device_class_printer_write_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
+                                ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_device_class_printer_read_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
+                                ULONG requested_length, ULONG *actual_length);
 
 /* Define Device Printer Class API prototypes.  */
 #if defined(UX_DEVICE_CLASS_PRINTER_ENABLE_ERROR_CHECKING)
@@ -198,6 +204,8 @@ UINT  _uxe_device_class_printer_ioctl(UX_DEVICE_CLASS_PRINTER *printer, ULONG io
 #define ux_device_class_printer_read                _uxe_device_class_printer_read
 #define ux_device_class_printer_write               _uxe_device_class_printer_write
 #define ux_device_class_printer_ioctl               _uxe_device_class_printer_ioctl
+#define ux_device_class_printer_read_run            _uxe_device_class_printer_read_run
+#define ux_device_class_printer_write_run           _uxe_device_class_printer_write_run
 
 #else
 
@@ -205,12 +213,9 @@ UINT  _uxe_device_class_printer_ioctl(UX_DEVICE_CLASS_PRINTER *printer, ULONG io
 #define ux_device_class_printer_read                _ux_device_class_printer_read
 #define ux_device_class_printer_write               _ux_device_class_printer_write
 #define ux_device_class_printer_ioctl               _ux_device_class_printer_ioctl
-
-#endif
-
-#if defined(UX_DEVICE_STANDALONE)
 #define ux_device_class_printer_read_run            _ux_device_class_printer_read_run
 #define ux_device_class_printer_write_run           _ux_device_class_printer_write_run
+
 #endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard

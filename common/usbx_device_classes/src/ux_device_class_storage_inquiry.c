@@ -31,7 +31,8 @@
 
 
 #if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < 24
-#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH is too small, please check
+/* #error UX_SLAVE_REQUEST_DATA_MAX_LENGTH is too small, please check  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /**************************************************************************/ 
@@ -39,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_inquiry                    PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -91,6 +92,10 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            updated dCSWDataResidue,    */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -104,6 +109,9 @@ ULONG                   inquiry_length;
 UCHAR                   *inquiry_buffer;
 
     UX_PARAMETER_NOT_USED(endpoint_out);
+
+    /* Build option check.  */
+    UX_ASSERT(UX_SLAVE_REQUEST_DATA_MAX_LENGTH >= 24);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_INQUIRY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

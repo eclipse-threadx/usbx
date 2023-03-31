@@ -194,3 +194,59 @@ ULONG           transfer_request_length;
     return(UX_SUCCESS); 
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_prolific_write                      PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in PROLIFIC write function call.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    prolific                              Pointer to PROLIFIC class     */
+/*    data_pointer                          Pointer to data to write      */
+/*    requested_length                      Length of data to write       */
+/*    actual_length                         Actual length of data written */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_prolific_write          PROLIFIC write               */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_prolific_write(UX_HOST_CLASS_PROLIFIC *prolific, UCHAR *data_pointer, 
+                                    ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((prolific == UX_NULL) ||
+        ((data_pointer == UX_NULL) && (requested_length != 0)) ||
+        (actual_length == UX_NULL))
+    {
+        return(UX_INVALID_PARAMETER);
+    }
+
+    /* Invoke PROLIFIC write function.  */
+    return(_ux_host_class_prolific_write(prolific, data_pointer, requested_length, actual_length));
+}

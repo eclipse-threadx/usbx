@@ -31,7 +31,8 @@
 
 
 #if UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE < UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH
-#error UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE too small, please check
+/* #error UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE too small, please check  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /**************************************************************************/ 
@@ -39,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_request_sense              PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,6 +87,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_request_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -101,6 +106,9 @@ ULONG                   sense_length;
 
     UX_PARAMETER_NOT_USED(cbwcb);
     UX_PARAMETER_NOT_USED(endpoint_out);
+
+    /* Build option check.  */
+    UX_ASSERT(UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE >= UX_SLAVE_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH);
 
     /* Obtain the pointer to the transfer request.  */
     transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;

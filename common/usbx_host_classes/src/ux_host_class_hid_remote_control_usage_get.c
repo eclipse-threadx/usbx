@@ -125,3 +125,57 @@ UX_HOST_CLASS_HID   *hid;
     return(UX_SUCCESS);    
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_hid_remote_control_usage_get        PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID remote control get function call.*/
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    remote_control_instance               Pointer to remote control     */
+/*    usage                                 Pointer to usage              */
+/*    value                                 Pointer to value              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_remote_control_usage_get                         */
+/*                                          Get remote control usage      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_hid_remote_control_usage_get(
+                    UX_HOST_CLASS_HID_REMOTE_CONTROL *remote_control_instance,
+                    ULONG *usage, ULONG *value)
+{
+
+    /* Sanity checks.  */
+    if ((remote_control_instance == UX_NULL) ||
+        (usage == UX_NULL) || (value == UX_NULL) ||
+        (usage == value))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke remote control get function.  */
+    return(_ux_host_class_hid_remote_control_usage_get(remote_control_instance, usage, value));
+}

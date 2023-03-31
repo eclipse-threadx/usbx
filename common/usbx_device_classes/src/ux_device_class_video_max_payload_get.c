@@ -90,3 +90,55 @@ UX_SLAVE_DEVICE             *device;
     return(endpoint -> ux_slave_endpoint_transfer_request.
                                     ux_slave_transfer_request_transfer_length);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_video_max_payload_length          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in getting video stream max payload     */
+/*    length function call.                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    stream                                Address of video stream       */
+/*                                            instance                    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_video_max_payload_length                           */
+/*                                          Get max payload length in the */
+/*                                            video stream.               */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+ULONG _uxe_device_class_video_max_payload_length(UX_DEVICE_CLASS_VIDEO_STREAM *stream)
+{
+
+    /* Sanity check. */
+    if (stream == UX_NULL)
+        return(0);
+
+    /* Call the actual function.  */
+    return(_ux_device_class_video_max_payload_length(stream));
+}

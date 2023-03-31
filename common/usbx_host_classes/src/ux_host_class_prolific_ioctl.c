@@ -335,3 +335,54 @@ VOID                                (*callback_function) (struct UX_HOST_CLASS_P
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_prolific_ioctl                      PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in PROLIFIC ioctl function call.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    prolific                              Pointer to PROLIFIC class     */
+/*    ioctl_function                        ioctl function                */
+/*    parameter                             pointer to structure          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_prolific_ioctl         PROLIFIC ioctl                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_prolific_ioctl(UX_HOST_CLASS_PROLIFIC *prolific, ULONG ioctl_function,
+                                    VOID *parameter)
+{
+
+    /* Sanity check.  */
+    if (prolific == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke PROLIFIC ioctl function.  */
+    return(_ux_host_class_prolific_ioctl(prolific, ioctl_function, parameter));
+}

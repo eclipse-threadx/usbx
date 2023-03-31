@@ -207,7 +207,7 @@ ULONG                       local_requested_length;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_printer_read                       PORTABLE C     */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -243,6 +243,9 @@ ULONG                       local_requested_length;
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  03-08-2023     Yajun Xia                Initial Version 6.2.1         */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            fixed error checking issue, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_printer_read(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
@@ -250,7 +253,7 @@ UINT _uxe_device_class_printer_read(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buf
 {
 
     /* Sanity checks.  */
-    if ((printer == UX_NULL) || (buffer == UX_NULL) || (actual_length == UX_NULL))
+    if ((printer == UX_NULL) || ((buffer == UX_NULL) && (requested_length > 0)) || (actual_length == UX_NULL))
     {
         return (UX_INVALID_PARAMETER);
     }

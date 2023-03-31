@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,6 +58,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added write auto ZLP,       */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -73,6 +76,12 @@
 extern   "C" { 
 
 #endif  
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_CDC_ACM_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_CDC_ACM_ENABLE_ERROR_CHECKING
+#endif
 
 /* Defined, _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
 
@@ -322,9 +331,34 @@ UINT  _ux_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *
 
 UINT  _ux_device_class_cdc_acm_tasks_run(VOID *instance);
 
-/* Define Device CDC Class API prototypes.  */
+UINT  _uxe_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
+                                    ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
+                                    ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
+                                    VOID *parameter);
+UINT  _uxe_device_class_cdc_acm_write_with_callback(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
+                                    ULONG requested_length);
+UINT  _uxe_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
+                                ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
+                                ULONG requested_length, ULONG *actual_length);
 
+/* Define Device CDC Class API prototypes.  */
 #define ux_device_class_cdc_acm_entry               _ux_device_class_cdc_acm_entry
+
+#if defined(UX_DEVICE_CLASS_CDC_ACM_ENABLE_ERROR_CHECKING)
+
+#define ux_device_class_cdc_acm_read                _uxe_device_class_cdc_acm_read
+#define ux_device_class_cdc_acm_write               _uxe_device_class_cdc_acm_write
+#define ux_device_class_cdc_acm_ioctl               _uxe_device_class_cdc_acm_ioctl
+#define ux_device_class_cdc_acm_write_with_callback _uxe_device_class_cdc_acm_write_with_callback
+
+#define ux_device_class_cdc_acm_read_run            _uxe_device_class_cdc_acm_read_run
+#define ux_device_class_cdc_acm_write_run           _uxe_device_class_cdc_acm_write_run
+
+#else
+
 #define ux_device_class_cdc_acm_read                _ux_device_class_cdc_acm_read
 #define ux_device_class_cdc_acm_write               _ux_device_class_cdc_acm_write
 #define ux_device_class_cdc_acm_ioctl               _ux_device_class_cdc_acm_ioctl
@@ -332,6 +366,8 @@ UINT  _ux_device_class_cdc_acm_tasks_run(VOID *instance);
 
 #define ux_device_class_cdc_acm_read_run            _ux_device_class_cdc_acm_read_run
 #define ux_device_class_cdc_acm_write_run           _ux_device_class_cdc_acm_write_run
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

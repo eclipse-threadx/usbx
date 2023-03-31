@@ -77,6 +77,13 @@ extern   "C" {
 #endif  
 
 
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_HID_KEYBOARD_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_HID_KEYBOARD_ENABLE_ERROR_CHECKING
+#endif
+
+
 /* Define HID Keyboard Class constants.  */
 
 #define UX_HOST_CLASS_HID_KEYBOARD_BUFFER_LENGTH            128
@@ -256,11 +263,28 @@ UINT    _ux_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_i
 
 VOID    _ux_host_class_hid_keyboard_tasks_run(UX_HOST_CLASS_HID_CLIENT *client);
 
+
+UINT    _uxe_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance, 
+                                            ULONG *keyboard_key, ULONG *keyboard_state);
+UINT    _uxe_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
+                                        ULONG ioctl_function, VOID *parameter);
+
+
 /* Define HID Keyboard Class API prototypes.  */
 
 #define ux_host_class_hid_keyboard_entry                   _ux_host_class_hid_keyboard_entry
+
+#if defined(UX_DEVICE_CLASS_HID_KEYBOARD_ENABLE_ERROR_CHECKING)
+
+#define ux_host_class_hid_keyboard_key_get                 _uxe_host_class_hid_keyboard_key_get
+#define ux_host_class_hid_keyboard_ioctl                   _uxe_host_class_hid_keyboard_ioctl
+
+#else
+
 #define ux_host_class_hid_keyboard_key_get                 _ux_host_class_hid_keyboard_key_get
 #define ux_host_class_hid_keyboard_ioctl                   _ux_host_class_hid_keyboard_ioctl
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

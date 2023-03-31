@@ -235,4 +235,66 @@ UINT                        status = UX_SUCCESS;
     return(UX_STATE_EXIT);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_printer_read_run                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer read function call.          */
+/*                                                                        */
+/*    It's for standalone mode.                                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Address of printer class      */
+/*                                            instance                    */
+/*    buffer                                Pointer to buffer to save     */
+/*                                            received data               */
+/*    requested_length                      Length of bytes to read       */
+/*    actual_length                         Pointer to save number of     */
+/*                                            bytes read                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    State machine Status to check                                       */
+/*    UX_STATE_NEXT                         Transfer done, to next state  */
+/*    UX_STATE_EXIT                         Abnormal, to reset state      */
+/*    UX_STATE_ERROR                        Error occurred                */
+/*    (others)                              Keep running, waiting         */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_printer_read_run     Printer class read process    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_printer_read_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
+                                ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((printer == UX_NULL) || ((buffer == UX_NULL) && (requested_length > 0)) || (actual_length == UX_NULL))
+    {
+        return (UX_STATE_ERROR);
+    }
+
+    return(_ux_device_class_printer_read_run(printer, buffer, requested_length, actual_length));
+}
+
 #endif

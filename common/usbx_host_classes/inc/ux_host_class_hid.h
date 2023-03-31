@@ -72,6 +72,13 @@ extern   "C" {
 #endif  
 
 
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_HID_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_HID_ENABLE_ERROR_CHECKING
+#endif
+
+
 /* Define HID Class constants.  */
 
 #define UX_HOST_CLASS_HID_CLASS                                 3
@@ -1089,22 +1096,68 @@ UINT    _ux_host_class_hid_tasks_run(UX_HOST_CLASS *hid_class);
 UINT    _ux_host_class_hid_idle_set_run(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id);
 UINT    _ux_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
 
+
+UINT    _uxe_host_class_hid_client_register(UCHAR *hid_client_name,
+                                UINT (*hid_client_handler)(struct UX_HOST_CLASS_HID_CLIENT_COMMAND_STRUCT *));
+
+UINT    _uxe_host_class_hid_idle_get(UX_HOST_CLASS_HID *hid, USHORT *idle_time, USHORT report_id);
+UINT    _uxe_host_class_hid_idle_set(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id);
+
+UINT    _uxe_host_class_hid_periodic_report_start(UX_HOST_CLASS_HID *hid);
+UINT    _uxe_host_class_hid_periodic_report_stop(UX_HOST_CLASS_HID *hid);
+
+UINT    _uxe_host_class_hid_report_callback_register(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_REPORT_CALLBACK *call_back);
+UINT    _uxe_host_class_hid_report_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
+UINT    _uxe_host_class_hid_report_id_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_REPORT_GET_ID *report_id);
+UINT    _uxe_host_class_hid_report_set(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
+
+UINT    _uxe_host_class_hid_idle_set_run(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id);
+UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
+
+
 /* Define HID Class API prototypes.  */
 
-#define ux_host_class_hid_client_register                   _ux_host_class_hid_client_register
 #define ux_host_class_hid_client_search                     _ux_host_class_hid_client_search
+
 #define ux_host_class_hid_descriptor_parse                  _ux_host_class_hid_descriptor_parse
+
 #define ux_host_class_hid_entry                             _ux_host_class_hid_entry
+
+#define ux_host_class_hid_report_add                        _ux_host_class_hid_report_add
+#define ux_host_class_hid_report_descriptor_get             _ux_host_class_hid_report_descriptor_get
+
+#if defined(UX_DEVICE_CLASS_HID_ENABLE_ERROR_CHECKING)
+
+#define ux_host_class_hid_client_register                   _uxe_host_class_hid_client_register
+
+#define ux_host_class_hid_idle_get                          _uxe_host_class_hid_idle_get
+#define ux_host_class_hid_idle_set                          _uxe_host_class_hid_idle_set
+
+#define ux_host_class_hid_periodic_report_start             _uxe_host_class_hid_periodic_report_start
+#define ux_host_class_hid_periodic_report_stop              _uxe_host_class_hid_periodic_report_stop
+
+#define ux_host_class_hid_report_callback_register          _uxe_host_class_hid_report_callback_register
+#define ux_host_class_hid_report_id_get                     _uxe_host_class_hid_report_id_get
+#define ux_host_class_hid_report_get                        _uxe_host_class_hid_report_get
+#define ux_host_class_hid_report_set                        _uxe_host_class_hid_report_set
+
+#else
+
+#define ux_host_class_hid_client_register                   _ux_host_class_hid_client_register
+
 #define ux_host_class_hid_idle_get                          _ux_host_class_hid_idle_get
 #define ux_host_class_hid_idle_set                          _ux_host_class_hid_idle_set
+
 #define ux_host_class_hid_periodic_report_start             _ux_host_class_hid_periodic_report_start
 #define ux_host_class_hid_periodic_report_stop              _ux_host_class_hid_periodic_report_stop
-#define ux_host_class_hid_report_add                        _ux_host_class_hid_report_add
+
 #define ux_host_class_hid_report_callback_register          _ux_host_class_hid_report_callback_register
-#define ux_host_class_hid_report_descriptor_get             _ux_host_class_hid_report_descriptor_get
-#define ux_host_class_hid_report_get                        _ux_host_class_hid_report_get
 #define ux_host_class_hid_report_id_get                     _ux_host_class_hid_report_id_get
+#define ux_host_class_hid_report_get                        _ux_host_class_hid_report_get
 #define ux_host_class_hid_report_set                        _ux_host_class_hid_report_set
+
+#endif
+
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

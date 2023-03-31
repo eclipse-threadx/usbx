@@ -100,3 +100,53 @@ UX_HOST_CLASS_HID   *hid;
     return(UX_SUCCESS);    
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_hid_mouse_buttons_get               PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID mouse buttons get function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    mouse_instance                        Pointer to mouse instance     */
+/*    mouse_buttons                         Current Mouse Buttons         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_mouse_buttons_get  Get mouse buttons             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_hid_mouse_buttons_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
+                                            ULONG *mouse_buttons)
+{
+
+    /* Sanity checks.  */
+    if ((mouse_instance == UX_NULL) || (mouse_buttons == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke mouse buttons get function.  */
+    return(_ux_host_class_hid_mouse_buttons_get(mouse_instance, mouse_buttons));
+
+}

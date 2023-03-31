@@ -122,3 +122,57 @@ UINT            status;
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_prolific_command                     PORTABLE C     */
+/*                                                            6.x         */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in PROLIFIC command function call.      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    prolific                              Pointer to prolific class     */
+/*    command                               command value                 */
+/*    value                                 value to be sent in the       */
+/*                                          command request               */
+/*    data_buffer                           buffer to be sent             */
+/*    data_length                           length of the buffer to send  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_prolific_command        PROLIFIC command             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_prolific_command(UX_HOST_CLASS_PROLIFIC *prolific, ULONG command,
+                                    ULONG value, UCHAR *data_buffer, ULONG data_length)
+{
+
+    /* Sanity check.  */
+    if (prolific == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke PROLIFIC command function.  */
+    return(_ux_host_class_prolific_command(prolific, command, value, data_buffer, data_length));
+}

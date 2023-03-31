@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_initialize                     PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,9 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compile options,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -97,6 +100,11 @@ UX_SLAVE_CLASS_HID                      *hid;
 UX_SLAVE_CLASS_HID_PARAMETER            *hid_parameter;
 UX_SLAVE_CLASS                          *class_ptr;
 UINT                                    status = UX_SUCCESS;
+
+
+    /* Compile option checks.  */
+    UX_ASSERT(UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH <= UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH);
+    UX_ASSERT(UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
 
 
     /* Get the class container.  */
@@ -269,3 +277,60 @@ UINT                                    status = UX_SUCCESS;
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_hid_initialize                    PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID initialize function call.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to hid command        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_hid_initialize       Initialize HID instance       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Stack                                                        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command)
+{
+
+UX_SLAVE_CLASS_HID_PARAMETER            *hid_parameter;
+
+    /* Get the pointer to the application parameters for the hid class.  */
+    hid_parameter =  command -> ux_slave_class_command_parameter;
+
+    /* Check input parameters.  */
+    if ((hid_parameter -> ux_device_class_hid_parameter_report_address == UX_NULL) ||
+        (hid_parameter -> ux_device_class_hid_parameter_report_length == 0) ||
+        (hid_parameter -> ux_device_class_hid_parameter_report_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH))
+    {
+        return(UX_INVALID_PARAMETER);
+    }
+
+    /* Invoke initialize function.  */
+    return(_ux_device_class_hid_initialize(command));
+}

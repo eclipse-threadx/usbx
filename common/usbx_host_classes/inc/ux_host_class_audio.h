@@ -85,6 +85,13 @@ extern   "C" {
 /* Defined, it disables control_get/value_get/value_set and related code (to optimize code size).  */
 /* #define UX_HOST_CLASS_AUDIO_DISABLE_CONTROLS  */
 
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_CLASS_AUDIO_ENABLE_ERROR_CHECKING)
+#define UX_HOST_CLASS_AUDIO_ENABLE_ERROR_CHECKING
+#endif
+
+
 #include "ux_class_audio10.h"
 #if defined(UX_HOST_CLASS_AUDIO_2_SUPPORT)
 #include "ux_class_audio20.h"
@@ -618,17 +625,102 @@ UINT    _ux_host_class_audio_interrupt_start(UX_HOST_CLASS_AUDIO_AC *audio,
                         VOID *arg);
 VOID    _ux_host_class_audio_interrupt_notification(UX_TRANSFER *transfer_request);
 
+UINT    _uxe_host_class_audio_control_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control);
+UINT    _uxe_host_class_audio_control_value_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control);
+UINT    _uxe_host_class_audio_control_value_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control);
+UINT    _uxe_host_class_audio_read(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST *audio_transfer_request);
+UINT    _uxe_host_class_audio_streaming_sampling_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS *audio_sampling);
+UINT    _uxe_host_class_audio_streaming_sampling_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling);
+UINT    _uxe_host_class_audio_write(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST *audio_transfer_request);
+UINT    _uxe_host_class_audio_control_request(UX_HOST_CLASS_AUDIO *audio,
+                        UINT streaming_control,
+                        UINT request_type, UINT request,
+                        UINT request_value,
+                        UINT spec_id,
+                        UCHAR *parameter, ULONG parameter_size, ULONG *actual_size);
+UINT    _uxe_host_class_audio_descriptors_parse(UX_HOST_CLASS_AUDIO *audio,
+                        UINT(*parse_function)(VOID  *arg,
+                                            UCHAR *packed_interface_descriptor,
+                                            UCHAR *packed_endpoint_descriptor,
+                                            UCHAR *packed_audio_descriptor),
+                        VOID* arg);
+UINT    _uxe_host_class_audio_raw_sampling_parse(UX_HOST_CLASS_AUDIO *audio,
+                        UINT(*parse_function)(VOID  *arg,
+                                              UCHAR *packed_interface_descriptor,
+                                              UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS *sam_attr),
+                        VOID* arg);
+UINT    _uxe_host_class_audio_stop(UX_HOST_CLASS_AUDIO *audio);
+UINT    _uxe_host_class_audio_feedback_get(UX_HOST_CLASS_AUDIO *audio, UCHAR *feedback);
+UINT    _uxe_host_class_audio_feedback_set(UX_HOST_CLASS_AUDIO *audio, UCHAR *feedback);
+UINT    _uxe_host_class_audio_entity_control_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control);
+UINT    _uxe_host_class_audio_entity_control_value_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control);
+UINT    _uxe_host_class_audio_entity_control_value_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control);
+UINT    _uxe_host_class_audio_interrupt_start(UX_HOST_CLASS_AUDIO_AC *audio,
+                        VOID(*callback_function)(UX_HOST_CLASS_AUDIO_AC *audio,
+                                                 UCHAR *message, ULONG length,
+                                                 VOID *arg),
+                        VOID *arg);
+
+
 /* Define Audio Class API prototypes.  */
 
-#define ux_host_class_audio_entry                   _ux_host_class_audio_entry
-#define ux_host_class_audio_control_get             _ux_host_class_audio_control_get
-#define ux_host_class_audio_control_value_get       _ux_host_class_audio_control_value_get
-#define ux_host_class_audio_control_value_set       _ux_host_class_audio_control_value_set
-#define ux_host_class_audio_read                    _ux_host_class_audio_read
-#define ux_host_class_audio_streaming_sampling_get  _ux_host_class_audio_streaming_sampling_get
-#define ux_host_class_audio_streaming_sampling_set  _ux_host_class_audio_streaming_sampling_set
-#define ux_host_class_audio_streaming_terminal_get  _ux_host_class_audio_streaming_terminal_get
-#define ux_host_class_audio_write                   _ux_host_class_audio_write
+#if defined(UX_HOST_CLASS_AUDIO_ENABLE_ERROR_CHECKING)
+
+#define ux_host_class_audio_entry                       _ux_host_class_audio_entry
+
+#define ux_host_class_audio_control_get                 _uxe_host_class_audio_control_get
+#define ux_host_class_audio_control_value_get           _uxe_host_class_audio_control_value_get
+#define ux_host_class_audio_control_value_set           _uxe_host_class_audio_control_value_set
+#define ux_host_class_audio_read                        _uxe_host_class_audio_read
+#define ux_host_class_audio_streaming_sampling_get      _uxe_host_class_audio_streaming_sampling_get
+#define ux_host_class_audio_streaming_sampling_set      _uxe_host_class_audio_streaming_sampling_set
+#define ux_host_class_audio_write                       _uxe_host_class_audio_write
+
+#define ux_host_class_audio_type_get                    _ux_host_class_audio_type_get
+#define ux_host_class_audio_speed_get                   _ux_host_class_audio_speed_get
+#define ux_host_class_audio_protocol_get                _ux_host_class_audio_protocol_get
+#define ux_host_class_audio_subclass_get                _ux_host_class_audio_subclass_get
+#define ux_host_class_audio_feedback_supported          _ux_host_class_audio_feedback_supported
+
+#define ux_host_class_audio_interface_get               _ux_host_class_audio_interface_get
+#define ux_host_class_audio_control_interface_get       _ux_host_class_audio_control_interface_get
+#define ux_host_class_audio_terminal_link_get           _ux_host_class_audio_terminal_link_get
+
+#define ux_host_class_audio_max_packet_size_get         _ux_host_class_audio_max_packet_size_get
+#define ux_host_class_audio_packet_size_get             _ux_host_class_audio_packet_size_get
+#define ux_host_class_audio_packet_freq_get             _ux_host_class_audio_packet_freq_get
+#define ux_host_class_audio_packet_fraction_get         _ux_host_class_audio_packet_fraction_get
+
+#define ux_host_class_audio_feedback_get                _uxe_host_class_audio_feedback_get
+#define ux_host_class_audio_feedback_set                _uxe_host_class_audio_feedback_set
+
+#define ux_host_class_audio_control_request             _uxe_host_class_audio_control_request
+
+#define ux_host_class_audio_descriptors_parse           _uxe_host_class_audio_descriptors_parse
+
+#define ux_host_class_audio_entity_control_get          _uxe_host_class_audio_entity_control_get
+#define ux_host_class_audio_entity_control_value_get    _uxe_host_class_audio_entity_control_value_get
+#define ux_host_class_audio_entity_control_value_set    _uxe_host_class_audio_entity_control_value_set
+
+#define ux_host_class_audio_raw_sampling_parse          _uxe_host_class_audio_raw_sampling_parse
+#define ux_host_class_audio_raw_sampling_start          _uxe_host_class_audio_streaming_sampling_set
+
+#define ux_host_class_audio_stop                        _uxe_host_class_audio_stop
+
+#define ux_host_class_audio_interrupt_start             _uxe_host_class_audio_interrupt_start
+
+
+#else
+
+#define ux_host_class_audio_entry                       _ux_host_class_audio_entry
+#define ux_host_class_audio_control_get                 _ux_host_class_audio_control_get
+#define ux_host_class_audio_control_value_get           _ux_host_class_audio_control_value_get
+#define ux_host_class_audio_control_value_set           _ux_host_class_audio_control_value_set
+#define ux_host_class_audio_read                        _ux_host_class_audio_read
+#define ux_host_class_audio_streaming_sampling_get      _ux_host_class_audio_streaming_sampling_get
+#define ux_host_class_audio_streaming_sampling_set      _ux_host_class_audio_streaming_sampling_set
+#define ux_host_class_audio_streaming_terminal_get      _ux_host_class_audio_streaming_terminal_get
+#define ux_host_class_audio_write                       _ux_host_class_audio_write
 
 #define ux_host_class_audio_type_get                    _ux_host_class_audio_type_get
 #define ux_host_class_audio_speed_get                   _ux_host_class_audio_speed_get
@@ -662,6 +754,9 @@ VOID    _ux_host_class_audio_interrupt_notification(UX_TRANSFER *transfer_reques
 #define ux_host_class_audio_stop                        _ux_host_class_audio_stop
 
 #define ux_host_class_audio_interrupt_start             _ux_host_class_audio_interrupt_start
+
+#endif
+
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard
    C conditional started above.  */

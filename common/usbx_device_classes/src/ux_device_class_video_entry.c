@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_entry                        PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -86,9 +89,15 @@ UINT        status;
     {
 
     case UX_SLAVE_CLASS_COMMAND_INITIALIZE:
+#if defined(UX_DEVICE_CLASS_VIDEO_ENABLE_ERROR_CHECKING)
+
+        /* Call the init function of the Video class.  */
+        status =  _uxe_device_class_video_initialize(command);
+#else
 
         /* Call the init function of the Video class.  */
         status =  _ux_device_class_video_initialize(command);
+#endif  /* UX_DEVICE_CLASS_VIDEO_ENABLE_ERROR_CHECKING */
 
         /* Return the completion status.  */
         return(status);

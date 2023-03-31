@@ -257,3 +257,68 @@ ULONG                                   i;
 
     return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_video_initialize                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video initialization function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to video command      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_video_initialize     Initialize video instance     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Video Class                                                  */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_class_video_initialize(UX_SLAVE_CLASS_COMMAND *command)
+{
+UX_DEVICE_CLASS_VIDEO_PARAMETER         *video_parameter;
+ULONG i;
+
+    /* Get the pointer to the application parameters for the video class.  */
+    video_parameter = (UX_DEVICE_CLASS_VIDEO_PARAMETER *)command -> ux_slave_class_command_parameter;
+
+    /* Sanity checks.  */
+    if (video_parameter == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* There must be at least one stream.  */
+    if ((video_parameter -> ux_device_class_video_parameter_streams_nb == 0) ||
+        (video_parameter -> ux_device_class_video_parameter_streams == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    for (i = 0; i < video_parameter -> ux_device_class_video_parameter_streams_nb; i ++)
+    {
+        if ((video_parameter -> ux_device_class_video_parameter_streams[i].ux_device_class_video_stream_parameter_max_payload_buffer_size == 0) ||
+            (video_parameter -> ux_device_class_video_parameter_streams[i].ux_device_class_video_stream_parameter_max_payload_buffer_nb == 0))
+            return(UX_INVALID_PARAMETER);
+    }
+
+    /* Do initialize.  */
+    return(_ux_device_class_video_initialize(command));
+}

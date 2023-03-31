@@ -223,3 +223,74 @@ ULONG                                   lun_index;
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_storage_initialize                PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in storage initialization function call.*/
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to storage command    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_storage_initialize     Initialize storage instance */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command)
+{
+
+UX_SLAVE_CLASS_STORAGE_PARAMETER        *storage_parameter;
+UINT                                    i;
+
+    /* Get the pointer to the application parameters for the storage class.  */
+    storage_parameter =  command -> ux_slave_class_command_parameter;
+
+    /* Sanity checks.  */
+    if (storage_parameter -> ux_slave_class_storage_parameter_number_lun > UX_MAX_SLAVE_LUN)
+        return(UX_INVALID_PARAMETER);
+    for (i = 0; i < storage_parameter -> ux_slave_class_storage_parameter_number_lun; i ++)
+    {
+        if ((storage_parameter -> ux_slave_class_storage_parameter_lun[i].
+                            ux_slave_class_storage_media_read == UX_NULL) ||
+            (storage_parameter -> ux_slave_class_storage_parameter_lun[i].
+                            ux_slave_class_storage_media_write == UX_NULL) ||
+            (storage_parameter -> ux_slave_class_storage_parameter_lun[i].
+                            ux_slave_class_storage_media_status == UX_NULL)
+#if defined(UX_SLAVE_CLASS_STORAGE_INCLUDE_MMC)
+            || (storage_parameter -> ux_slave_class_storage_parameter_lun[i].
+                            ux_slave_class_storage_media_notification == UX_NULL)
+#endif
+           )
+        {
+            return(UX_INVALID_PARAMETER);
+        }
+    }
+
+    /* Invoke storage initialize function.  */
+    return(_ux_device_class_storage_initialize(command));
+}

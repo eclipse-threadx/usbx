@@ -106,3 +106,59 @@ UX_HOST_CLASS_HID   *hid;
     return(UX_SUCCESS);    
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_hid_mouse_position_get              PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID mouse position get function call.*/
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    mouse_instance                        Pointer to mouse instance     */
+/*    mouse_x_position                      Current Mouse X Position      */
+/*    mouse_y_position                      Current Mouse Y Position      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_mouse_position_get Get mouse position            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_hid_mouse_position_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
+                                            SLONG *mouse_x_position, 
+                                            SLONG *mouse_y_position)
+{
+
+    /* Sanity checks.  */
+    if ((mouse_instance == UX_NULL) ||
+        (mouse_x_position == UX_NULL) || (mouse_y_position == UX_NULL) ||
+        (mouse_x_position == mouse_y_position))
+    {
+        return(UX_INVALID_PARAMETER);
+    }
+
+    /* Invoke position get function.  */
+    return(_ux_host_class_hid_mouse_position_get(mouse_instance,
+                                        mouse_x_position, mouse_y_position));
+}

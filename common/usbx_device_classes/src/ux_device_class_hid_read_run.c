@@ -252,4 +252,61 @@ UINT                        status= UX_SUCCESS;
     return(UX_STATE_EXIT);
 #endif
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_hid_read_run                      PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID read function call.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to hid instance       */
+/*    buffer                                Pointer to receive buffer     */
+/*    requested_length                      Receive buffer size in bytes  */
+/*    actual_length                         Actual num bytes received     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_hid_read_run         Run read state machine once   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid, UCHAR *buffer,
+                                   ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((hid == UX_NULL) ||
+        (buffer == UX_NULL) || (requested_length == 0) ||
+        (actual_length == UX_NULL))
+    {
+        return(UX_STATE_ERROR);
+    }
+
+    /* Invoke function to run reading state machine.  */
+    return(_ux_device_class_hid_read_run(hid, buffer, requested_length, actual_length));
+}
 #endif

@@ -176,3 +176,53 @@ UX_SLAVE_CLASS_HID_EVENT   *next_hid_event;
     return(UX_SUCCESS);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_hid_event_set                     PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID event set function call.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to hid instance       */
+/*    hid_event                             Pointer to hid event          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_hid_event_set        Set an HID event              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid, 
+                                      UX_SLAVE_CLASS_HID_EVENT *hid_event)
+{
+
+    /* Sanity checks.  */
+    if ((hid == UX_NULL) || (hid_event == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke function to get event.  */
+    return(_ux_device_class_hid_event_set(hid, hid_event));
+}

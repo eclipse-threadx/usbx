@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_read_payload_get             PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,13 +61,15 @@
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    ThreadX                                                             */
+/*    Application                                                         */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_video_read_payload_get(UX_DEVICE_CLASS_VIDEO_STREAM *stream,
@@ -109,4 +111,60 @@ UX_SLAVE_DEVICE             *device;
     *payload_length = stream -> ux_device_class_video_stream_access_pos -> ux_device_class_video_payload_length;
 
     return(UX_SUCCESS);
+}
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_video_read_payload_get            PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video read payload get function      */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    stream                                Address of video stream       */
+/*                                            instance                    */
+/*    payload_data                          Pointer to buffer to save     */
+/*                                          pointer to payload data       */
+/*    payload_length                        Pointer to buffer to save     */
+/*                                          Pointer to payload length     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_video_read_payload_get                             */
+/*                                          Video read payload get        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_video_read_payload_get(UX_DEVICE_CLASS_VIDEO_STREAM *stream,
+                                           UCHAR **payload_data, ULONG *payload_length)
+{
+
+    /* Sanity check. */
+    if ((stream == UX_NULL) || (payload_data == UX_NULL) || (payload_length == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual video read payload get function.  */
+    return(_ux_device_class_video_read_payload_get(stream, payload_data, payload_length));
 }

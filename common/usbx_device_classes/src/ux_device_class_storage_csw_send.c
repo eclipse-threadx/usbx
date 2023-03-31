@@ -30,7 +30,8 @@
 #include "ux_device_stack.h"
 
 #if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < UX_SLAVE_CLASS_STORAGE_CSW_LENGTH
-#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check
+/* #error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /**************************************************************************/ 
@@ -38,7 +39,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_csw_send                   PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -89,6 +90,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_csw_send(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
@@ -102,6 +107,9 @@ UCHAR                   *csw_buffer;
 
     UX_PARAMETER_NOT_USED(csw_status);
     UX_PARAMETER_NOT_USED(lun);
+
+    /* Build option check.  */
+    UX_ASSERT(UX_SLAVE_REQUEST_DATA_MAX_LENGTH >= UX_SLAVE_CLASS_STORAGE_CSW_LENGTH);
 
 #if defined(UX_DEVICE_STANDALONE)
 

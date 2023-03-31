@@ -78,7 +78,7 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_initialize                   PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -139,6 +139,9 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            removed internal NX pool,   */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compile options,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -152,6 +155,11 @@ UX_SLAVE_CLASS_RNDIS                        *rndis;
 UX_SLAVE_CLASS_RNDIS_PARAMETER              *rndis_parameter;
 UX_SLAVE_CLASS                              *class_ptr;
 UINT                                        status;
+
+
+    /* Compile option checks.  */
+    UX_ASSERT(UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
+    UX_ASSERT(UX_DEVICE_CLASS_RNDIS_MAX_CONTROL_RESPONSE_LENGTH <= UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH);
 
     /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;

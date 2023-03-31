@@ -71,6 +71,14 @@ extern   "C" {
 
 #endif  
 
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_CLASS_CDC_ACM_ENABLE_ERROR_CHECKING)
+#define UX_HOST_CLASS_CDC_ACM_ENABLE_ERROR_CHECKING
+#endif
+
+
 /* Define CDC ACM Class constants.  */
 
 #define UX_HOST_CLASS_CDC_ACM_DEVICE_INIT_DELAY                 1000
@@ -368,9 +376,39 @@ UINT  _ux_host_class_cdc_acm_write_with_callback(UX_HOST_CLASS_CDC_ACM *cdc_acm,
                                   ULONG requested_length);
 VOID  _ux_host_class_cdc_acm_transmission_callback(UX_TRANSFER *transfer_request);
 
+
+UINT  _uxe_host_class_cdc_acm_command(UX_HOST_CLASS_CDC_ACM *cdc_acm, ULONG command,
+                                    ULONG value, UCHAR *data_buffer, ULONG data_length);
+UINT  _uxe_host_class_cdc_acm_read (UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer, 
+                                  ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_host_class_cdc_acm_write(UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer, 
+                                  ULONG requested_length, ULONG *actual_length);
+UINT  _uxe_host_class_cdc_acm_ioctl(UX_HOST_CLASS_CDC_ACM *cdc_acm, ULONG request,
+                                  VOID *parameter);
+UINT  _uxe_host_class_cdc_acm_reception_stop (UX_HOST_CLASS_CDC_ACM *cdc_acm, 
+                                    UX_HOST_CLASS_CDC_ACM_RECEPTION *cdc_acm_reception);
+UINT  _uxe_host_class_cdc_acm_reception_start (UX_HOST_CLASS_CDC_ACM *cdc_acm, 
+                                    UX_HOST_CLASS_CDC_ACM_RECEPTION *cdc_acm_reception);
+UINT  _uxe_host_class_cdc_acm_write_with_callback(UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer, 
+                                  ULONG requested_length);
+
+
 /* Define CDC ACM Class API prototypes.  */
 
 #define ux_host_class_cdc_acm_entry                     _ux_host_class_cdc_acm_entry
+
+#if defined(UX_HOST_CLASS_CDC_ACM_ENABLE_ERROR_CHECKING)
+
+#define ux_host_class_cdc_acm_read                      _uxe_host_class_cdc_acm_read
+#define ux_host_class_cdc_acm_write                     _uxe_host_class_cdc_acm_write
+#define ux_host_class_cdc_acm_ioctl                     _uxe_host_class_cdc_acm_ioctl
+#define ux_host_class_cdc_acm_reception_start           _uxe_host_class_cdc_acm_reception_start
+#define ux_host_class_cdc_acm_reception_stop            _uxe_host_class_cdc_acm_reception_stop
+
+#define ux_host_class_cdc_acm_write_with_callback       _uxe_host_class_cdc_acm_write_with_callback
+
+#else
+
 #define ux_host_class_cdc_acm_read                      _ux_host_class_cdc_acm_read
 #define ux_host_class_cdc_acm_write                     _ux_host_class_cdc_acm_write
 #define ux_host_class_cdc_acm_ioctl                     _ux_host_class_cdc_acm_ioctl
@@ -378,6 +416,8 @@ VOID  _ux_host_class_cdc_acm_transmission_callback(UX_TRANSFER *transfer_request
 #define ux_host_class_cdc_acm_reception_stop            _ux_host_class_cdc_acm_reception_stop
 
 #define ux_host_class_cdc_acm_write_with_callback       _ux_host_class_cdc_acm_write_with_callback
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

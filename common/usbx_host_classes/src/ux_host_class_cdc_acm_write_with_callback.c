@@ -160,4 +160,60 @@ ULONG           transfer_request_length;
     return((status == UX_STATE_WAIT) ?
         UX_SUCCESS : transfer_request -> ux_transfer_request_completion_code);
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_cdc_acm_write_with_callback         PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in CDC ACM write function call.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_acm                               Pointer to CDC ACM class      */
+/*    data_pointer                          Pointer to data to write      */
+/*    requested_length                      Length of data to write       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_cdc_acm_write_with_callback                          */
+/*                                          CDC ACM write with callback   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_cdc_acm_write_with_callback(UX_HOST_CLASS_CDC_ACM *cdc_acm,
+                                    UCHAR *data_pointer, ULONG requested_length)
+{
+
+    /* Sanity checks.  */
+    if ((cdc_acm == UX_NULL) ||
+        ((data_pointer == UX_NULL) && (requested_length != 0)))
+    {
+        return(UX_INVALID_PARAMETER);
+    }
+
+    /* Invoke CDC ACM write with callback function.  */
+    return(_ux_host_class_cdc_acm_write_with_callback(cdc_acm, data_pointer, requested_length));
+}
 #endif

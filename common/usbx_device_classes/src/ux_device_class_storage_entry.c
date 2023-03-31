@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_entry                      PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -91,7 +94,11 @@ UINT        status;
     case UX_SLAVE_CLASS_COMMAND_INITIALIZE:
 
         /* Call the init function of the Storage class.  */
+#if defined(UX_DEVICE_CLASS_STORAGE_ENABLE_ERROR_CHECKING)
+        status =  _uxe_device_class_storage_initialize(command);
+#else
         status =  _ux_device_class_storage_initialize(command);
+#endif
         
         /* Return the completion status.  */
         return(status);

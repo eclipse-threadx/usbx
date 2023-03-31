@@ -745,3 +745,63 @@ UINT                                    status;
     return(status);
 }
 #endif /* defined(UX_HOST_CLASS_AUDIO_2_SUPPORT) */
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_audio_raw_sampling_parse            PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in audio RAW sampling parse function    */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio control (AC) */
+/*                                          instance                      */
+/*    callback_function                     Callback function invoked on  */
+/*                                          interrupt message reception   */
+/*    arg                                   Callback argument passed to   */
+/*                                          callback function             */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_audio_raw_sampling_parse                             */
+/*                                          Parse RAW sampling properties */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_host_class_audio_raw_sampling_parse(UX_HOST_CLASS_AUDIO *audio,
+        UINT(*parse_function)(VOID  *arg,
+                              UCHAR *packed_interface_descriptor,
+                              UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS *sam_attr),
+        VOID* arg)
+{
+
+    /* Sanity checks.  */
+    if ((audio == UX_NULL) || (parse_function == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke sampling characteristics parse function.  */
+    return(_ux_host_class_audio_raw_sampling_parse(audio, parse_function, arg));
+}

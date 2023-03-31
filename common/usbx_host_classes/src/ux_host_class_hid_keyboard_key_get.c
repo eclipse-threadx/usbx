@@ -123,3 +123,55 @@ UX_HOST_CLASS_HID   *hid;
     return(UX_SUCCESS);    
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_hid_keyboard_key_get                PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID key get function call.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    keyboard_instance                     Pointer to remote control     */ 
+/*    keyboard key                          Pointer to keyboard key       */ 
+/*    keyboard state                        Pointer to keyboard state     */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_keyboard_key_get   Get a keyboard key            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance, 
+                                            ULONG *keyboard_key, ULONG *keyboard_state)
+{
+
+    /* Sanity checks.  */
+    if ((keyboard_instance == UX_NULL) ||
+        (keyboard_key == UX_NULL) || (keyboard_state == UX_NULL) ||
+        (keyboard_key == keyboard_state))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke key get function.  */
+    return(_ux_host_class_hid_keyboard_key_get(keyboard_instance, keyboard_key, keyboard_state));
+}

@@ -57,7 +57,8 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
     USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CACHE_LENGTH +               \
     USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_IEC_LENGTH)
 #if USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_ALL_RESPONSE_LENGTH > UX_SLAVE_REQUEST_DATA_MAX_LENGTH
-#error "The maximum-sized MODE_SENSE response cannot fit inside the bulk in endpoint's data buffer."
+/* #error "The maximum-sized MODE_SENSE response cannot fit inside the bulk in endpoint's data buffer."  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /**************************************************************************/ 
@@ -65,7 +66,7 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_mode_sense                 PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -115,6 +116,10 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -138,6 +143,9 @@ ULONG                   page_length;
 
 
     UX_PARAMETER_NOT_USED(endpoint_out);
+
+    /* Build option check.  */
+    UX_ASSERT(USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_ALL_RESPONSE_LENGTH <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_MODE_SENSE, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

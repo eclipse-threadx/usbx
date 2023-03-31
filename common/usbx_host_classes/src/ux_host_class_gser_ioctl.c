@@ -48,7 +48,7 @@
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
-/*    acm                                   Pointer to acm class          */ 
+/*    gser                                  Pointer to gser class         */ 
 /*    ioctl_function                        ioctl function                */ 
 /*    parameter                             pointer to structure          */ 
 /*                                                                        */ 
@@ -287,3 +287,54 @@ ULONG                               value;
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_gser_ioctl                          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in GSER ioctl function call.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    gser                                  Pointer to GSER class         */
+/*    ioctl_function                        ioctl function                */
+/*    parameter                             pointer to structure          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_gser_ioctl             GSER ioctl                    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_gser_ioctl(UX_HOST_CLASS_GSER *gser, ULONG interface_index, ULONG ioctl_function,
+                                    VOID *parameter)
+{
+
+    /* Sanity check.  */
+    if (gser == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke GSER ioctl function.  */
+    return(_ux_host_class_gser_ioctl(gser, interface_index, ioctl_function, parameter));
+}

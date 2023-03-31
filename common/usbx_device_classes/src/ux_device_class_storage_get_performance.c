@@ -31,7 +31,8 @@
 
 #define USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH                    16
 #if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < (USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8)
-#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check
+/* #error UX_SLAVE_REQUEST_DATA_MAX_LENGTH too small, please check  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 UCHAR usbx_device_class_storage_performance[] = { 
 
@@ -44,7 +45,7 @@ UCHAR usbx_device_class_storage_performance[] = {
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_get_performance            PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -89,6 +90,10 @@ UCHAR usbx_device_class_storage_performance[] = {
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_performance(UX_SLAVE_CLASS_STORAGE *storage, 
@@ -106,6 +111,9 @@ ULONG                   data_length = 0;
 
     UX_PARAMETER_NOT_USED(lun);
     UX_PARAMETER_NOT_USED(endpoint_out);
+
+    /* Build option check.  */
+    UX_ASSERT(UX_SLAVE_REQUEST_DATA_MAX_LENGTH >= (USBX_DEVICE_CLASS_STORAGE_GET_PERFORMANCE_0_LENGTH + 8));
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_OTHER, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

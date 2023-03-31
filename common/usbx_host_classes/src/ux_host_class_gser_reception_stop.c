@@ -111,3 +111,53 @@ ULONG           interface_index;
     return(UX_SUCCESS);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_gser_reception_stop                 PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in CDC ACM reception function call.     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    gser                                  Pointer to CDC ACM class      */
+/*    gser_reception                        Pointer to reception struct   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_gser_reception_stop    GSER reception stop           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser, 
+                                    UX_HOST_CLASS_GSER_RECEPTION *gser_reception)
+{
+
+    /* Sanity checks.  */
+    if ((gser == UX_NULL) || (gser_reception == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke CDC ACM reception stop function.  */
+    return(_ux_host_class_gser_reception_stop(gser, gser_reception));
+}

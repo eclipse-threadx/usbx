@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_write_run                  PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -62,6 +62,7 @@
 /*    State machine Status to check                                       */
 /*    UX_STATE_NEXT                         Transfer done, to next state  */
 /*    UX_STATE_EXIT                         Abnormal, to reset state      */
+/*    UX_STATE_ERROR                        Error occurred                */
 /*    (others)                              Keep running, waiting         */
 /*                                                                        */
 /*  CALLS                                                                 */
@@ -86,6 +87,9 @@
 /*  10-31-2022     Yajun Xia                Modified comment(s),          */
 /*                                            fixed return code,          */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            fixed return code,          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
@@ -108,7 +112,7 @@ UINT                        status = 0;
     if (cdc_acm -> ux_slave_class_cdc_acm_transmission_status == UX_TRUE)
 
         /* Not allowed. */
-        return(UX_ERROR);
+        return(UX_STATE_ERROR);
 #endif
 
     /* Get the pointer to the device.  */
@@ -271,4 +275,66 @@ UINT                        status = 0;
     /* Error case.  */
     return(UX_STATE_EXIT);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_class_cdc_acm_write_run                 PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in CDC ACM class write process.         */
+/*                                                                        */
+/*    It's for standalone mode.                                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_acm                               Address of cdc_acm class      */
+/*                                                instance                */
+/*    buffer                                Pointer to data to write      */
+/*    requested_length                      Length of bytes to write      */
+/*    actual_length                         Pointer to save number of     */
+/*                                                bytes written           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    State machine Status to check                                       */
+/*    UX_STATE_NEXT                         Transfer done, to next state  */
+/*    UX_STATE_EXIT                         Abnormal, to reset state      */
+/*    UX_STATE_ERROR                        Error occurred                */
+/*    (others)                              Keep running, waiting         */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_cdc_acm_write_run    CDC ACM class write process   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
+                    UCHAR *buffer, ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((cdc_acm == UX_NULL) || ((buffer == UX_NULL) && (requested_length > 0)) || (actual_length == UX_NULL))
+    {
+        return(UX_STATE_ERROR);
+    }
+
+    return (_ux_device_class_cdc_acm_write_run(cdc_acm, buffer, requested_length, actual_length));
+}
+
 #endif

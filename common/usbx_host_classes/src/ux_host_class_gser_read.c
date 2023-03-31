@@ -217,3 +217,60 @@ ULONG           transfer_request_length;
     return(UX_SUCCESS); 
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_gser_read                           PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in GSER read function call.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    gser                                  Pointer to GSER class         */ 
+/*    data_pointer                          Pointer to buffer             */
+/*    requested_length                      Requested data read           */
+/*    actual_length                         Actual data read              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_gser_read              GSER read                     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_gser_read(UX_HOST_CLASS_GSER *gser, 
+                                    ULONG interface_index,
+                                    UCHAR *data_pointer, 
+                                    ULONG requested_length, 
+                                    ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((gser == UX_NULL) || (data_pointer == UX_NULL) || (actual_length == UX_NULL))
+    {
+        return(UX_INVALID_PARAMETER);
+    }
+
+    /* Invoke GSER read function.  */
+    return(_ux_host_class_gser_read(gser, interface_index, data_pointer, requested_length, actual_length));
+}

@@ -67,6 +67,13 @@ extern   "C" {
 #endif  
 
 
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_HID_REMOTE_CONTROL_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_HID_REMOTE_CONTROL_ENABLE_ERROR_CHECKING
+#endif
+
+
 /* Define HID Remote Control Class constants.  */
 
 #define UX_HOST_CLASS_HID_REMOTE_CONTROL_BUFFER_LENGTH          128
@@ -105,10 +112,22 @@ UINT    _ux_host_class_hid_remote_control_deactivate(UX_HOST_CLASS_HID_CLIENT_CO
 UINT    _ux_host_class_hid_remote_control_entry(UX_HOST_CLASS_HID_CLIENT_COMMAND *command);
 UINT    _ux_host_class_hid_remote_control_usage_get(UX_HOST_CLASS_HID_REMOTE_CONTROL *remote_control_instance, ULONG *usage, ULONG *value);
 
+UINT    _uxe_host_class_hid_remote_control_usage_get(UX_HOST_CLASS_HID_REMOTE_CONTROL *remote_control_instance, ULONG *usage, ULONG *value);
+
+
 /* Define HID Keyboard Class API prototypes.  */
 
 #define ux_host_class_hid_remote_control_entry                   _ux_host_class_hid_remote_control_entry
+
+#if defined(UX_DEVICE_CLASS_HID_REMOTE_CONTROL_ENABLE_ERROR_CHECKING)
+
+#define ux_host_class_hid_remote_control_usage_get               _uxe_host_class_hid_remote_control_usage_get
+
+#else
+
 #define ux_host_class_hid_remote_control_usage_get               _ux_host_class_hid_remote_control_usage_get
+
+#endif
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

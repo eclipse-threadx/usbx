@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_rndis.h                             PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,6 +55,9 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added wait and length DEFs, */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved error checking,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -488,7 +491,7 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 /* Calculate message buffer length (not overflow).  */
 #define UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH                                    (UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
 #if UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH > UX_SLAVE_REQUEST_DATA_MAX_LENGTH
-#error "Error: the maximum-sized RNDIS response cannot fit inside the control endpoint's data buffer. Increase UX_SLAVE_REQUEST_DATA_MAX_LENGTH."
+/* Checked in _initialize().  */
 #endif
 
 /* Calculate response buffer length.  */
@@ -509,7 +512,7 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 
 /* Ensure maximum-sized RNDIS response can fit in the control endpoint's transfer buffer.  */
 #if UX_DEVICE_CLASS_RNDIS_MAX_CONTROL_RESPONSE_LENGTH > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH
-#error "Error: the maximum-sized RNDIS response cannot fit inside the control endpoint's data buffer. Increase UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH."
+/* Checked in _initialize().  */
 #endif
 
 /* Define Slave RNDIS Class Calling Parameter structure */

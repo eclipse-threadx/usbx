@@ -195,3 +195,55 @@ ULONG           transfer_request_length;
     return(UX_SUCCESS); 
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_prolific_read                       PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in PROLIFIC read function call.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    prolific                              Pointer to PROLIFIC class     */
+/*    data_pointer                          Pointer to buffer             */
+/*    requested_length                      Requested data read           */
+/*    actual_length                         Actual data read              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_prolific_read           PROLIFIC read                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_prolific_read (UX_HOST_CLASS_PROLIFIC *prolific, UCHAR *data_pointer, 
+                                    ULONG requested_length, ULONG *actual_length)
+{
+
+    /* Sanity checks.  */
+    if ((prolific == UX_NULL) || (data_pointer == UX_NULL) || (actual_length == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke PROLIFIC read function.  */
+    return(_ux_host_class_prolific_read(prolific, data_pointer, requested_length, actual_length));
+}

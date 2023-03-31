@@ -166,3 +166,58 @@ ULONG           request_direction;
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_gser_command                        PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in GSER command function call.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    gser                                  Pointer to GSER class         */
+/*    command                               command value                 */
+/*    value                                 value to be sent in the       */
+/*                                          command request               */
+/*    data_buffer                           buffer to be sent             */
+/*    data_length                           length of the buffer to send  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_gser_command           Send GSER request             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_gser_command(UX_HOST_CLASS_GSER *gser, ULONG interface_index, ULONG command,
+                                    ULONG value, UCHAR *data_buffer, ULONG data_length)
+{
+
+    /* Sanity check.  */
+    if (gser == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke GSER command function.  */
+    return(_ux_host_class_gser_command(gser, interface_index,
+                                    command, value, data_buffer, data_length));
+}

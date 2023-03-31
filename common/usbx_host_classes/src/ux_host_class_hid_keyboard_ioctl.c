@@ -124,3 +124,53 @@ UINT status = UX_SUCCESS;
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_hid_keyboard_ioctl                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in HID keyboard ioctl function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    keyboard_instance                    Pointer to hid keyboard        */
+/*    ioctl_function                       IOCTL function                 */
+/*    parameter                            Pointer to parameter/structure */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_keyboard_ioctl    IOCTL function                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
+                                        ULONG ioctl_function, VOID *parameter)
+{
+
+    /* Sanity checks.  */
+    if (keyboard_instance == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke report ID get function.  */
+    return(_ux_host_class_hid_keyboard_ioctl(keyboard_instance, ioctl_function, parameter));
+}

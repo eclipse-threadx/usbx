@@ -31,7 +31,8 @@
 
 #define USBX_DEVICE_CLASS_STORAGE_DISK_INFORMATION_LENGTH 34
 #if UX_SLAVE_REQUEST_DATA_MAX_LENGTH < USBX_DEVICE_CLASS_STORAGE_DISK_INFORMATION_LENGTH
-#error UX_SLAVE_REQUEST_DATA_MAX_LENGTH is too small, please check
+/* #error UX_SLAVE_REQUEST_DATA_MAX_LENGTH is too small, please check  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 UCHAR usbx_device_class_storage_disk_information[] = { 
 
@@ -64,7 +65,7 @@ UCHAR usbx_device_class_storage_disk_information[] = {
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_read_disk_information      PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -108,6 +109,10 @@ UCHAR usbx_device_class_storage_disk_information[] = {
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_read_disk_information(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -120,6 +125,9 @@ UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   allocation_length;
 
     UX_PARAMETER_NOT_USED(endpoint_out);
+
+    /* Build option check.  */
+    UX_ASSERT(UX_SLAVE_REQUEST_DATA_MAX_LENGTH >= USBX_DEVICE_CLASS_STORAGE_DISK_INFORMATION_LENGTH);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_GET_CONFIGURATION, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

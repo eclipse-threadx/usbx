@@ -129,3 +129,54 @@ UINT            status;
     return(status); 
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_swar_reception_start                PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in SWAR reception function call.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    swar                                  Pointer to SWAR class         */
+/*    swar_reception                        Pointer to reception struct   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_swar_reception_start                                 */
+/*                                          SWAR reception start          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar, 
+                                    UX_HOST_CLASS_SWAR_RECEPTION *swar_reception)
+{
+
+    /* Sanity checks.  */
+    if ((swar == UX_NULL) || (swar_reception == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke SWAR reception start function.  */
+    return(_ux_host_class_swar_reception_start(swar, swar_reception));
+}
