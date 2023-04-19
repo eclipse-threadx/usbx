@@ -215,3 +215,53 @@ UINT                status;
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_interface_setting_select            PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack interface select function */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    interface_ptr                         Pointer to interface          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_interface_setting_select                             */
+/*                                          Interface setting select      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_interface_setting_select(UX_INTERFACE *interface_ptr)
+{
+
+    /* Sanity check.  */
+    if (interface_ptr == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke interface setting select function.  */
+    return(_ux_host_stack_interface_setting_select(interface_ptr));
+}

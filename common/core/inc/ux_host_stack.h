@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_stack.h                                     PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,9 @@
 /*                                            names conflict C++ keyword, */
 /*                                            added standalone HUB,       */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -80,6 +83,13 @@
 extern   "C" { 
 
 #endif  
+
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_STACK_ENABLE_ERROR_CHECKING)
+#define UX_HOST_STACK_ENABLE_ERROR_CHECKING
+#endif
 
 
 /* Define Host Stack enumeration state machine states.  */
@@ -193,6 +203,31 @@ VOID    _ux_host_stack_hnp_polling_thread_entry(ULONG id);
 
 UINT    _ux_host_stack_tasks_run(VOID);
 UINT    _ux_host_stack_transfer_run(UX_TRANSFER *transfer_request);
+
+
+UINT    _uxe_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **ux_class);
+UINT    _uxe_host_stack_class_instance_get(UX_HOST_CLASS *class, UINT class_index, VOID **class_instance);
+UINT    _uxe_host_stack_class_register(UCHAR *class_name,
+                        UINT (*class_entry_function)(struct UX_HOST_CLASS_COMMAND_STRUCT *));
+UINT    _uxe_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
+                                                UINT interface_index, UINT alternate_setting_index,
+                                                UX_INTERFACE **ux_interface);
+UINT    _uxe_host_stack_device_configuration_activate(UX_CONFIGURATION *configuration);
+UINT    _uxe_host_stack_device_configuration_deactivate(UX_DEVICE *device);
+UINT    _uxe_host_stack_device_configuration_get(UX_DEVICE *device, UINT configuration_index,
+                                                        UX_CONFIGURATION **configuration);
+UINT    _uxe_host_stack_device_get(ULONG device_index, UX_DEVICE **device);
+UINT    _uxe_host_stack_device_string_get(UX_DEVICE *device, UCHAR *descriptor_buffer, ULONG length, ULONG language_id, ULONG string_index);
+UINT    _uxe_host_stack_endpoint_transfer_abort(UX_ENDPOINT *endpoint);
+UINT    _uxe_host_stack_hcd_register(UCHAR *hcd_name,
+                                    UINT (*hcd_init_function)(struct UX_HCD_STRUCT *), ULONG hcd_param1, ULONG hcd_param2);
+UINT    _uxe_host_stack_hcd_unregister(UCHAR *hcd_name, ULONG hcd_param1, ULONG hcd_param2);
+UINT    _uxe_host_stack_interface_endpoint_get(UX_INTERFACE *ux_interface, UINT endpoint_index, UX_ENDPOINT **endpoint);
+UINT    _uxe_host_stack_interface_setting_select(UX_INTERFACE *ux_interface);
+UINT    _uxe_host_stack_transfer_request(UX_TRANSFER *transfer_request);
+UINT    _uxe_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request);
+UINT    _uxe_host_stack_transfer_run(UX_TRANSFER *transfer_request);
+
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

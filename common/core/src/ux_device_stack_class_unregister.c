@@ -150,3 +150,54 @@ ULONG                       class_index;
     return(UX_NO_CLASS_MATCH);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_stack_class_unregister                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in device stack class unregister        */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class_name                            Name of class                 */
+/*    class_function_entry                  Class entry function          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_class_unregister     Class unregister              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_stack_class_unregister(UCHAR *class_name,
+                        UINT (*class_entry_function)(struct UX_SLAVE_CLASS_COMMAND_STRUCT *))
+{
+
+    /* Sanity checks.  */
+    if ((class_name == UX_NULL) || (class_entry_function == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke unregister function.  */
+    return(_ux_device_stack_class_unregister(class_name, class_entry_function));
+}

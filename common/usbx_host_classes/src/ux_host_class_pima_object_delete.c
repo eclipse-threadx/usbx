@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -30,51 +30,51 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_object_delete                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_object_delete                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function deletes an object. If the object handle is set to     */ 
-/*    0xFFFFFFFF then all objects on the media are deleted.               */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                       Pointer to pima class    */ 
-/*    pima_session                               Pointer to pima session  */ 
-/*    object_handle                              The object handle        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function deletes an object. If the object handle is set to     */
+/*    0xFFFFFFFF then all objects on the media are deleted.               */
+/*                                                                        */
+/*                                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    object_handle                              The object handle        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*  _ux_host_class_pima_command                 Pima command function     */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USB application                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_pima_object_delete(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_object_delete(UX_HOST_CLASS_PIMA *pima,
                                         UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                         ULONG object_handle)
 {
@@ -95,10 +95,10 @@ UINT                                status;
 
     /* Issue command to get the object info.  1 parameter.  */
     command.ux_host_class_pima_command_nb_parameters =  1;
-    
+
     /* Parameter 1 is the Object Handle.  */
     command.ux_host_class_pima_command_parameter_1 =  object_handle;
-    
+
     /* Other parameters unused.  */
     command.ux_host_class_pima_command_parameter_2 =  0;
     command.ux_host_class_pima_command_parameter_3 =  0;
@@ -116,3 +116,54 @@ UINT                                status;
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_object_delete                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima object delete function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    object_handle                              The object handle        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_object_delete     Delete pima object            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_object_delete(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                        ULONG object_handle)
+{
+
+    /* Sanity checks.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual pima object delete function.  */
+    return(_ux_host_class_pima_object_delete(pima, pima_session, object_handle));
+}

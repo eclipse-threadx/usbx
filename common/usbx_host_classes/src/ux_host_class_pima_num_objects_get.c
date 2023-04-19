@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -30,48 +30,52 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_num_objects_get                 PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_num_objects_get                 PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function returns the number of objects for a specific storage. */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                       Pointer to pima class    */ 
-/*    pima_session                               Pointer to pima session  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function returns the number of objects for a specific storage. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    storage_id                                 The storage ID           */
+/*    object_format_code                         The object format code   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*  _ux_host_class_pima_command                 Pima command function     */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USB application                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_pima_num_objects_get(UX_HOST_CLASS_PIMA *pima, 
-                                        UX_HOST_CLASS_PIMA_SESSION *pima_session, 
+UINT  _ux_host_class_pima_num_objects_get(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                         ULONG storage_id,
                                         ULONG object_format_code)
 {
@@ -92,7 +96,7 @@ UINT                                status;
 
     /* Issue command to get the storage IDs.  2 parameter.  */
     command.ux_host_class_pima_command_nb_parameters =  2;
-    
+
     /* Parameter 1 is the Storage ID.  */
     command.ux_host_class_pima_command_parameter_1 =  storage_id;
 
@@ -103,7 +107,7 @@ UINT                                status;
     command.ux_host_class_pima_command_parameter_3 =  0;
     command.ux_host_class_pima_command_parameter_4 =  0;
     command.ux_host_class_pima_command_parameter_5 =  0;
-    
+
     /* Then set the command to GET_NUM_OBJETCS.  */
     command.ux_host_class_pima_command_operation_code =  UX_HOST_CLASS_PIMA_OC_GET_NUM_OBJECTS;
 
@@ -120,3 +124,57 @@ UINT                                status;
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_num_objects_get                PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima object number get function      */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    storage_id                                 The storage ID           */
+/*    object_format_code                         The object format code   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_num_objects_get   Get pima object number        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_num_objects_get(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                        ULONG storage_id,
+                                        ULONG object_format_code)
+{
+
+    /* Sanity checks.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual pima num objects get function.  */
+    return(_ux_host_class_pima_num_objects_get(pima, pima_session, storage_id, object_format_code));
+}

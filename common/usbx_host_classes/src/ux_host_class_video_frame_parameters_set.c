@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -30,52 +30,52 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _ux_host_class_video_frame_parameters_set           PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function sets the video parameters for the video device.       */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
 /*    frame_format                          Video format to use           */
 /*    width                                 Video frame width             */
 /*    height                                Video frame height            */
 /*    frame_interval                        Video frame interval          */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_class_video_format_data_get  Get format data               */
 /*    _ux_host_class_video_frame_data_get   Get frame data                */
 /*    _ux_host_stack_transfer_request       Process transfer request      */
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
 /*    _ux_utility_memory_allocate           Allocate memory block         */
 /*    _ux_utility_memory_free               Release memory block          */
 /*    _ux_host_semaphore_get                Get semaphore                 */
 /*    _ux_host_semaphore_put                Put semaphore                 */
 /*    _ux_utility_long_get                  Read 32-bit value             */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -89,6 +89,8 @@
 /*                                            internal clean up,          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_frame_parameters_set(UX_HOST_CLASS_VIDEO *video, ULONG frame_format, ULONG width, ULONG height, ULONG frame_interval)
@@ -320,3 +322,56 @@ ULONG                                           max_payload_size;
     }
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_video_frame_parameters_set          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video frame parameters set function  */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    frame_format                          Video format to use           */
+/*    width                                 Video frame width             */
+/*    height                                Video frame height            */
+/*    frame_interval                        Video frame interval          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_frame_parameters_set                           */
+/*                                          Video frame parameters set    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_video_frame_parameters_set(UX_HOST_CLASS_VIDEO *video, ULONG frame_format, ULONG width, ULONG height, ULONG frame_interval)
+{
+
+    /* Sanity checks.  */
+    if (video == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual video frame parameters set function.  */
+    return(_ux_host_class_video_frame_parameters_set(video, frame_format, width, height, frame_interval));
+}

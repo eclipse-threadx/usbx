@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Printer Class                                                       */
 /**                                                                       */
@@ -82,7 +82,7 @@ UINT            printer_name_length;
                 break;
             }
         }
-        
+
         /* And reduce the remaining length by 1.  */
         descriptor_length--;
 
@@ -120,46 +120,46 @@ UINT            printer_name_length;
     }
 }
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_name_get                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_printer_name_get                     PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function obtains the printer name. The name is used by the     */
-/*    application layer to identify the printer and loads its handler.    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    printer                               Pointer to printer class      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_compare            Compare memory block          */ 
+/*    application layer to identify the printer and loads its handler.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Pointer to printer class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_compare            Compare memory block          */
 /*    _ux_utility_memory_copy               Copy memory block             */
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_short_get_big_endian      Get 16-bit value              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Printer Class                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    _ux_utility_memory_free               Free memory block             */
+/*    _ux_utility_short_get_big_endian      Get 16-bit value              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Printer Class                                                       */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            verified memset and memcpy  */
@@ -239,3 +239,49 @@ UINT            status;
 #endif
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_printer_name_get                    PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer name get function call.      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Pointer to printer class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_printer_name_get       Obtains the printer name      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_printer_name_get(UX_HOST_CLASS_PRINTER *printer)
+{
+
+    /* Sanity checks.  */
+    if (printer == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    return(_ux_host_class_printer_name_get(printer));
+}

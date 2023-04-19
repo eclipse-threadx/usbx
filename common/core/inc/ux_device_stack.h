@@ -25,7 +25,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_stack.h                                   PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,6 +53,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -108,6 +111,21 @@ UINT    _ux_device_stack_uninitialize(VOID);
 
 UINT    _ux_device_stack_tasks_run(VOID);
 UINT    _ux_device_stack_transfer_run(UX_SLAVE_TRANSFER *transfer_request, ULONG slave_length, ULONG host_length);
+
+UINT    _uxe_device_stack_class_register(UCHAR *class_name,
+                                    UINT (*class_entry_function)(struct UX_SLAVE_CLASS_COMMAND_STRUCT *),
+                                    ULONG configuration_number,
+                                    ULONG interface_number,
+                                    VOID *parameter);
+UINT    _uxe_device_stack_class_unregister(UCHAR *class_name,
+                                    UINT (*class_entry_function)(struct UX_SLAVE_CLASS_COMMAND_STRUCT *));
+
+UINT    _uxe_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,
+                                    UCHAR * device_framework_full_speed, ULONG device_framework_length_full_speed,
+                                    UCHAR * string_framework, ULONG string_framework_length,
+                                    UCHAR * language_id_framework, ULONG language_id_framework_length,
+                                    UINT (*ux_system_slave_change_function)(ULONG));
+
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

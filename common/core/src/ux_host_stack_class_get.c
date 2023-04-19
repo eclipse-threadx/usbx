@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_stack_class_get                            PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -52,7 +52,7 @@
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
 /*    class_name                            Name of class                 */ 
-/*    class                                 Class pointer                 */ 
+/*    host_class                            Class pointer                 */ 
 /*                                                                        */ 
 /*  OUTPUT                                                                */ 
 /*                                                                        */ 
@@ -78,6 +78,8 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **host_class)
@@ -137,3 +139,52 @@ ULONG               class_index;
     return(UX_HOST_CLASS_UNKNOWN);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_class_get                           PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack class get function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class_name                            Name of class                 */
+/*    host_class                            Class pointer                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_get              Host stack class get          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **host_class)
+{
+
+    /* Sanity checks.  */
+    if ((class_name == UX_NULL) || (host_class == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke class get function.  */
+    return(_ux_host_stack_class_get(class_name, host_class));
+}

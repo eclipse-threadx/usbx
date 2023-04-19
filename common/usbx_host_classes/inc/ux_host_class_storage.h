@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_storage.h                             PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -64,6 +64,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -79,6 +82,13 @@
 extern   "C" { 
 
 #endif  
+
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_CLASS_STORAGE_ENABLE_ERROR_CHECKING)
+#define UX_HOST_CLASS_STORAGE_ENABLE_ERROR_CHECKING
+#endif
 
 
 #if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX) && !defined(UX_HOST_STANDALONE)
@@ -653,16 +663,23 @@ UINT    _ux_host_class_storage_media_lock(UX_HOST_CLASS_STORAGE_MEDIA *storage_m
 
 #if defined(UX_HOST_STANDALONE)
 UINT    _ux_host_class_storage_lock(UX_HOST_CLASS_STORAGE *storage, ULONG wait);
+UINT    _uxe_host_class_storage_lock(UX_HOST_CLASS_STORAGE *storage, ULONG wait);
 #define _ux_host_class_storage_unlock(s) do { (s) -> ux_host_class_storage_flags &= ~UX_HOST_CLASS_STORAGE_FLAG_LOCK; } while(0)
+#define _uxe_host_class_storage_unlock(s) do { if((s) != UX_NULL) (s) -> ux_host_class_storage_flags &= ~UX_HOST_CLASS_STORAGE_FLAG_LOCK; } while(0)
 #define _ux_host_class_storage_media_unlock(m) _ux_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage)
+#define _uxe_host_class_storage_media_unlock(m) do { if((m) != UX_NULL) _uxe_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage); } while(0)
 #else
 #define _ux_host_class_storage_lock(s,w) _ux_host_semaphore_get(&(s) -> ux_host_class_storage_semaphore, (w))
+#define _uxe_host_class_storage_lock(s,w) (((s) != UX_NULL) ? _ux_host_semaphore_get(&(s) -> ux_host_class_storage_semaphore, (w)) : UX_INVALID_PARAMETER)
 #define _ux_host_class_storage_unlock(s) _ux_host_semaphore_put(&(s) -> ux_host_class_storage_semaphore)
+#define _uxe_host_class_storage_unlock(s) (((s) != UX_NULL) ? _ux_host_semaphore_put(&(s) -> ux_host_class_storage_semaphore) : UX_INVALID_PARAMETER)
 #define _ux_host_class_storage_media_unlock(m) _ux_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage)
+#define _uxe_host_class_storage_media_unlock(m) (((m) != UX_NULL) ? _uxe_host_class_storage_unlock((m) -> ux_host_class_storage_media_storage) : UX_INVALID_PARAMETER)
 #endif
 #define _ux_host_class_storage_max_lun(s)           ((s) -> ux_host_class_storage_max_lun)
 #define _ux_host_class_storage_lun(s)               ((s) -> ux_host_class_storage_lun)
 #define _ux_host_class_storage_lun_select(s,l)      do { (s) -> ux_host_class_storage_lun = (l); } while(0)
+#define _uxe_host_class_storage_lun_select(s,l)     do { if ((s) != UX_NULL) (s) -> ux_host_class_storage_lun = (l); } while(0)
 #define _ux_host_class_storage_sense_status(s)      ((s) -> ux_host_class_storage_sense_code)
 
 UINT    _ux_host_class_storage_media_check(UX_HOST_CLASS_STORAGE *storage);
@@ -673,9 +690,41 @@ UINT    _ux_host_class_storage_check_run(UX_HOST_CLASS_STORAGE *storage);
 UINT    _ux_host_class_storage_read_write_run(UX_HOST_CLASS_STORAGE *storage,
                     ULONG read_write, ULONG sector_start, ULONG sector_count, UCHAR *data_pointer);
 
+
+UINT    _uxe_host_class_storage_media_read(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
+                                        ULONG sector_count, UCHAR *data_pointer);
+UINT    _uxe_host_class_storage_media_write(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
+                                        ULONG sector_count, UCHAR *data_pointer);
+
+UINT    _uxe_host_class_storage_media_check(UX_HOST_CLASS_STORAGE *storage);
+
+UINT    _uxe_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage, ULONG media_lun, UX_HOST_CLASS_STORAGE_MEDIA **storage_media);
+UINT    _uxe_host_class_storage_media_lock(UX_HOST_CLASS_STORAGE_MEDIA *storage_media, ULONG wait);
+
+
 /* Define Storage Class API prototypes.  */
 
 #define  ux_host_class_storage_entry                           _ux_host_class_storage_entry
+
+#define  ux_host_class_storage_sense_status                    _ux_host_class_storage_sense_status
+
+#if defined(UX_HOST_CLASS_STORAGE_ENABLE_ERROR_CHECKING)
+
+#define  ux_host_class_storage_lock                            _uxe_host_class_storage_lock
+#define  ux_host_class_storage_unlock                          _uxe_host_class_storage_unlock
+#define  ux_host_class_storage_lun_select                      _uxe_host_class_storage_lun_select
+
+#define  ux_host_class_storage_media_read                      _uxe_host_class_storage_media_read
+#define  ux_host_class_storage_media_write                     _uxe_host_class_storage_media_write
+
+#define  ux_host_class_storage_media_get                       _uxe_host_class_storage_media_get
+#define  ux_host_class_storage_media_lock                      _uxe_host_class_storage_media_lock
+#define  ux_host_class_storage_media_unlock                    _uxe_host_class_storage_media_unlock
+
+#define  ux_host_class_storage_media_check                     _uxe_host_class_storage_media_check
+
+
+#else
 
 #define  ux_host_class_storage_lock                            _ux_host_class_storage_lock
 #define  ux_host_class_storage_unlock                          _ux_host_class_storage_unlock
@@ -690,7 +739,8 @@ UINT    _ux_host_class_storage_read_write_run(UX_HOST_CLASS_STORAGE *storage,
 
 #define  ux_host_class_storage_media_check                     _ux_host_class_storage_media_check
 
-#define  ux_host_class_storage_sense_status                    _ux_host_class_storage_sense_status
+#endif
+
 
 /* Determine if a C++ compiler is being used.  If so, complete the standard 
    C conditional started above.  */   

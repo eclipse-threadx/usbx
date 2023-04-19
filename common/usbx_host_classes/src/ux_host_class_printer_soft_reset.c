@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Printer Class                                                       */
 /**                                                                       */
@@ -30,43 +30,43 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_soft_reset                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_printer_soft_reset                   PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a soft reset of the printer in case the      */ 
-/*    printer gets into an error mode.                                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    printer                               Pointer to printer class      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*    _ux_host_semaphore_put                Release protection semaphore  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function performs a soft reset of the printer in case the      */
+/*    printer gets into an error mode.                                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Pointer to printer class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_host_semaphore_get                Get protection semaphore      */
+/*    _ux_host_semaphore_put                Release protection semaphore  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -98,7 +98,7 @@ UINT            status;
 
     /* Ensure the instance is valid.  */
     if (printer -> ux_host_class_printer_state !=  UX_HOST_CLASS_INSTANCE_LIVE)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -172,3 +172,50 @@ UINT            status;
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_printer_soft_reset                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer soft reset function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Pointer to printer class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_printer_soft_reset     Printer soft reset            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT   _uxe_host_class_printer_soft_reset(UX_HOST_CLASS_PRINTER *printer)
+{
+
+    /* Sanity checks.  */
+    if (printer == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual printer soft reset function.  */
+    return(_ux_host_class_printer_soft_reset(printer));
+}

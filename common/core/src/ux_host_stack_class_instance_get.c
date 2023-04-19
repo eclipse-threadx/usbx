@@ -113,3 +113,54 @@ VOID    **current_class_instance;
     return(UX_SUCCESS);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_class_instance_get                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack class get function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class                                 Pointer to class              */
+/*    class_index                           Index of class                */
+/*    class_instance                        Destination of class instance */
+/*                                            pointer                     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_get     Host stack class instance get */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_class_instance_get(UX_HOST_CLASS *host_class, UINT class_index, VOID **class_instance)
+{
+
+    /* Sanity check.  */
+    if ((host_class == UX_NULL) || (class_instance == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke class instance get function.  */
+    return(_ux_host_stack_class_instance_get(host_class, class_index, class_instance));
+}

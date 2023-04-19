@@ -31,7 +31,8 @@
 
 
 #if UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH < UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE
-#error UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH too small, please check
+/* #error UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH too small, please check  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /**************************************************************************/
@@ -39,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_pima_device_prop_value_get         PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.X          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +85,10 @@
 /*                                            updated status handling,    */
 /*                                            improved sanity checks,     */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_device_prop_value_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -95,6 +100,9 @@ UX_SLAVE_TRANSFER                   *transfer_request;
 UCHAR                               *pima_data_buffer;
 ULONG                               device_property_value_length;
 UCHAR                               *device_property_value;
+
+    /* Build option check.  */
+    UX_ASSERT(UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH >= UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_PIMA_GET_DEVICE_PROP_VALUE, pima, device_property_code, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

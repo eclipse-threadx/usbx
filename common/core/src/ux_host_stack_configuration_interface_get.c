@@ -187,3 +187,59 @@ UX_INTERFACE        *current_interface;
     return(UX_INTERFACE_HANDLE_UNKNOWN);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_configuration_interface_get         PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack interface get function    */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    configuration                         Pointer to configuration      */
+/*    interface_index                       Index of interface            */
+/*    alternate_setting_index               Index of alternate setting    */
+/*    interface                             Destination of interface      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_configuration_interface_get                          */
+/*                                          Host stack interface get      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
+                                                UINT interface_index, UINT alternate_setting_index,
+                                                UX_INTERFACE **ux_interface)
+{
+
+    /* Sanity checks.  */
+    if ((configuration == UX_NULL) || (ux_interface == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke interface get function.  */
+    return(_ux_host_stack_configuration_interface_get(configuration,
+                    interface_index, alternate_setting_index, ux_interface));
+}

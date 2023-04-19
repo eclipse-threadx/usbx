@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -26,20 +26,20 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_pima.h                                PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX PIMA class.                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    USBX PIMA class.                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -53,21 +53,32 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved internal checks,   */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            increased default buffer    */
+/*                                            length to get device info,  */
+/*                                            added error checks support, */      
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_PIMA_H
 #define UX_HOST_CLASS_PIMA_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_CLASS_PIMA_ENABLE_ERROR_CHECKING)
+#define UX_HOST_CLASS_PIMA_ENABLE_ERROR_CHECKING
+#endif
 
 /* Define PIMA Class constants.  */
 
@@ -79,7 +90,7 @@ extern   "C" {
 #define UX_HOST_CLASS_PIMA_MAGIC_NUMBER                         0x50494D41
 #define UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH                   256
 #define UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH                     256
-#define UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH          64 
+#define UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH          64
 #define UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS                      64
 #if (UX_OVERFLOW_CHECK_ADD_ULONG(UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS, 1) || \
     UX_OVERFLOW_CHECK_MULC_ULONG(UX_HOST_CLASS_PIMA_MAX_STORAGE_IDS + 1, 4))
@@ -133,7 +144,7 @@ extern   "C" {
 #define UX_HOST_CLASS_PIMA_REQUEST_STATUS_OFFSET_LENGTH         0x00
 #define UX_HOST_CLASS_PIMA_REQUEST_STATUS_OFFSET_CODE           0x02
 #define UX_HOST_CLASS_PIMA_REQUEST_STATUS_COMMAND_COUNTER       16
-#define UX_HOST_CLASS_PIMA_REQUEST_STATUS_COMMAND_DELAY         1000 
+#define UX_HOST_CLASS_PIMA_REQUEST_STATUS_COMMAND_DELAY         1000
 
 /* Define PIMA command container type.  */
 
@@ -169,7 +180,7 @@ extern   "C" {
 #define UX_HOST_CLASS_PIMA_COMMAND_HEADER_PARAMETER_5           0x1C
 
 #define UX_HOST_CLASS_PIMA_COMMAND_HEADER_SIZE                  0x0C
-#define UX_HOST_CLASS_PIMA_CONTAINER_SIZE                       0x40 
+#define UX_HOST_CLASS_PIMA_CONTAINER_SIZE                       0x40
 #define UX_HOST_CLASS_PIMA_ALL_HEADER_SIZE                      0x20
 
 /* Define PIMA Data Header Format.  */
@@ -226,7 +237,7 @@ extern   "C" {
 #define UX_HOST_CLASS_PIMA_OC_FORMAT_STORE                      0x100F
 #define UX_HOST_CLASS_PIMA_OC_RESET_DEVICE                      0x1010
 #define UX_HOST_CLASS_PIMA_OC_SELF_TEST                         0x1011
-#define UX_HOST_CLASS_PIMA_OC_SET_OBJECT_PROTECTION             0x1012    
+#define UX_HOST_CLASS_PIMA_OC_SET_OBJECT_PROTECTION             0x1012
 #define UX_HOST_CLASS_PIMA_OC_POWER_DOWN                        0x1013
 #define UX_HOST_CLASS_PIMA_OC_GET_DEVICE_PROP_DESC              0x1014
 #define UX_HOST_CLASS_PIMA_OC_GET_DEVICE_PROP_VALUE             0x1015
@@ -310,7 +321,7 @@ extern   "C" {
 #define UX_HOST_CLASS_PIMA_OFC_AVI                              0x300A
 #define UX_HOST_CLASS_PIMA_OFC_MPEG                             0x300B
 #define UX_HOST_CLASS_PIMA_OFC_ASF                              0x300C
-#define UX_HOST_CLASS_PIMA_OFC_QT                               0x300D 
+#define UX_HOST_CLASS_PIMA_OFC_QT                               0x300D
 #define UX_HOST_CLASS_PIMA_OFC_EXIF_JPEG                        0x3801
 #define UX_HOST_CLASS_PIMA_OFC_TIFF_EP                          0x3802
 #define UX_HOST_CLASS_PIMA_OFC_FLASHPIX                         0x3803
@@ -350,9 +361,9 @@ extern   "C" {
 
 typedef struct UX_HOST_CLASS_PIMA_EVENT_STRUCT
 {
-    struct UX_HOST_CLASS_PIMA_SESSION_STRUCT  
+    struct UX_HOST_CLASS_PIMA_SESSION_STRUCT
                     *ux_host_class_pima_event_session;
-    struct UX_HOST_CLASS_PIMA_STRUCT  
+    struct UX_HOST_CLASS_PIMA_STRUCT
                     *ux_host_class_pima_event_pima_instance;
     ULONG           ux_host_class_pima_event_code;
     ULONG           ux_host_class_pima_event_session_id;
@@ -360,7 +371,7 @@ typedef struct UX_HOST_CLASS_PIMA_EVENT_STRUCT
     ULONG           ux_host_class_pima_event_parameter_1;
     ULONG           ux_host_class_pima_event_parameter_2;
     ULONG           ux_host_class_pima_event_parameter_3;
-    
+
 } UX_HOST_CLASS_PIMA_EVENT;
 
 /* Define PIMA structure.  */
@@ -368,7 +379,7 @@ typedef struct UX_HOST_CLASS_PIMA_EVENT_STRUCT
 typedef struct UX_HOST_CLASS_PIMA_STRUCT
 {
 
-    struct UX_HOST_CLASS_PIMA_STRUCT  
+    struct UX_HOST_CLASS_PIMA_STRUCT
                     *ux_host_class_pima_next_instance;
     UX_HOST_CLASS   *ux_host_class_pima_class;
     UX_DEVICE       *ux_host_class_pima_device;
@@ -389,9 +400,9 @@ typedef struct UX_HOST_CLASS_PIMA_STRUCT
     UCHAR           *ux_host_class_pima_event_buffer_current_offset;
     ULONG           ux_host_class_pima_event_buffer_current_length;
     ULONG           ux_host_class_pima_event_buffer_expected_length;
-    struct UX_HOST_CLASS_PIMA_SESSION_STRUCT  
+    struct UX_HOST_CLASS_PIMA_SESSION_STRUCT
                     *ux_host_class_pima_session;
-    UCHAR           *ux_host_class_pima_container;                    
+    UCHAR           *ux_host_class_pima_container;
     UX_SEMAPHORE    ux_host_class_pima_semaphore;
     VOID            *ux_host_class_pima_application;
     ULONG           ux_host_class_pima_zlp_flag;
@@ -406,12 +417,12 @@ typedef struct UX_HOST_CLASS_PIMA_SESSION_STRUCT
     ULONG           ux_host_class_pima_session_magic;
     ALIGN_TYPE      ux_host_class_pima_session_id;
     ULONG           ux_host_class_pima_session_state;
-    struct UX_HOST_CLASS_PIMA_STRUCT  
+    struct UX_HOST_CLASS_PIMA_STRUCT
                     *ux_host_class_pima_session_pima_instance;
     ULONG           ux_host_class_pima_session_nb_storage_ids;
     ULONG           ux_host_class_pima_session_nb_objects;
     VOID            (*ux_host_class_pima_session_event_callback)(struct UX_HOST_CLASS_PIMA_EVENT_STRUCT *pima_event);
-    
+
 } UX_HOST_CLASS_PIMA_SESSION;
 
 
@@ -427,7 +438,7 @@ typedef struct UX_HOST_CLASS_PIMA_COMMAND_STRUCT
     ULONG           ux_host_class_pima_command_parameter_3;
     ULONG           ux_host_class_pima_command_parameter_4;
     ULONG           ux_host_class_pima_command_parameter_5;
-    
+
 } UX_HOST_CLASS_PIMA_COMMAND;
 
 /* Define PIMA object info structure.  */
@@ -460,13 +471,13 @@ typedef struct UX_HOST_CLASS_PIMA_OBJECT_STRUCT
     ULONG           ux_host_class_pima_object_handle_id;
     ULONG           ux_host_class_pima_object_length;
     UCHAR           *ux_host_class_pima_object_buffer;
-    
+
 } UX_HOST_CLASS_PIMA_OBJECT;
 
 /* Define PIMA Object decompaction structure.  */
 
 #define UX_HOST_CLASS_PIMA_OBJECT_MAX_LENGTH                                512
-#define UX_HOST_CLASS_PIMA_OBJECT_VARIABLE_OFFSET                           52    
+#define UX_HOST_CLASS_PIMA_OBJECT_VARIABLE_OFFSET                           52
 #define UX_HOST_CLASS_PIMA_OBJECT_ENTRIES                                   15
 
 /* Define PIMA device info structure.  */
@@ -488,12 +499,12 @@ typedef struct UX_HOST_CLASS_PIMA_DEVICE_STRUCT
     UCHAR            ux_host_class_pima_device_model[UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
     UCHAR            ux_host_class_pima_device_version[UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
     UCHAR            ux_host_class_pima_device_serial_number[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
-    
+
 } UX_HOST_CLASS_PIMA_DEVICE;
 
 /* Define PIMA Device decompaction structure.  */
 
-#define UX_HOST_CLASS_PIMA_DEVICE_MAX_LENGTH                                512
+#define UX_HOST_CLASS_PIMA_DEVICE_MAX_LENGTH                                1024
 #define UX_HOST_CLASS_PIMA_DEVICE_STANDARD_VERSION                          0
 #define UX_HOST_CLASS_PIMA_DEVICE_VENDOR_EXTENSION_ID                       2
 #define UX_HOST_CLASS_PIMA_DEVICE_VENDOR_EXTENSION_VERSION                  6
@@ -514,14 +525,14 @@ typedef struct UX_HOST_CLASS_PIMA_STORAGE_STRUCT
     ULONG            ux_host_class_pima_storage_free_space_images;
     UCHAR            ux_host_class_pima_storage_description[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
     UCHAR            ux_host_class_pima_storage_volume_label[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
-    
+
 } UX_HOST_CLASS_PIMA_STORAGE;
 
 /* Define PIMA storage decompaction structure.  */
 
 #define UX_HOST_CLASS_PIMA_STORAGE_MAX_LENGTH                             512
 #define UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET                        26
-#define UX_HOST_CLASS_PIMA_STORAGE_ENTRIES                                8 
+#define UX_HOST_CLASS_PIMA_STORAGE_ENTRIES                                8
 
 /* Define Pima Class function prototypes.  */
 
@@ -532,10 +543,10 @@ UINT  _ux_host_class_pima_endpoints_get(UX_HOST_CLASS_PIMA *cdc_acm);
 UINT  _ux_host_class_pima_entry(UX_HOST_CLASS_COMMAND *command);
 VOID  _ux_host_class_pima_notification(UX_TRANSFER *transfer_request);
 UINT  _ux_host_class_pima_command(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_COMMAND *command,
-                                    ULONG direction, UCHAR *data_buffer, ULONG data_length,        
+                                    ULONG direction, UCHAR *data_buffer, ULONG data_length,
                                     ULONG max_payload_length);
 UINT  _ux_host_class_pima_device_reset(UX_HOST_CLASS_PIMA *pima);
-UINT  _ux_host_class_pima_num_objects_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG storage_id, 
+UINT  _ux_host_class_pima_num_objects_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG storage_id,
                                         ULONG object_format_code);
 UINT  _ux_host_class_pima_object_copy(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG object_handle,
                                         ULONG storage_id, ULONG parent_object_handle);
@@ -559,42 +570,96 @@ UINT  _ux_host_class_pima_thumb_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA
                                         UCHAR *thumb_buffer, ULONG thumb_buffer_length, ULONG *thumb_actual_length);
 UINT  _ux_host_class_pima_write(UX_HOST_CLASS_PIMA *pima, UCHAR *data_pointer, ULONG data_length, ULONG operation_code, ULONG max_payload_length);
 UINT  _ux_host_class_pima_request_cancel(UX_HOST_CLASS_PIMA *pima);
-UINT  _ux_host_class_pima_object_transfer_abort(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_object_transfer_abort(UX_HOST_CLASS_PIMA *pima,
                                         UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                         ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object);
-UINT  _ux_host_class_pima_object_close(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_object_close(UX_HOST_CLASS_PIMA *pima,
                                         UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                         ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object);
-UINT  _ux_host_class_pima_object_open(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_object_open(UX_HOST_CLASS_PIMA *pima,
                                         UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                         ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object);
-UINT  _ux_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima,
                                         UX_HOST_CLASS_PIMA_DEVICE *pima_device);
-                                        
-/* Define Device PIMA Class API prototypes.  */
 
-#define ux_host_class_pima_entry                    _ux_host_class_pima_entry           
-#define ux_host_class_pima_device_info_get          _ux_host_class_pima_device_info_get 
+UINT  _uxe_host_class_pima_num_objects_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG storage_id,
+                                        ULONG object_format_code);
+
+UINT  _uxe_host_class_pima_object_delete(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG object_handle);
+UINT  _uxe_host_class_pima_object_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object,
+                                        UCHAR *object_buffer, ULONG object_buffer_length, ULONG *object_actual_length);
+UINT  _uxe_host_class_pima_object_handles_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                    ULONG *object_handles_array, ULONG object_handles_length, ULONG storage_id, ULONG object_format_code, ULONG object_handle_association);
+UINT  _uxe_host_class_pima_object_info_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object);
+UINT  _uxe_host_class_pima_object_info_send(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG storage_id, ULONG parent_object_id,
+                                        UX_HOST_CLASS_PIMA_OBJECT *object);
+UINT  _uxe_host_class_pima_object_send(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, UX_HOST_CLASS_PIMA_OBJECT *object,
+                                        UCHAR *object_buffer, ULONG object_buffer_length);
+UINT  _uxe_host_class_pima_session_close(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session);
+UINT  _uxe_host_class_pima_session_open(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session);
+UINT  _uxe_host_class_pima_storage_ids_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG *storage_ids_array, ULONG storage_id_length);
+UINT  _uxe_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG storage_id, UX_HOST_CLASS_PIMA_STORAGE *storage);
+UINT  _uxe_host_class_pima_thumb_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session, ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object,
+                                        UCHAR *thumb_buffer, ULONG thumb_buffer_length, ULONG *thumb_actual_length);
+UINT  _uxe_host_class_pima_object_transfer_abort(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                        ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object);
+UINT  _uxe_host_class_pima_object_close(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                        ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object);
+UINT  _uxe_host_class_pima_object_open(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                        ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object);
+UINT  _uxe_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_DEVICE *pima_device);
+
+/* Define Device PIMA Class API prototypes.  */
+#if defined(UX_HOST_CLASS_PIMA_ENABLE_ERROR_CHECKING)
+
+#define ux_host_class_pima_entry                    _ux_host_class_pima_entry
+#define ux_host_class_pima_device_info_get          _uxe_host_class_pima_device_info_get
+#define ux_host_class_pima_object_info_send         _uxe_host_class_pima_object_info_send
+#define ux_host_class_pima_object_info_get          _uxe_host_class_pima_object_info_get
+#define ux_host_class_pima_object_open              _uxe_host_class_pima_object_open
+#define ux_host_class_pima_object_get               _uxe_host_class_pima_object_get
+#define ux_host_class_pima_thumb_get                _uxe_host_class_pima_thumb_get
+#define ux_host_class_pima_object_send              _uxe_host_class_pima_object_send
+#define ux_host_class_pima_object_delete            _uxe_host_class_pima_object_delete
+#define ux_host_class_pima_object_transfer_abort    _uxe_host_class_pima_object_transfer_abort
+#define ux_host_class_pima_object_close             _uxe_host_class_pima_object_close
+#define ux_host_class_pima_session_open             _uxe_host_class_pima_session_open
+#define ux_host_class_pima_session_close            _uxe_host_class_pima_session_close
+#define ux_host_class_pima_storage_ids_get          _uxe_host_class_pima_storage_ids_get
+#define ux_host_class_pima_storage_info_get         _uxe_host_class_pima_storage_info_get
+#define ux_host_class_pima_object_handles_get       _uxe_host_class_pima_object_handles_get
+#define ux_host_class_pima_num_objects_get          _uxe_host_class_pima_num_objects_get
+
+#else
+
+#define ux_host_class_pima_entry                    _ux_host_class_pima_entry
+#define ux_host_class_pima_device_info_get          _ux_host_class_pima_device_info_get
 #define ux_host_class_pima_object_info_send         _ux_host_class_pima_object_info_send
-#define ux_host_class_pima_object_info_get          _ux_host_class_pima_object_info_get 
-#define ux_host_class_pima_object_open              _ux_host_class_pima_object_open     
-#define ux_host_class_pima_object_get               _ux_host_class_pima_object_get      
-#define ux_host_class_pima_thumb_get                _ux_host_class_pima_thumb_get      
+#define ux_host_class_pima_object_info_get          _ux_host_class_pima_object_info_get
+#define ux_host_class_pima_object_open              _ux_host_class_pima_object_open
+#define ux_host_class_pima_object_get               _ux_host_class_pima_object_get
+#define ux_host_class_pima_thumb_get                _ux_host_class_pima_thumb_get
 #define ux_host_class_pima_object_send              _ux_host_class_pima_object_send
 #define ux_host_class_pima_object_delete            _ux_host_class_pima_object_delete
 #define ux_host_class_pima_object_transfer_abort    _ux_host_class_pima_object_transfer_abort
-#define ux_host_class_pima_object_close             _ux_host_class_pima_object_close         
-#define ux_host_class_pima_session_open             _ux_host_class_pima_session_open    
-#define ux_host_class_pima_session_close            _ux_host_class_pima_session_close   
-#define ux_host_class_pima_storage_ids_get          _ux_host_class_pima_storage_ids_get 
+#define ux_host_class_pima_object_close             _ux_host_class_pima_object_close
+#define ux_host_class_pima_session_open             _ux_host_class_pima_session_open
+#define ux_host_class_pima_session_close            _ux_host_class_pima_session_close
+#define ux_host_class_pima_storage_ids_get          _ux_host_class_pima_storage_ids_get
 #define ux_host_class_pima_storage_info_get         _ux_host_class_pima_storage_info_get
-#define ux_host_class_pima_object_handles_get       _ux_host_class_pima_object_handles_get 
-#define ux_host_class_pima_num_objects_get          _ux_host_class_pima_num_objects_get 
+#define ux_host_class_pima_object_handles_get       _ux_host_class_pima_object_handles_get
+#define ux_host_class_pima_num_objects_get          _ux_host_class_pima_num_objects_get
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+#endif
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif

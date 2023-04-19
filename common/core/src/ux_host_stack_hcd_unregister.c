@@ -195,3 +195,56 @@ UINT        hcd_name_length =  0;
 
     return(UX_SUCCESS);
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_hcd_unregister                      PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack HCD unregister function   */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_name                              Name of HCD to unregister     */
+/*    hcd_param1                            Parameter 1 of HCD            */
+/*    hcd_param2                            Parameter 2 of HCD            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_hcd_unregister         HCD unregister                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_hcd_unregister(UCHAR *hcd_name,
+                                    ULONG hcd_param1, ULONG hcd_param2)
+{
+
+    /* Sanity check.  */
+    if (hcd_name == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke HCD unregister function.  */
+    return(_ux_host_stack_hcd_unregister(hcd_name, hcd_param1, hcd_param2));
+}

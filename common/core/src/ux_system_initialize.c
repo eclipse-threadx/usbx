@@ -268,3 +268,56 @@ UINT                status;
     return(UX_SUCCESS);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_system_initialize                              PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in system initialization function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    regular_memory_pool_start        Start of non cached memory pool    */
+/*    regular_memory_size              Size of non cached memory pool     */
+/*    cache_safe_memory_pool_start     Start of cached memory pool        */
+/*    cache_safe_memory_size           Size of cached memory pool         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_system_initialize                 Get encoded feedback          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
+                            VOID *cache_safe_memory_pool_start, ULONG cache_safe_memory_size)
+{
+
+    /* Sanity check.  */
+    if ((regular_memory_pool_start == UX_NULL) || (regular_memory_size == 0))
+            return(UX_INVALID_PARAMETER);
+    
+    /* Invoke system initialization function.  */
+    return(_ux_system_initialize(regular_memory_pool_start, regular_memory_size, 
+                                 cache_safe_memory_pool_start, cache_safe_memory_size));
+}

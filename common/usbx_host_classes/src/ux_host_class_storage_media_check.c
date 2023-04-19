@@ -83,4 +83,53 @@ UINT            status;
     } while(status == UX_STATE_WAIT);
     return(storage -> ux_host_class_storage_status);
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_storage_media_check                 PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in storage media check function call.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_media_check     Check storage media          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_storage_media_check(UX_HOST_CLASS_STORAGE *storage)
+{
+
+    /* Sanity check.  */
+    if (storage == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke storage media check function.  */
+    return(_ux_host_class_storage_media_check(storage));
+}
 #endif

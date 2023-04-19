@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_pima.h                              PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,6 +58,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -73,6 +76,14 @@
 extern   "C" { 
 
 #endif  
+
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_CLASS_PIMA_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_CLASS_PIMA_ENABLE_ERROR_CHECKING
+#endif
+
 
 /* Define PIMA Class constants.  */
 
@@ -1015,6 +1026,10 @@ UINT  _ux_device_class_pima_object_prop_value_set(UX_SLAVE_CLASS_PIMA *pima,
                                                     ULONG object_property_code);
 UINT  _ux_device_class_pima_storage_format(UX_SLAVE_CLASS_PIMA *pima, ULONG storage_id);
 UINT  _ux_device_class_pima_device_reset(UX_SLAVE_CLASS_PIMA *pima);
+
+
+UINT  _uxe_device_class_pima_initialize(UX_SLAVE_CLASS_COMMAND *command);
+
 
 /* Define Device PIMA Class API prototypes.  */
 

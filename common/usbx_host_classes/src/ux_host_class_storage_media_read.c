@@ -193,3 +193,56 @@ UINT            media_retry;
     return(UX_HOST_CLASS_STORAGE_SENSE_ERROR);                                            
 #endif
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_storage_media_read                   PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in storage media read function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    sector_start                          Starting sector               */
+/*    sector_count                          Number of sectors to read     */
+/*    data_pointer                          Pointer to data to read       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_media_read     Read storage media            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_storage_media_read(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
+                                    ULONG sector_count, UCHAR *data_pointer)
+{
+
+    /* Sanity checks.  */
+    if ((storage == UX_NULL) || (data_pointer == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke storage media read function.  */
+    return(_ux_host_class_storage_media_read(storage, sector_start, sector_count, data_pointer));
+}

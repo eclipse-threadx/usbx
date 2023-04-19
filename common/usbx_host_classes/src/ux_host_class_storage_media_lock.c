@@ -103,4 +103,55 @@ UINT                            status;
     return(UX_SUCCESS);
 #endif
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_storage_media_lock                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in storage media lock function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage_media                         Pointer to storage media to   */
+/*                                          select                        */
+/*    wait                                  Wait option                   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_media_lock     Lock and select storage media */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT    _uxe_host_class_storage_media_lock(UX_HOST_CLASS_STORAGE_MEDIA *storage_media, ULONG wait)
+{
+
+    /* Sanity check.  */
+    if (storage_media == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke storage media lock function.  */
+    return(_ux_host_class_storage_media_lock(storage_media, wait));
+}
 #endif

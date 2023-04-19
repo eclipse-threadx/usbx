@@ -31,6 +31,118 @@
 #include "ux_device_class_pima.h"
 
 
+#ifdef UX_PIMA_WITH_MTP_SUPPORT
+static USHORT _dpsclient_object_prop_supported[] = {0};
+static UINT _dpsclient_object_prop_desc_get (struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                ULONG object_property,
+                                ULONG object_format_code,
+                                UCHAR **object_prop_dataset,
+                                ULONG *object_prop_dataset_length)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(object_property);
+    UX_PARAMETER_NOT_USED(object_format_code);
+    UX_PARAMETER_NOT_USED(object_prop_dataset);
+    UX_PARAMETER_NOT_USED(object_prop_dataset_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_object_prop_value_get (struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                    ULONG object_handle,
+                                    ULONG object_property,
+                                    UCHAR **object_prop_value,
+                                    ULONG *object_prop_value_length)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(object_handle);
+    UX_PARAMETER_NOT_USED(object_property);
+    UX_PARAMETER_NOT_USED(object_prop_value);
+    UX_PARAMETER_NOT_USED(object_prop_value_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_object_prop_value_set (struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                    ULONG object_handle,
+                                    ULONG object_property,
+                                    UCHAR *object_prop_value,
+                                    ULONG object_prop_value_length)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(object_handle);
+    UX_PARAMETER_NOT_USED(object_property);
+    UX_PARAMETER_NOT_USED(object_prop_value);
+    UX_PARAMETER_NOT_USED(object_prop_value_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_object_references_get (struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                    ULONG object_handle,
+                                    UCHAR **object_references_array,
+                                    ULONG *object_references_array_length)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(object_handle);
+    UX_PARAMETER_NOT_USED(object_references_array);
+    UX_PARAMETER_NOT_USED(object_references_array_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_object_references_set (struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                    ULONG object_handle,
+                                    UCHAR *object_references_array,
+                                    ULONG object_references_array_length)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(object_handle);
+    UX_PARAMETER_NOT_USED(object_references_array);
+    UX_PARAMETER_NOT_USED(object_references_array_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+#endif
+static UINT _dpsclient_device_reset(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_device_prop_desc_get(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                ULONG device_property,
+                                UCHAR **device_prop_dataset,
+                                ULONG *device_prop_dataset_length)
+
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(device_property);
+    UX_PARAMETER_NOT_USED(device_prop_dataset);
+    UX_PARAMETER_NOT_USED(device_prop_dataset_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_device_prop_value_get(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                ULONG device_property,
+                                UCHAR **device_prop_value,
+                                ULONG *device_prop_value_length)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(device_property);
+    UX_PARAMETER_NOT_USED(device_prop_value);
+    UX_PARAMETER_NOT_USED(device_prop_value_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_device_prop_value_set(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                ULONG device_property,
+                                UCHAR *device_prop_value,
+                                ULONG device_prop_value_length)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(device_property);
+    UX_PARAMETER_NOT_USED(device_prop_value);
+    UX_PARAMETER_NOT_USED(device_prop_value_length);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+static UINT _dpsclient_storage_format(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
+                                ULONG storage_id)
+{
+    UX_PARAMETER_NOT_USED(pima);
+    UX_PARAMETER_NOT_USED(storage_id);
+    return(UX_DEVICE_CLASS_PIMA_RC_OPERATION_NOT_SUPPORTED);
+}
+
+
 /**************************************************************************/ 
 /*                                                                        */ 
 /*  FUNCTION                                               RELEASE        */ 
@@ -73,6 +185,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used macros for RTOS calls, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            initialized PIMA callbacks, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_start(UX_PICTBRIDGE *pictbridge)
@@ -223,6 +338,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_storage_free_space_image      = 0;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_storage_description           = _ux_pictbridge_volume_description;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_storage_volume_label          = _ux_pictbridge_volume_label;
+
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_number_get             = _ux_pictbridge_dpsclient_object_number_get;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_handles_get            = _ux_pictbridge_dpsclient_object_handles_get;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_info_get               = _ux_pictbridge_dpsclient_object_info_get;   
@@ -230,6 +346,21 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_info_send              = _ux_pictbridge_dpsclient_object_info_send;  
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_data_send              = _ux_pictbridge_dpsclient_object_data_send;  
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_delete                 = _ux_pictbridge_dpsclient_object_delete;
+
+#ifdef UX_PIMA_WITH_MTP_SUPPORT
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_properties_list        = _dpsclient_object_prop_supported;
+
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_prop_desc_get          = _dpsclient_object_prop_desc_get;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_prop_value_get         = _dpsclient_object_prop_value_get;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_prop_value_set         = _dpsclient_object_prop_value_set;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_references_get         = _dpsclient_object_references_get;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_references_set         = _dpsclient_object_references_set;
+#endif
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_device_reset                  = _dpsclient_device_reset;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_device_prop_desc_get          = _dpsclient_device_prop_desc_get;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_device_prop_value_get         = _dpsclient_device_prop_value_get;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_device_prop_value_set         = _dpsclient_device_prop_value_set;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_storage_format                = _dpsclient_storage_format;
 
         /* Store the instance owner.  */
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_application                   = (VOID *) pictbridge;

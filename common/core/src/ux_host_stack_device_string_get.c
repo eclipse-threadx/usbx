@@ -147,3 +147,59 @@ UINT            status;
     /* Return completion status.  */
     return(status);
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_device_string_get                   PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack device get function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    device                                Pointer to device instance    */
+/*    descriptor_buffer                     Pointer to a buffer to fill   */
+/*                                          LANGID or STRING descriptor   */
+/*    length                                Length of buffer              */
+/*    language_id                           0 to obtain LANGID descriptor */
+/*                                          valid language ID to obtain   */
+/*                                          string descriptor             */
+/*    string_index                          Index of the string           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_device_string_get      String descriptor get         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_device_string_get(UX_DEVICE *device, UCHAR *descriptor_buffer, ULONG length, ULONG language_id, ULONG string_index)
+{
+
+    /* Sanity check.  */
+    if ((device == UX_NULL) || (descriptor_buffer == UX_NULL) || (length == 0))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke string descriptor get function.  */
+    return(_ux_host_stack_device_string_get(device, descriptor_buffer, length, language_id, string_index));
+}

@@ -32,7 +32,8 @@
 #if (UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH < UX_DEVICE_DESCRIPTOR_LENGTH) || \
     (UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH < UX_DEVICE_QUALIFIER_DESCRIPTOR_LENGTH) || \
     (UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH < UX_OTG_DESCRIPTOR_LENGTH)
-#error UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH too small, please check
+/* #error UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH too small, please check  */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /**************************************************************************/
@@ -40,7 +41,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_descriptor_send                    PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +89,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            moved compile option check, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_descriptor_send(ULONG descriptor_type, ULONG request_index, ULONG host_length)
@@ -114,6 +118,12 @@ UCHAR                           *string_memory;
 UCHAR                           *string_framework;
 ULONG                           string_framework_length;
 ULONG                           string_length;
+
+
+    /* Build option check.  */
+    UX_ASSERT((UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH >= UX_DEVICE_DESCRIPTOR_LENGTH) &&
+              (UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH >= UX_DEVICE_QUALIFIER_DESCRIPTOR_LENGTH) &&
+              (UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH >= UX_OTG_DESCRIPTOR_LENGTH));
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_STACK_DESCRIPTOR_SEND, descriptor_type, request_index, 0, 0, UX_TRACE_DEVICE_STACK_EVENTS, 0, 0)

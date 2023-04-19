@@ -134,4 +134,58 @@ UINT                            scan_index;
     return(UX_ERROR);
 #endif
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_storage_media_get                   PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in storage media get function call.     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    media_lun                             Media logical unit No. (LUN)  */
+/*    storage_media                         Holds returned storage media  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_media_get       Get storage media            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT    _uxe_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage,
+                                         ULONG media_lun,
+                                         UX_HOST_CLASS_STORAGE_MEDIA **storage_media)
+{
+
+    /* Sanity check.  */
+    if ((storage == UX_NULL) || (storage_media == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke storage media get function.  */
+    return(_ux_host_class_storage_media_get(storage, media_lun, storage_media));
+}
+
 #endif

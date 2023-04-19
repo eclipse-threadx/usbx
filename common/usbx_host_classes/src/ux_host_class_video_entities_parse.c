@@ -188,3 +188,59 @@ UINT                                            status;
     /* We get here when all descriptors scanned.  */
     return(UX_SUCCESS);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_video_entities_parse                PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video entities parse function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video instance     */
+/*    parse_function                        Parse function for each       */
+/*                                          video class descriptor        */
+/*    arg                                   Parse function argument       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_entities_parse   Video entities parse          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Video Class                                                         */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT _uxe_host_class_video_entities_parse(UX_HOST_CLASS_VIDEO *video,
+        UINT(*parse_function)(VOID  *arg,
+                              UCHAR *packed_interface_descriptor,
+                              UCHAR *packed_entity_descriptor),
+        VOID* arg)
+{
+
+    /* Sanity checks.  */
+    if (video == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual video entities parse function.  */
+    return(_ux_host_class_video_entities_parse(video, parse_function, arg));
+}

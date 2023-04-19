@@ -136,3 +136,54 @@ UX_ENDPOINT     *current_endpoint;
     return(UX_ENDPOINT_HANDLE_UNKNOWN);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_interface_endpoint_get              PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack endpoint get function     */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    interface_ptr                         Pointer to interface          */ 
+/*    endpoint_index                        Index of endpoint to get      */ 
+/*    endpoint                              Destination for endpoint      */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_interface_endpoint_get Endpoint get                  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_interface_endpoint_get(UX_INTERFACE *interface_ptr, UINT endpoint_index, UX_ENDPOINT **endpoint)
+{
+
+    /* Sanity checks.  */
+    if ((interface_ptr == UX_NULL) || (endpoint == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke endpoint get function.  */
+    return(_ux_host_stack_interface_endpoint_get(interface_ptr, endpoint_index, endpoint));
+}

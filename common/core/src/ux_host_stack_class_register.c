@@ -173,3 +173,55 @@ ULONG               class_index;
     /* No more entries in the class table.  */
     return(UX_MEMORY_ARRAY_FULL);
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_class_register                      PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack class register function   */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class_name                            Name of class                 */
+/*    class_entry_function                  Entry function of the class   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_get     Host stack class instance get */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_class_register(UCHAR *class_name,
+                        UINT (*class_entry_function)(struct UX_HOST_CLASS_COMMAND_STRUCT *))
+{
+
+    /* Sanity checks.  */
+    if ((class_name == UX_NULL) || (class_entry_function == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke class register function.  */
+    return(_ux_host_stack_class_register(class_name, class_entry_function));
+}

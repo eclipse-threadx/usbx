@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -30,43 +30,46 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_session_close                   PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_session_close                   PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function closes a session with the PIMA device.                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                       Pointer to pima class    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function closes a session with the PIMA device.                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*  _ux_host_class_pima_command                 Pima command function     */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USB application                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_session_close(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session)
@@ -88,10 +91,10 @@ UINT                                status;
 
     /* The transaction ID in the PIMA instance should be reset.  */
     pima -> ux_host_class_pima_transaction_id =  0;
-        
+
     /* Issue command to close the session with the PIMA device.  No parameter.  */
     command.ux_host_class_pima_command_nb_parameters =  0;
-    
+
     /* Then set the command to CLOSE_SESSION.  */
     command.ux_host_class_pima_command_operation_code =  UX_HOST_CLASS_PIMA_OC_CLOSE_SESSION;
 
@@ -111,15 +114,63 @@ UINT                                status;
 
         /* Reset the PIMA session in the pima instance. */
         pima -> ux_host_class_pima_session = UX_NULL;
-        
+
         /* Reset the magic field.  */
         pima_session -> ux_host_class_pima_session_magic =  0;
-        
+
         /* Mark the session as closed.  */
         pima_session -> ux_host_class_pima_session_state = UX_HOST_CLASS_PIMA_SESSION_STATE_CLOSED;
     }
-    
+
     /* Return completion status.  */
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_session_close                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima session close function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_session_close     Close pima session            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_session_close(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session)
+{
+
+    /* Sanity checks.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL))
+        return (UX_INVALID_PARAMETER);
+
+    /* Call the actual pima session close function.  */
+    return(_ux_host_class_pima_session_close(pima, pima_session));
+}

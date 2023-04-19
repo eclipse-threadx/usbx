@@ -147,3 +147,58 @@ ULONG           completion_code;
     return(UX_SUCCESS);       
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_transfer_request_abort              PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack transfer abort function   */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    transfer_request                      Pointer to transfer           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request_abort Transfer abort                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request)
+{
+
+    /* Sanity checks.  */
+    if (transfer_request == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+    if (transfer_request -> ux_transfer_request_endpoint == UX_NULL)
+        return(UX_ENDPOINT_HANDLE_UNKNOWN);
+    if (transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_device == UX_NULL)
+        return(UX_DEVICE_HANDLE_UNKNOWN);
+    if (UX_DEVICE_HCD_GET(transfer_request -> ux_transfer_request_endpoint -> ux_endpoint_device) == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke transfer abort function.  */
+    return(_ux_host_stack_transfer_request_abort(transfer_request));
+}

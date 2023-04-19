@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_transfer_buffers_add           PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,7 +75,7 @@
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
-/*    Video Class                                                         */
+/*    Application                                                         */
 /*                                                                        */
 /*  RELEASE HISTORY                                                       */
 /*                                                                        */
@@ -97,6 +97,8 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            set pending on endpoint,    */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_buffers_add(UX_HOST_CLASS_VIDEO *video, UCHAR** buffers, ULONG num_buffers)
@@ -227,4 +229,57 @@ UINT            i;
 
     /* Return completion status.  */
     return(status);
+}
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_video_transfer_buffers_add          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video transfer buffers add function  */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    buffers                               Pointer to data buffer        */
+/*                                          pointers array                */
+/*    num_buffers                           Number of data buffers        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_transfer_buffers_add                           */
+/*                                          video transfer buffers add    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_video_transfer_buffers_add(UX_HOST_CLASS_VIDEO *video, UCHAR** buffers, ULONG num_buffers)
+{
+
+    /* Sanity checks.  */
+    if ((video == UX_NULL) || (buffers == UX_NULL) || (num_buffers == 0))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual video transfer buffers add function.  */
+    return(_ux_host_class_video_transfer_buffers_add(video, buffers, num_buffers));
 }

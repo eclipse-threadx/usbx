@@ -148,3 +148,53 @@ ULONG       current_device_index;
     /* Return error.  */
     return(UX_DEVICE_HANDLE_UNKNOWN);
 }
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_device_get                          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack device get function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    device_index                          Index of device               */
+/*    device                                Destination for device pointer*/
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_device_get             Host stack device get         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_device_get(ULONG device_index, UX_DEVICE **device)
+{
+
+    /* Sanity check.  */
+    if (device == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke device get function.  */
+    return(_ux_host_stack_device_get(device_index, device));
+}

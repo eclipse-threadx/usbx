@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -30,48 +30,48 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _ux_host_class_video_transfer_buffer_add            PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function adds a buffer for video transfer requests.            */
-/*                                                                        */ 
+/*                                                                        */
 /*    Note check ux_host_class_video_max_payload_get to see minimum       */
 /*    recommended buffer size.                                            */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
 /*    buffer                                Pointer to data buffer        */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_class_instance_verify  Verify instance is valid      */
 /*    _ux_host_stack_transfer_request       Process transfer request      */
 /*    _ux_host_semaphore_get                Get semaphore                 */
 /*    _ux_host_semaphore_put                Release semaphore             */
-/*    _ux_system_error_handler              Log system error              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    _ux_system_error_handler              Log system error              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -88,6 +88,8 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            set pending on endpoint,    */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_buffer_add(UX_HOST_CLASS_VIDEO *video, UCHAR* buffer)
@@ -180,4 +182,55 @@ ULONG           packet_size;
 
     /* Return completion status.  */
     return(status);
+}
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_video_transfer_buffer_add           PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video transfer buffer add function   */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    buffer                                Pointer to data buffer        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_transfer_buffer_add                            */
+/*                                          video transfer buffer add     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_video_transfer_buffer_add(UX_HOST_CLASS_VIDEO *video, UCHAR* buffer)
+{
+
+    /* Sanity checks.  */
+    if ((video == UX_NULL) || (buffer == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call actual video transfer buffer add function.  */
+    return(_ux_host_class_video_transfer_buffer_add(video, buffer));
 }

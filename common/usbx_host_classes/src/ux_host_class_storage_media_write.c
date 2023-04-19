@@ -171,3 +171,55 @@ UINT            media_retry;
 #endif
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_storage_media_write                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in storage media write function call.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    sector_start                          Starting sector               */
+/*    sector_count                          Number of sectors to write    */
+/*    data_pointer                          Pointer to data to write      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Status                                                              */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_media_write     write storage media          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_storage_media_write(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
+                                    ULONG sector_count, UCHAR *data_pointer)
+{
+
+    /* Sanity check.  */
+    if (storage == UX_NULL)
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke storage media write function.  */
+    return(_ux_host_class_storage_media_write(storage, sector_start, sector_count, data_pointer));
+}

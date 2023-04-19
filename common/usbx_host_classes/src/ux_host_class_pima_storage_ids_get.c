@@ -162,3 +162,57 @@ ULONG                                nb_storage_ids;
     /* Return completion status.  */
     return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_storage_ids_get                PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima session storage ids get         */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    storage_ids_array                          Pointer to buffer to     */
+/*                                               fill storage IDs         */
+/*    storage_id_length                          Array length in N of IDs */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_storage_ids_get   Get pima storage ids          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_storage_ids_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                           ULONG *storage_ids_array, ULONG storage_id_length)
+{
+
+    /* Check for invalid input pointers.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL) || (storage_ids_array == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual pima storage ids get function.  */
+    return(_ux_host_class_pima_storage_ids_get(pima, pima_session, storage_ids_array, storage_id_length));
+}

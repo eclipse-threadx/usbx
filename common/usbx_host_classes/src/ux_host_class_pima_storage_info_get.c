@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -30,54 +30,57 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_storage_info_get                PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_storage_info_get                PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function gets the current storage information block.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                       Pointer to pima class    */ 
-/*    pima_session                               Pointer to pima session  */ 
-/*    storage_id                                 The storage ID           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function gets the current storage information block.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    storage_id                                 The storage ID           */
+/*    storage                                    Pointer to storage       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_class_pima_command           Pima command function         */
 /*    _ux_utility_descriptor_parse          Parse descriptor              */
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_copy               Copy memory                   */
 /*    _ux_utility_memory_free               Free memory                   */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USB application                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima,
                                         UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                         ULONG storage_id, UX_HOST_CLASS_PIMA_STORAGE *storage)
 {
@@ -101,10 +104,10 @@ ULONG                                unicode_string_length;
 
     /* Issue command to get the storage IDs.  1 parameter.  */
     command.ux_host_class_pima_command_nb_parameters =  1;
-    
+
     /* Parameter 1 is the Storage ID.  */
     command.ux_host_class_pima_command_parameter_1 =  storage_id;
-    
+
     /* Other parameters unused.  */
     command.ux_host_class_pima_command_parameter_2 =  0;
     command.ux_host_class_pima_command_parameter_3 =  0;
@@ -120,7 +123,7 @@ ULONG                                unicode_string_length;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Issue the command.  */
-    status = _ux_host_class_pima_command(pima, &command, UX_HOST_CLASS_PIMA_DATA_PHASE_IN , storage_buffer, 
+    status = _ux_host_class_pima_command(pima, &command, UX_HOST_CLASS_PIMA_DATA_PHASE_IN , storage_buffer,
                                         UX_HOST_CLASS_PIMA_STORAGE_MAX_LENGTH, UX_HOST_CLASS_PIMA_STORAGE_MAX_LENGTH);
 
     /* Check the result. If the result is OK, the storage info block was read properly. */
@@ -134,7 +137,7 @@ ULONG                                unicode_string_length;
 
         /* Copy the storage description field.  Point to the beginning of the storage description string.  */
         storage_pointer =  storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET;
-        
+
         /* Get the unicode string length.  */
         unicode_string_length =  (ULONG) *storage_pointer ;
 
@@ -143,7 +146,7 @@ ULONG                                unicode_string_length;
 
         /* Point to the volume label.  */
         storage_pointer =  storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET + unicode_string_length;
-        
+
         /* Get the unicode string length.  */
         unicode_string_length =  (ULONG) *storage_pointer ;
 
@@ -154,8 +157,61 @@ ULONG                                unicode_string_length;
 
     /* Free the original storage info buffer.  */
     _ux_utility_memory_free(storage_buffer);
-    
+
     /* Return completion status.  */
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_storage_info_get               PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima session storage info get        */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    storage_id                                 The storage ID           */
+/*    storage                                    Pointer to storage       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ue_host_class_pima_storage_info_get  Get pima storage info         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                        ULONG storage_id, UX_HOST_CLASS_PIMA_STORAGE *storage)
+{
+
+    /* Sanity check.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL) || (storage == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual pima storage info get function.  */
+    return(_ux_host_class_pima_storage_info_get(pima, pima_session, storage_id, storage));
+}

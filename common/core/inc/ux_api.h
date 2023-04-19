@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */ 
 /*                                                                        */ 
 /*    ux_api.h                                            PORTABLE C      */ 
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -133,6 +133,9 @@
 /*                                            max class driver configure, */
 /*                                            added a new error code,     */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -184,6 +187,24 @@ extern   "C" {
     defined(UX_HOST_STANDALONE) && defined(UX_HOST_SIDE_ONLY)
 #define UX_STANDALONE
 #endif
+#endif
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_SYSTEM_ENABLE_ERROR_CHECKING)
+#define UX_SYSTEM_ENABLE_ERROR_CHECKING
+#endif
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_DEVICE_STACK_ENABLE_ERROR_CHECKING)
+#define UX_DEVICE_STACK_ENABLE_ERROR_CHECKING
+#endif
+
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_STACK_ENABLE_ERROR_CHECKING)
+#define UX_HOST_STACK_ENABLE_ERROR_CHECKING
 #endif
 
 
@@ -2658,7 +2679,12 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 
 /* Define USBX Services.  */
 
+#if defined(UX_SYSTEM_ENABLE_ERROR_CHECKING)
 #define ux_system_initialize                                    _ux_system_initialize
+#else
+#define ux_system_initialize                                    _uxe_system_initialize
+#endif
+
 #define ux_system_uninitialize                                  _ux_system_uninitialize
 #define ux_system_tasks_run                                     _ux_system_tasks_run
 
@@ -2666,31 +2692,54 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 
 #define ux_host_class_storage_entry                             _ux_host_class_storage_entry
 
+#if defined(UX_HOST_STACK_ENABLE_ERROR_CHECKING)
+
+#define ux_host_stack_class_get                                 _uxe_host_stack_class_get
+#define ux_host_stack_class_instance_get                        _uxe_host_stack_class_instance_get
+#define ux_host_stack_class_register                            _uxe_host_stack_class_register
+#define ux_host_stack_device_configuration_activate             _uxe_host_stack_device_configuration_activate
+#define ux_host_stack_device_configuration_deactivate           _uxe_host_stack_device_configuration_deactivate
+#define ux_host_stack_device_configuration_get                  _uxe_host_stack_device_configuration_get
+#define ux_host_stack_device_get                                _uxe_host_stack_device_get
+#define ux_host_stack_device_string_get                         _uxe_host_stack_device_string_get
+#define ux_host_stack_endpoint_transfer_abort                   _uxe_host_stack_endpoint_transfer_abort
+#define ux_host_stack_hcd_register                              _uxe_host_stack_hcd_register
+#define ux_host_stack_hcd_unregister                            _uxe_host_stack_hcd_unregister
+#define ux_host_stack_interface_endpoint_get                    _uxe_host_stack_interface_endpoint_get
+#define ux_host_stack_interface_setting_select                  _uxe_host_stack_interface_setting_select
+#define ux_host_stack_transfer_request                          _uxe_host_stack_transfer_request
+#define ux_host_stack_transfer_request_abort                    _uxe_host_stack_transfer_request_abort
+
+#else
+
 #define ux_host_stack_class_get                                 _ux_host_stack_class_get
-#define ux_host_stack_class_instance_create                     _ux_host_stack_class_instance_create
-#define ux_host_stack_class_instance_destroy                    _ux_host_stack_class_instance_destroy
 #define ux_host_stack_class_instance_get                        _ux_host_stack_class_instance_get
 #define ux_host_stack_class_register                            _ux_host_stack_class_register
-#define ux_host_stack_class_unregister                          _ux_host_stack_class_unregister
-#define ux_host_stack_configuration_interface_get               _ux_host_stack_configuration_interface_get
 #define ux_host_stack_device_configuration_activate             _ux_host_stack_device_configuration_activate
 #define ux_host_stack_device_configuration_deactivate           _ux_host_stack_device_configuration_deactivate
 #define ux_host_stack_device_configuration_get                  _ux_host_stack_device_configuration_get
-#define ux_host_stack_device_configuration_select               _ux_host_stack_device_configuration_select
 #define ux_host_stack_device_get                                _ux_host_stack_device_get
 #define ux_host_stack_device_string_get                         _ux_host_stack_device_string_get
 #define ux_host_stack_endpoint_transfer_abort                   _ux_host_stack_endpoint_transfer_abort
 #define ux_host_stack_hcd_register                              _ux_host_stack_hcd_register
 #define ux_host_stack_hcd_unregister                            _ux_host_stack_hcd_unregister
-#define ux_host_stack_initialize                                _ux_host_stack_initialize
-#define ux_host_stack_uninitialize                              _ux_host_stack_uninitialize
 #define ux_host_stack_interface_endpoint_get                    _ux_host_stack_interface_endpoint_get
 #define ux_host_stack_interface_setting_select                  _ux_host_stack_interface_setting_select
 #define ux_host_stack_transfer_request                          _ux_host_stack_transfer_request
 #define ux_host_stack_transfer_request_abort                    _ux_host_stack_transfer_request_abort
+
+#endif
+
+#define ux_host_stack_class_instance_create                     _ux_host_stack_class_instance_create
+#define ux_host_stack_class_instance_destroy                    _ux_host_stack_class_instance_destroy
+#define ux_host_stack_class_unregister                          _ux_host_stack_class_unregister
+#define ux_host_stack_configuration_interface_get               _ux_host_stack_configuration_interface_get
+#define ux_host_stack_device_configuration_reset                _ux_host_stack_device_configuration_reset
+#define ux_host_stack_device_configuration_select               _ux_host_stack_device_configuration_select
+#define ux_host_stack_initialize                                _ux_host_stack_initialize
+#define ux_host_stack_uninitialize                              _ux_host_stack_uninitialize
 #define ux_host_stack_hnp_polling_thread_entry                  _ux_host_stack_hnp_polling_thread_entry
 #define ux_host_stack_role_swap                                 _ux_host_stack_role_swap
-#define ux_host_stack_device_configuration_reset                _ux_host_stack_device_configuration_reset
 
 #define ux_host_stack_tasks_run                                 _ux_host_stack_tasks_run
 #define ux_host_stack_transfer_run                              _ux_host_stack_transfer_run
@@ -2699,10 +2748,23 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_utility_pci_read                                     _ux_utility_pci_read
 #define ux_utility_pci_write                                    _ux_utility_pci_write
 
-#define ux_device_stack_alternate_setting_get                   _ux_device_stack_alternate_setting_get
-#define ux_device_stack_alternate_setting_set                   _ux_device_stack_alternate_setting_set
+#if defined(UX_DEVICE_STACK_ENABLE_ERROR_CHECKING)
+
+#define ux_device_stack_class_register                          _uxe_device_stack_class_register
+#define ux_device_stack_class_unregister                        _uxe_device_stack_class_unregister
+#define ux_device_stack_initialize                              _uxe_device_stack_initialize
+
+#else
+
 #define ux_device_stack_class_register                          _ux_device_stack_class_register
 #define ux_device_stack_class_unregister                        _ux_device_stack_class_unregister
+#define ux_device_stack_initialize                              _ux_device_stack_initialize
+
+#endif
+#define ux_device_stack_uninitialize                            _ux_device_stack_uninitialize
+
+#define ux_device_stack_alternate_setting_get                   _ux_device_stack_alternate_setting_get
+#define ux_device_stack_alternate_setting_set                   _ux_device_stack_alternate_setting_set
 #define ux_device_stack_configuration_get                       _ux_device_stack_configuration_get
 #define ux_device_stack_configuration_set                       _ux_device_stack_configuration_set
 #define ux_device_stack_descriptor_send                         _ux_device_stack_descriptor_send
@@ -2710,8 +2772,6 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_device_stack_disconnect                              _ux_device_stack_disconnect
 #define ux_device_stack_endpoint_stall                          _ux_device_stack_endpoint_stall
 #define ux_device_stack_host_wakeup                             _ux_device_stack_host_wakeup
-#define ux_device_stack_initialize                              _ux_device_stack_initialize
-#define ux_device_stack_uninitialize                            _ux_device_stack_uninitialize
 #define ux_device_stack_interface_delete                        _ux_device_stack_interface_delete
 #define ux_device_stack_interface_get                           _ux_device_stack_interface_get
 #define ux_device_stack_interface_set                           _ux_device_stack_interface_set
@@ -2739,6 +2799,10 @@ UINT    ux_system_initialize(VOID *non_cached_memory_pool_start, ULONG non_cache
                                 VOID *cached_memory_pool_start, ULONG cached_memory_size);
 UINT    ux_system_uninitialize(VOID);
 UINT    ux_system_tasks_run(VOID);
+
+UINT    uxe_system_initialize(VOID *non_cached_memory_pool_start, ULONG non_cached_memory_size, 
+                                VOID *cached_memory_pool_start, ULONG cached_memory_size);
+
 
 /* Define USBX Host API prototypes.  */
 

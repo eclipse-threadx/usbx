@@ -33,7 +33,8 @@
 #if UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH < UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE +   \
                                                    4 +                                      \
                                                   (4 * UX_DEVICE_CLASS_PIMA_MAX_STORAGE_IDS)
-#error UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH too small
+/* #error UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH too small */
+/* Build option checked runtime by UX_ASSERT  */
 #endif
 
 /**************************************************************************/ 
@@ -41,7 +42,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_storage_id_send               PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.X          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +80,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved sanity checks,     */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked compiling options   */
+/*                                            by runtime UX_ASSERT,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_storage_id_send(UX_SLAVE_CLASS_PIMA *pima)
@@ -88,6 +93,12 @@ UINT                    status;
 UX_SLAVE_TRANSFER       *transfer_request;
 ULONG                   storage_id_length;
 UCHAR                   *storage_id;
+
+    /* Build option check.  */
+    UX_ASSERT(UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH >=
+                                (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 
+                                 4 +                                     
+                                 (4 * UX_DEVICE_CLASS_PIMA_MAX_STORAGE_IDS)));
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_PIMA_STORAGE_ID_SEND, pima, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

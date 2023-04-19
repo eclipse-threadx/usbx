@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -30,48 +30,48 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_object_transfer_abort           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_object_transfer_abort           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function aborts a pending transfer to\from an object.          */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                       Pointer to pima class    */ 
-/*    pima_session                               Pointer to pima session  */ 
-/*    object_handle                              The object handle        */ 
-/*    object                                     Pointer to object info   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function aborts a pending transfer to\from an object.          */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    object_handle                              The object handle        */
+/*    object                                     Pointer to object info   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_class_pima_request_cancel         Cancel request           */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USB application                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_pima_object_transfer_abort(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_object_transfer_abort(UX_HOST_CLASS_PIMA *pima,
                                                 UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                                 ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object)
 {
@@ -93,11 +93,11 @@ UINT                                status;
 
     /* Check if the object is already closed.  */
     if (object -> ux_host_class_pima_object_state != UX_HOST_CLASS_PIMA_OBJECT_STATE_OPENED)
-        return (UX_HOST_CLASS_PIMA_RC_OBJECT_ALREADY_CLOSED );    
+        return (UX_HOST_CLASS_PIMA_RC_OBJECT_ALREADY_CLOSED );
 
     /* Cancel the current request.  */
     status = _ux_host_class_pima_request_cancel(pima);
-    
+
     /* The transfer for this transaction was aborted. No need to issue a status phase when the object is closed.  */
     object -> ux_host_class_pima_object_transfer_status = UX_HOST_CLASS_PIMA_OBJECT_TRANSFER_STATUS_ABORTED;
 
@@ -108,3 +108,56 @@ UINT                                status;
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_object_transfer_abort          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima object transfer abort function  */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    object_handle                              The object handle        */
+/*    object                                     Pointer to object info   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_object_transfer_abort Transfer abort            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_object_transfer_abort(UX_HOST_CLASS_PIMA *pima,
+                                                UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                                ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object)
+{
+
+    /* Sanity checks.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL) || (object == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual pima object transfer abort function.  */
+    return(_ux_host_class_pima_object_transfer_abort(pima, pima_session, object_handle, object));
+}

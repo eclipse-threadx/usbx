@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -30,19 +30,19 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_read                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_video_read                           PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function reads from the video streaming interface.             */ 
+/*                                                                        */
+/*    This function reads from the video streaming interface.             */
 /*                                                                        */
 /*    Note if the transfer request is not linked (next pointer is NULL),  */
 /*    a single request is performed. If the transfer request links into a */
@@ -50,33 +50,33 @@
 /*                                                                        */
 /*    Note check ux_host_class_video_max_payload_get to see request       */
 /*    length limitation.                                                  */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
-/*    video_transfer_request                Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_transfer_request Video transfer request        */ 
-/*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_host_semaphore_put                Put semaphore                 */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    video_transfer_request                Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_transfer_request Video transfer request        */
+/*    _ux_host_stack_class_instance_verify  Verify instance is valid      */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*    _ux_host_semaphore_put                Put semaphore                 */
 /*    _ux_system_error_handler              System error log              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    Video Class                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -101,7 +101,7 @@ UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
 
     /* Ensure the instance is valid.  */
     if (_ux_host_stack_class_instance_verify(_ux_system_host_class_video_name, (VOID *) video) != UX_SUCCESS)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -116,7 +116,7 @@ UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
 
     /* By default the transmission will be successful.  */
     status =  UX_SUCCESS;
-    
+
     /* Ensure we have a selected interface that allows isoch transmission.  */
     if ((video -> ux_host_class_video_isochronous_endpoint == UX_NULL) ||
         (video -> ux_host_class_video_isochronous_endpoint -> ux_endpoint_descriptor.wMaxPacketSize == 0))
@@ -145,3 +145,52 @@ UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST    *transfer_list;
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_video_read                          PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video read function call.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    video_transfer_request                Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_read             Video read                    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    Video Class                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_video_read(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST *video_transfer_request)
+{
+
+    /* Sanity checks.  */
+    if ((video == UX_NULL) || (video_transfer_request == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual video read function.  */
+    return(_ux_host_class_video_read(video, video_transfer_request));
+}

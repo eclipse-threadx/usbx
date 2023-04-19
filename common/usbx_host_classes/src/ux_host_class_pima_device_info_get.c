@@ -360,3 +360,53 @@ UINT                                 status;
     /* Return completion status.  */
     return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_device_info_get                PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima device info get function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                  Pointer to pima class         */
+/*    pima_device                           Device structure to fill      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_device_info_get   Get pima device info          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima,
+                                          UX_HOST_CLASS_PIMA_DEVICE *pima_device)
+{
+
+    /* Sanity Checks.  */
+    if ((pima == UX_NULL) || (pima_device == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual pima device info get function.  */
+    return(_ux_host_class_pima_device_info_get(pima, pima_device));
+}

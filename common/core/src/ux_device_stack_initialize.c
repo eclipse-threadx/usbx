@@ -458,3 +458,64 @@ UCHAR                           *memory;
     return(status);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_device_stack_initialize                        PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in device stack initialization          */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class_name                            Name of class                 */
+/*    class_function_entry                  Class entry function          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_initialize           Device Stack Initialize       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,
+                                  UCHAR * device_framework_full_speed, ULONG device_framework_length_full_speed,
+                                  UCHAR * string_framework, ULONG string_framework_length,
+                                  UCHAR * language_id_framework, ULONG language_id_framework_length,
+                                  UINT (*ux_system_slave_change_function)(ULONG))
+{
+
+    /* Sanity checks.  */
+    if (((device_framework_high_speed == UX_NULL) && (device_framework_length_high_speed != 0)) ||
+        (device_framework_full_speed == UX_NULL) || (device_framework_length_full_speed == 0) ||
+        ((string_framework == UX_NULL) && (string_framework_length != 0)) ||
+        (language_id_framework == UX_NULL) || (language_id_framework_length == 0))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke stack initialize function.  */
+    return(_ux_device_stack_initialize(device_framework_high_speed, device_framework_length_high_speed,
+                                       device_framework_full_speed, device_framework_length_full_speed,
+                                       string_framework, string_framework_length,
+                                       language_id_framework, language_id_framework_length,
+                                       ux_system_slave_change_function));
+}

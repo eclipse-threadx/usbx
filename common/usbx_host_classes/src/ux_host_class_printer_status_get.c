@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Printer Class                                                       */
 /**                                                                       */
@@ -30,48 +30,48 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_status_get                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_printer_status_get                   PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function obtains the printer status. The printer status is     */ 
+/*                                                                        */
+/*    This function obtains the printer status. The printer status is     */
 /*    similar to the LPT status (1284 standard).                          */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    printer                               Pointer to printer class      */ 
-/*    printer_status                        Pointer to return status      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_verify  Verify the class instance     */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_long_get                  Get 32-bit long word          */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*    _ux_host_semaphore_put                Release protection semaphore  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Pointer to printer class      */
+/*    printer_status                        Pointer to return status      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_verify  Verify the class instance     */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_long_get                  Get 32-bit long word          */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Free memory block             */
+/*    _ux_host_semaphore_get                Get protection semaphore      */
+/*    _ux_host_semaphore_put                Release protection semaphore  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -101,7 +101,7 @@ UCHAR *         printer_status_buffer;
 
     /* Ensure the instance is valid.  */
     if (printer -> ux_host_class_printer_state !=  UX_HOST_CLASS_INSTANCE_LIVE)
-    {        
+    {
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_INSTANCE_UNKNOWN, printer, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -208,4 +208,53 @@ UCHAR *         printer_status_buffer;
 
     /* Return completion status.  */
     return(status);
+}
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_printer_status_get                  PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer statis get function call.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Pointer to printer class      */
+/*    printer_status                        Pointer to return status      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_printer_status_get     Obtains the printer status    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_printer_status_get(UX_HOST_CLASS_PRINTER *printer, ULONG *printer_status)
+{
+
+    /* Sanity checks.  */
+    if ((printer == UX_NULL) || (printer_status == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual printer status get function.  */
+    return(_ux_host_class_printer_status_get(printer, printer_status));
 }

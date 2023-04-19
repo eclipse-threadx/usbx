@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -30,49 +30,49 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_control_get                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_video_control_get                    PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function obtains the static values for a single video control  */ 
-/*    on either the master channel or a specific channel.                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
-/*    video_control                         Pointer to video control      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_host_semaphore_put                Release semaphore             */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_utility_short_get                 Read 16-bit value             */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function obtains the static values for a single video control  */
+/*    on either the master channel or a specific channel.                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    video_control                         Pointer to video control      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_verify  Verify instance is valid      */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*    _ux_host_semaphore_put                Release semaphore             */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
+/*    _ux_utility_short_get                 Read 16-bit value             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    Video Class                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -95,7 +95,7 @@ UCHAR *         control_buffer;
 
     /* Ensure the instance is valid.  */
     if (_ux_host_stack_class_instance_verify(_ux_system_host_class_video_name, (VOID *) video) != UX_SUCCESS)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -119,7 +119,7 @@ UCHAR *         control_buffer;
     control_buffer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, 2);
     if (control_buffer == UX_NULL)
     {
-    
+
         /* Unprotect thread reentry to this instance.  */
         _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
@@ -127,16 +127,16 @@ UCHAR *         control_buffer;
         return(UX_MEMORY_INSUFFICIENT);
     }
 
-    /* Protect the control endpoint semaphore here.  It will be unprotected in the 
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
     status =  _ux_host_semaphore_get(&video -> ux_host_class_video_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
     /* Check for status.  */
     if (status != UX_SUCCESS)
-    
+
         /* Something went wrong. */
         return(status);
-        
+
     /* Create a transfer request for the GET_MIN request.  */
     transfer_request -> ux_transfer_request_data_pointer =      control_buffer;
     transfer_request -> ux_transfer_request_requested_length =  2;
@@ -155,7 +155,7 @@ UCHAR *         control_buffer;
         /* Update the MIN static value for the caller.  */
         video_control -> ux_host_class_video_control_min =  (LONG)(SHORT)_ux_utility_short_get(control_buffer);
     }
-    else        
+    else
     {
 
         /* Free the previous control buffer.  */
@@ -181,7 +181,7 @@ UCHAR *         control_buffer;
         /* Update the MAX static value for the caller.  */
         video_control -> ux_host_class_video_control_max =  (LONG)(SHORT)_ux_utility_short_get(control_buffer);
     }
-    else        
+    else
     {
 
         /* Free the previous control buffer.  */
@@ -218,3 +218,51 @@ UCHAR *         control_buffer;
     return(status);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_video_control_get                   PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in video control get function call.     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    video_control                         Pointer to video control      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_control_get      Get the video control         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    Video Class                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_video_control_get(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_CONTROL *video_control)
+{
+    /* Sanity Checks.  */
+    if ((video == UX_NULL) || (video_control == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual video control get function.  */
+    return(_ux_host_class_video_control_get(video, video_control));
+}

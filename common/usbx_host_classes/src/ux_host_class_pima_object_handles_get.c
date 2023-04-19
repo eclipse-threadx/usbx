@@ -178,3 +178,64 @@ UINT                                 status;
     /* Return completion status.  */
     return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_object_handles_get             PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima object handles get function     */
+/*    call.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    object_handles_array                       Pointer to store handles */
+/*    object_handles_length                      Array length in handles  */
+/*    object_format_code                         Object Format Code       */
+/*    object_handle_association                  Object Handle            */
+/*                                               Association              */
+/*                                                                        */
+/*    The 2 last parameter are optional and should be set to 0 if not     */
+/*    used.                                                               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_object_handles_get    Get object handles        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_object_handles_get(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                    ULONG *object_handles_array, ULONG object_handles_length,
+                                    ULONG storage_id, ULONG object_format_code, ULONG object_handle_association)
+{
+
+    /* Sanity checks.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL) || (object_handles_array == UX_NULL) || (object_handles_length == 0))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual function.  */
+    return(_ux_host_class_pima_object_handles_get(pima, pima_session, object_handles_array, object_handles_length,
+                                    storage_id, object_format_code, object_handle_association));
+}

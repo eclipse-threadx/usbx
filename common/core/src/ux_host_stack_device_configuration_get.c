@@ -134,3 +134,56 @@ UX_CONFIGURATION        *current_configuration;
     return(UX_CONFIGURATION_HANDLE_UNKNOWN);
 }
 
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_stack_device_configuration_get            PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in host stack config get function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    device                                Pointer to device             */
+/*    configuration_index                   Index of configuration        */
+/*    configuration                         Pointer to configuration      */
+/*                                            destination                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_device_configuration_get                             */
+/*                                          Host configuration get        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_stack_device_configuration_get(UX_DEVICE *device, UINT configuration_index,
+                                                        UX_CONFIGURATION **configuration)
+{
+
+    /* Sanity checks.  */
+    if ((device == UX_NULL) || (configuration == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Invoke configuration get function.  */
+    return(_ux_host_stack_device_configuration_get(device, configuration_index, configuration));
+}

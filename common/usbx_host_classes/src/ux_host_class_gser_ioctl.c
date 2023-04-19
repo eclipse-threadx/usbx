@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Generic Serial Host module class                                    */
 /**                                                                       */
@@ -30,52 +30,54 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_gser_ioctl                           PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_gser_ioctl                           PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the ioctl entry point for the application to       */ 
-/*    configure the ACM device.                                           */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    gser                                  Pointer to gser class         */ 
-/*    ioctl_function                        ioctl function                */ 
-/*    parameter                             pointer to structure          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_gser_command           Send command to acm device    */ 
+/*                                                                        */
+/*    This function is the ioctl entry point for the application to       */
+/*    configure the ACM device.                                           */
+/*                                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    gser                                  Pointer to gser class         */
+/*    ioctl_function                        ioctl function                */
+/*    parameter                             pointer to structure          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_gser_command           Send command to acm device    */
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort transfer                */
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
 /*    _ux_utility_long_put                  Put 32-bit value              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Storage Class                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_gser_ioctl(UX_HOST_CLASS_GSER *gser, ULONG interface_index, ULONG ioctl_function,
@@ -91,7 +93,7 @@ ULONG                               value;
 
     /* Ensure the instance is valid.  */
     if (gser -> ux_host_class_gser_state !=  UX_HOST_CLASS_INSTANCE_LIVE)
-    {        
+    {
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_INSTANCE_UNKNOWN, gser, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -104,97 +106,97 @@ ULONG                               value;
     {
 
     case UX_HOST_CLASS_GSER_IOCTL_SET_LINE_CODING:
-    
+
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_GSER_IOCTL_SET_LINE_CODING, gser, parameter, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
-    
+
         /* Allocate some cache safe memory for the control command.  */
         data_buffer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_GSER_LINE_CODING_LENGTH);
-        
+
         /* Check if error. Return with error if no memory could be allocated.  */
         if (data_buffer == UX_NULL)
-            
+
             /* Do not proceed. Set error code.  */
             status = UX_MEMORY_INSUFFICIENT;
         else
         {
-        
+
             /* Build the buffer from the calling parameter. Cast the calling parameter.  */
             line_coding = (UX_HOST_CLASS_GSER_LINE_CODING *) parameter;
-            
+
             /* Put the data rate.  */
-            _ux_utility_long_put(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_RATE, 
+            _ux_utility_long_put(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_RATE,
                                 line_coding -> ux_host_class_gser_line_coding_dter);
-                                
+
             /* Then the stop bit.  */
-            *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_STOP_BIT) = 
+            *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_STOP_BIT) =
             (UCHAR) line_coding -> ux_host_class_gser_line_coding_stop_bit;
-            
+
             /* Then the parity.  */
-            *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_PARITY) = 
+            *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_PARITY) =
             (UCHAR) line_coding -> ux_host_class_gser_line_coding_parity;
-            
+
             /* Finally the data bits.  */
-            *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_DATA_BIT) = 
+            *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_DATA_BIT) =
             (UCHAR) line_coding -> ux_host_class_gser_line_coding_data_bits;
 
             /* Send the command to the device.  */
             status = _ux_host_class_gser_command(gser, interface_index, UX_HOST_CLASS_GSER_REQ_SET_LINE_CODING,
                                     0, data_buffer, UX_HOST_CLASS_GSER_LINE_CODING_LENGTH);
-            
+
             /* We free the resources allocated no matter what.  */
-            _ux_utility_memory_free(data_buffer);            
-        }        
+            _ux_utility_memory_free(data_buffer);
+        }
         break;
-                    
+
     case UX_HOST_CLASS_GSER_IOCTL_GET_LINE_CODING:
-    
+
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_GSER_IOCTL_GET_LINE_CODING, gser, parameter, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
-    
+
         /* Allocate some cache safe memory for the control command.  */
         data_buffer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_GSER_LINE_CODING_LENGTH);
-        
+
         /* Check if error. Return with error if no memory could be allocated.  */
         if (data_buffer == UX_NULL)
-            
+
             /* Do not proceed. Set error code.  */
             status = UX_MEMORY_INSUFFICIENT;
         else
         {
-        
+
             /* Send the command to the device.  */
             status = _ux_host_class_gser_command(gser, interface_index, UX_HOST_CLASS_GSER_REQ_GET_LINE_CODING,
                                     0, data_buffer, UX_HOST_CLASS_GSER_LINE_CODING_LENGTH);
-        
+
             /* Fill in the calling buffer if the result is successful. */
             if (status == UX_SUCCESS)
             {
-            
+
                 /* Build the buffer from the calling parameter. Cast the calling parameter.  */
                 line_coding = (UX_HOST_CLASS_GSER_LINE_CODING *) parameter;
-            
+
                 /* Get the data rate.  */
                 line_coding -> ux_host_class_gser_line_coding_dter = _ux_utility_long_get(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_RATE);
-                                
+
                 /* Then the stop bit.  */
-                line_coding -> ux_host_class_gser_line_coding_stop_bit = 
+                line_coding -> ux_host_class_gser_line_coding_stop_bit =
                 (ULONG) *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_STOP_BIT);
-            
+
                 /* Then the parity.  */
-                line_coding -> ux_host_class_gser_line_coding_parity = 
+                line_coding -> ux_host_class_gser_line_coding_parity =
                 (ULONG) *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_PARITY);
-            
+
                 /* Finally the data bits.  */
                 line_coding -> ux_host_class_gser_line_coding_data_bits =
-                (ULONG) *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_DATA_BIT); 
+                (ULONG) *(data_buffer + UX_HOST_CLASS_GSER_LINE_CODING_DATA_BIT);
             }
 
             /* We free the resources allocated no matter what.  */
-            _ux_utility_memory_free(data_buffer);            
-        }        
+            _ux_utility_memory_free(data_buffer);
+        }
         break;
-            
+
     case UX_HOST_CLASS_GSER_IOCTL_SET_LINE_STATE:
 
         /* If trace is enabled, insert this event into the trace buffer.  */
@@ -202,15 +204,15 @@ ULONG                               value;
 
         /* Cast the calling parameter.  */
         line_state = (UX_HOST_CLASS_GSER_LINE_STATE *) parameter;
-                    
+
         /* Build the value field.  */
-        value = (line_state -> ux_host_class_gser_line_state_dtr | 
+        value = (line_state -> ux_host_class_gser_line_state_dtr |
                 (line_state -> ux_host_class_gser_line_state_rts << 1));
-    
+
         /* Send the command to the device.  */
         status = _ux_host_class_gser_command(gser, interface_index, UX_HOST_CLASS_GSER_REQ_SET_LINE_STATE,
                                     value, UX_NULL,0);
-        break;    
+        break;
 
     case UX_HOST_CLASS_GSER_IOCTL_SEND_BREAK :
 
@@ -219,11 +221,11 @@ ULONG                               value;
 
         /* Build the value field.  */
         value = *((ULONG *) parameter);
-    
+
         /* Send the command to the device.  */
         status = _ux_host_class_gser_command(gser, interface_index, UX_HOST_CLASS_GSER_REQ_SEND_BREAK,
                                     value, UX_NULL,0);
-        break;    
+        break;
 
     case UX_HOST_CLASS_GSER_IOCTL_ABORT_IN_PIPE :
 
@@ -232,7 +234,7 @@ ULONG                               value;
 
         /* We need to abort transactions on the bulk In pipe.  */
         _ux_host_stack_endpoint_transfer_abort(gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_bulk_in_endpoint);
-        
+
         /* Status is successful.  */
         status = UX_SUCCESS;
         break;
@@ -274,14 +276,14 @@ ULONG                               value;
         status = UX_SUCCESS;
         break;
 
-    default: 
+    default:
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         /* Function not supported. Return an error.  */
         status =  UX_FUNCTION_NOT_SUPPORTED;
-    }   
+    }
 
     /* Return status to caller.  */
     return(status);

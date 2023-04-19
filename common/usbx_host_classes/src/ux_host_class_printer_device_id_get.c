@@ -160,3 +160,56 @@ UINT                 status;
     /* Return completion status.  */
     return(status);
 }
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_printer_device_id_get               PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in printer device ID get function call. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    printer                               Pointer to printer class      */
+/*    descriptor_buffer                     Pointer to a buffer to fill   */
+/*                                          IEEE 1284 device ID string    */
+/*                                          (including length in the      */
+/*                                          first two bytes in BE format) */
+/*    length                                Length of buffer in bytes     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_printer_device_id_get  Obtains the printer device ID */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_printer_device_id_get(UX_HOST_CLASS_PRINTER *printer, UCHAR *descriptor_buffer, ULONG length)
+{
+
+    /* Sanity checks.  */
+    if ((printer == UX_NULL) || (descriptor_buffer == UX_NULL) || (length == 0))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual printer device ID get function.  */
+    return(_ux_host_class_printer_device_id_get(printer, descriptor_buffer, length));
+}

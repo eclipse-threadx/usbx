@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Printer Class                                                       */
 /**                                                                       */
@@ -21,25 +21,25 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_printer.h                             PORTABLE C      */ 
-/*                                                           6.1.10       */
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_printer.h                             PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX printer class.                                                 */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    USBX printer class.                                                 */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -57,22 +57,30 @@
 /*                                            added standalone support,   */
 /*                                            added a new protocol const, */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_PRINTER_H
 #define UX_HOST_CLASS_PRINTER_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
+/* Internal option: enable the basic USBX error checking. This define is typically used
+   while debugging application.  */
+#if defined(UX_ENABLE_ERROR_CHECKING) && !defined(UX_HOST_CLASS_PRINTER_ENABLE_ERROR_CHECKING)
+#define UX_HOST_CLASS_PRINTER_ENABLE_ERROR_CHECKING
+#endif
 
 /* Define Printer Class constants.  */
 
@@ -107,10 +115,10 @@ extern   "C" {
 
 /* Define Printer Class structure.  */
 
-typedef struct UX_HOST_CLASS_PRINTER_STRUCT 
+typedef struct UX_HOST_CLASS_PRINTER_STRUCT
 {
 
-    struct UX_HOST_CLASS_PRINTER_STRUCT  
+    struct UX_HOST_CLASS_PRINTER_STRUCT
                     *ux_host_class_printer_next_instance;
     UX_HOST_CLASS   *ux_host_class_printer_class;
     UX_DEVICE       *ux_host_class_printer_device;
@@ -149,14 +157,36 @@ UINT    _ux_host_class_printer_endpoints_get(UX_HOST_CLASS_PRINTER *printer);
 UINT    _ux_host_class_printer_entry(UX_HOST_CLASS_COMMAND *command);
 UINT    _ux_host_class_printer_name_get(UX_HOST_CLASS_PRINTER *printer);
 UINT    _ux_host_class_printer_device_id_get(UX_HOST_CLASS_PRINTER *printer, UCHAR *descriptor_buffer, ULONG length);
-UINT    _ux_host_class_printer_read (UX_HOST_CLASS_PRINTER *printer, UCHAR *data_pointer, 
+UINT    _ux_host_class_printer_read (UX_HOST_CLASS_PRINTER *printer, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
 UINT    _ux_host_class_printer_soft_reset(UX_HOST_CLASS_PRINTER *printer);
 UINT    _ux_host_class_printer_status_get(UX_HOST_CLASS_PRINTER *printer, ULONG *printer_status);
-UINT    _ux_host_class_printer_write(UX_HOST_CLASS_PRINTER *printer, UCHAR * data_pointer, 
+UINT    _ux_host_class_printer_write(UX_HOST_CLASS_PRINTER *printer, UCHAR * data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
 
+// UINT    _uxe_host_class_printer_activate(UX_HOST_CLASS_COMMAND *command);
+UINT    _uxe_host_class_printer_name_get(UX_HOST_CLASS_PRINTER *printer);
+UINT    _uxe_host_class_printer_device_id_get(UX_HOST_CLASS_PRINTER *printer, UCHAR *descriptor_buffer, ULONG length);
+UINT    _uxe_host_class_printer_read (UX_HOST_CLASS_PRINTER *printer, UCHAR *data_pointer,
+                                     ULONG requested_length, ULONG *actual_length);
+UINT    _uxe_host_class_printer_soft_reset(UX_HOST_CLASS_PRINTER *printer);
+UINT    _uxe_host_class_printer_status_get(UX_HOST_CLASS_PRINTER *printer, ULONG *printer_status);
+UINT    _uxe_host_class_printer_write(UX_HOST_CLASS_PRINTER *printer, UCHAR * data_pointer,
+                                     ULONG requested_length, ULONG *actual_length);
+
 /* Define Printer Class API prototypes.  */
+#if defined(UX_HOST_CLASS_PRINTER_ENABLE_ERROR_CHECKING)
+
+#define   ux_host_class_printer_entry                                  _ux_host_class_printer_entry
+#define   ux_host_class_printer_activate                               _ux_host_class_printer_activate
+#define   ux_host_class_printer_name_get                               _uxe_host_class_printer_name_get
+#define   ux_host_class_printer_device_id_get                          _uxe_host_class_printer_device_id_get
+#define   ux_host_class_printer_read                                   _uxe_host_class_printer_read
+#define   ux_host_class_printer_soft_reset                             _uxe_host_class_printer_soft_reset
+#define   ux_host_class_printer_status_get                             _uxe_host_class_printer_status_get
+#define   ux_host_class_printer_write                                  _uxe_host_class_printer_write
+
+#else
 
 #define   ux_host_class_printer_entry                                  _ux_host_class_printer_entry
 #define   ux_host_class_printer_activate                               _ux_host_class_printer_activate
@@ -167,10 +197,12 @@ UINT    _ux_host_class_printer_write(UX_HOST_CLASS_PRINTER *printer, UCHAR * dat
 #define   ux_host_class_printer_status_get                             _ux_host_class_printer_status_get
 #define   ux_host_class_printer_write                                  _ux_host_class_printer_write
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+#endif /* UX_HOST_CLASS_PRINTER_ENABLE_ERROR_CHECKING */
+
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -30,45 +30,45 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_object_close                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_object_close                    PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function closes an object,                                     */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                       Pointer to pima class    */ 
-/*    pima_session                               Pointer to pima session  */ 
-/*    object_handle                              The object handle        */ 
-/*    object                                     Pointer to object info   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function closes an object,                                     */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    object_handle                              The object handle        */
+/*    object                                     Pointer to object info   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_transfer_request            Transfer request         */
 /*    _ux_host_stack_transfer_request_abort      Abort transfer           */
 /*    _ux_host_stack_endpoint_reset              Reset endpoint           */
 /*    _ux_host_semaphore_get                     Get semaphore            */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USB application                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
@@ -78,7 +78,7 @@
 /*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_pima_object_close(UX_HOST_CLASS_PIMA *pima, 
+UINT  _ux_host_class_pima_object_close(UX_HOST_CLASS_PIMA *pima,
                                         UX_HOST_CLASS_PIMA_SESSION *pima_session,
                                         ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object)
 {
@@ -103,8 +103,8 @@ UINT                                status;
 
     /* Check if the object is already closed.  */
     if (object -> ux_host_class_pima_object_state != UX_HOST_CLASS_PIMA_OBJECT_STATE_OPENED)
-        return (UX_HOST_CLASS_PIMA_RC_OBJECT_ALREADY_CLOSED );    
-        
+        return (UX_HOST_CLASS_PIMA_RC_OBJECT_ALREADY_CLOSED );
+
     /* Close the object.  */
     object -> ux_host_class_pima_object_state = UX_HOST_CLASS_PIMA_OBJECT_STATE_CLOSED;
 
@@ -118,40 +118,40 @@ UINT                                status;
         /* Check if we had a ZLP condition during the data phase.  */
         if (pima -> ux_host_class_pima_zlp_flag != UX_HOST_CLASS_PIMA_ZLP_NONE)
         {
-            
-            /* We had a ZLP, so we now expect a zero length packet prior to the status phase.  
+
+            /* We had a ZLP, so we now expect a zero length packet prior to the status phase.
                We need to determine the direction.  */
             if (pima -> ux_host_class_pima_zlp_flag == UX_HOST_CLASS_PIMA_ZLP_IN)
 
                 /* We use the Bulk In pipe for receiving the zlp.  */
                 transfer_request =  &pima -> ux_host_class_pima_bulk_in_endpoint -> ux_endpoint_transfer_request;
-                    
+
             else
-            
+
                 /* We use the Bulk Out pipe for sending the zlp.  */
                 transfer_request =  &pima -> ux_host_class_pima_bulk_in_endpoint -> ux_endpoint_transfer_request;
-                    
-            /* Initialize the payload to zero length. */                        
+
+            /* Initialize the payload to zero length. */
             transfer_request -> ux_transfer_request_data_pointer =  UX_NULL;
             transfer_request -> ux_transfer_request_requested_length =  0;
 
             /* Reset the ZLP now.  */
             pima -> ux_host_class_pima_zlp_flag = UX_HOST_CLASS_PIMA_ZLP_NONE;
-            
+
             /* Send request to HCD layer.  */
             status =  _ux_host_stack_transfer_request(transfer_request);
-            
+
             /* If the transfer is successful, we need to wait for the transfer request to be completed.  */
             if (status == UX_SUCCESS)
             {
-            
+
                 /* Wait for the completion of the transfer request.  */
                 status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
-        
+
                 /* If the semaphore did not succeed we probably have a time out.  */
                 if (status != UX_SUCCESS)
                 {
-        
+
                     /* All transfers pending need to abort. There may have been a partial transfer.  */
                     _ux_host_stack_transfer_request_abort(transfer_request);
 
@@ -163,37 +163,37 @@ UINT                                status;
 
                     /* There was an error, return to the caller.  */
                     return(status);
-                }            
+                }
             }
         }
 
         /* We use the Bulk In pipe for receiving the response payload.  */
         transfer_request =  &pima -> ux_host_class_pima_bulk_in_endpoint -> ux_endpoint_transfer_request;
-    
+
         /* Get the pointer to the ptp payload.  */
         ptp_payload =  pima -> ux_host_class_pima_container ;
 
         /* Calculate the requested length for this payload.  */
         requested_length =  UX_HOST_CLASS_PIMA_RESPONSE_HEADER_SIZE;
-        
+
         /* Initialize the transfer_request.  */
         transfer_request -> ux_transfer_request_data_pointer =  ptp_payload;
         transfer_request -> ux_transfer_request_requested_length =  requested_length;
-        
+
         /* Send request to HCD layer.  */
         status =  _ux_host_stack_transfer_request(transfer_request);
-        
+
         /* If the transfer is successful, we need to wait for the transfer request to be completed.  */
         if (status == UX_SUCCESS)
         {
-            
+
             /* Wait for the completion of the transfer request.  */
             status =  _ux_host_semaphore_get(&transfer_request -> ux_transfer_request_semaphore, UX_MS_TO_TICK(UX_HOST_CLASS_PIMA_CLASS_TRANSFER_TIMEOUT));
-        
+
             /* If the semaphore did not succeed we probably have a time out.  */
             if (status != UX_SUCCESS)
             {
-        
+
                 /* All transfers pending need to abort. There may have been a partial transfer.  */
                 _ux_host_stack_transfer_request_abort(transfer_request);
 
@@ -205,15 +205,15 @@ UINT                                status;
 
                 /* There was an error, return to the caller.  */
                 return(status);
-            }            
+            }
         }
         else
         {
-        
+
             /* There was a non transfer error, no partial transfer to be checked */
             return(status);
         }
-        
+
     }
 
     /* The transfer for this transaction is now inactive.  */
@@ -223,3 +223,55 @@ UINT                                status;
     return(UX_SUCCESS);
 }
 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _uxe_host_class_pima_object_close                   PORTABLE C      */
+/*                                                           6.x          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yajun Xia, Microsoft Corporation                                    */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks errors in pima object close function call.     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*    pima_session                               Pointer to pima session  */
+/*    object_handle                              The object handle        */
+/*    object                                     Pointer to object info   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_object_close      Close pima object             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*                                                                        */
+/**************************************************************************/
+UINT  _uxe_host_class_pima_object_close(UX_HOST_CLASS_PIMA *pima,
+                                        UX_HOST_CLASS_PIMA_SESSION *pima_session,
+                                        ULONG object_handle, UX_HOST_CLASS_PIMA_OBJECT *object)
+{
+
+    /* Sanity checks.  */
+    if ((pima == UX_NULL) || (pima_session == UX_NULL) || (object == UX_NULL))
+        return(UX_INVALID_PARAMETER);
+
+    /* Call the actual object close function.  */
+    return(_ux_host_class_pima_object_close(pima, pima_session, object_handle, object));
+}
