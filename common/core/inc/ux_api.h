@@ -1084,7 +1084,11 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 
 /* Define basic USBX constants.  */
 
+#ifdef __cplusplus
+#define UX_NULL                                                         (0)
+#else
 #define UX_NULL                                                         ((void*)0)
+#endif
 #define UX_INVALID_PTR                                                  ((void*)(~((ALIGN_TYPE)0)))
 #define UX_TRUE                                                         1u
 #define UX_FALSE                                                        0u
