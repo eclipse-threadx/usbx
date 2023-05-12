@@ -91,6 +91,8 @@
 /*                                            resulting in version 6.1.11 */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            moved compile option check, */
+/*                                            added support for get string*/
+/*                                            requests with zero wIndex,  */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
@@ -399,6 +401,16 @@ ULONG                           string_length;
         }
         else
         {
+#ifdef UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID
+
+            /* Check if the language ID is zero.  */
+            if (request_index == 0)
+            {
+
+                /* Get the first language ID in the language ID framework.  */
+                request_index =  _ux_utility_short_get(_ux_system_slave -> ux_system_slave_language_id_framework);
+            }
+#endif
 
             /* The host wants a specific string index returned. Get the string framework pointer
                and length.  */

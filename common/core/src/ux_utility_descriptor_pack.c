@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Utility                                                             */
 /**                                                                       */
@@ -28,50 +28,53 @@
 #include "ux_api.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_utility_descriptor_pack                         PORTABLE C      */ 
-/*                                                           6.1          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_utility_descriptor_pack                         PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function will pack an application structure into a USB         */
-/*    descriptor.                                                         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    descriptor                            Pointer to the unpacked       */ 
+/*    descriptor.                                                         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    descriptor                            Pointer to the unpacked       */
 /*                                            descriptor                  */
 /*    descriptor_structure                  Components of the descriptor  */
-/*    descriptor_entries                    Number of entries in the      */ 
+/*    descriptor_entries                    Number of entries in the      */
 /*                                            descriptor                  */
 /*    raw_descriptor                        Pointer to packed descriptor  */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_long_put                  Put 32-bit value              */
 /*    _ux_utility_short_put                 Put 16-bit value              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized USB descriptors,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_descriptor_pack(UCHAR * descriptor, UCHAR * descriptor_structure,
@@ -90,27 +93,37 @@ VOID  _ux_utility_descriptor_pack(UCHAR * descriptor, UCHAR * descriptor_structu
            insert it into the target descriptor.  */
         case 4:
 
+            /* Increase address so it's aligned.  */
+            while((ALIGN_TYPE)descriptor & 3u)
+                descriptor++;
+
+            /* Put the DW.  */
             _ux_utility_long_put(raw_descriptor, *((ULONG *) descriptor));
             raw_descriptor +=  4;
-            break;                   
+            descriptor += 4;
+            break;
 
         case 2:
 
-            _ux_utility_short_put(raw_descriptor, (USHORT)*((ULONG *) descriptor));
+            /* Increase address so it's aligned.  */
+            while((ALIGN_TYPE)descriptor & 1u)
+                descriptor++;
+
+            /* Put the Word.  */
+            _ux_utility_short_put(raw_descriptor, (USHORT)*((USHORT *) descriptor));
             raw_descriptor += 2;
-            break;                   
+            descriptor += 2;
+            break;
 
         default:
 
-            *raw_descriptor =  (UCHAR) *((ULONG *) descriptor);
+            /* Put the byte.  */
+            *raw_descriptor =  (UCHAR) *((UCHAR *) descriptor);
             raw_descriptor++;
+            descriptor++;
         }
-
-        /* Add the size of the component to the destination.  */
-        descriptor +=  4;
     }
 
     /* Return to caller.  */
     return;
 }
-

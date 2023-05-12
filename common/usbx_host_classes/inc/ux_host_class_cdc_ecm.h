@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_cdc_ecm.h                             PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,6 +60,9 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            supported NX packet chain,  */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized USB descriptors,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -311,14 +314,15 @@ typedef struct UX_HOST_CLASS_CDC_ECM_STRUCT
 
 typedef struct UX_HOST_CLASS_ECM_INTERFACE_DESCRIPTOR_STRUCT
 {
-    ULONG           bFunctionLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubtype;
-    ULONG           iMACAddress;
+    UCHAR           bFunctionLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubtype;
+    UCHAR           iMACAddress;
     ULONG           bmEthernetStatistics;
-    ULONG           wMaxSegmentSize;
-    ULONG           wNumberMCFilters;
-    ULONG           bNumberPowerFilters;
+    USHORT          wMaxSegmentSize;
+    USHORT          wNumberMCFilters;
+    UCHAR           bNumberPowerFilters;
+    UCHAR           _align_size[3];
 } UX_HOST_CLASS_ECM_INTERFACE_DESCRIPTOR;
 
 /* Define CDC ECM Class function prototypes.  */

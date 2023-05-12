@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hid.h                                 PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,6 +55,9 @@
 /*                                            added interrupt OUT support,*/
 /*                                            added standalone mode,      */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized USB descriptors,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -789,13 +792,15 @@ extern   "C" {
 typedef struct UX_HID_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bcdHID;
-    ULONG           bCountryCode;
-    ULONG           bNumDescriptor;
-    ULONG           bReportDescriptorType;
-    ULONG           wItemLength;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    USHORT          bcdHID;
+    UCHAR           bCountryCode;
+    UCHAR           bNumDescriptor;
+    UCHAR           bReportDescriptorType;
+    UCHAR           _align_wItemLength[1];
+    USHORT          wItemLength;
+    UCHAR           _align_size[2];
 } UX_HID_DESCRIPTOR;
 
 

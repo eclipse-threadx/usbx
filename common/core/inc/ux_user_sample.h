@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_user.h                                           PORTABLE C      */ 
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -99,6 +99,10 @@
 /*                                            added option to enable      */
 /*                                            basic USBX error checking,  */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Xiuwen Cai               Modified comment(s),          */
+/*                                            added option for get string */
+/*                                            requests with zero wIndex,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -224,6 +228,10 @@
 
 #define UX_SLAVE_REQUEST_DATA_MAX_LENGTH    (1024 * 2)
 
+/* Defined, this enables processing of Get String Descriptor requests with zero Language ID.  
+   The first language ID in the language ID framwork will be used if the request has a zero
+   Language ID.  */
+/* #define UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID  */
 
 /* Defined, this value includes code to handle storage Multi-Media Commands (MMC). E.g., DVD-ROM.
 */

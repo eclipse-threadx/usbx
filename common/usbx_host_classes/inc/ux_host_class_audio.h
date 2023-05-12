@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_host_class_audio.h                               PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,6 +57,9 @@
 /*                                            added feedback support,     */
 /*                                            added Audio 2.0 support,    */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized USB descriptors,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -308,14 +311,14 @@ extern   "C" {
 typedef struct UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubType;
-    ULONG           bFormatType;
-    ULONG           bNrChannels;
-    ULONG           bSubframeSize;
-    ULONG           bBitResolution;
-    ULONG           bSamFreqType;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubType;
+    UCHAR           bFormatType;
+    UCHAR           bNrChannels;
+    UCHAR           bSubframeSize;
+    UCHAR           bBitResolution;
+    UCHAR           bSamFreqType;
 } UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR;
 
 
@@ -324,16 +327,16 @@ typedef struct UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_AUDIO_INPUT_TERMINAL_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubType;
-    ULONG           bTerminalID;
-    ULONG           wTerminalType;
-    ULONG           bAssocTerminal;
-    ULONG           bNrChannels;
-    ULONG           wChannelConfig;
-    ULONG           iChannelNames;
-    ULONG           iTerminal;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubType;
+    UCHAR           bTerminalID;
+    USHORT          wTerminalType;
+    UCHAR           bAssocTerminal;
+    UCHAR           bNrChannels;
+    USHORT          wChannelConfig;
+    UCHAR           iChannelNames;
+    UCHAR           iTerminal;
 } UX_HOST_CLASS_AUDIO_INPUT_TERMINAL_DESCRIPTOR;
 
 
@@ -342,14 +345,15 @@ typedef struct UX_HOST_CLASS_AUDIO_INPUT_TERMINAL_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubType;
-    ULONG           bTerminalID;
-    ULONG           wTerminalType;
-    ULONG           bAssocTerminal;
-    ULONG           bSourceID;
-    ULONG           iTerminal;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubType;
+    UCHAR           bTerminalID;
+    USHORT          wTerminalType;
+    UCHAR           bAssocTerminal;
+    UCHAR           bSourceID;
+    UCHAR           iTerminal;
+    UCHAR           _align_size[3];
 } UX_HOST_CLASS_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR;
 
 
@@ -358,13 +362,14 @@ typedef struct UX_HOST_CLASS_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_AUDIO_FEATURE_UNIT_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubType;
-    ULONG           bUnitID;
-    ULONG           bSourceID;
-    ULONG           bControlSize;
-    ULONG           bmaControls;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubType;
+    UCHAR           bUnitID;
+    UCHAR           bSourceID;
+    UCHAR           bControlSize;
+    UCHAR           bmaControls;
+    UCHAR           _align_size[1];
 } UX_HOST_CLASS_AUDIO_FEATURE_UNIT_DESCRIPTOR;
 
 
@@ -373,12 +378,13 @@ typedef struct UX_HOST_CLASS_AUDIO_FEATURE_UNIT_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_AUDIO_STREAMING_INTERFACE_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubtype;
-    ULONG           bTerminalLink;
-    ULONG           bDelay;
-    ULONG           wFormatTag;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubtype;
+    UCHAR           bTerminalLink;
+    UCHAR           bDelay;
+    UCHAR           _align_wFormatTag[1];
+    USHORT          wFormatTag;
 } UX_HOST_CLASS_AUDIO_STREAMING_INTERFACE_DESCRIPTOR;
 
 
@@ -387,12 +393,13 @@ typedef struct UX_HOST_CLASS_AUDIO_STREAMING_INTERFACE_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_AUDIO_STREAMING_ENDPOINT_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubtype;
-    ULONG           bmAttributes;
-    ULONG           bLockDelayUnits;
-    ULONG           wLockDelay;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubtype;
+    UCHAR           bmAttributes;
+    UCHAR           bLockDelayUnits;
+    UCHAR           _align_wLockDelay[1];
+    USHORT          wLockDelay;
 } UX_HOST_CLASS_AUDIO_STREAMING_ENDPOINT_DESCRIPTOR;
 
 

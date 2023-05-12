@@ -49,7 +49,7 @@ ULONG           port_index;
                                                             (UCHAR *) &hub -> ux_host_class_hub_descriptor);
 
     /* Check the protocol used by the HUB. This will indicate if the HUB supports multiple TTs in high speed mode.  */
-    tt_protocols = (hub -> ux_host_class_hub_device -> ux_device_descriptor.bDeviceProtocol << 8) |
+    tt_protocols = ((ULONG)hub -> ux_host_class_hub_device -> ux_device_descriptor.bDeviceProtocol << 8) |
                     hub -> ux_host_class_hub_interface -> ux_interface_descriptor.bInterfaceProtocol;
     switch(tt_protocols)
     {
@@ -129,7 +129,7 @@ ULONG           port_index;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_descriptor_get                   PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -174,6 +174,9 @@ ULONG           port_index;
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_descriptor_get(UX_HOST_CLASS_HUB *hub)

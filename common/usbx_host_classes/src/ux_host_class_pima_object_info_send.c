@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_pima_object_info_send                PORTABLE C      */
-/*                                                           6.1          */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,10 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
+/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*                                            fixed allocated buffer      */
+/*                                            pointer checking issue,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_object_info_send(UX_HOST_CLASS_PIMA *pima,
@@ -125,7 +129,7 @@ UINT                                 status;
 
     /* Allocate some DMA safe memory for sending the object info block.  */
     object_buffer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_PIMA_OBJECT_MAX_LENGTH);
-    if (object == UX_NULL)
+    if (object_buffer == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Get the end of the object buffer.  */

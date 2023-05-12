@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_utility.h                                        PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,6 +57,10 @@
 /*                                            added macros for RTOS calls,*/
 /*                                            fixed OHCI PRSC issue,      */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added new function to check */
+/*                                            parsed size of descriptor,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -70,6 +74,8 @@ VOID             _ux_utility_descriptor_parse(UCHAR * raw_descriptor, UCHAR * de
                              UINT descriptor_entries, UCHAR * descriptor);
 VOID             _ux_utility_descriptor_pack(UCHAR * descriptor, UCHAR * descriptor_structure,
                              UINT descriptor_entries, UCHAR * raw_descriptor);
+ULONG            _ux_utility_descriptor_parse_size(UCHAR * descriptor_structure, UINT descriptor_entries, UINT size_align_mask);
+
 ULONG            _ux_utility_long_get(UCHAR * address);
 VOID             _ux_utility_long_put(UCHAR * address, ULONG value);
 VOID             _ux_utility_long_put_big_endian(UCHAR * address, ULONG value);

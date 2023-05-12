@@ -103,7 +103,7 @@ UCHAR                                       element_hexa_lower;
 
     /* We now need to retrieve the MAC address of the node which is embedded in the ECM descriptor.
        We will parse the entire configuration descriptor of the device and look for the ECM Ethernet Networking Functional Descriptor.  */ 
-    configuration_index = cdc_ecm -> ux_host_class_cdc_ecm_interface_data -> ux_interface_configuration -> ux_configuration_descriptor.bConfigurationValue -1;
+    configuration_index = (ULONG)cdc_ecm -> ux_host_class_cdc_ecm_interface_data -> ux_interface_configuration -> ux_configuration_descriptor.bConfigurationValue -1;
        
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &cdc_ecm -> ux_host_class_cdc_ecm_device -> ux_device_control_endpoint;

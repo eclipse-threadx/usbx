@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_class_hub.h                                 PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized USB descriptors,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -188,14 +191,16 @@ extern   "C" {
 typedef struct UX_HUB_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bNbPorts;
-    ULONG           wHubCharacteristics;
-    ULONG           bPwrOn2PwrGood;
-    ULONG           bHubContrCurrent;
-    ULONG           bDeviceRemovable;
-    ULONG           bPortPwrCtrlMask;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bNbPorts;
+    UCHAR           _align_wHubCharacteristics[1];
+    USHORT          wHubCharacteristics;
+    UCHAR           bPwrOn2PwrGood;
+    UCHAR           bHubContrCurrent;
+    UCHAR           bDeviceRemovable;
+    UCHAR           bPortPwrCtrlMask;
+    UCHAR           _align_size[2];
 } UX_HUB_DESCRIPTOR;
 
 

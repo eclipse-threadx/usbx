@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_write                           PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,10 @@
 /*                                            added queue modify protect, */
 /*                                            improved error check,       */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            improved 64-bit support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_write(VOID *asix_class, NX_PACKET *packet)
@@ -174,7 +178,7 @@ ULONG               copied;
         UX_RESTORE
         return(UX_MATH_OVERFLOW);
     }
-    adjusted_length = packet -> nx_packet_length + sizeof(USHORT) * 2;
+    adjusted_length = packet -> nx_packet_length + (ULONG)sizeof(USHORT) * 2;
     if (adjusted_length > UX_HOST_CLASS_ASIX_TRANSMIT_BUFFER_SIZE)
     {
 
@@ -233,7 +237,7 @@ ULONG               copied;
             transfer_request -> ux_transfer_request_data_pointer = asix -> ux_host_class_asix_xmit_buffer;
 
             /* Restore packet status.  */
-            packet -> nx_packet_length -= sizeof(USHORT) * 2;
+            packet -> nx_packet_length -= (ULONG)sizeof(USHORT) * 2;
             packet -> nx_packet_prepend_ptr += sizeof(USHORT) * 2;
         }
         else

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_pima_device_info_get                 PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed DeviceInfo extract,   */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima,
@@ -169,7 +172,7 @@ UINT                                 status;
             else
             {
                 array_length <<= 1;
-                array_length += sizeof(ULONG);
+                array_length += (ULONG)sizeof(ULONG);
             }
         }
 
@@ -190,7 +193,7 @@ UINT                                 status;
             else
             {
                 array_length <<= 1;
-                array_length += sizeof(ULONG);
+                array_length += (ULONG)sizeof(ULONG);
             }
         }
 
@@ -211,7 +214,7 @@ UINT                                 status;
             else
             {
                 array_length <<= 1;
-                array_length += sizeof(ULONG);
+                array_length += (ULONG)sizeof(ULONG);
             }
         }
 
@@ -232,7 +235,7 @@ UINT                                 status;
             else
             {
                 array_length <<= 1;
-                array_length += sizeof(ULONG);
+                array_length += (ULONG)sizeof(ULONG);
             }
         }
 
@@ -253,7 +256,7 @@ UINT                                 status;
             else
             {
                 array_length <<= 1;
-                array_length += sizeof(ULONG);
+                array_length += (ULONG)sizeof(ULONG);
             }
         }
 

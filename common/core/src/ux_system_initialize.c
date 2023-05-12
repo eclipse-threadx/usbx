@@ -69,7 +69,7 @@ UCHAR _ux_system_container_id_descriptor_structure[] =                      {1,1
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_system_initialize                               PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -115,6 +115,10 @@ UCHAR _ux_system_container_id_descriptor_structure[] =                      {1,1
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added UX_ASSERT check for   */
+/*                                            STD descriptor parse size,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
@@ -312,6 +316,19 @@ UINT                status;
 UINT  _uxe_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
                             VOID *cache_safe_memory_pool_start, ULONG cache_safe_memory_size)
 {
+
+    /* Compiling option check of descriptors structs.  */
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_endpoint_descriptor_structure, UX_ENDPOINT_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_ENDPOINT_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_device_descriptor_structure, UX_DEVICE_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_DEVICE_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_configuration_descriptor_structure, UX_CONFIGURATION_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_CONFIGURATION_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_interface_descriptor_structure, UX_INTERFACE_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_INTERFACE_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_interface_association_descriptor_structure, UX_INTERFACE_ASSOCIATION_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_INTERFACE_ASSOCIATION_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_string_descriptor_structure, UX_STRING_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_STRING_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_dfu_functional_descriptor_structure, UX_DFU_FUNCTIONAL_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_DFU_FUNCTIONAL_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_bos_descriptor_structure, UX_BOS_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_BOS_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_usb_2_0_extension_descriptor_structure, UX_USB_2_0_EXTENSION_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_USB_2_0_EXTENSION_DESCRIPTOR));
+    UX_ASSERT((_ux_utility_descriptor_parse_size(_ux_system_container_id_descriptor_structure, UX_CONTAINER_ID_DESCRIPTOR_ENTRIES, 0x3u)) == sizeof(UX_CONTAINER_ID_DESCRIPTOR));
+
 
     /* Sanity check.  */
     if ((regular_memory_pool_start == UX_NULL) || (regular_memory_size == 0))

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_transmission_callback           PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,10 @@
 /*                                            supported NX packet chain,  */
 /*                                            fixed empty queue handling, */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            improved 64-bit support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_transmission_callback (UX_TRANSFER *transfer_request)
@@ -158,7 +162,7 @@ ULONG                           copied;
         if (next_packet -> nx_packet_next)
         {
 
-            next_packet -> nx_packet_length += sizeof(USHORT) * 2;
+            next_packet -> nx_packet_length += (ULONG)sizeof(USHORT) * 2;
             next_packet -> nx_packet_prepend_ptr -= sizeof(USHORT) * 2;
             nx_packet_data_extract_offset(next_packet, 0, asix -> ux_host_class_asix_xmit_buffer, next_packet -> nx_packet_length, &copied);
 
@@ -167,7 +171,7 @@ ULONG                           copied;
             transfer_request -> ux_transfer_request_data_pointer = asix -> ux_host_class_asix_xmit_buffer;
 
             /* Restore packet status.  */
-            next_packet -> nx_packet_length -= sizeof(USHORT) * 2;
+            next_packet -> nx_packet_length -= (ULONG)sizeof(USHORT) * 2;
             next_packet -> nx_packet_prepend_ptr += sizeof(USHORT) * 2;
         }
         else

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_printer_device_id_get                PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -83,6 +83,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_device_id_get(UX_HOST_CLASS_PRINTER *printer, UCHAR *descriptor_buffer, ULONG length)
@@ -142,7 +145,7 @@ UINT                 status;
     transfer_request -> ux_transfer_request_function =          UX_HOST_CLASS_PRINTER_GET_DEVICE_ID;
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_value =             0; /* Do not support multiple configuration for now.  */
-    transfer_request -> ux_transfer_request_index =             (interface_ptr -> ux_interface_descriptor.bInterfaceNumber  << 8) |
+    transfer_request -> ux_transfer_request_index =             ((UINT)interface_ptr -> ux_interface_descriptor.bInterfaceNumber  << 8) |
                                                                 (interface_ptr -> ux_interface_descriptor.bAlternateSetting     );
 
 #if defined(UX_HOST_STANDALONE)

@@ -56,7 +56,8 @@
 /*                                            according to UVC 1.5 Class  */
 /*                                            specification,              */
 /*                                            resulting in version 6.1.8  */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized USB descriptors,  */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -389,14 +390,15 @@ extern UCHAR _ux_system_host_class_video_name[];
 typedef struct UX_HOST_CLASS_VIDEO_INTERFACE_HEADER_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubType;
-    ULONG           bcdUVC;
-    ULONG           wTotalLength;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubType;
+    UCHAR           _align_bcdUVC[1];
+    USHORT          bcdUVC;
+    USHORT          wTotalLength;
     ULONG           dwClockFrequency;
-    ULONG           bInCollection;
-    ULONG           baInterfaceNr;
+    UCHAR           bInCollection;
+    UCHAR           baInterfaceNr;
 } UX_HOST_CLASS_VIDEO_INTERFACE_HEADER_DESCRIPTOR;
 
 /* Define Video Class specific input header interface descriptor.  */
@@ -404,13 +406,13 @@ typedef struct UX_HOST_CLASS_VIDEO_INTERFACE_HEADER_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_VIDEO_INPUT_TERMINAL_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubType;
-    ULONG           bTerminalID;
-    ULONG           wTerminalType;
-    ULONG           bAssocTerminal;
-    ULONG           iTerminal;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubType;
+    UCHAR           bTerminalID;
+    USHORT          wTerminalType;
+    UCHAR           bAssocTerminal;
+    UCHAR           iTerminal;
 } UX_HOST_CLASS_VIDEO_INPUT_TERMINAL_DESCRIPTOR;
 
 /* Define Video Class specific input header interface descriptor.  */
@@ -418,19 +420,19 @@ typedef struct UX_HOST_CLASS_VIDEO_INPUT_TERMINAL_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_VIDEO_INPUT_HEADER_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubType;
-    ULONG           bNumFormats;
-    ULONG           wTotalLength;
-    ULONG           bEndpointAddress;
-    ULONG           bmInfo;
-    ULONG           bTerminalLink;
-    ULONG           bStillCaptureMethod;
-    ULONG           bTriggerSupport;
-    ULONG           bTriggerUsage;
-    ULONG           bControlSize;
-    ULONG           bmaControls;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubType;
+    UCHAR           bNumFormats;
+    USHORT          wTotalLength;
+    UCHAR           bEndpointAddress;
+    UCHAR           bmInfo;
+    UCHAR           bTerminalLink;
+    UCHAR           bStillCaptureMethod;
+    UCHAR           bTriggerSupport;
+    UCHAR           bTriggerUsage;
+    UCHAR           bControlSize;
+    UCHAR           bmaControls;
 } UX_HOST_CLASS_VIDEO_INPUT_HEADER_DESCRIPTOR;
 
 /* Define Video Class Selector descriptor.  */
@@ -438,12 +440,12 @@ typedef struct UX_HOST_CLASS_VIDEO_INPUT_HEADER_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_VIDEO_SELECTOR_UNIT_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubtype;
-    ULONG           bUnitID;
-    ULONG           bNrInPins;
-    ULONG           baSourceID;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubtype;
+    UCHAR           bUnitID;
+    UCHAR           bNrInPins;
+    UCHAR           baSourceID;
 } UX_HOST_CLASS_VIDEO_SELECTOR_UNIT_DESCRIPTOR;
 
 /* Define Video Class Camera Terminal descriptor.  */
@@ -451,17 +453,18 @@ typedef struct UX_HOST_CLASS_VIDEO_SELECTOR_UNIT_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_VIDEO_CAMERA_TERMINAL_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubtype;
-    ULONG           bTerminalID;
-    ULONG           wTerminalType;
-    ULONG           bAssocTerminal;
-    ULONG           iTerminal;
-    ULONG           wObjectiveFocalLengthMin;
-    ULONG           wObjectiveFocalLengthMax;
-    ULONG           wOcularFocalLength;
-    ULONG           bControlSize;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubtype;
+    UCHAR           bTerminalID;
+    USHORT          wTerminalType;
+    UCHAR           bAssocTerminal;
+    UCHAR           iTerminal;
+    USHORT          wObjectiveFocalLengthMin;
+    USHORT          wObjectiveFocalLengthMax;
+    USHORT          wOcularFocalLength;
+    UCHAR           bControlSize;
+    UCHAR           _align_bmControls[1];
     ULONG           bmControls;
 } UX_HOST_CLASS_VIDEO_CAMERA_TERMINAL_DESCRIPTOR;
 
@@ -470,18 +473,21 @@ typedef struct UX_HOST_CLASS_VIDEO_CAMERA_TERMINAL_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_VIDEO_FRAME_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubtype;
-    ULONG           bFrameIndex;
-    ULONG           bmCapabilities;
-    ULONG           wWidth;
-    ULONG           wHeight;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubtype;
+    UCHAR           bFrameIndex;
+    UCHAR           bmCapabilities;
+    UCHAR           _align_wWidth[1];
+    USHORT          wWidth;
+    USHORT          wHeight;
+    UCHAR           _align_dwMinBitRate[2];
     ULONG           dwMinBitRate;
     ULONG           dwMaxBitRate;
     ULONG           dwMaxVideoFrameBufferSize;
     ULONG           dwDefaultFrameInterval;
-    ULONG           bFrameIntervalType;
+    UCHAR           bFrameIntervalType;
+    UCHAR           _align_size[3];
 } UX_HOST_CLASS_VIDEO_FRAME_DESCRIPTOR;
 
 
@@ -491,16 +497,17 @@ typedef struct UX_HOST_CLASS_VIDEO_FRAME_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_VIDEO_PROCESSING_UNIT_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDescriptorSubtype;
-    ULONG           bUnitID;
-    ULONG           bSourceID;
-    ULONG           wMaxMultiplier;
-    ULONG           bControlSize;
-    ULONG           bmControls;
-    ULONG           iProcessing;
-    ULONG           bmVideoStandards;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDescriptorSubtype;
+    UCHAR           bUnitID;
+    UCHAR           bSourceID;
+    UCHAR           _align_wMaxMultiplier[1];
+    USHORT          wMaxMultiplier;
+    UCHAR           bControlSize;
+    UCHAR           bmControls;
+    UCHAR           iProcessing;
+    UCHAR           bmVideoStandards;
 } UX_HOST_CLASS_VIDEO_PROCESSING_UNIT_DESCRIPTOR;
 
 

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_request_control_transfer               PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,6 +86,9 @@
 /*                                            refined macros names,       */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.1.2  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed compile warnings,     */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_request_control_transfer(UX_HCD_EHCI *hcd_ehci, UX_TRANSFER *transfer_request)
@@ -131,7 +134,7 @@ UINT            pid;
 
     /* Set the default MPS Capability info in the ED.  */
     ed -> ux_ehci_ed_cap0 &=  ~UX_EHCI_QH_MPS_MASK;
-    ed -> ux_ehci_ed_cap0 |=  endpoint -> ux_endpoint_descriptor.wMaxPacketSize << UX_EHCI_QH_MPS_LOC;
+    ed -> ux_ehci_ed_cap0 |=  (ULONG)endpoint -> ux_endpoint_descriptor.wMaxPacketSize << UX_EHCI_QH_MPS_LOC;
 
     /* On Control transfers, the toggle is set in the TD, not the QH.  */
     ed -> ux_ehci_ed_cap0 |=  UX_EHCI_QH_DTC;

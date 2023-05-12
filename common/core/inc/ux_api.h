@@ -134,6 +134,7 @@
 /*                                            added a new error code,     */
 /*                                            resulting in version 6.2.1  */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized USB descriptors,  */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -1814,12 +1815,13 @@ typedef struct UX_TRANSFER_STRUCT
 typedef struct UX_ENDPOINT_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bEndpointAddress;
-    ULONG           bmAttributes;
-    ULONG           wMaxPacketSize;
-    ULONG           bInterval;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bEndpointAddress;
+    UCHAR           bmAttributes;
+    USHORT          wMaxPacketSize;
+    UCHAR           bInterval;
+    UCHAR           _align_size[1];
 } UX_ENDPOINT_DESCRIPTOR;
 
 #define UX_ENDPOINT_DESCRIPTOR_ENTRIES                                  6
@@ -1852,39 +1854,42 @@ typedef struct UX_ENDPOINT_STRUCT
 typedef struct UX_DEVICE_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bcdUSB;
-    ULONG           bDeviceClass;
-    ULONG           bDeviceSubClass;
-    ULONG           bDeviceProtocol;
-    ULONG           bMaxPacketSize0;
-    ULONG           idVendor;
-    ULONG           idProduct;
-    ULONG           bcdDevice;
-    ULONG           iManufacturer;
-    ULONG           iProduct;
-    ULONG           iSerialNumber;
-    ULONG           bNumConfigurations;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    USHORT          bcdUSB;
+    UCHAR           bDeviceClass;
+    UCHAR           bDeviceSubClass;
+    UCHAR           bDeviceProtocol;
+    UCHAR           bMaxPacketSize0;
+    USHORT          idVendor;
+    USHORT          idProduct;
+    USHORT          bcdDevice;
+    UCHAR           iManufacturer;
+    UCHAR           iProduct;
+    UCHAR           iSerialNumber;
+    UCHAR           bNumConfigurations;
+    UCHAR           _align_size[2];
 } UX_DEVICE_DESCRIPTOR;
 
 #define UX_DEVICE_DESCRIPTOR_ENTRIES                                    14
 #define UX_DEVICE_DESCRIPTOR_LENGTH                                     18
+
 
 /* Define USBX Device Qualifier Descriptor structure.  */
 
 typedef struct UX_DEVICE_QUALIFIER_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bcdUSB;
-    ULONG           bDeviceClass;
-    ULONG           bDeviceSubClass;
-    ULONG           bDeviceProtocol;
-    ULONG           bMaxPacketSize0;
-    ULONG           bNumConfigurations;
-    ULONG           bReserved;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    USHORT          bcdUSB;
+    UCHAR           bDeviceClass;
+    UCHAR           bDeviceSubClass;
+    UCHAR           bDeviceProtocol;
+    UCHAR           bMaxPacketSize0;
+    UCHAR           bNumConfigurations;
+    UCHAR           bReserved;
+    UCHAR           _align_size[2];
 } UX_DEVICE_QUALIFIER_DESCRIPTOR;
 
 #define UX_DEVICE_QUALIFIER_DESCRIPTOR_ENTRIES                          9
@@ -1896,47 +1901,50 @@ typedef struct UX_DEVICE_QUALIFIER_DESCRIPTOR_STRUCT
 typedef struct UX_OTHER_SPEED_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           wTotalLength;
-    ULONG           bNumInterfaces;
-    ULONG           bConfigurationValue;
-    ULONG           iConfiguration;
-    ULONG           bmAttributes;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    USHORT          wTotalLength;
+    UCHAR           bNumInterfaces;
+    UCHAR           bConfigurationValue;
+    UCHAR           iConfiguration;
+    UCHAR           bmAttributes;
     ULONG           MaxPower;
 } UX_OTHER_SPEED_DESCRIPTOR;
 
 #define UX_OTHER_SPEED_DESCRIPTOR_ENTRIES                               8
 #define UX_OTHER_SPEED_DESCRIPTOR_LENGTH                                9
 
+
 /* Define USBX OTG Descriptor structure.  */
 
 typedef struct UX_OTG_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bmAttributes;
-    ULONG           bcdOTG;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bmAttributes;
+    UCHAR           _align_bcdOTG[1];
+    USHORT          bcdOTG;
+    UCHAR           _algin_size[2];
 } UX_OTG_DESCRIPTOR;
 
 #define UX_OTG_DESCRIPTOR_ENTRIES                          4
 #define UX_OTG_DESCRIPTOR_LENGTH                           5
+
 
 /* Define USBX Interface Association Descriptor structure.  */
 
 typedef struct UX_INTERFACE_ASSOCIATION_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bFirstInterface;
-    ULONG           bInterfaceCount;
-    ULONG           bFunctionClass;
-    ULONG           bFunctionSubClass;
-    ULONG           bFunctionProtocol;
-    ULONG           iFunction;
-
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bFirstInterface;
+    UCHAR           bInterfaceCount;
+    UCHAR           bFunctionClass;
+    UCHAR           bFunctionSubClass;
+    UCHAR           bFunctionProtocol;
+    UCHAR           iFunction;
 } UX_INTERFACE_ASSOCIATION_DESCRIPTOR;
                                                             
 #define UX_INTERFACE_ASSOCIATION_DESCRIPTOR_ENTRIES         8
@@ -2060,15 +2068,16 @@ typedef struct UX_DEVICE_STRUCT
 typedef struct UX_CONFIGURATION_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           wTotalLength;
-    ULONG           bNumInterfaces;
-    ULONG           bConfigurationValue;
-    ULONG           iConfiguration;
-    ULONG           bmAttributes;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    USHORT          wTotalLength;
+    UCHAR           bNumInterfaces;
+    UCHAR           bConfigurationValue;
+    UCHAR           iConfiguration;
+    UCHAR           bmAttributes;
     ULONG           MaxPower;
 } UX_CONFIGURATION_DESCRIPTOR;
+
 
 #define UX_CONFIGURATION_DESCRIPTOR_ENTRIES                             8
 #define UX_CONFIGURATION_DESCRIPTOR_LENGTH                              9
@@ -2107,15 +2116,16 @@ typedef struct UX_CONFIGURATION_STRUCT
 typedef struct UX_INTERFACE_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bInterfaceNumber;
-    ULONG           bAlternateSetting;
-    ULONG           bNumEndpoints;
-    ULONG           bInterfaceClass;
-    ULONG           bInterfaceSubClass;
-    ULONG           bInterfaceProtocol;
-    ULONG           iInterface;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bInterfaceNumber;
+    UCHAR           bAlternateSetting;
+    UCHAR           bNumEndpoints;
+    UCHAR           bInterfaceClass;
+    UCHAR           bInterfaceSubClass;
+    UCHAR           bInterfaceProtocol;
+    UCHAR           iInterface;
+    UCHAR           _align_size[3];
 } UX_INTERFACE_DESCRIPTOR;
     
 #define UX_INTERFACE_DESCRIPTOR_ENTRIES                                 9
@@ -2153,9 +2163,9 @@ typedef struct UX_INTERFACE_STRUCT
 typedef struct UX_STRING_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bString[1];
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bString[2];
 } UX_STRING_DESCRIPTOR;
 
 #define UX_STRING_DESCRIPTOR_ENTRIES                                    3
@@ -2166,10 +2176,11 @@ typedef struct UX_STRING_DESCRIPTOR_STRUCT
 
 typedef struct UX_BOS_DESCRIPTOR_STRUCT
 {
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           wTotalLength;
-    ULONG           bNumDeviceCaps;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    USHORT          wTotalLength;
+    UCHAR           bNumDeviceCaps;
+    UCHAR           _align_size[3];
 } UX_BOS_DESCRIPTOR;
 
 #define UX_BOS_DESCRIPTOR_ENTRIES                                       4
@@ -2180,9 +2191,10 @@ typedef struct UX_BOS_DESCRIPTOR_STRUCT
 
 typedef struct UX_USB_2_0_EXTENSION_DESCRIPTOR_STRUCT
 {
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDevCapabilityType;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDevCapabilityType;
+    UCHAR           _align_bmAttributes[1];
     ULONG           bmAttributes;
 } UX_USB_2_0_EXTENSION_DESCRIPTOR;
 
@@ -2194,14 +2206,14 @@ typedef struct UX_USB_2_0_EXTENSION_DESCRIPTOR_STRUCT
 
 typedef struct UX_CONTAINER_ID_DESCRIPTOR_STRUCT
 {
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bDevCapabilityType;
-    ULONG           bReserved;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bDevCapabilityType;
+    UCHAR           bReserved;
     ULONG           ContainerID[4];
 } UX_CONTAINER_ID_DESCRIPTOR;
 
-#define UX_CONTAINER_ID_DESCRIPTOR_ENTRIES                              5
+#define UX_CONTAINER_ID_DESCRIPTOR_ENTRIES                              8
 #define UX_CONTAINER_ID_DESCRIPTOR_LENGTH                               20
 
 
@@ -2210,16 +2222,19 @@ typedef struct UX_CONTAINER_ID_DESCRIPTOR_STRUCT
 typedef struct UX_DFU_FUNCTIONAL_DESCRIPTOR_STRUCT
 {
 
-    ULONG           bLength;
-    ULONG           bDescriptorType;
-    ULONG           bmAttributes;
-    ULONG           wDetachTimeOut;
-    ULONG           wTransferSize;
-    ULONG           bcdDFUVersion;
+    UCHAR           bLength;
+    UCHAR           bDescriptorType;
+    UCHAR           bmAttributes;
+    UCHAR           _align_wDetachTimeOut[1];
+    USHORT          wDetachTimeOut;
+    USHORT          wTransferSize;
+    USHORT          bcdDFUVersion;
+    UCHAR           _align_size[2];
 } UX_DFU_FUNCTIONAL_DESCRIPTOR;
                                                                         
 #define UX_DFU_FUNCTIONAL_DESCRIPTOR_ENTRIES                            6
 #define UX_DFU_FUNCTIONAL_DESCRIPTOR_LENGTH                             9
+
 
 /* Define USBX Host Controller structure.  */
 
