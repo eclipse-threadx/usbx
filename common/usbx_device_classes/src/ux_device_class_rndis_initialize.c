@@ -140,6 +140,8 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*                                            removed internal NX pool,   */
 /*                                            resulting in version 6.2.0  */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            checked compile options,    */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -158,8 +160,12 @@ UINT                                        status;
 
 
     /* Compile option checks.  */
-    UX_ASSERT(UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
     UX_ASSERT(UX_DEVICE_CLASS_RNDIS_MAX_CONTROL_RESPONSE_LENGTH <= UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH);
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 0
+    UX_ASSERT(UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
+    UX_ASSERT(UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
+    UX_ASSERT(UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
+#endif
 
     /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;
@@ -201,10 +207,26 @@ UINT                                        status;
     /* Store the rest of the parameters as they are in the local instance.  */
     _ux_utility_memory_copy(&rndis -> ux_slave_class_rndis_parameter, rndis_parameter, sizeof (UX_SLAVE_CLASS_RNDIS_PARAMETER)); /* Use case of memcpy is verified. */
 
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+    /* Allocate memory for endpoints.  */
+    UX_ASSERT(!UX_DEVICE_CLASS_RNDIS_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW);
+    rndis -> ux_device_class_rndis_endpoint_buffer = _ux_utility_memory_allocate(
+                            UX_NO_ALIGN,UX_CACHE_SAFE_MEMORY,
+                            UX_DEVICE_CLASS_RNDIS_ENDPOINT_BUFFER_SIZE);
+    if (rndis -> ux_device_class_rndis_endpoint_buffer == UX_NULL)
+        status = UX_MEMORY_INSUFFICIENT;
+#else
+    status = UX_SUCCESS;
+#endif
+
     /* Create a mutex to protect the RNDIS thread and the application messing up the transmit queue.  */
-    status =  _ux_utility_mutex_create(&rndis -> ux_slave_class_rndis_mutex, "ux_slave_class_rndis_mutex");
-    if (status != UX_SUCCESS)
-        status = UX_MUTEX_ERROR;
+    if (status == UX_SUCCESS)
+    {
+        status =  _ux_utility_mutex_create(&rndis -> ux_slave_class_rndis_mutex, "ux_slave_class_rndis_mutex");
+        if (status != UX_SUCCESS)
+            status = UX_MUTEX_ERROR;
+    }
 
     /* Allocate some memory for the interrupt thread stack. */
     if (status == UX_SUCCESS)
@@ -355,6 +377,11 @@ UINT                                        status;
     /* Delete rndis -> ux_slave_class_rndis_mutex.  */
     if (rndis -> ux_slave_class_rndis_mutex.tx_mutex_id != 0)
         _ux_device_mutex_delete(&rndis -> ux_slave_class_rndis_mutex);
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    if (rndis -> ux_device_class_rndis_endpoint_buffer != UX_NULL)
+        _ux_utility_memory_free(rndis -> ux_device_class_rndis_endpoint_buffer);
+#endif
 
     /* Free memory for rndis instance.  */
     _ux_utility_memory_free(rndis);

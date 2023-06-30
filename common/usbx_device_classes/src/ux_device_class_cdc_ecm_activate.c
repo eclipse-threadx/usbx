@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_activate                   PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,6 +82,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -134,10 +138,17 @@ ULONG                       physical_address_lsw;
         
                     /* We have found the interrupt endpoint, save it.  */
                     cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_endpoint =  endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+                    /* Set the endpoint buffer to the endpoint.  */
+                    endpoint -> ux_slave_endpoint_transfer_request.
+                        ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CDC_ECM_INTERRUPTIN_BUFFER(cdc_ecm);
+#endif
 
                     /* Reset the endpoint buffers.  */
                     _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_endpoint -> ux_slave_endpoint_transfer_request. 
-                                        ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
+                                        ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_CDC_ECM_INTERRUPTIN_BUFFER_SIZE); /* Use case of memset is verified. */
 
                     /* Resume the interrupt endpoint threads.  */
                     _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread); 
@@ -185,18 +196,30 @@ ULONG                       physical_address_lsw;
         
                     /* Look at type.  */
                     if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_BULK_ENDPOINT)
-                
+                    {
+
                         /* We have found the bulk in endpoint, save it.  */
                         cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint =  endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+                        endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER(cdc_ecm);
+#endif
+                    }
                         
                 }
                 else
                 {
                     /* Look at type for out endpoint.  */
                     if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_BULK_ENDPOINT)
-                
+                    {
+
                         /* We have found the bulk out endpoint, save it.  */
                         cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint =  endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+                        endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER(cdc_ecm);
+#endif
+                    }
                 }                
         
                 /* Next endpoint.  */
@@ -219,9 +242,9 @@ ULONG                       physical_address_lsw;
 
             /* Reset the endpoint buffers.  */
             _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint -> ux_slave_endpoint_transfer_request. 
-                                            ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
+                                            ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE); /* Use case of memset is verified. */
             _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint -> ux_slave_endpoint_transfer_request. 
-                                            ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
+                                            ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE); /* Use case of memset is verified. */
 
             /* Resume the endpoint threads.  */
             _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread); 

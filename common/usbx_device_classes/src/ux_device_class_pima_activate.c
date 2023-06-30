@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_activate                      PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -76,6 +76,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -135,6 +139,15 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
     pima -> ux_device_class_pima_bulk_in_endpoint           = endpoint_in;
     pima -> ux_device_class_pima_bulk_out_endpoint          = endpoint_out;
     pima -> ux_device_class_pima_interrupt_endpoint         = endpoint_interrupt;
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    endpoint_in -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                    UX_DEVICE_CLASS_PIMA_BULKIN_BUFFER(pima);
+    endpoint_out -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                    UX_DEVICE_CLASS_PIMA_BULKOUT_BUFFER(pima);
+    endpoint_interrupt -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                    UX_DEVICE_CLASS_PIMA_INTERRUPTIN_BUFFER(pima);
+#endif
 
     /* Initialize status code.  */
     pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_IDLE;

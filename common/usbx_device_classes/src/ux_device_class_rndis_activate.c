@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_activate                     PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,6 +79,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -138,23 +142,40 @@ ULONG                       physical_address_lsw;
 
             /* Look at type.  */
             if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_INTERRUPT_ENDPOINT)
-        
+            {
+
                 /* We have found the interrupt endpoint, save it.  */
                 rndis -> ux_slave_class_rndis_interrupt_endpoint =  endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+                endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER(rndis);
+#endif
+            }
 
             else
-                            
+            {
+
                 /* We have found the bulk in endpoint, save it.  */
                 rndis -> ux_slave_class_rndis_bulkin_endpoint =  endpoint;
-
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+                endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER(rndis);
+#endif
+            }
         }
         else
         {
             /* Look at type for out endpoint.  */
             if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_BULK_ENDPOINT)
-        
+            {
+
                 /* We have found the bulk out endpoint, save it.  */
                 rndis -> ux_slave_class_rndis_bulkout_endpoint =  endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+                endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER(rndis);
+#endif
+            }
         }                
 
         /* Next endpoint.  */

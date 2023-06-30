@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_initialize                 PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*  10-31-2022     Yajun Xia                Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -106,6 +110,19 @@ UINT                                    status;
     printer -> ux_device_class_printer_parameter.ux_device_class_printer_instance_deactivate = printer_parameter -> ux_device_class_printer_instance_deactivate;
     printer -> ux_device_class_printer_parameter.ux_device_class_printer_soft_reset          = printer_parameter -> ux_device_class_printer_soft_reset;
 
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+    /* Allocate endpoint buffer.  */
+    UX_ASSERT(!UX_DEVICE_CLASS_PRINTER_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW);
+    printer -> ux_device_class_printer_endpoint_buffer = _ux_utility_memory_allocate(UX_NO_ALIGN,
+            UX_CACHE_SAFE_MEMORY, UX_DEVICE_CLASS_PRINTER_ENDPOINT_BUFFER_SIZE);
+    if (printer -> ux_device_class_printer_endpoint_buffer == UX_NULL)
+    {
+        _ux_utility_memory_free(printer);
+        return(UX_MEMORY_INSUFFICIENT);
+    }
+#endif
+
 #if !defined(UX_DEVICE_STANDALONE)
     /* Create the Mutex for each endpoint as multiple threads cannot access each pipe at the same time.  */
     status =  _ux_utility_mutex_create(&printer -> ux_device_class_printer_endpoint_in_mutex, "ux_device_class_printer_in_mutex");
@@ -115,6 +132,9 @@ UINT                                    status;
     {
 
         /* Free the resources.  */
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+        _ux_utility_memory_free(printer -> ux_device_class_printer_endpoint_buffer);
+#endif
         _ux_utility_memory_free(printer);
 
         /* Return fatal error.  */
@@ -132,6 +152,9 @@ UINT                                    status;
         _ux_device_mutex_delete(&printer -> ux_device_class_printer_endpoint_in_mutex);
 
         /* Free the resources.  */
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+        _ux_utility_memory_free(printer -> ux_device_class_printer_endpoint_buffer);
+#endif
         _ux_utility_memory_free(printer);
 
         /* Return fatal error.  */

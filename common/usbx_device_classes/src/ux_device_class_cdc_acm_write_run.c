@@ -87,7 +87,10 @@
 /*  10-31-2022     Yajun Xia                Modified comment(s),          */
 /*                                            fixed return code,          */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*  xx-xx-xxxx     Yajun Xia, CQ Xiao       Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            fixed return code,          */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -100,15 +103,17 @@ UX_SLAVE_ENDPOINT           *endpoint;
 UX_SLAVE_DEVICE             *device;
 UX_SLAVE_INTERFACE          *interface_ptr;
 UX_SLAVE_TRANSFER           *transfer_request;
-UINT                        zlp = UX_FALSE;
 UINT                        status = 0;
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER != 1) || !defined(UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY)
+UINT                        zlp = UX_FALSE;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ACM_WRITE, cdc_acm, buffer, requested_length, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 
-    /* Check if current cdc-acm is using callback or not. We cannot use direct reads with callback on.  */
+    /* Check if current cdc-acm is using callback or not. We cannot use direct writes with callback on.  */
     if (cdc_acm -> ux_slave_class_cdc_acm_transmission_status == UX_TRUE)
 
         /* Not allowed. */
@@ -152,6 +157,60 @@ UINT                        status = 0;
     /* We are writing to the IN endpoint.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
 
+#if defined(UX_DEVICE_CLASS_CDC_ACM_OWN_ENDPOINT_BUFFER)
+    transfer_request -> ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER(cdc_acm);
+#endif
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY)
+
+    /* Run the transfer state machine.  */
+    if(cdc_acm -> ux_device_class_cdc_acm_write_state == UX_STATE_RESET)
+    {
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ACM_WRITE, cdc_acm, buffer, requested_length, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
+
+        cdc_acm -> ux_device_class_cdc_acm_write_state = UX_DEVICE_CLASS_CDC_ACM_WRITE_WAIT;
+        cdc_acm -> ux_device_class_cdc_acm_write_status = UX_TRANSFER_NO_ANSWER;
+        transfer_request -> ux_slave_transfer_request_data_pointer = buffer;
+        UX_SLAVE_TRANSFER_STATE_RESET(transfer_request);
+    }
+
+    /* Issue the transfer request.  */
+#if defined(UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP)
+    status = _ux_device_stack_transfer_run(transfer_request, requested_length, requested_length + 1);
+#else
+    status = _ux_device_stack_transfer_run(transfer_request, requested_length, requested_length);
+#endif
+
+    /* Error case.  */
+    if (status < UX_STATE_NEXT)
+    {
+        cdc_acm -> ux_device_class_cdc_acm_write_state = UX_STATE_RESET;
+        cdc_acm -> ux_device_class_cdc_acm_write_status =
+            transfer_request -> ux_slave_transfer_request_completion_code;
+        return(UX_STATE_ERROR);
+    }
+
+    /* Success case.  */
+    if (status == UX_STATE_NEXT)
+    {
+
+        /* Last transfer status.  */
+        cdc_acm -> ux_device_class_cdc_acm_write_status =
+            transfer_request -> ux_slave_transfer_request_completion_code;
+
+        /* Update actual length.  */
+        *actual_length = transfer_request -> ux_slave_transfer_request_actual_length;
+
+        /* It's done.  */
+        cdc_acm -> ux_device_class_cdc_acm_write_state = UX_STATE_RESET;
+    }
+
+    return(status);
+#else
+
     /* Handle state cases.  */
     switch(cdc_acm -> ux_device_class_cdc_acm_write_state)
     {
@@ -161,7 +220,7 @@ UINT                        status = 0;
         cdc_acm -> ux_device_class_cdc_acm_write_buffer = buffer;
         cdc_acm -> ux_device_class_cdc_acm_write_requested_length = requested_length;
         cdc_acm -> ux_device_class_cdc_acm_write_actual_length = 0;
-        cdc_acm -> ux_device_class_cdc_acm_write_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
+        cdc_acm -> ux_device_class_cdc_acm_write_host_length = UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE;
         if (requested_length == 0)
             zlp = UX_TRUE;
 
@@ -182,11 +241,11 @@ UINT                        status = 0;
         }
 
         /* Check if we have enough in the local buffer.  */
-        if (requested_length > UX_SLAVE_REQUEST_DATA_MAX_LENGTH)
+        if (requested_length > UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE)
 
             /* We have too much to transfer.  */
             cdc_acm -> ux_device_class_cdc_acm_write_transfer_length =
-                                            UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
+                                            UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE;
 
         else
         {
@@ -201,7 +260,7 @@ UINT                        status = 0;
 #else
 
             /* Assume expected more than transfer to let stack append ZLP if needed.  */
-            cdc_acm -> ux_device_class_cdc_acm_write_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH + 1;
+            cdc_acm -> ux_device_class_cdc_acm_write_host_length = UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE + 1;
 #endif
         }
 
@@ -274,6 +333,7 @@ UINT                        status = 0;
 
     /* Error case.  */
     return(UX_STATE_EXIT);
+#endif
 }
 
 /**************************************************************************/

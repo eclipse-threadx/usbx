@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio.h                             PORTABLE C      */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,10 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -94,6 +98,11 @@ extern   "C" {
 #define UX_DEVICE_CLASS_AUDIO_ENABLE_ERROR_CHECKING
 #endif
 
+
+/* Works if UX_DEVICE_ENDPOINT_BUFFER_OWNER is 1.
+     If defined, it represents feedback endpoint buffer size.
+     It should be larger than feedback endpoint max packet size in framework.  */
+#define UX_DEVICE_CLASS_AUDIO_FEEDBACK_BUFFER_SIZE                  8
 
 
 /* Define Audio Class OS related constants.  */
@@ -413,8 +422,17 @@ typedef struct UX_DEVICE_CLASS_AUDIO_STREAM_STRUCT
     UX_SLAVE_INTERFACE                      *ux_device_class_audio_stream_interface;
     UX_SLAVE_ENDPOINT                       *ux_device_class_audio_stream_endpoint;
 
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                                   *ux_device_class_audio_stream_endpoint_buffer;
+#endif
+
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
     UX_SLAVE_ENDPOINT                       *ux_device_class_audio_stream_feedback;
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                                   *ux_device_class_audio_stream_feedback_buffer;
+#endif
+
 
 #if !defined(UX_DEVICE_STANDALONE)
     UCHAR                                   *ux_device_class_audio_stream_feedback_thread_stack;
@@ -460,6 +478,10 @@ typedef struct UX_DEVICE_CLASS_AUDIO_STRUCT
 
 #if defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
     UX_SLAVE_ENDPOINT                       *ux_device_class_audio_interrupt;
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                                   *ux_device_class_audio_interrupt_buffer;
+#endif
 
     ULONG                                   ux_device_class_audio_status_size;       /* in Bytes.  */
     ULONG                                   ux_device_class_audio_status_queue_bytes;/* in Bytes.  */

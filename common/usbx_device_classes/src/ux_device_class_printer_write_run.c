@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_write_run                   PORTABLE C     */
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -78,6 +78,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-31-2022         Yajun Xia            Initial Version 6.2.0         */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_printer_write_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
@@ -140,7 +144,7 @@ UINT                        status = 0;
         printer -> ux_device_class_printer_write_buffer = buffer;
         printer -> ux_device_class_printer_write_requested_length = requested_length;
         printer -> ux_device_class_printer_write_actual_length = 0;
-        printer -> ux_device_class_printer_write_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
+        printer -> ux_device_class_printer_write_host_length = UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE;
         if (requested_length == 0)
             zlp = UX_TRUE;
 
@@ -161,11 +165,11 @@ UINT                        status = 0;
         }
 
         /* Check if we have enough in the local buffer.  */
-        if (requested_length > UX_SLAVE_REQUEST_DATA_MAX_LENGTH)
+        if (requested_length > UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE)
 
             /* We have too much to transfer.  */
             printer -> ux_device_class_printer_write_transfer_length =
-                                            UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
+                                            UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE;
 
         else
         {
@@ -180,7 +184,7 @@ UINT                        status = 0;
 #else
 
             /* Assume expected more than transfer to let stack append ZLP if needed.  */
-            printer -> ux_device_class_printer_write_host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH + 1;
+            printer -> ux_device_class_printer_write_host_length = UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE + 1;
 #endif
         }
 

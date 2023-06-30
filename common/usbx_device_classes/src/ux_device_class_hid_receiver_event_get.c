@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_receiver_event_get             PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            cleaned compile with TRACE, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
@@ -102,7 +105,10 @@ UX_DEVICE_CLASS_HID_RECEIVED_EVENT      *pos;
 
         /* Fill event structure to return.  */
         event -> ux_device_class_hid_received_event_length = pos -> ux_device_class_hid_received_event_length;
-        event -> ux_device_class_hid_received_event_data = (UCHAR *)&pos -> ux_device_class_hid_received_event_data;
+
+        /* Fill data buffer address to return.  */
+        event -> ux_device_class_hid_received_event_data = UX_DEVICE_CLASS_HID_RECEIVED_QUEUE_ITEM_BUFFER(pos);
+
         return(UX_SUCCESS);
     }
 

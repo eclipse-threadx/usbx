@@ -50,7 +50,9 @@
 /*  03-08-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*  xx-xx-xxxx     Yajun Xia, CQ Xiao       Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            fixed error checking issue, */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -78,6 +80,17 @@ extern   "C" {
 /* Defined, _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
 
 /* #define UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP  */
+
+
+/* Option: bulk out endpoint / read buffer size, must be larger than max packet size in framework, and aligned in 4-bytes.  */
+#ifndef UX_DEVICE_CLASS_PRINTER_READ_BUFFER_SIZE
+#define UX_DEVICE_CLASS_PRINTER_READ_BUFFER_SIZE                         512
+#endif
+
+/* Option: bulk in endpoint / write buffer size, must be larger than max packet size in framework, and aligned in 4-bytes.  */
+#ifndef UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE
+#define UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE                        UX_SLAVE_REQUEST_DATA_MAX_LENGTH
+#endif
 
 
 /* Define Printer Class USB Class constants.  */
@@ -136,6 +149,9 @@ typedef struct UX_DEVICE_CLASS_PRINTER_STRUCT
     UX_SLAVE_INTERFACE      *ux_device_class_printer_interface;
     UX_SLAVE_ENDPOINT       *ux_device_class_printer_endpoint_out;
     UX_SLAVE_ENDPOINT       *ux_device_class_printer_endpoint_in;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                   *ux_device_class_printer_endpoint_buffer;
+#endif
     ULONG                   ux_device_class_printer_port_status;
     UX_DEVICE_CLASS_PRINTER_PARAMETER
                             ux_device_class_printer_parameter;
@@ -159,6 +175,14 @@ typedef struct UX_DEVICE_CLASS_PRINTER_STRUCT
     UINT                    ux_device_class_printer_write_state;
 #endif
 } UX_DEVICE_CLASS_PRINTER;
+
+/* Define PRINTER endpoint buffer settings (when PRINTER owns buffer).  */
+#define UX_DEVICE_CLASS_PRINTER_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW \
+    (UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_PRINTER_READ_BUFFER_SIZE,      \
+                                 UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE))
+#define UX_DEVICE_CLASS_PRINTER_ENDPOINT_BUFFER_SIZE    (UX_DEVICE_CLASS_PRINTER_READ_BUFFER_SIZE + UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE)
+#define UX_DEVICE_CLASS_PRINTER_READ_BUFFER(ecm)        ((ecm)->ux_device_class_printer_endpoint_buffer)
+#define UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER(ecm)       (UX_DEVICE_CLASS_PRINTER_READ_BUFFER(ecm) + UX_DEVICE_CLASS_PRINTER_READ_BUFFER_SIZE)
 
 
 /* Define Device Printer Class prototypes.  */

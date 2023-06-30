@@ -90,7 +90,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*  xx-xx-xxxx     Yajun Xia, CQ Xiao       Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
@@ -151,13 +154,36 @@ ULONG                       local_requested_length;
 
     /* Protect this thread.  */
     _ux_device_mutex_on(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
-        
-    /* All CDC reading  are on the endpoint OUT, from the host.  */
+
+    /* All CDC readings are on the endpoint OUT, from the host.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
-    
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if !defined(UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY)
+    transfer_request -> ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CDC_ACM_READ_BUFFER(cdc_acm);
+#else
+    transfer_request -> ux_slave_transfer_request_data_pointer = buffer;
+#endif
+#endif
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY)
+
+    /* Check if device is configured.  */
+    if (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
+    {
+
+        /* Issue the transfer request.  */
+        local_requested_length = requested_length;
+        status = _ux_device_stack_transfer_request(transfer_request, requested_length, local_requested_length);
+        *actual_length = transfer_request -> ux_slave_transfer_request_actual_length;
+    }
+
+#else
+
     /* Reset the actual length.  */
     *actual_length =  0;
-    
+
     /* Check if we need more transactions.  */
     while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED && requested_length != 0)
     { 
@@ -218,7 +244,8 @@ ULONG                       local_requested_length;
         }            
     }
 
-    
+#endif
+
     /* Free Mutex resource.  */
     _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
 

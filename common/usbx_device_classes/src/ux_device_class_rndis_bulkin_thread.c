@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkin_thread                PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,10 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used NX API to copy data,   */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkin_thread(ULONG rndis_class)
@@ -157,7 +161,7 @@ ULONG                           copied;
                         transfer_length =  current_packet -> nx_packet_length + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH;
 
                         /* Is there enough space for this packet in the transfer buffer?  */
-                        if (transfer_length <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH)
+                        if (transfer_length <= UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE)
                         {
 
                             /* Copy the packet in the transfer descriptor buffer.  */
@@ -179,7 +183,7 @@ ULONG                           copied;
                                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_RNDIS_PACKET_TRANSMIT, rndis, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
                                 /* Send the request to the device controller.  */
-                                status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, UX_DEVICE_CLASS_RNDIS_ETHERNET_PACKET_SIZE + 1);
+                                status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE + 1);
                             }
 
                             /* Check for error. */

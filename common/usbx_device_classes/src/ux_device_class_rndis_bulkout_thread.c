@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkout_thread               PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,10 @@
 /*                                            used NX API to copy data,   */
 /*                                            used linked NX IP pool,     */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class)
@@ -153,7 +157,7 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
             {
 
                 /* And length.  */
-                transfer_request -> ux_slave_transfer_request_requested_length =  UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH;
+                transfer_request -> ux_slave_transfer_request_requested_length =  UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE;
                 transfer_request -> ux_slave_transfer_request_actual_length =     0;
             
                 /* Memorize this packet at the beginning of the queue.  */
@@ -163,8 +167,8 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
                 packet -> nx_packet_queue_next = UX_NULL;
                         
                 /* Send the request to the device controller.  */
-                status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH,
-                                                                UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH);
+                status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE,
+                                                                UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE);
 
                 /* Check the completion code. */
                 if (status == UX_SUCCESS)

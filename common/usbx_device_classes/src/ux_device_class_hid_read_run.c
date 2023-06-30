@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_read_run                       PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  07-29-2022     Chaoqiong Xiao           Initial Version 6.1.12        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid, UCHAR *buffer,
@@ -135,6 +138,45 @@ UINT                        status= UX_SUCCESS;
 
     /* Handle state cases.  */
     read_state = hid -> ux_device_class_hid_read_state;
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+    if (read_state == UX_STATE_RESET)
+    {
+
+        /* Initialize read states.  */
+        hid -> ux_device_class_hid_read_state = UX_DEVICE_CLASS_HID_READ_START;
+        hid -> ux_device_class_hid_read_status = UX_TRANSFER_NO_ANSWER;
+
+        /* Set the data pointer to the buffer.  */
+        transfer_request -> ux_slave_transfer_request_data_pointer = buffer;
+
+        /* Reset request state.  */
+        UX_SLAVE_TRANSFER_STATE_RESET(transfer_request);
+    }
+
+    /* Send the request to the device controller.  */
+    status =  _ux_device_stack_transfer_run(transfer_request, requested_length, requested_length);
+
+    /* Error/success case.  */
+    if (status <= UX_STATE_NEXT)
+    {
+
+        /* Update actual length.  */
+        *actual_length = transfer_request -> ux_slave_transfer_request_actual_length;
+
+        /* Last transfer status.  */
+        hid -> ux_device_class_hid_read_status =
+            transfer_request -> ux_slave_transfer_request_completion_code;
+
+        /* Reset read state.  */
+        hid -> ux_device_class_hid_read_state = UX_STATE_RESET;
+    }
+
+    /* Return status indicator.  */
+    return(status);
+
+#else
     switch(read_state)
     {
     case UX_STATE_RESET:
@@ -250,6 +292,7 @@ UINT                        status= UX_SUCCESS;
 
     /* Error case.  */
     return(UX_STATE_EXIT);
+#endif
 #endif
 }
 

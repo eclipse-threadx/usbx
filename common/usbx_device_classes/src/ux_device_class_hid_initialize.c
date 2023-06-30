@@ -89,6 +89,9 @@
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.2.0  */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            checked compile options,    */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -100,12 +103,22 @@ UX_SLAVE_CLASS_HID                      *hid;
 UX_SLAVE_CLASS_HID_PARAMETER            *hid_parameter;
 UX_SLAVE_CLASS                          *class_ptr;
 UINT                                    status = UX_SUCCESS;
+ULONG                                   array_memory_size;
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+UINT                                    i;
+UCHAR                                   *buffer;
+#endif
 
 
     /* Compile option checks.  */
     UX_ASSERT(UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH <= UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH);
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 0
     UX_ASSERT(UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH <= UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
+#endif
 
+
+    /* Get the pointer to the application parameters for the hid class.  */
+    hid_parameter =  command -> ux_slave_class_command_parameter;
 
     /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;
@@ -119,6 +132,20 @@ UINT                                    status = UX_SUCCESS;
 
     /* Save the address of the HID instance inside the HID container.  */
     class_ptr -> ux_slave_class_instance = (VOID *) hid;
+
+#if defined(UX_DEVICE_CLASS_HID_OWN_ENDPOINT_BUFFER)
+
+    /* Allocate buffer(s) for endpoint(s).  */
+    UX_ASSERT(!UX_DEVICE_CLASS_HID_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW);
+    hid -> ux_device_class_hid_endpoint_buffer = _ux_utility_memory_allocate(
+                            UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY,
+                            UX_DEVICE_CLASS_HID_ENDPOINT_BUFFER_SIZE);
+    if (hid -> ux_device_class_hid_endpoint_buffer == UX_NULL)
+    {
+        _ux_utility_memory_free(hid);
+        return(UX_MEMORY_INSUFFICIENT);
+    }
+#endif
 
 #if !defined(UX_DEVICE_STANDALONE)
 
@@ -141,6 +168,13 @@ UINT                                    status = UX_SUCCESS;
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
 #else
 
+#if defined(UX_DEVICE_CLASS_HID_FLEXIBLE_EVENTS_QUEUE)
+
+    /* Set event buffer.  */
+    hid -> ux_device_class_hid_event.ux_device_class_hid_event_buffer =
+                                    UX_DEVICE_CLASS_HID_INTERRUPTIN_BUFFER(hid);
+#endif
+
     /* Set task function.  */
     class_ptr -> ux_slave_class_task_function = _ux_device_class_hid_tasks_run;
 #endif
@@ -153,8 +187,6 @@ UINT                                    status = UX_SUCCESS;
         UX_THREAD_EXTENSION_PTR_SET(&(class_ptr -> ux_slave_class_thread), class_ptr)
 #endif
 
-        /* Get the pointer to the application parameters for the hid class.  */
-        hid_parameter =  command -> ux_slave_class_command_parameter;
 
         /* Store all the application parameter information about the report.  */
         hid -> ux_device_class_hid_report_address             = hid_parameter -> ux_device_class_hid_parameter_report_address;
@@ -165,8 +197,68 @@ UINT                                    status = UX_SUCCESS;
         hid -> ux_device_class_hid_callback                   = hid_parameter -> ux_device_class_hid_parameter_callback;
         hid -> ux_device_class_hid_get_callback               = hid_parameter -> ux_device_class_hid_parameter_get_callback;
 
+#if defined(UX_DEVICE_CLASS_HID_FLEXIBLE_EVENTS_QUEUE)
+
+        /* If event length is invalid, UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH is used.  */
+        if (UX_DEVICE_CLASS_HID_PARAM_EVENT_MAX_LENGTH(hid_parameter) == 0 ||
+            UX_DEVICE_CLASS_HID_PARAM_EVENT_MAX_LENGTH(hid_parameter) > UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH)
+            UX_DEVICE_CLASS_HID_PARAM_EVENT_MAX_LENGTH(hid_parameter) = UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH;
+
+        /* If event queue size is invalid, UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE is used.  */
+        if (UX_DEVICE_CLASS_HID_PARAM_EVENT_QUEUE_SIZE(hid_parameter) < 2 ||
+            UX_DEVICE_CLASS_HID_PARAM_EVENT_QUEUE_SIZE(hid_parameter) > UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE)
+            UX_DEVICE_CLASS_HID_PARAM_EVENT_QUEUE_SIZE(hid_parameter) = UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE;
+
+        /* Save event size.  */
+        UX_DEVICE_CLASS_HID_EVENT_MAX_LENGTH(hid) = UX_DEVICE_CLASS_HID_PARAM_EVENT_MAX_LENGTH(hid_parameter);
+#endif
+
         /* Create the event array.  */
-        hid -> ux_device_class_hid_event_array =  _ux_utility_memory_allocate_mulc_safe(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS_HID_EVENT), UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE);
+        UX_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(
+                    UX_DEVICE_CLASS_HID_EVENT_QUEUE_ITEM_SIZE(hid),
+                    UX_DEVICE_CLASS_HID_PARAM_EVENT_QUEUE_SIZE(hid_parameter)));
+        array_memory_size = UX_DEVICE_CLASS_HID_EVENT_QUEUE_ITEM_SIZE(hid) * UX_DEVICE_CLASS_HID_PARAM_EVENT_QUEUE_SIZE(hid_parameter);
+        hid -> ux_device_class_hid_event_array =  _ux_utility_memory_allocate(UX_NO_ALIGN,
+                                        UX_REGULAR_MEMORY, array_memory_size);
+
+        /* Do we need event buffer?
+         * 1. Even zero copy, report copy is kept to avoid keep buffers in application.
+         * 2. Other cases, buffer must be allocated.
+         */
+        /* Allocate buffer if needed.  */
+        {
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+            /* Allocate cache safe event buffers.  */
+            buffer = _ux_utility_memory_allocate_mulv_safe(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY,
+                        UX_DEVICE_CLASS_HID_PARAM_EVENT_MAX_LENGTH(hid_parameter),
+                        UX_DEVICE_CLASS_HID_PARAM_EVENT_QUEUE_SIZE(hid_parameter));
+
+            /* Allocation error check.  */
+            if (buffer == UX_NULL)
+            {
+                if (hid -> ux_device_class_hid_event_array != UX_NULL)
+                {
+                    _ux_utility_memory_free(hid -> ux_device_class_hid_event_array);
+                    hid -> ux_device_class_hid_event_array = UX_NULL;
+                }
+            }
+            else
+            {
+
+                /* Assign event buffers.  */
+                for (i = 0; i < UX_DEVICE_CLASS_HID_PARAM_EVENT_QUEUE_SIZE(hid_parameter); i ++)
+                {
+                    hid -> ux_device_class_hid_event_array[i].ux_device_class_hid_event_buffer = buffer;
+                    buffer += UX_DEVICE_CLASS_HID_PARAM_EVENT_MAX_LENGTH(hid_parameter);
+                }
+            }
+#else
+
+            /* Regular event place data following id,type and length.  */
+#endif
+        }
 
         /* Check for successful allocation.  */
         if (hid -> ux_device_class_hid_event_array != UX_NULL)
@@ -176,7 +268,7 @@ UINT                                    status = UX_SUCCESS;
                At first, the head and tail are pointing to the beginning of the array.  */
             hid -> ux_device_class_hid_event_array_head =  hid -> ux_device_class_hid_event_array;
             hid -> ux_device_class_hid_event_array_tail =  hid -> ux_device_class_hid_event_array;
-            hid -> ux_device_class_hid_event_array_end  =  hid -> ux_device_class_hid_event_array + UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE;
+            hid -> ux_device_class_hid_event_array_end  =  (UX_DEVICE_CLASS_HID_EVENT*)((UCHAR*)hid -> ux_device_class_hid_event_array + array_memory_size);
 
             /* Store the start and stop signals if needed by the application.  */
             hid -> ux_slave_class_hid_instance_activate = hid_parameter -> ux_slave_class_hid_instance_activate;
@@ -244,6 +336,9 @@ UINT                                    status = UX_SUCCESS;
             /* There is still initialization activities after array creation,
              * and some error occurs in this stage.  */
             /* Free allocated event array memory.  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+            _ux_utility_memory_free(hid -> ux_device_class_hid_event_array -> ux_device_class_hid_event_buffer);
+#endif
             _ux_utility_memory_free(hid -> ux_device_class_hid_event_array);
 #endif
 
@@ -265,6 +360,10 @@ UINT                                    status = UX_SUCCESS;
     /* Free stack. */
     if (class_ptr -> ux_slave_class_thread_stack)
         _ux_utility_memory_free(class_ptr -> ux_slave_class_thread_stack);
+#endif
+
+#if defined(UX_DEVICE_CLASS_HID_OWN_ENDPOINT_BUFFER)
+    _ux_utility_memory_free(hid -> ux_device_class_hid_endpoint_buffer);
 #endif
 
     /* Unmount instance. */

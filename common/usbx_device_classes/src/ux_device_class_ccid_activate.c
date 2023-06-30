@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_activate                      PORTABLE C      */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,10 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_ccid_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -109,13 +113,32 @@ UINT                                    i;
         if (endpoint_type == UX_INTERRUPT_ENDPOINT)
         {
             ccid -> ux_device_class_ccid_endpoint_notify = endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+            endpoint -> ux_slave_endpoint_transfer_request.
+                ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CCID_INTERRUPTIN_BUFFER(ccid);
+#endif
         }
         if (endpoint_type == UX_BULK_ENDPOINT)
         {
             if (endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_IN)
+            {
                 ccid -> ux_device_class_ccid_endpoint_in = endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+                endpoint -> ux_slave_endpoint_transfer_request.
+                    ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CCID_BULKIN_BUFFER(ccid);
+#endif
+            }
             else
+            {
                 ccid -> ux_device_class_ccid_endpoint_out = endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+                endpoint -> ux_slave_endpoint_transfer_request.
+                    ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CCID_BULKOUT_BUFFER(ccid);
+#endif
+            }
         }
         endpoint = endpoint -> ux_slave_endpoint_next_endpoint;
     }

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dpump.h                             PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,6 +50,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -65,6 +69,13 @@
 extern   "C" { 
 
 #endif  
+
+
+/* Bulk out endpoint / read buffer size, must be larger than max packet size in framework, and aligned in 4-bytes.  */
+#define UX_DEVICE_CLASS_DPUMP_READ_BUFFER_SIZE                  UX_SLAVE_REQUEST_DATA_MAX_LENGTH
+
+/* Bulk in endpoint / write buffer size, must be larger than max packet size in framework, and aligned in 4-bytes.  */
+#define UX_DEVICE_CLASS_DPUMP_WRITE_BUFFER_SIZE                 UX_SLAVE_REQUEST_DATA_MAX_LENGTH
 
 
 /* Define Storage Class USB Class constants.  */
@@ -94,6 +105,9 @@ typedef struct UX_SLAVE_CLASS_DPUMP_STRUCT
     UX_SLAVE_CLASS_DPUMP_PARAMETER      ux_slave_class_dpump_parameter;
     UX_SLAVE_ENDPOINT                   *ux_slave_class_dpump_bulkin_endpoint;
     UX_SLAVE_ENDPOINT                   *ux_slave_class_dpump_bulkout_endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                               *ux_device_class_dpump_endpoint_buffer;
+#endif
     ULONG                               ux_slave_class_dpump_alternate_setting;
 #if defined(UX_DEVICE_STANDALONE)
     UCHAR                               *ux_device_class_dpump_write_buffer;
@@ -110,6 +124,15 @@ typedef struct UX_SLAVE_CLASS_DPUMP_STRUCT
     UINT                                ux_device_class_dpump_read_status;
 #endif
 } UX_SLAVE_CLASS_DPUMP;
+
+/* Defined for endpoint buffer settings (when DPUMP owns buffer).  */
+#define UX_DEVICE_CLASS_DPUMP_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW                \
+    (UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_DPUMP_READ_BUFFER_SIZE,        \
+                                 UX_DEVICE_CLASS_DPUMP_WRITE_BUFFER_SIZE))
+#define UX_DEVICE_CLASS_DPUMP_ENDPOINT_BUFFER_SIZE  (UX_DEVICE_CLASS_DPUMP_READ_BUFFER_SIZE + UX_DEVICE_CLASS_DPUMP_WRITE_BUFFER_SIZE)
+#define UX_DEVICE_CLASS_DPUMP_READ_BUFFER(dpump)    ((dpump)->ux_device_class_dpump_endpoint_buffer)
+#define UX_DEVICE_CLASS_DPUMP_WRITE_BUFFER(dpump)   (UX_DEVICE_CLASS_DPUMP_READ_BUFFER(dpump) + UX_DEVICE_CLASS_DPUMP_READ_BUFFER_SIZE)
+
 
 /* Define Device Data Pump Class prototypes.  */
 

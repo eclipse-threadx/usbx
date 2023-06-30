@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_uninitialize                 PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -113,11 +117,21 @@ ULONG                            i;
 #endif
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_buffer);
 
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+            _ux_utility_memory_free(stream -> ux_device_class_audio_stream_endpoint_buffer);
+#if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
+            _ux_utility_memory_free(stream -> ux_device_class_audio_stream_feedback_buffer);
+#endif
+#endif
+
             /* Next stream instance.  */
             stream ++;
         }
 
 #if defined(UX_DEVICE_CLASS_AUDIO_INTERRUPT_SUPPORT)
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+        _ux_utility_memory_free(audio -> ux_device_class_audio_interrupt_buffer);
+#endif
 #if !defined(UX_DEVICE_STANDALONE)
         _ux_device_thread_delete(&audio_class -> ux_slave_class_thread);
         _ux_utility_memory_free(audio_class -> ux_slave_class_thread_stack);

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_control_request_process            PORTABLE C      */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -94,6 +94,10 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed vendor request issue, */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved interface request  */
+/*                                            process with print class,   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_control_request_process(UX_SLAVE_TRANSFER *transfer_request)
@@ -219,12 +223,23 @@ ULONG                       application_data_length;
                        the request index, we should go to the next one.  */
                     /* For printer class (0x07) GET_DEVICE_ID (0x00) the high byte of 
                        wIndex is interface index (for recommended index sequence the interface
-                       number is same as interface index inside configuration).  */
-                    if (((request_index & 0xFF) != class_index) ||
-                        ((class_ptr -> ux_slave_class_interface -> ux_slave_interface_descriptor.bInterfaceClass == 0x07) &&
-                         (request == 0x00) &&
-                         *(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_INDEX + 1) != class_index))
-                        continue;
+                       number is same as interface index inside configuration).
+                     */
+                    if ((request_type == 0xA1) && (request == 0x00) &&
+                        (class_ptr -> ux_slave_class_interface -> ux_slave_interface_descriptor.bInterfaceClass == 0x07))
+                    {
+
+                        /* Check wIndex high byte.  */
+                        if(*(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_INDEX + 1) != class_index)
+                            continue;
+                    }
+                    else
+                    {
+
+                        /* Check wIndex low.  */
+                        if ((request_index & 0xFF) != class_index)
+                            continue;
+                    }
                 }
 
                 /* Memorize the class in the command.  */

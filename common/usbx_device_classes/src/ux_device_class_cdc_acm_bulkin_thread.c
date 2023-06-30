@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_bulkin_thread              PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -92,6 +92,11 @@
 /*                                            names conflict C++ keyword, */
 /*                                            added auto ZLP support,     */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_acm_bulkin_thread(ULONG cdc_acm_class)
@@ -130,6 +135,11 @@ ULONG                           sent_length;
         endpoint =  endpoint -> ux_slave_endpoint_next_endpoint;
     }
 
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY)
+    endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER(cdc_acm);
+#endif
+
     /* This thread runs forever but can be suspended or resumed.  */
     while(1)
     {
@@ -152,6 +162,31 @@ ULONG                           sent_length;
                 /* Get the length of the entire buffer to send.  */
                 total_length = cdc_acm -> ux_slave_class_cdc_acm_callback_total_length;
 
+#if defined(UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY)
+
+#if !defined(UX_DEVICE_CLASS_CDC_ACM_WRITE_AUTO_ZLP)
+
+                /* Assume host request length just equal.  */
+                host_length = total_length;
+#else
+
+                /* Assume host request length larger to append ZLP automatically.  */
+                host_length = total_length + 1;
+#endif
+
+                /* Pass all data to lower level transfer.  */
+                transfer_length = total_length;
+
+                /* Setup the data pointer.  */
+                transfer_request -> ux_slave_transfer_request_data_pointer = cdc_acm -> ux_slave_class_cdc_acm_callback_data_pointer;
+
+                /* Issue the transfer request.  */
+                status = _ux_device_stack_transfer_request(transfer_request, transfer_length, host_length);
+
+                /* Update length sent.  */
+                sent_length = transfer_request -> ux_slave_transfer_request_actual_length;
+#else
+
                 /* Duplicate the data pointer to keep a current pointer.  */
                 cdc_acm -> ux_slave_class_cdc_acm_callback_current_data_pointer = cdc_acm -> ux_slave_class_cdc_acm_callback_data_pointer;
 
@@ -168,15 +203,15 @@ ULONG                           sent_length;
                 {
 
                     /* We should send the total length.  But we may have a case of ZLP. */
-                    host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
+                    host_length = UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE;
                     while (total_length)
                     {
 
                         /* Check the length remaining to send.  */
-                        if (total_length > UX_SLAVE_REQUEST_DATA_MAX_LENGTH)
+                        if (total_length > UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE)
 
                             /* We can't fit all the length.  */
-                            transfer_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
+                            transfer_length = UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE;
 
                         else
                         {
@@ -191,7 +226,7 @@ ULONG                           sent_length;
 #else
 
                             /* Assume expected more to let stack append ZLP if needed.  */
-                            host_length = UX_SLAVE_REQUEST_DATA_MAX_LENGTH + 1;
+                            host_length = UX_DEVICE_CLASS_CDC_ACM_WRITE_BUFFER_SIZE + 1;
 #endif
                         }
 
@@ -224,6 +259,7 @@ ULONG                           sent_length;
                         }
                     }
                 }
+#endif
 
                 /* Schedule of transmission was completed.  */
                 cdc_acm -> ux_slave_class_cdc_acm_scheduled_write = UX_FALSE;

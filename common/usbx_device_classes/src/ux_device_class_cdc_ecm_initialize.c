@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_ecm_initialize                 PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -89,6 +89,10 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            removed internal NX pool,   */
 /*                                            resulting in version 6.2.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -124,6 +128,17 @@ UINT                                            status;
 
     /* Assume good result.  */
     status = UX_SUCCESS;
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+    /* Allocate buffer for endpoints.  */
+    UX_ASSERT(!UX_DEVICE_CLASS_CDC_ECM_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW);
+    cdc_ecm -> ux_device_class_cdc_ecm_endpoint_buffer =
+            _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY,
+                                        UX_DEVICE_CLASS_CDC_ECM_ENDPOINT_BUFFER_SIZE);
+    if (cdc_ecm -> ux_device_class_cdc_ecm_endpoint_buffer == UX_NULL)
+        status = (UX_MEMORY_INSUFFICIENT);
+#endif
 
     /* Allocate some memory for the bulk out thread stack. */
     cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack =
@@ -251,6 +266,10 @@ UINT                                            status;
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_thread_stack);
     if (cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack)
         _ux_utility_memory_free(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread_stack);
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    if (cdc_ecm -> ux_device_class_cdc_ecm_endpoint_buffer)
+        _ux_utility_memory_free(cdc_ecm -> ux_device_class_cdc_ecm_endpoint_buffer);
+#endif
     _ux_device_mutex_delete(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
     _ux_utility_memory_free(cdc_ecm);
 

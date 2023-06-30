@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_thread                     PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -127,6 +127,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_storage_thread(ULONG storage_class)
@@ -189,6 +193,17 @@ UCHAR                       *cbw_cb;
                 /* We found the endpoint IN first, so next endpoint is OUT.  */
                 endpoint_out =  endpoint_in -> ux_slave_endpoint_next_endpoint;
             }
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+            /* Assign endpoint buffers.  */
+            endpoint_out -> ux_slave_endpoint_transfer_request.
+                    ux_slave_transfer_request_data_pointer =
+                            UX_DEVICE_CLASS_STORAGE_BULKOUT_BUFFER(storage);
+            endpoint_in -> ux_slave_endpoint_transfer_request.
+                    ux_slave_transfer_request_data_pointer =
+                            UX_DEVICE_CLASS_STORAGE_BULKIN_BUFFER(storage);
+#endif
 
             /* All SCSI commands are on the endpoint OUT, from the host.  */
             transfer_request =  &endpoint_out -> ux_slave_endpoint_transfer_request;

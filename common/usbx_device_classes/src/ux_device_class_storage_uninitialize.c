@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_uninitialize               PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,6 +75,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -99,6 +103,10 @@ UX_SLAVE_CLASS                          *class_ptr;
 #if !(defined(UX_DEVICE_STANDALONE) || defined(UX_STANDALONE))    
         /* Remove the thread used by STORAGE.  */
         _ux_utility_memory_free(class_ptr -> ux_slave_class_thread_stack);
+#endif
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+        _ux_utility_memory_free(storage -> ux_device_class_storage_endpoint_buffer);
 #endif
 
         /* Free the resources.  */

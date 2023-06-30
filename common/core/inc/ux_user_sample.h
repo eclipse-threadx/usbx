@@ -99,7 +99,11 @@
 /*                                            added option to enable      */
 /*                                            basic USBX error checking,  */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Xiuwen Cai               Modified comment(s),          */
+/*  xx-xx-xxxx     Xiuwen Cai, CQ Xiao      Modified comment(s),          */
+/*                                            added zero copy support     */
+/*                                            in many device classes,     */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            added option for get string */
 /*                                            requests with zero wIndex,  */
 /*                                            resulting in version 6.x    */
@@ -220,6 +224,33 @@
 /* #define UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH 256
 */
 
+/* Defined, this value represents the endpoint buffer owner.
+   0 - The default, endpoint buffer is managed by core stack. Each endpoint takes UX_SLAVE_REQUEST_DATA_MAX_LENGTH bytes.
+   1 - Endpoint buffer managed by classes. In this case not all endpoints consume UX_SLAVE_REQUEST_DATA_MAX_LENGTH bytes.
+*/
+
+#define UX_DEVICE_ENDPOINT_BUFFER_OWNER      0
+
+/* Defined, it enables device CDC ACM zero copy for bulk in/out endpoints (write/read).
+    Enabled, the endpoint buffer is not allocated in class, application must
+    provide the buffer for read/write, and the buffer must meet device controller driver (DCD)
+    buffer requirements (e.g., aligned and cache safe).
+    It only works if UX_DEVICE_ENDPOINT_BUFFER_OWNER is 1 (endpoint buffer managed by class).
+ */
+/* #define UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY  */
+
+/* Defined, it enables zero copy and flexible queue support (works if HID owns endpoint buffer).
+    Enabled, the internal queue buffer is directly used for transfer, the APIs are kept to keep
+    backword compatibility, to AVOID KEEPING BUFFERS IN APPLICATION.
+    Flexible queue introduces initialization parameter _event_max_number and _event_max_length,
+    so each HID function could have different queue settings.
+    _event_max_number could be 2 ~ UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE.
+    Max of _event_max_length could be UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH.
+    If the initialization parameters are invalid (are 0s or exceed upper mentioned definition),
+    UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE and UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH are used to
+    calculate and allocate the queue.
+ */
+/* #define UX_DEVICE_CLASS_HID_ZERO_COPY  */
 
 /* Defined, this value represents the maximum number of bytes that can be received or transmitted
    on any endpoint. This value cannot be less than the maximum packet size of any endpoint. The default 
@@ -413,6 +444,11 @@
 /* defined, this macro enables device audio feedback endpoint support.  */
 
 /* #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT  */
+
+/* Works if UX_DEVICE_ENDPOINT_BUFFER_OWNER is 1.
+     Defined, it represents feedback endpoint buffer size.
+     It should be larger than feedback endpoint max packet size in framework.  */
+/* #define UX_DEVICE_CLASS_AUDIO_FEEDBACK_ENDPOINT_BUFFER_SIZE    8            */
 
 /* Defined, class _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
 

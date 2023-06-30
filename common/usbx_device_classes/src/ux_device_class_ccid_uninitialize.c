@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_uninitialize                  PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,6 +66,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_ccid_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -103,6 +107,11 @@ ULONG                                   i;
         _ux_device_mutex_delete(&ccid -> ux_device_class_ccid_mutex);
         _ux_device_semaphore_delete(&ccid -> ux_device_class_ccid_notify_semaphore);
         _ux_device_mutex_delete(&ccid -> ux_device_class_ccid_response_mutex);
+#endif
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+        /* Free the bulk in endpoint memory.  */
+        _ux_utility_memory_free(ccid -> ux_device_class_ccid_endpoint_buffer);
 #endif
 
         /* Free instance memory.  */

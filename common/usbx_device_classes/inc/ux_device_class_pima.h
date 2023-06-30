@@ -59,6 +59,8 @@
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -84,10 +86,15 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_ENABLE_ERROR_CHECKING
 #endif
 
+#define UX_DEVICE_CLASS_PIMA_BULK_BUFFER_LENGTH                                     UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH
+#define UX_DEVICE_CLASS_PIMA_INTERRUPT_BUFFER_LENGTH                                32 /* >=UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH  */
+
 
 /* Define PIMA Class constants.  */
 
+#ifndef UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH
 #define UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH                                 UX_SLAVE_REQUEST_DATA_MAX_LENGTH
+#endif
 #define UX_DEVICE_CLASS_PIMA_MAX_PAYLOAD                                            (UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH - UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE)
 #define UX_DEVICE_CLASS_PIMA_OBJECT_INFO_BUFFER_SIZE                                (UX_DEVICE_CLASS_PIMA_MAX_PAYLOAD)
 #define UX_DEVICE_CLASS_PIMA_DEVICE_INFO_BUFFER_SIZE                                (UX_DEVICE_CLASS_PIMA_MAX_PAYLOAD)
@@ -813,6 +820,9 @@ typedef struct UX_SLAVE_CLASS_PIMA_STRUCT
     UX_SLAVE_ENDPOINT       *ux_device_class_pima_bulk_in_endpoint;
     UX_SLAVE_ENDPOINT       *ux_device_class_pima_bulk_out_endpoint;
     UX_SLAVE_ENDPOINT       *ux_device_class_pima_interrupt_endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                   *ux_device_class_pima_endpoint_buffer;
+#endif
     UINT                    ux_device_class_pima_state;
     USHORT                  ux_device_class_pima_device_status;
     ULONG                   ux_device_class_pima_session_id;
@@ -883,6 +893,17 @@ typedef struct UX_SLAVE_CLASS_PIMA_STRUCT
     
                                                                 
 } UX_SLAVE_CLASS_PIMA;
+
+/* Define PIMA endpoint buffer settings (when PIMA owns buffer).  */
+#define UX_DEVICE_CLASS_PIMA_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW                 \
+    (UX_OVERFLOW_CHECK_MULC_ULONG(UX_DEVICE_CLASS_PIMA_BULK_BUFFER_LENGTH, 2) ||\
+     UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_PIMA_BULK_BUFFER_LENGTH * 2,   \
+                                 UX_DEVICE_CLASS_PIMA_INTERRUPT_BUFFER_LENGTH))
+#define UX_DEVICE_CLASS_PIMA_ENDPOINT_BUFFER_SIZE       (UX_DEVICE_CLASS_PIMA_BULK_BUFFER_LENGTH * 2 + UX_DEVICE_CLASS_PIMA_INTERRUPT_BUFFER_LENGTH)
+#define UX_DEVICE_CLASS_PIMA_BULKOUT_BUFFER(pima)       ((pima)->ux_device_class_pima_endpoint_buffer)
+#define UX_DEVICE_CLASS_PIMA_BULKIN_BUFFER(pima)        (UX_DEVICE_CLASS_PIMA_BULKOUT_BUFFER(pima) + UX_DEVICE_CLASS_PIMA_BULK_BUFFER_LENGTH)
+#define UX_DEVICE_CLASS_PIMA_INTERRUPTIN_BUFFER(pima)   (UX_DEVICE_CLASS_PIMA_BULKIN_BUFFER(pima) + UX_DEVICE_CLASS_PIMA_BULK_BUFFER_LENGTH)
+
 
 /* Define PIMA initialization command structure.  */
 

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_read                           PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,6 +80,9 @@
 /*                                            resulting in version 6.1.11 */
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_hid_read(UX_SLAVE_CLASS_HID *hid, UCHAR *buffer,
@@ -128,6 +131,20 @@ ULONG                       local_requested_length;
 
     /* All HID reading  are on the endpoint OUT, from the host.  */
     transfer_request = &endpoint -> ux_slave_endpoint_transfer_request;
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+    /* Directly use buffer from application.  */
+    transfer_request -> ux_slave_transfer_request_data_pointer = buffer;
+
+    /* Send the request to the device controller.  */
+    local_requested_length = requested_length;
+    status =  _ux_device_stack_transfer_request(transfer_request, local_requested_length, local_requested_length);
+
+    /* Save actual length.  */
+    *actual_length = transfer_request -> ux_slave_transfer_request_actual_length;
+
+#else
 
     /* Reset the actual length.  */
     *actual_length =  0;
@@ -189,6 +206,8 @@ ULONG                       local_requested_length;
             return(status);
         }
     }
+
+#endif
 
     /* Free Mutex resource.  */
     _ux_device_mutex_off(&hid -> ux_device_class_hid_read_mutex);

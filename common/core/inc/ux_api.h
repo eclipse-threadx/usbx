@@ -134,6 +134,8 @@
 /*                                            added a new error code,     */
 /*                                            resulting in version 6.2.1  */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            optimized USB descriptors,  */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.x    */
@@ -208,6 +210,15 @@ extern   "C" {
 #define UX_HOST_STACK_ENABLE_ERROR_CHECKING
 #endif
 
+/* Defined, this value represents the endpoint buffer owner.
+   0 - The default, endpoint buffer is managed by core stack. Each endpoint takes UX_SLAVE_REQUEST_DATA_MAX_LENGTH bytes.
+   1 - Endpoint buffer managed by classes. In this case not all endpoints consume UX_SLAVE_REQUEST_DATA_MAX_LENGTH bytes.
+*/
+#ifndef UX_DEVICE_ENDPOINT_BUFFER_OWNER
+#define UX_DEVICE_ENDPOINT_BUFFER_OWNER             0
+#endif
+#define UX_DEVICE_ENDPOINT_BUFFER_OWNER_CORE        0
+#define UX_DEVICE_ENDPOINT_BUFFER_OWNER_CLASS       1
 
 /* Define the maximum length for class names (exclude string null-terminator).  */
 #define UX_MAX_CLASS_NAME_LENGTH    63

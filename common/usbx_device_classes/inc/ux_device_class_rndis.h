@@ -56,6 +56,8 @@
 /*                                            added wait and length DEFs, */
 /*                                            resulting in version 6.2.0  */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            improved error checking,    */
 /*                                            resulting in version 6.x    */
 /*                                                                        */
@@ -73,6 +75,16 @@
 extern   "C" { 
 
 #endif  
+
+/* Bulk out endpoint buffer size (UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE).  */
+#define UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE                       UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE
+
+/* Bulk in endpoint buffer size (UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE).  */
+#define UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE                        UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE
+
+/* Interrupt in endpoint buffer size (UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_LENGTH).  */
+#define UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE                   UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_LENGTH
+
 
 #if !defined(UX_DEVICE_STANDALONE)
 #include "nx_api.h"
@@ -488,12 +500,6 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 #define UX_DEVICE_CLASS_RNDIS_PACKET_POOL_INST_WAIT                             100
 #endif
 
-/* Calculate message buffer length (not overflow).  */
-#define UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH                                    (UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
-#if UX_DEVICE_CLASS_RNDIS_MAX_MSG_LENGTH > UX_SLAVE_REQUEST_DATA_MAX_LENGTH
-/* Checked in _initialize().  */
-#endif
-
 /* Calculate response buffer length.  */
 #define UX_DEVICE_CLASS_RNDIS_OID_SUPPORTED_RESPONSE_LENGTH             (UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER + UX_DEVICE_CLASS_RNDIS_OID_SUPPORTED_LIST_LENGTH * 4)
 #define UX_DEVICE_CLASS_RNDIS_VENDOR_DESCRIPTION_MAX_RESPONSE_LENGTH    (UX_DEVICE_CLASS_RNDIS_CMPLT_QUERY_INFO_BUFFER + UX_DEVICE_CLASS_RNDIS_VENDOR_DESCRIPTION_MAX_LENGTH)
@@ -543,6 +549,9 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
     UX_SLAVE_ENDPOINT                       *ux_slave_class_rndis_interrupt_endpoint;
     UX_SLAVE_ENDPOINT                       *ux_slave_class_rndis_bulkin_endpoint;
     UX_SLAVE_ENDPOINT                       *ux_slave_class_rndis_bulkout_endpoint;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                                   *ux_device_class_rndis_endpoint_buffer;
+#endif
     UCHAR                                   ux_slave_class_rndis_response[UX_DEVICE_CLASS_RNDIS_MAX_CONTROL_RESPONSE_LENGTH];
     ULONG                                   ux_slave_class_rndis_response_length;
     ULONG                                   ux_slave_class_rndis_state;
@@ -586,6 +595,18 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
     VOID                                    *ux_slave_class_rndis_network_handle;
     
 } UX_SLAVE_CLASS_RNDIS;
+
+/* Define RNDIS endpoint buffer settings (when RNDIS owns buffer).  */
+#define UX_DEVICE_CLASS_RNDIS_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW \
+    (UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE,     \
+                                 UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE) ||   \
+     UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE +    \
+                                 UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE,      \
+                                 UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE))
+#define UX_DEVICE_CLASS_RNDIS_ENDPOINT_BUFFER_SIZE          (UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE + UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE + UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE)
+#define UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER(rndis)         ((rndis)->ux_device_class_rndis_endpoint_buffer)
+#define UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER(rndis)          (UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER(rndis) + UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE)
+#define UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER(rndis)     (UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER(rndis)  + UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE)
 
 
 /* Requests - Ethernet Networking Control Model */

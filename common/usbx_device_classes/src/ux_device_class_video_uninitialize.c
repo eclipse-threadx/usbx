@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_uninitialize                 PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,6 +65,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -93,6 +97,9 @@ ULONG                            i;
 #if !defined(UX_DEVICE_STANDALONE)
             _ux_utility_thread_delete(&stream -> ux_device_class_video_stream_thread);
             _ux_utility_memory_free(stream -> ux_device_class_video_stream_thread_stack);
+#endif
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+            _ux_utility_memory_free(stream -> ux_device_class_video_stream_endpoint_buffer);
 #endif
             _ux_utility_memory_free(stream -> ux_device_class_video_stream_buffer);
 

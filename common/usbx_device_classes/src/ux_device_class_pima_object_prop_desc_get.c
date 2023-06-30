@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_object_prop_desc_get          PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,10 @@
 /*                                            updated status handling,    */
 /*                                            passed max length to app,   */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_prop_desc_get(UX_SLAVE_CLASS_PIMA *pima,
@@ -105,7 +109,7 @@ UCHAR                   *object_props_desc_end;
     object_props_desc =  transfer_request -> ux_slave_transfer_request_data_pointer;
 
     /* Save the end of the object info.  */
-    object_props_desc_end =  object_props_desc + UX_SLAVE_REQUEST_DATA_MAX_LENGTH;
+    object_props_desc_end =  object_props_desc + UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH;
 
     /* Fill in the data container type.  */
     _ux_utility_short_put(object_props_desc + UX_DEVICE_CLASS_PIMA_DATA_HEADER_TYPE,

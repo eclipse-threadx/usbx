@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_activate                       PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +84,11 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -96,6 +101,7 @@ UX_SLAVE_ENDPOINT                       *endpoint_interrupt;
 UX_SLAVE_ENDPOINT                       *endpoint_in = UX_NULL;
 #if defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
 UX_SLAVE_ENDPOINT                       *endpoint_out = UX_NULL;
+UCHAR                                   *pos;
 #endif
 
     /* Get the class container.  */
@@ -128,6 +134,15 @@ UX_SLAVE_ENDPOINT                       *endpoint_out = UX_NULL;
 
                 /* It's interrupt IN endpoint we need.  */
                 endpoint_in = endpoint_interrupt;
+
+#if defined(UX_DEVICE_CLASS_HID_OWN_ENDPOINT_BUFFER)
+
+                /* Set endpoint buffer owner to class instance.  */
+                endpoint_in -> ux_slave_endpoint_transfer_request.
+                        ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_HID_INTERRUPTIN_BUFFER(hid);
+#endif
+
 #if defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
                 if (endpoint_out != UX_NULL)
 #endif
@@ -139,6 +154,15 @@ UX_SLAVE_ENDPOINT                       *endpoint_out = UX_NULL;
 
                 /* It's optional interrupt OUT endpoint.  */
                 endpoint_out = endpoint_interrupt;
+
+#if defined(UX_DEVICE_CLASS_HID_OWN_ENDPOINT_BUFFER)
+
+                /* Set endpoint buffer owner to class instance.  */
+                endpoint_out -> ux_slave_endpoint_transfer_request.
+                        ux_slave_transfer_request_data_pointer =
+                                UX_DEVICE_CLASS_HID_INTERRUPTOUT_BUFFER(hid);
+#endif
+
                 if (endpoint_in != UX_NULL)
                     break;
             }
@@ -178,10 +202,12 @@ UX_SLAVE_ENDPOINT                       *endpoint_out = UX_NULL;
             hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_events;
         hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_event_read_pos =
             hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_events;
-        _ux_utility_memory_set(
-            hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_events, 0x00,
-            (ALIGN_TYPE)hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_events_end -
-            (ALIGN_TYPE)hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_events); /* Use case of memset is verified. */
+        for (pos = (UCHAR*)hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_events;
+             pos < (UCHAR*)hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_events_end;
+             pos += UX_DEVICE_CLASS_HID_RECEIVED_QUEUE_ITEM_SIZE(hid -> ux_device_class_hid_receiver))
+        {
+            ((UX_DEVICE_CLASS_HID_RECEIVED_EVENT*)pos) -> ux_device_class_hid_received_event_length = 0;
+        }
 
 #if !defined(UX_DEVICE_STANDALONE)
 
@@ -203,7 +229,7 @@ UX_SLAVE_ENDPOINT                       *endpoint_out = UX_NULL;
 
     /* Reset event buffered for background transfer.  */
     _ux_utility_memory_set((VOID *)&hid -> ux_device_class_hid_event, 0,
-                                            sizeof(UX_SLAVE_CLASS_HID_EVENT)); /* Use case of memset is verified. */
+                                            sizeof(UX_DEVICE_CLASS_HID_EVENT)); /* Use case of memset is verified. */
     hid -> ux_device_class_hid_event.ux_device_class_hid_event_length =
                     endpoint_in -> ux_slave_endpoint_transfer_request.
                                     ux_slave_transfer_request_transfer_length;

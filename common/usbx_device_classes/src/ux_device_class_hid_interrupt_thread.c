@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_interrupt_thread               PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +84,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            off for standalone compile, */
 /*                                            resulting in version 6.1.10 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_hid_interrupt_thread(ULONG hid_class)
@@ -93,7 +96,7 @@ UX_SLAVE_CLASS              *class_ptr;
 UX_SLAVE_CLASS_HID          *hid;
 UX_SLAVE_DEVICE             *device;
 UX_SLAVE_TRANSFER           *transfer_request_in;
-UX_SLAVE_CLASS_HID_EVENT    hid_event;
+UX_DEVICE_CLASS_HID_EVENT   *hid_event;
 UINT                        status;
 UCHAR                       *buffer;
 ULONG                       actual_flags;
@@ -139,10 +142,18 @@ ULONG                       actual_flags;
                     transfer_request_in -> ux_slave_transfer_request_requested_length =
                             transfer_request_in -> ux_slave_transfer_request_transfer_length;
 
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+                    /* Restore endpoint buffer (never touched, filled with zeros).  */
+                    transfer_request_in -> ux_slave_transfer_request_data_pointer =
+                                    UX_DEVICE_CLASS_HID_INTERRUPTIN_BUFFER(hid);
+#else
+
                     /* Set the data to zeros.  */
                     _ux_utility_memory_set(
                         transfer_request_in -> ux_slave_transfer_request_data_pointer, 0,
                         transfer_request_in -> ux_slave_transfer_request_requested_length); /* Use case of memset is verified. */
+#endif
                 }
 
                 /* Send the request to the device controller.  */
@@ -174,19 +185,29 @@ ULONG                       actual_flags;
 
 
             /* Check if we have an event to report.  */
-            while (_ux_device_class_hid_event_get(hid, &hid_event) == UX_SUCCESS)
+            while (_ux_device_class_hid_event_check(hid, &hid_event) == UX_SUCCESS)
             {
 
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+                /* Directly use the event buffer for transfer.  */
+                buffer = hid_event -> ux_device_class_hid_event_buffer;
+                transfer_request_in -> ux_slave_transfer_request_data_pointer = buffer;
+#else
                 /* Prepare the event data payload from the hid event structure.  Get a pointer to the buffer area.  */
                 buffer =  transfer_request_in -> ux_slave_transfer_request_data_pointer;
             
                 /* Copy the event buffer into the target buffer.  */
-                _ux_utility_memory_copy(buffer, hid_event.ux_device_class_hid_event_buffer, hid_event.ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
-            
+                _ux_utility_memory_copy(buffer, UX_DEVICE_CLASS_HID_EVENT_BUFFER(hid_event), hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
+#endif
+
                 /* Send the request to the device controller.  */
-                status =  _ux_device_stack_transfer_request(transfer_request_in, hid_event.ux_device_class_hid_event_length, 
-                                                                hid_event.ux_device_class_hid_event_length);
-                
+                status =  _ux_device_stack_transfer_request(transfer_request_in, hid_event -> ux_device_class_hid_event_length, 
+                                                            hid_event -> ux_device_class_hid_event_length);
+
+                /* The queue tail is handled and should be freed.  */
+                _ux_device_class_hid_event_free(hid);
+
                 /* Check error code. We don't want to invoke the error callback
                    if the device was disconnected, since that's expected.  */
                 if (status != UX_SUCCESS && status != UX_TRANSFER_BUS_RESET)

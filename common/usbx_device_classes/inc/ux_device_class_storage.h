@@ -58,8 +58,10 @@
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
 /*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.1.10 */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -83,6 +85,8 @@ extern   "C" {
 #define UX_DEVICE_CLASS_STORAGE_ENABLE_ERROR_CHECKING
 #endif
 
+/* Bulk endpoint buffer size (UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE).  */
+#define UX_DEVICE_CLASS_STORAGE_BULK_BUFFER_SIZE                    UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE
 
 /* Define User configurable Storage Class constants.  */
 
@@ -522,6 +526,9 @@ typedef struct UX_SLAVE_CLASS_STORAGE_LUN_STRUCT
 typedef struct UX_SLAVE_CLASS_STORAGE_STRUCT
 {
     UX_SLAVE_INTERFACE          *ux_slave_class_storage_interface;
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+    UCHAR                       *ux_device_class_storage_endpoint_buffer;
+#endif
     ULONG                       ux_slave_class_storage_number_lun;
     UX_SLAVE_CLASS_STORAGE_LUN  ux_slave_class_storage_lun[UX_MAX_SLAVE_LUN];
     ULONG                       ux_slave_class_storage_host_length;
@@ -567,6 +574,13 @@ typedef struct UX_SLAVE_CLASS_STORAGE_STRUCT
 #endif
 
 } UX_SLAVE_CLASS_STORAGE;
+
+/* Defined for endpoint buffer settings (when STORAGE owns buffer).  */
+#define UX_DEVICE_CLASS_STORAGE_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW              \
+    (UX_OVERFLOW_CHECK_MULC_ULONG(UX_DEVICE_CLASS_STORAGE_BULK_BUFFER_SIZE, 2))
+#define UX_DEVICE_CLASS_STORAGE_ENDPOINT_BUFFER_SIZE  (UX_DEVICE_CLASS_STORAGE_BULK_BUFFER_SIZE * 2)
+#define UX_DEVICE_CLASS_STORAGE_BULKOUT_BUFFER(storage)    ((storage)->ux_device_class_storage_endpoint_buffer)
+#define UX_DEVICE_CLASS_STORAGE_BULKIN_BUFFER(storage)   (UX_DEVICE_CLASS_STORAGE_BULKOUT_BUFFER(storage) + UX_DEVICE_CLASS_STORAGE_BULK_BUFFER_SIZE)
 
 #define UX_DEVICE_CLASS_STORAGE_CSW_STATUS(p)               (((UCHAR*)(p))[0])
 #define UX_DEVICE_CLASS_STORAGE_CSW_SKIP(p)                 (((UCHAR*)(p))[3])

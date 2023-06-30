@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_hid_uninitialize                   PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,11 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes, */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -106,6 +111,9 @@ UX_SLAVE_CLASS                          *class_ptr;
 #endif
 
     /* Free memory for the array. */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+    _ux_utility_memory_free(hid -> ux_device_class_hid_event_array -> ux_device_class_hid_event_buffer);
+#endif
     _ux_utility_memory_free(hid -> ux_device_class_hid_event_array);
 
 #if defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
@@ -120,6 +128,10 @@ UX_SLAVE_CLASS                          *class_ptr;
     if (hid -> ux_device_class_hid_receiver)
         hid -> ux_device_class_hid_receiver ->
             ux_device_class_hid_receiver_uninitialize(hid -> ux_device_class_hid_receiver);
+#endif
+
+#if defined(UX_DEVICE_CLASS_HID_OWN_ENDPOINT_BUFFER)
+    _ux_utility_memory_free(hid -> ux_device_class_hid_endpoint_buffer);
 #endif
 
     /* Free the resources.  */

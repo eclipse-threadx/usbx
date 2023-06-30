@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_tasks_run                      PORTABLE C      */
-/*                                                           6.1.10       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_hid_tasks_run(VOID *instance)
@@ -80,7 +83,7 @@ UINT _ux_device_class_hid_tasks_run(VOID *instance)
 
 UX_SLAVE_CLASS_HID          *hid;
 UX_SLAVE_DEVICE             *device;
-UX_SLAVE_CLASS_HID_EVENT    *hid_event;
+UX_DEVICE_CLASS_HID_EVENT   *hid_event;
 UX_SLAVE_TRANSFER           *trans;
 ULONG                       tick, elapsed;
 UINT                        status;
@@ -122,8 +125,7 @@ UINT                        status;
     case UX_STATE_IDLE:
 
         /* Check if there is event ready.  */
-        hid_event = &hid -> ux_device_class_hid_event;
-        status = _ux_device_class_hid_event_get(hid, hid_event);
+        status = _ux_device_class_hid_event_check(hid, &hid_event);
 
         /* If there is no event, check idle rate.  */
         if (status != UX_SUCCESS)
@@ -153,9 +155,20 @@ UINT                        status;
         /* Prepare the request to send event.  */
         trans = &hid -> ux_device_class_hid_interrupt_endpoint ->
                                             ux_slave_endpoint_transfer_request;
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+        /* Directly use event buffer for transfer.  */
+        trans -> ux_slave_transfer_request_data_pointer =
+                                hid_event -> ux_device_class_hid_event_buffer;
+#else
+
+        /* Copy event data to endpoint buffer.  */
         _ux_utility_memory_copy(trans -> ux_slave_transfer_request_data_pointer,
-                                hid_event -> ux_device_class_hid_event_buffer,
+                                UX_DEVICE_CLASS_HID_EVENT_BUFFER(hid_event),
                                 hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
+#endif
+
         trans -> ux_slave_transfer_request_requested_length =
                                 hid_event -> ux_device_class_hid_event_length;
         UX_SLAVE_TRANSFER_STATE_RESET(trans);
@@ -175,6 +188,9 @@ UINT                        status;
         /* Any error or success case.  */
         if (status <= UX_STATE_NEXT)
         {
+
+            /* Event handled and the tail should be freed.  */
+            _ux_device_class_hid_event_free(hid);
 
             /* Next round.  */
             hid -> ux_device_class_hid_event_state = UX_STATE_RESET;

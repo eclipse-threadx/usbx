@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_receiver_thread                PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,7 +56,6 @@
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    _ux_utility_event_flags_get           Get event flags               */
-/*    _ux_device_class_hid_event_get        Get HID event                 */
 /*    _ux_device_stack_transfer_request     Request transfer              */
 /*    _ux_utility_memory_copy               Copy memory                   */
 /*    _ux_utility_thread_suspend            Suspend thread                */
@@ -73,6 +72,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added receiver callback,    */
 /*                                            resulting in version 6.1.11 */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_hid_receiver_thread(ULONG hid_instance)
@@ -111,6 +113,9 @@ ULONG                               temp;
             continue;
         }
 
+        /* Protect read.  */
+        _ux_device_mutex_on(&hid -> ux_device_class_hid_read_mutex);
+
         /* Check if there is buffer available.  */
         pos = receiver -> ux_device_class_hid_receiver_event_save_pos;
         if (pos -> ux_device_class_hid_received_event_length != 0)
@@ -125,6 +130,7 @@ ULONG                               temp;
             {
 
                 /* Keep checking before a good state.  */
+                _ux_device_mutex_off(&hid -> ux_device_class_hid_read_mutex);
                 continue;
             }
         }
@@ -132,8 +138,12 @@ ULONG                               temp;
         /* Event buffer available, issue request to get data.  */
         transfer = &hid -> ux_device_class_hid_read_endpoint -> ux_slave_endpoint_transfer_request;
 
-        /* Protect read.  */
-        _ux_device_mutex_on(&hid -> ux_device_class_hid_read_mutex);
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+        /* Directly use event buffer for transfer.  */
+        buffer = pos -> ux_device_class_hid_received_event_data;
+        transfer -> ux_slave_transfer_request_data_pointer = buffer;
+#endif
 
         /* Issue the transfer request.  */
         status = _ux_device_stack_transfer_request(transfer, 
@@ -148,18 +158,25 @@ ULONG                               temp;
             continue;
         }
 
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
+
+        /* Save received event length.  */
+        temp = transfer -> ux_slave_transfer_request_actual_length;
+#else
         /* Save received event data and length.  */
         buffer = (UCHAR *)&pos -> ux_device_class_hid_received_event_data;
         temp = transfer -> ux_slave_transfer_request_actual_length;
         _ux_utility_memory_copy(buffer,
                         transfer -> ux_slave_transfer_request_data_pointer,
                         temp); /* Use case of memcpy is verified. */
+#endif
 
         /* Unprotect read.  */
         _ux_device_mutex_off(&hid -> ux_device_class_hid_read_mutex);
 
         /* Advance the save position.  */
-        next_pos = (UCHAR *)pos + receiver -> ux_device_class_hid_receiver_event_buffer_size + sizeof(ULONG);
+        next_pos = (UCHAR *)pos + UX_DEVICE_CLASS_HID_RECEIVED_QUEUE_ITEM_SIZE(receiver);
+
         if (next_pos >= (UCHAR *)receiver -> ux_device_class_hid_receiver_events_end)
             next_pos = (UCHAR *)receiver -> ux_device_class_hid_receiver_events;
         receiver -> ux_device_class_hid_receiver_event_save_pos = (UX_DEVICE_CLASS_HID_RECEIVED_EVENT *)next_pos;
