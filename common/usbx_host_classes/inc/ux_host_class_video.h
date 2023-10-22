@@ -542,6 +542,7 @@ typedef struct UX_HOST_CLASS_VIDEO_STRUCT
     UCHAR           *ux_host_class_video_current_frame_address;
     ULONG           ux_host_class_video_current_frame_interval;
     ULONG           ux_host_class_video_current_max_payload_size;
+    ULONG           ux_host_class_video_current_clock_frequency;
     UX_TRANSFER     ux_host_class_video_transfer_requests[UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST_COUNT];
     ULONG           ux_host_class_video_transfer_request_start_index;
     ULONG           ux_host_class_video_transfer_request_end_index;
