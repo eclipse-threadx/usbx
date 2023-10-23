@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_icc_remove                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -66,8 +66,8 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun Xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_ccid_icc_remove(UX_DEVICE_CLASS_CCID *ccid, ULONG slot)
@@ -127,7 +127,7 @@ UX_DEVICE_CLASS_CCID_SLOT       *ccid_slot;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_ccid_icc_remove                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -157,7 +157,7 @@ UX_DEVICE_CLASS_CCID_SLOT       *ccid_slot;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_ccid_icc_remove(UX_DEVICE_CLASS_CCID *ccid, ULONG slot)

@@ -140,7 +140,7 @@ UX_CONFIGURATION        *current_configuration;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_stack_device_configuration_get            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -173,7 +173,7 @@ UX_CONFIGURATION        *current_configuration;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_device_configuration_get(UX_DEVICE *device, UINT configuration_index,

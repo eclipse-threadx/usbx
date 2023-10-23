@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_read_thread_entry            PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added error statistics,     */
 /*                                            resulting in version 6.2.0  */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            useed zero copy when class  */
+/*                                            owns endpoint buffer,       */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID _ux_device_class_video_read_thread_entry(ULONG video_stream)
@@ -115,6 +119,13 @@ ULONG                           actual_length;
             /* Get transfer instance.  */
             transfer = &endpoint -> ux_slave_endpoint_transfer_request;
 
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+            /* Zero copy: directly use frame buffer for transfer.  */
+            transfer -> ux_slave_transfer_request_data_pointer = stream ->
+                    ux_device_class_video_stream_transfer_pos -> ux_device_class_video_payload_data;
+#endif
+
             /* Start payload transfer anyway.  */
             status = _ux_device_stack_transfer_request(transfer, max_packet_size, max_packet_size);
 
@@ -132,9 +143,17 @@ ULONG                           actual_length;
 
             /* Frame received, log it.  */
             stream -> ux_device_class_video_stream_transfer_pos -> ux_device_class_video_payload_length = actual_length;
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+            /* Zero copy: data already in frame buffer.  */
+#else
+
+            /* Copy data from endpoint buffer.  */
             _ux_utility_memory_copy(stream -> ux_device_class_video_stream_transfer_pos -> ux_device_class_video_payload_data,
                             transfer -> ux_slave_transfer_request_data_pointer,
                             actual_length); /* Use case of memcpy is verified. */
+#endif
 
             /* For simple, do not advance the transfer position if there is overflow.  */
             next_pos = (UCHAR *)stream -> ux_device_class_video_stream_transfer_pos;

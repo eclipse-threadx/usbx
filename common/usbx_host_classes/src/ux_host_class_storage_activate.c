@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_storage_activate                     PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,6 +55,9 @@
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    _ux_host_class_storage_configure      Configure storage device      */
+/*    _ux_host_class_storage_device_support_check                         */
+/*                                          Check protocol support        */
+/*    _ux_host_class_storage_endpoints_get  Get all endpoints             */
 /*    _ux_host_class_storage_device_initialize                            */
 /*                                          Initialize storage device     */
 /*    _ux_host_stack_class_instance_create  Create class instance         */
@@ -81,6 +84,11 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            moved class/sub/protocol    */
+/*                                            check and endpoints get     */
+/*                                            into _activate function,    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_activate(UX_HOST_CLASS_COMMAND *command)
@@ -110,14 +118,6 @@ UINT                    status;
     /* Store the device container into the storage class instance.  */
     storage -> ux_host_class_storage_device =  interface_ptr -> ux_interface_configuration -> ux_configuration_device;
 
-    /* Create this class instance.  */
-    _ux_host_stack_class_instance_create(command -> ux_host_class_command_class_ptr, (VOID *) storage);
-
-    /* This instance of the device must also be stored in the interface container.  */
-    interface_ptr -> ux_interface_class_instance =  (VOID *) storage;
-
-#if defined(UX_HOST_STANDALONE)
-
     /* Check class,sub class, protocol.  */
     status =  _ux_host_class_storage_device_support_check(storage);
     if (status != UX_SUCCESS)
@@ -134,6 +134,14 @@ UINT                    status;
         _ux_utility_memory_free(storage);
         return(status);
     }
+
+    /* Create this class instance.  */
+    _ux_host_stack_class_instance_create(command -> ux_host_class_command_class_ptr, (VOID *) storage);
+
+    /* This instance of the device must also be stored in the interface container.  */
+    interface_ptr -> ux_interface_class_instance =  (VOID *) storage;
+
+#if defined(UX_HOST_STANDALONE)
 
     /* Activate storage class task function.  */
     storage -> ux_host_class_storage_class -> ux_host_class_task_function = _ux_host_class_storage_tasks_run;

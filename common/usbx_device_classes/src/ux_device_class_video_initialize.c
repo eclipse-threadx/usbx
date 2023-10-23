@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_initialize                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,10 +70,11 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            endpoint buffer in classes  */
+/*                                            with zero copy enabled,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -153,7 +154,11 @@ ULONG                                   i;
                             stream_parameter -> ux_device_class_video_stream_parameter_max_payload_buffer_nb;
 
         /* Create block of buffer buffer is cache safe for USB transfer.  */
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+        stream -> ux_device_class_video_stream_buffer = (UCHAR *)_ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, memory_size);
+#else
         stream -> ux_device_class_video_stream_buffer = (UCHAR *)_ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, memory_size);
+#endif
 
         /* Check for successful allocation.  */
         if (stream -> ux_device_class_video_stream_buffer == UX_NULL)
@@ -165,17 +170,6 @@ ULONG                                   i;
         stream -> ux_device_class_video_stream_buffer_size = memory_size;
         stream -> ux_device_class_video_stream_transfer_pos = (UX_DEVICE_CLASS_VIDEO_PAYLOAD *)stream -> ux_device_class_video_stream_buffer;
         stream -> ux_device_class_video_stream_access_pos = stream -> ux_device_class_video_stream_transfer_pos;
-
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
-        stream -> ux_device_class_video_stream_endpoint_buffer = _ux_utility_memory_allocate(
-                UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY,
-                stream -> ux_device_class_video_stream_payload_buffer_size);
-        if (stream -> ux_device_class_video_stream_endpoint_buffer == UX_NULL)
-        {
-            status = UX_MEMORY_INSUFFICIENT;
-            break;
-        }
-#endif
 
 #if !defined(UX_DEVICE_STANDALONE)
 
@@ -262,10 +256,6 @@ ULONG                                   i;
         if (stream -> ux_device_class_video_stream_thread_stack)
             _ux_utility_memory_free(stream -> ux_device_class_video_stream_thread_stack);
 #endif
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
-        if (stream -> ux_device_class_video_stream_endpoint_buffer)
-            _ux_utility_memory_free(stream -> ux_device_class_video_stream_endpoint_buffer);
-#endif
         if (stream -> ux_device_class_video_stream_buffer)
             _ux_utility_memory_free(stream -> ux_device_class_video_stream_buffer);
         stream ++;
@@ -280,7 +270,7 @@ ULONG                                   i;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_video_initialize                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -309,7 +299,7 @@ ULONG                                   i;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_video_initialize(UX_SLAVE_CLASS_COMMAND *command)

@@ -393,7 +393,7 @@ ULONG                   res_bytes;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_audio_streaming_sampling_set        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -425,7 +425,7 @@ ULONG                   res_bytes;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_audio_streaming_sampling_set(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_SAMPLING *audio_sampling)

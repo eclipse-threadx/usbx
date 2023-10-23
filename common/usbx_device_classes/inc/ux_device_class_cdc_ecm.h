@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_ecm.h                           PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,10 +55,11 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added wait definitions,     */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -99,11 +100,26 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 #endif
 
 
+/* Option: defined, it enables zero copy support (works if CDC_ECM owns endpoint buffer).
+    Enabled, it requires that the NX packet pool is in cache safe area, and buffer max size is
+    larger than UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE (1536).
+ */
+/* #define UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY  */
+
+
 /* Bulk out endpoint buffer size, must be larger than endpoint and ethernet max packet size, and aligned in 4-bytes.  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
+#define UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE                      0
+#else
 #define UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE                      UX_DEVICE_CLASS_CDC_ECM_MAX_PACKET_LENGTH
+#endif
 
 /* Bulk in endpoint buffer size, must be larger than endpoint and ethernet max packet size, and aligned in 4-bytes.  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
+#define UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE                       0
+#else
 #define UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE                       UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE
+#endif
 
 /* Interrupt in endpoint buffer size...  */
 #define UX_DEVICE_CLASS_CDC_ECM_INTERRUPTIN_BUFFER_SIZE                  UX_DEVICE_CLASS_CDC_ECM_INTERRUPT_RESPONSE_LENGTH
@@ -370,12 +386,16 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
 } UX_SLAVE_CLASS_CDC_ECM;
 
 /* Define CDC ECM endpoint buffer settings (when CDC ECM owns buffer).  */
+#if defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
+#define UX_DEVICE_CLASS_CDC_ECM_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW 0 /* No calculation, no overflow  */
+#else
 #define UX_DEVICE_CLASS_CDC_ECM_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW \
     (UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE,   \
                                  UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE) || \
      UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE +  \
                                  UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE,    \
                                  UX_DEVICE_CLASS_CDC_ECM_INTERRUPTIN_BUFFER_SIZE))
+#endif
 #define UX_DEVICE_CLASS_CDC_ECM_ENDPOINT_BUFFER_SIZE        (UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE + UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE + UX_DEVICE_CLASS_CDC_ECM_INTERRUPTIN_BUFFER_SIZE)
 #define UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER(ecm)         ((ecm)->ux_device_class_cdc_ecm_endpoint_buffer)
 #define UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER(ecm)          (UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER(ecm) + UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE)

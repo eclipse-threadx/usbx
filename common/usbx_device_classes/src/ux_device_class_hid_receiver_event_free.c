@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_receiver_event_free             PORTABLE C     */
-/*                                                            6.x         */
+/*                                                            6.3.0       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,9 +68,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added zero copy support,    */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid)
@@ -123,7 +123,7 @@ UCHAR                                   *next_pos;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_hid_receiver_event_free           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -153,7 +153,7 @@ UCHAR                                   *next_pos;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid)

@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_request_sense              PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,10 +87,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            checked compiling options   */
 /*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_request_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,

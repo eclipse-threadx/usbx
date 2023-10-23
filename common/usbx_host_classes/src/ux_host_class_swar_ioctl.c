@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_swar_ioctl                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,8 +72,8 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_ioctl(UX_HOST_CLASS_SWAR *swar, ULONG ioctl_function,
@@ -135,7 +135,7 @@ UINT                                status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_swar_ioctl                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -166,7 +166,7 @@ UINT                                status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_swar_ioctl(UX_HOST_CLASS_SWAR *swar, ULONG ioctl_function,

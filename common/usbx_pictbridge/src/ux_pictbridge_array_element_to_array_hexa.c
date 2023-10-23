@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_array_element_to_array_hexa          PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  04-25-2022     Yajun Xia                Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            limited output array size,  */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_array_element_to_array_hexa(UCHAR *element, ULONG *hexa_array)
@@ -84,6 +87,7 @@ ULONG                   element_length;
 ULONG                   saved_element_length = 0;
 UINT                    string_length = UX_PICTBRIDGE_MAX_ELEMENT_SIZE;
 UINT                    status;
+ULONG                   *hexa_array_end = hexa_array + UX_PICTBRIDGE_MAX_DEVINFO_ARRAY_SIZE;
 
 
     /* Get the string length.  */
@@ -207,6 +211,10 @@ UINT                    status;
             remaining_length--;
         }            
         
+        /* Check if the array is Full.  */
+        if (hexa_array == hexa_array_end)
+            break;
+        
         /* Increment the element position to the next one if there.  */
         element++;
         
@@ -215,8 +223,12 @@ UINT                    status;
         
     }
     
-    /* Reset the last position in the array.  */
-    *hexa_array = 0;
+    /* Reset the remaining positions in the array.  */
+    while(hexa_array != hexa_array_end)
+    {
+        *hexa_array = 0;
+        hexa_array++;
+    }
                
     /* Operation was successful.  */
     return(UX_SUCCESS);    

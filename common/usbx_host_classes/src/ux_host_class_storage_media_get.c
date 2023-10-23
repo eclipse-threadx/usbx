@@ -141,7 +141,7 @@ UINT                            scan_index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_storage_media_get                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -172,7 +172,7 @@ UINT                            scan_index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT    _uxe_host_class_storage_media_get(UX_HOST_CLASS_STORAGE *storage,

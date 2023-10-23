@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_swar_configure                       PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,6 +73,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed interface link,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_configure(UX_HOST_CLASS_SWAR *swar)
@@ -138,19 +141,7 @@ UX_DEVICE               *parent_device;
     /* If the operation went well, the swar default alternate setting for the swar interface is 
        active. We have to memorize the data interface since the bulk in/out endpoints are hooked to it. */
     status =  _ux_host_stack_configuration_interface_get(configuration, UX_HOST_CLASS_SWAR_DATA_INTERFACE, 0, &swar -> ux_host_class_swar_interface);
-    if (status == UX_SUCCESS)
-    {
-
-        /* Store the instance in the interface container, this is for the USB stack
-           when it needs to invoke the class.  */        
-        swar -> ux_host_class_swar_interface -> ux_interface_class_instance =  (VOID *) swar;
-
-        /* Store the class container in the interface.  The device has the correct class, duplicate it to the 
-           interface.  */
-        swar -> ux_host_class_swar_interface -> ux_interface_class =  swar -> ux_host_class_swar_device -> ux_device_class ;
-    }
 
     /* Return completion status.  */
     return(status);
 }
-

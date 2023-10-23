@@ -44,7 +44,7 @@ static inline VOID _ux_host_stack_pending_transfers_run(VOID);
 /*  FUNCTION                                                 RELEASE      */
 /*                                                                        */
 /*    _ux_host_stack_tasks_run                              PORTABLE C    */
-/*                                                             6.2.0      */
+/*                                                             6.3.0      */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -110,6 +110,9 @@ static inline VOID _ux_host_stack_pending_transfers_run(VOID);
 /*                                            fixed activation issue on   */
 /*                                            no class linked interfaces, */
 /*                                            resulting in version 6.2.0  */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved enum transfer,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_host_stack_tasks_run(VOID)
@@ -200,8 +203,8 @@ static inline VOID _ux_host_stack_enum_address_sent(UX_DEVICE *device)
 {
 
     /* Address (request wValue) applied to device.  */
-    device -> ux_device_address =
-            device -> ux_device_enum_trans -> ux_transfer_request_value;
+    device -> ux_device_address = device -> ux_device_control_endpoint.
+                ux_endpoint_transfer_request.ux_transfer_request_value & 0x7F;
     device -> ux_device_state = UX_DEVICE_ADDRESSED;
 
     /* Unlock enumeration.  */
@@ -625,7 +628,7 @@ INT                     immediate_state = UX_TRUE;
         case UX_HOST_STACK_ENUM_DEVICE_ADDR_SENT:
 
             /* Transfer error check.  */
-            trans = device -> ux_device_enum_trans;
+            trans = &device -> ux_device_control_endpoint.ux_endpoint_transfer_request;
             if (trans -> ux_transfer_request_completion_code != UX_SUCCESS)
             {
                 device -> ux_device_enum_state = UX_HOST_STACK_ENUM_RETRY;
@@ -659,7 +662,7 @@ INT                     immediate_state = UX_TRUE;
         case UX_HOST_STACK_ENUM_DEVICE_DESCR_PARSE:
 
             /* Transfer error check.  */
-            trans = device -> ux_device_enum_trans;
+            trans = &device -> ux_device_control_endpoint.ux_endpoint_transfer_request;
             buffer = trans -> ux_transfer_request_data_pointer;
             if (UX_HOST_STACK_ENUM_TRANS_ERROR(trans))
             {
@@ -707,6 +710,7 @@ INT                     immediate_state = UX_TRUE;
                 trans -> ux_transfer_request_requested_length = UX_DEVICE_DESCRIPTOR_LENGTH;
 
                 /* Issue GetDescriptor(Device) again and parse it.  */
+                device -> ux_device_enum_trans = trans;
                 UX_TRANSFER_STATE_RESET(trans);
                 device -> ux_device_enum_state = UX_HOST_STACK_ENUM_TRANS_WAIT;
                 device -> ux_device_enum_next_state = UX_HOST_STACK_ENUM_DEVICE_DESCR_PARSE;
@@ -744,7 +748,7 @@ INT                     immediate_state = UX_TRUE;
         case UX_HOST_STACK_ENUM_CONFIG_DESCR_PARSE:
 
             /* Transfer error check.  */
-            trans = device -> ux_device_enum_trans;
+            trans = &device -> ux_device_control_endpoint.ux_endpoint_transfer_request;
             buffer = trans -> ux_transfer_request_data_pointer;
             if (UX_HOST_STACK_ENUM_TRANS_ERROR(trans))
             {
@@ -792,6 +796,7 @@ INT                     immediate_state = UX_TRUE;
                     configuration -> ux_configuration_descriptor.wTotalLength;
 
                 /* Start transfer again.  */
+                device -> ux_device_enum_trans = trans;
                 UX_TRANSFER_STATE_RESET(device -> ux_device_enum_trans);
                 device -> ux_device_enum_state = UX_HOST_STACK_ENUM_TRANS_WAIT;
                 device -> ux_device_enum_next_state = UX_HOST_STACK_ENUM_CONFIG_DESCR_PARSE;
@@ -866,7 +871,7 @@ INT                     immediate_state = UX_TRUE;
             continue;
 
         case UX_HOST_STACK_ENUM_CONFIG_ACTIVATE:
-            trans = device -> ux_device_enum_trans;
+            trans = &device -> ux_device_control_endpoint.ux_endpoint_transfer_request;
             if (UX_HOST_STACK_ENUM_TRANS_ERROR(trans))
             {
                 device -> ux_device_enum_state = UX_HOST_STACK_ENUM_RETRY;
@@ -960,6 +965,7 @@ INT                     immediate_state = UX_TRUE;
             /* Transfer done - next state.  */
             if (status == UX_STATE_NEXT || status == UX_STATE_IDLE)
             {
+                device -> ux_device_enum_trans = UX_NULL;
                 device -> ux_device_enum_state = device -> ux_device_enum_next_state;
                 continue;
             }
@@ -979,6 +985,7 @@ INT                     immediate_state = UX_TRUE;
                     _ux_utility_memory_free(device -> ux_device_enum_inst.ptr);
                     device -> ux_device_enum_inst.ptr = UX_NULL;
                 }
+                device -> ux_device_enum_trans = UX_NULL;
                 device -> ux_device_enum_state = UX_HOST_STACK_ENUM_FAIL;
                 continue;
             }
@@ -996,6 +1003,7 @@ INT                     immediate_state = UX_TRUE;
                     _ux_utility_memory_free(device -> ux_device_enum_inst.ptr);
                     device -> ux_device_enum_inst.ptr = UX_NULL;
                 }
+                device -> ux_device_enum_trans = UX_NULL;
                 device -> ux_device_enum_state = UX_HOST_STACK_ENUM_RETRY;
                 continue;
             }

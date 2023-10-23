@@ -32,26 +32,26 @@
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
-/*    _ux_utility_memory_free_block_best_get              PORTABLE C      */
+/*    _ux_utility_memory_byte_pool_create                 PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
-/*    Chaoqiong Xiao, Microsoft Corporation                               */
+/*    Yajun Xia, Microsoft Corporation                                    */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function returns the best free memory block.                   */
-/*                                                                        */
-/*    It's deprecated.                                                    */
+/*    This function creates a pool of memory bytes in the specified       */
+/*    memory area.                                                        */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    memory_cache_flag                     Memory pool source            */
-/*    memory_size_requested                 Size of memory requested      */
+/*    pool_ptr                          Pointer to pool control block     */
+/*    pool_start                        Address of beginning of pool area */
+/*    pool_size                         Number of bytes in the byte pool  */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Pointer to best free block                                          */
+/*    UX_SUCCESS                        Successful completion status      */
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
@@ -65,86 +65,66 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-31-2023     Yajun Xia                Modified comment(s),          */
-/*                                            deprecated for memory       */
-/*                                            footprint optimization,     */
-/*                                            resulting in version 6.3.0  */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
-#if 0
-UX_MEMORY_BLOCK  *_ux_utility_memory_free_block_best_get(ULONG memory_cache_flag,
-                                                        ULONG memory_size_requested)
+UINT  _ux_utility_memory_byte_pool_create(UX_MEMORY_BYTE_POOL *pool_ptr, VOID *pool_start, ULONG pool_size)
 {
 
-UX_MEMORY_BLOCK     *memory_block;
-UX_MEMORY_BLOCK     *best_memory_block;
+UCHAR               *block_ptr;
+UCHAR               **block_indirect_ptr;
+UCHAR               *temp_ptr;
+ALIGN_TYPE          *free_ptr;
 
 
-    /* Reset the free memory block.  */
-    best_memory_block =  UX_NULL;
+    /* Initialize the byte pool control block to all zeros.  */
+    _ux_utility_memory_set((UCHAR *)pool_ptr, 0, sizeof(UX_MEMORY_BYTE_POOL)); /* Use case of memset is verified. */
 
-    /* Check the type of memory we need.  */
-    switch (memory_cache_flag)
-    {
+    /* Round the pool size down to something that is evenly divisible by
+       an ULONG.  */
+    pool_size =   (pool_size/(sizeof(ALIGN_TYPE))) * (sizeof(ALIGN_TYPE));
 
-        case UX_REGULAR_MEMORY            :
+    /* Save the start and size of the pool.  */
+    pool_ptr -> ux_byte_pool_start =   UX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
+    pool_ptr -> ux_byte_pool_size =    pool_size;
+    pool_ptr -> ux_byte_pool_search =  UX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
 
-            /* Start at the beginning of the regular memory pool.  */
-            memory_block =  _ux_system -> ux_system_regular_memory_pool_start;
-            break;
+    /* Initially, the pool will have two blocks.  One large block at the
+       beginning that is available and a small allocated block at the end
+       of the pool that is there just for the algorithm.  Be sure to count
+       the available block's header in the available bytes count.  */
+    pool_ptr -> ux_byte_pool_available =   pool_size - ((sizeof(VOID *)) + (sizeof(ALIGN_TYPE)));
+    pool_ptr -> ux_byte_pool_fragments =   ((UINT) 2);
 
-        case UX_CACHE_SAFE_MEMORY       :
+    /* Each block contains a "next" pointer that points to the next block in the pool followed by a ALIGN_TYPE
+       field that contains either the constant UX_BYTE_BLOCK_FREE (if the block is free) or a pointer to the
+       owning pool (if the block is allocated).  */
 
-            /* Start at the beginning of the cache safe memory pool.  */
-            memory_block =  _ux_system -> ux_system_cache_safe_memory_pool_start;
-            break;
+    /* Calculate the end of the pool's memory area.  */
+    block_ptr =  UX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
+    block_ptr =  UX_UCHAR_POINTER_ADD(block_ptr, pool_size);
 
-        default                            :
+    /* Backup the end of the pool pointer and build the pre-allocated block.  */
+    block_ptr =  UX_UCHAR_POINTER_SUB(block_ptr, (sizeof(ALIGN_TYPE)));
 
-            /* Wrong memory type.  */
-            return(UX_NULL);
+    /* Cast the pool pointer into a ULONG.  */
+    temp_ptr =             UX_BYTE_POOL_TO_UCHAR_POINTER_CONVERT(pool_ptr);
+    block_indirect_ptr =   UX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(block_ptr);
+    *block_indirect_ptr =  temp_ptr;
 
-    }
+    block_ptr =            UX_UCHAR_POINTER_SUB(block_ptr, (sizeof(UCHAR *)));
+    block_indirect_ptr =   UX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(block_ptr);
+    *block_indirect_ptr =  UX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
 
-    /* Loop on all memory blocks from the beginning.  */
-    while (memory_block != UX_NULL)
-    {
+    /* Now setup the large available block in the pool.  */
+    temp_ptr =             UX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
+    block_indirect_ptr =   UX_UCHAR_TO_INDIRECT_UCHAR_POINTER_CONVERT(temp_ptr);
+    *block_indirect_ptr =  block_ptr;
+    block_ptr =            UX_VOID_TO_UCHAR_POINTER_CONVERT(pool_start);
+    block_ptr =            UX_UCHAR_POINTER_ADD(block_ptr, (sizeof(UCHAR *)));
+    free_ptr =             UX_UCHAR_TO_ALIGN_TYPE_POINTER_CONVERT(block_ptr);
+    *free_ptr =            UX_BYTE_BLOCK_FREE;
 
-        /* Check the memory block status.  */
-        if (memory_block -> ux_memory_block_status == UX_MEMORY_UNUSED)
-        {
-
-            /* Check the size of this free block and see if it will
-               fit the memory requirement.  */
-            if (memory_block -> ux_memory_block_size > memory_size_requested)
-            {
-
-                /* This memory block will do. Now see if it is the best.
-                   The best memory block is the one whose memory is closest
-                   to the memory requested.  */
-                if (best_memory_block == UX_NULL)
-
-                    /* Initialize the best block with the first free one.  */
-                    best_memory_block =  memory_block;
-                else
-                {
-
-                    if (memory_block -> ux_memory_block_size < best_memory_block -> ux_memory_block_size)
-
-                        /* We have discovered a better fit block.  */
-                        best_memory_block =  memory_block;
-                }
-            }
-        }
-
-        /* Search the next free block until the end.  */
-        memory_block =  memory_block -> ux_memory_block_next;
-    }
-
-    /* If no free memory block was found, the return value will be NULL.  */
-    return(best_memory_block);
+    /* Return UX_SUCCESS.  */
+    return(UX_SUCCESS);
 }
-#endif

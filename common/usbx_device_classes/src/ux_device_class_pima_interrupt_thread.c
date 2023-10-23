@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_interrupt_thread              PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +84,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed event message size,   */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved INT EP management, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_pima_interrupt_thread(ULONG pima_class)
@@ -122,12 +125,15 @@ UCHAR                       *buffer;
         /* Get the pointer to the device.  */
         device =  &_ux_system_slave -> ux_system_slave_device;
         
-        /* All PIMA events are on the interrupt endpoint IN, from the host.  */
-        transfer_request_in =  &pima -> ux_device_class_pima_interrupt_endpoint -> ux_slave_endpoint_transfer_request;
     
         /* As long as the device is in the CONFIGURED state.  */
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
         { 
+
+            /* All PIMA events are on the interrupt endpoint IN, from the host.  */
+            if (pima -> ux_device_class_pima_interrupt_endpoint == UX_NULL)
+                break;
+            transfer_request_in =  &pima -> ux_device_class_pima_interrupt_endpoint -> ux_slave_endpoint_transfer_request;
 
             /* Wait until something has awaken us.  */
             status =  _ux_device_semaphore_get(&pima -> ux_device_class_pima_interrupt_thread_semaphore, UX_WAIT_FOREVER);

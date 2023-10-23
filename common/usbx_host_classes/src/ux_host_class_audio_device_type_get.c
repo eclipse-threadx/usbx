@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_device_type_get                PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -71,6 +71,9 @@
 /*                                            removed protocol store,     */
 /*                                            added audio 2.0 support,    */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved descriptors check, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_device_type_get(UX_HOST_CLASS_AUDIO *audio)
@@ -146,21 +149,22 @@ UINT                                            i;
             /* Ensure we have the correct interface for Audio Control.  */
             if ((descriptor[5] == UX_HOST_CLASS_AUDIO_CLASS) &&
                 (descriptor[6] == UX_HOST_CLASS_AUDIO_SUBCLASS_CONTROL))
+            {
                 interface_descriptor = descriptor;
+
+                /* Check if interface is out of IAD.  */
+                if(iad)
+                {
+                    if ((iad[2] > interface_descriptor[2]) ||
+                        (iad[2] + iad[3] <= interface_descriptor[2]))
+                        iad = UX_NULL;
+                }
+            }
             else
             {
                 interface_descriptor = UX_NULL;
                 descriptor_found = UX_FALSE;
-            }
-
-            /* Check IAD.  */
-            if (iad)
-            {
-
-                /* Check if interface is out of IAD.  */
-                if ((iad[2] > interface_descriptor[2]) ||
-                    (iad[2] + iad[3] <= interface_descriptor[2]))
-                    iad = UX_NULL;
+                iad = UX_NULL;
             }
             break;
 

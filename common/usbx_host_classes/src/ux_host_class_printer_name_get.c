@@ -125,7 +125,7 @@ UINT            printer_name_length;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_printer_name_get                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -176,9 +176,9 @@ UINT            printer_name_length;
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_name_get(UX_HOST_CLASS_PRINTER *printer)
@@ -247,7 +247,7 @@ UINT            status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_printer_name_get                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -276,7 +276,7 @@ UINT            status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_printer_name_get(UX_HOST_CLASS_PRINTER *printer)

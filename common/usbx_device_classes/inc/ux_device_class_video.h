@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_video.h                             PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -44,11 +44,12 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Yajun xia, CQ Xiao       Modified comment(s),          */
+/*  10-31-2023     Yajun xia, CQ Xiao       Modified comment(s),          */
 /*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
+/*                                            endpoint buffer in classes  */
+/*                                            with zero copy enabled,     */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -588,9 +589,6 @@ typedef struct UX_DEVICE_CLASS_VIDEO_STREAM_STRUCT
     struct UX_DEVICE_CLASS_VIDEO_STRUCT     *ux_device_class_video_stream_video;
     UX_SLAVE_INTERFACE                      *ux_device_class_video_stream_interface;
     UX_SLAVE_ENDPOINT                       *ux_device_class_video_stream_endpoint;
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
-    UCHAR                                   *ux_device_class_video_stream_endpoint_buffer;
-#endif
 
     ULONG                                    ux_device_class_video_stream_error;
 

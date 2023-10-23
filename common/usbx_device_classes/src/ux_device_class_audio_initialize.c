@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_initialize                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,10 +87,11 @@
 /*  10-31-2022     Yajun Xia                Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            endpoint buffer in classes  */
+/*                                            with zero copy enabled,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -259,16 +260,6 @@ ULONG                                   i;
     {
 
 #if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
-
-        /* Allocate memory for stream endpoint buffer.  */
-        stream -> ux_device_class_audio_stream_endpoint_buffer = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY,
-                        stream_parameter -> ux_device_class_audio_stream_parameter_max_frame_buffer_size);
-        if (stream -> ux_device_class_audio_stream_endpoint_buffer == UX_NULL)
-        {
-            status = UX_MEMORY_INSUFFICIENT;
-            break;
-        }
-
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
 
         /* Allocate memory for feedback endpoint buffer.  */
@@ -303,7 +294,11 @@ ULONG                                   i;
                             stream_parameter -> ux_device_class_audio_stream_parameter_max_frame_buffer_nb;
 
         /* Create block of buffer buffer is cache safe for USB transfer.  */
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+        stream -> ux_device_class_audio_stream_buffer = (UCHAR *)_ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, memory_size);
+#else
         stream -> ux_device_class_audio_stream_buffer = (UCHAR *)_ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, memory_size);
+#endif
 
         /* Check for successful allocation.  */
         if (stream -> ux_device_class_audio_stream_buffer == UX_NULL)
@@ -466,10 +461,6 @@ ULONG                                   i;
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_thread_stack);
         }
 #endif
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
-        if (stream -> ux_device_class_audio_stream_endpoint_buffer)
-            _ux_utility_memory_free(stream -> ux_device_class_audio_stream_endpoint_buffer);
-#endif
         if (stream -> ux_device_class_audio_stream_buffer)
             _ux_utility_memory_free(stream -> ux_device_class_audio_stream_buffer);
         stream ++;
@@ -505,7 +496,7 @@ ULONG                                   i;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_audio_initialize                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -535,9 +526,9 @@ ULONG                                   i;
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  03-08-2023     Chaoqiong Xiao           Initial Version 6.2.1         */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*  10-31-2023     Yajun Xia                Modified comment(s),          */
 /*                                            fixed error checking issue, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_audio_initialize(UX_SLAVE_CLASS_COMMAND *command)

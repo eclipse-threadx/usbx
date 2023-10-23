@@ -155,7 +155,7 @@ ULONG       current_device_index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_stack_device_get                          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -185,7 +185,7 @@ ULONG       current_device_index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_device_get(ULONG device_index, UX_DEVICE **device)

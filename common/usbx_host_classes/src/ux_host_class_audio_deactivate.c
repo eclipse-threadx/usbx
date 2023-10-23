@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_audio_deactivate                     PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -81,6 +81,9 @@
 /*                                            protect reentry with mutex, */
 /*                                            added feedback support,     */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved AC AS management,  */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -89,6 +92,7 @@ UINT  _ux_host_class_audio_deactivate(UX_HOST_CLASS_COMMAND *command)
 UX_HOST_CLASS_AUDIO     *audio;
 #if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
 UX_HOST_CLASS_AUDIO_AC  *ac;
+UINT                    i;
 #endif
 
     /* Get the instance for this class.  */
@@ -109,7 +113,14 @@ UX_HOST_CLASS_AUDIO_AC  *ac;
 
         /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
         endpoints to exit properly.  */
-        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
+
+        /* Clear the links in AS interfaces.  */
+        for (i = 0; i < ac -> ux_host_class_audio_as_count; i++)
+        {
+            if (ac -> ux_host_class_audio_as[i])
+                ac -> ux_host_class_audio_as[i] -> ux_host_class_audio_ac = UX_NULL;
+        }
 
         /* Destroy the instance.  */
         _ux_host_stack_class_instance_destroy(audio -> ux_host_class_audio_class, (VOID *) audio);
@@ -138,6 +149,14 @@ UX_HOST_CLASS_AUDIO_AC  *ac;
         /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
         endpoints to exit properly.  */
         _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+
+#if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
+
+        /* Clear the links in AC interface.  */
+        ac =  audio -> ux_host_class_audio_ac;
+        if (ac)
+            ac -> ux_host_class_audio_as[audio -> ux_host_class_audio_ac_as] = UX_NULL;
+#endif
 
         /* Destroy the instance.  */
         _ux_host_stack_class_instance_destroy(audio -> ux_host_class_audio_class, (VOID *) audio);

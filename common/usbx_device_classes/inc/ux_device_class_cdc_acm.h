@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,12 +58,12 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added write auto ZLP,       */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Yajun xia, CQ Xiao       Modified comment(s),          */
+/*  10-31-2023     Yajun xia, CQ Xiao       Modified comment(s),          */
 /*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

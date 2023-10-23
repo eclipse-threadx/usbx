@@ -87,6 +87,8 @@ UX_HOST_CLASS_CDC_ACM       *cdc_acm;
 UX_TRANSFER                 *transfer_request;
 #if !defined(UX_HOST_STANDALONE)
 UINT                        status;
+#else
+UX_HOST_CLASS_CDC_ACM       *cdc_acm_inst;
 #endif
 
     /* Get the instance for this class.  */
@@ -120,6 +122,27 @@ UINT                        status;
             /* Free data buffer for the interrupt transfer.  */
             _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
         }
+
+#if defined(UX_HOST_STANDALONE)
+
+        /* Linked from data instance must be removed then.  */
+        /* We scan CDC ACM instances to find the master instance.  */
+        /* Get first instance linked to the class.  */
+        cdc_acm_inst = (UX_HOST_CLASS_CDC_ACM *) cdc_acm ->
+                    ux_host_class_cdc_acm_class -> ux_host_class_first_instance;
+
+        /* Scan all instances.  */
+        while(cdc_acm_inst)
+        {
+
+            /* If this data interface is linking to the control instance, unlink it.  */
+            if (cdc_acm_inst -> ux_host_class_cdc_acm_control == cdc_acm)
+                cdc_acm_inst -> ux_host_class_cdc_acm_control = UX_NULL;
+
+            /* Next instance.  */
+            cdc_acm_inst = cdc_acm_inst -> ux_host_class_cdc_acm_next_instance;
+        }
+#endif
     }
     else
     {

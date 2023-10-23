@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_host_stack.h                                     PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,9 +65,9 @@
 /*                                            names conflict C++ keyword, */
 /*                                            added standalone HUB,       */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

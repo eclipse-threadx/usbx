@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_rndis.h                             PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -55,11 +55,12 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added wait and length DEFs, */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            improved error checking,    */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -76,11 +77,27 @@ extern   "C" {
 
 #endif  
 
+
+/* Option: defined, it enables zero copy support (works if HID owns endpoint buffer).
+    Enabled, it requires that the NX packet pool is in cache safe area, and buffer max size is
+    larger than UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE (1600).
+ */
+/* #define UX_DEVICE_CLASS_RNDIS_ZERO_COPY  */
+
+
 /* Bulk out endpoint buffer size (UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE).  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
+#define UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE                       0
+#else
 #define UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE                       UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE
+#endif
 
 /* Bulk in endpoint buffer size (UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE).  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
+#define UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE                        0
+#else
 #define UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE                        UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE
+#endif
 
 /* Interrupt in endpoint buffer size (UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_LENGTH).  */
 #define UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE                   UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_LENGTH
@@ -597,12 +614,16 @@ typedef struct UX_SLAVE_CLASS_RNDIS_STRUCT
 } UX_SLAVE_CLASS_RNDIS;
 
 /* Define RNDIS endpoint buffer settings (when RNDIS owns buffer).  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
+#define UX_DEVICE_CLASS_RNDIS_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW 0 /* only one buffer, no calculation  */
+#else
 #define UX_DEVICE_CLASS_RNDIS_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW \
     (UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE,     \
                                  UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE) ||   \
      UX_OVERFLOW_CHECK_ADD_ULONG(UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE +    \
                                  UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE,      \
                                  UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE))
+#endif
 #define UX_DEVICE_CLASS_RNDIS_ENDPOINT_BUFFER_SIZE          (UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE + UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE + UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE)
 #define UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER(rndis)         ((rndis)->ux_device_class_rndis_endpoint_buffer)
 #define UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER(rndis)          (UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER(rndis) + UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE)

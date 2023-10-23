@@ -41,7 +41,7 @@ static inline UINT _ux_host_class_hub_activate_wait(UX_HOST_CLASS_COMMAND *comma
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_hub_entry                            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,9 +84,10 @@ static inline UINT _ux_host_class_hub_activate_wait(UX_HOST_CLASS_COMMAND *comma
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed power on delay calc,  */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed fail code sequence,   */
 /*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_entry(UX_HOST_CLASS_COMMAND *command)
@@ -410,17 +411,14 @@ ULONG                   current_ms, elapsed_ms;
                 /* Unlink from device.  */
                 device -> ux_device_class_instance = UX_NULL;
 
-                /* Free hub.  */
-                _ux_utility_memory_free(hub);
-
                 /* Error trap. */
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, hub -> ux_host_class_hub_run_status);
 
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, hub -> ux_host_class_hub_run_status, hub, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
-                /* To error state.  */
-                hub -> ux_host_class_hub_enum_state = UX_STATE_ERROR;
+                /* Free hub.  */
+                _ux_utility_memory_free(hub);
                 return(UX_STATE_ERROR);
             }
 

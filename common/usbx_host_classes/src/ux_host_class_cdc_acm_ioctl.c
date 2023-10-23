@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_cdc_acm_ioctl                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,8 +79,8 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_ioctl(UX_HOST_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -348,7 +348,7 @@ UX_TRANSFER                             *transfer;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_cdc_acm_ioctl                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -379,7 +379,7 @@ UX_TRANSFER                             *transfer;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_cdc_acm_ioctl(UX_HOST_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,

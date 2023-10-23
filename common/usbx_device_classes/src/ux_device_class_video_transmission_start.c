@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_transmission_start           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,8 +68,8 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun Xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_video_transmission_start(UX_DEVICE_CLASS_VIDEO_STREAM *stream)
@@ -123,7 +123,7 @@ UX_SLAVE_DEVICE             *device;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_video_transmission_start          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -155,7 +155,7 @@ UX_SLAVE_DEVICE             *device;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_video_transmission_start(UX_DEVICE_CLASS_VIDEO_STREAM *stream)

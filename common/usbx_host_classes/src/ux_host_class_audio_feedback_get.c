@@ -105,7 +105,7 @@ UINT  _ux_host_class_audio_feedback_get(UX_HOST_CLASS_AUDIO *audio, UCHAR *feedb
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_audio_feedback_get                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -136,7 +136,7 @@ UINT  _ux_host_class_audio_feedback_get(UX_HOST_CLASS_AUDIO *audio, UCHAR *feedb
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_audio_feedback_get(UX_HOST_CLASS_AUDIO *audio, UCHAR *feedback)

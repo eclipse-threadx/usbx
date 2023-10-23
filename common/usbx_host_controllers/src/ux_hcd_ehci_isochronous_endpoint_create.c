@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_hcd_ehci_isochronous_endpoint_create            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,9 +87,11 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed error handling,       */
+/*                                            fixed split transfer issue, */
 /*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_isochronous_endpoint_create(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -246,6 +248,7 @@ UINT                            status;
             for (i = 0; i < ed -> ux_ehci_hsiso_ed_nb_tds; i ++)
                 ed -> ux_ehci_hsiso_ed_fr_td[i] -> ux_ehci_hsiso_td_status = UX_UNUSED;
             _ux_utility_memory_free(ed);
+            return(status);
         }
 
         /* Save information not related to periodic things.  */
@@ -496,7 +499,7 @@ UINT                            status;
             }
 
             /* Increment SSplit count.  */
-            ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[i] ++;
+            ed_anchor -> REF_AS.ANCHOR.ux_ehci_ed_microframe_ssplit_count[microframe_i] ++;
         }
 
     }

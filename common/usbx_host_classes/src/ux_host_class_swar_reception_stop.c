@@ -116,7 +116,7 @@ UINT  _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_swar_reception_stop                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -146,7 +146,7 @@ UINT  _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar, 

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_change                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,10 +84,11 @@
 /*  10-31-2022     Yajun Xia                Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            endpoint buffer in classes  */
+/*                                            with zero copy enabled,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -238,11 +239,11 @@ ULONG                                    endpoint_dir;
         }
 
 #if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
-    stream -> ux_device_class_audio_stream_endpoint -> ux_slave_endpoint_transfer_request.
-        ux_slave_transfer_request_data_pointer = stream -> ux_device_class_audio_stream_endpoint_buffer;
 #if defined(UX_DEVICE_CLASS_AUDIO_FEEDBACK_SUPPORT)
-    stream -> ux_device_class_audio_stream_feedback -> ux_slave_endpoint_transfer_request.
-        ux_slave_transfer_request_data_pointer = stream -> ux_device_class_audio_stream_feedback_buffer;
+    if (stream -> ux_device_class_audio_stream_feedback)
+        stream -> ux_device_class_audio_stream_feedback ->
+            ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
+                        stream -> ux_device_class_audio_stream_feedback_buffer;
 #endif
 #endif
 

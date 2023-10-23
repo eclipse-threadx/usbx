@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_tasks_run                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -73,9 +73,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added zero copy support,    */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_hid_tasks_run(VOID *instance)
@@ -106,6 +106,9 @@ UINT                        status;
     if (hid -> ux_device_class_hid_receiver)
         hid -> ux_device_class_hid_receiver -> ux_device_class_hid_receiver_tasks_run(hid);
 #endif
+
+    /* Get access to current event instance.  */
+    hid_event = &hid -> ux_device_class_hid_event;
 
     /* Run HID state machine.  */
     switch(hid -> ux_device_class_hid_event_state)
@@ -180,7 +183,6 @@ UINT                        status;
         /* Run transfer state machine.  */
         trans = &hid -> ux_device_class_hid_interrupt_endpoint ->
                                             ux_slave_endpoint_transfer_request;
-        hid_event = &hid -> ux_device_class_hid_event;
         status = _ux_device_stack_transfer_run(trans,
                                 hid_event -> ux_device_class_hid_event_length,
                                 hid_event -> ux_device_class_hid_event_length);

@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkin_thread                PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,10 +88,11 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used NX API to copy data,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkin_thread(ULONG rndis_class)
@@ -106,6 +107,10 @@ ULONG                           actual_flags;
 NX_PACKET                       *current_packet;
 ULONG                           transfer_length;
 ULONG                           copied;
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY) && !defined(NX_DISABLE_PACKET_CHAIN)
+NX_PACKET                       *packet;
+UINT                            do_copy;
+#endif
 
     /* Cast properly the rndis instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, rndis_class)
@@ -156,9 +161,124 @@ ULONG                           copied;
                     /* If the link is down no need to rearm a packet. */
                     if (rndis -> ux_slave_class_rndis_link_state == UX_DEVICE_CLASS_RNDIS_LINK_STATE_UP)
                     {
-                
+
+                        /* Input packet mapping:
+                         *                           | <----- nx_packet_length -----> |
+                         *    .. NX_PHYSICAL_HEADER? | NX_ETHERNET_SIZE | Packet ...  |
+                         *  start                  prepend                         append
+                         */
+
                         /* Calculate the transfer length.  */
                         transfer_length =  current_packet -> nx_packet_length + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH;
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
+
+                        /* Default to success.  */
+                        status = UX_SUCCESS;
+
+                        /* Check if there was enough space for RNDIS header, if not data should be copied.  */
+                        do_copy = (current_packet -> nx_packet_data_start + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH > current_packet -> nx_packet_prepend_ptr);
+
+#ifndef NX_DISABLE_PACKET_CHAIN
+
+                        /* Check if packet is chained, chained packets must be joined (copied).  */
+                        if (current_packet -> nx_packet_next)
+                            do_copy = 1;
+#endif
+
+                        /* Check if data is being copied to new packet.  */
+                        if (do_copy)
+                        {
+
+                            /* Check if packet pool is good for data collection.  */
+                            if (transfer_length > current_packet -> nx_packet_pool_owner -> nx_packet_pool_payload_size)
+                                status = UX_TRANSFER_BUFFER_OVERFLOW;
+
+                            /* Allocate a new packet for data collection.  */
+                            if (status == UX_SUCCESS)
+                            {
+                                status = nx_packet_allocate(current_packet -> nx_packet_pool_owner,
+                                    &packet, UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH,
+                                    UX_MS_TO_TICK(UX_DEVICE_CLASS_RNDIS_PACKET_POOL_WAIT));
+
+                                /* Reserve space for RNDIS header.  */
+                                packet -> nx_packet_append_ptr = packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH;
+
+                            }
+
+                            /* Copy the data to allocated.  */
+                            if (status == UX_SUCCESS)
+                            {
+
+                                /* RNDIS packet header already reserved.  */
+
+                                /* Copy the data to allocated.  */
+                                status = nx_packet_data_extract_offset(current_packet, 0,
+                                    packet -> nx_packet_append_ptr,
+                                    current_packet -> nx_packet_length, &copied);
+                                if (status == NX_SUCCESS)
+                                {
+                                    packet -> nx_packet_length = copied;
+
+                                    /* Release the chained packet.  */
+                                    current_packet -> nx_packet_length = current_packet -> nx_packet_length - UX_DEVICE_CLASS_RNDIS_ETHERNET_SIZE;
+                                    nx_packet_transmit_release(current_packet);
+
+                                    /* Use copied packet to transfer.  */
+                                    current_packet = packet;
+                                }
+                            }
+
+                            /* Can not copy/buffer issue.  */
+                            if (status != UX_SUCCESS)
+                                status = UX_TRANSFER_BUFFER_OVERFLOW;
+                        }
+                        else
+                        {
+
+                            /* There is enough space for RNDIS header, move prepend_ptr for it.  */
+                            current_packet -> nx_packet_prepend_ptr -= UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH;
+                        }
+
+                        if (status == UX_SUCCESS)
+                        {
+
+                            /* Add the RNDIS header to this packet.  */
+
+                            /* Reset the RNDIS header.  */
+                            _ux_utility_memory_set(current_packet -> nx_packet_prepend_ptr, 0x00, UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH); /* Use case of memset is verified. */
+
+                            /* Initialize fields in header.  */
+                            _ux_utility_long_put(current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_TYPE, UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_MSG);
+                            _ux_utility_long_put(current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_LENGTH, transfer_length);
+                            _ux_utility_long_put(current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_RNDIS_PACKET_DATA_OFFSET, 
+                                                    UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH - UX_DEVICE_CLASS_RNDIS_PACKET_DATA_OFFSET);
+                            _ux_utility_long_put(current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_RNDIS_PACKET_DATA_LENGTH, current_packet -> nx_packet_length);
+
+                            /* Set the transfer request data pointer to the packet buffer.  */
+                            transfer_request -> ux_slave_transfer_request_data_pointer = current_packet -> nx_packet_prepend_ptr;
+
+                            /* If trace is enabled, insert this event into the trace buffer.  */
+                            UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_RNDIS_PACKET_TRANSMIT, rndis, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
+
+                            /* Send the request to the device controller.  */
+                            status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, transfer_length + 1);
+                        }
+
+                        /* Check error code.  */
+                        if (status != UX_SUCCESS)
+                        {
+
+                            /* Is this not a transfer abort? (it's fine to be aborted)  */
+                            if (status != UX_TRANSFER_BUS_RESET)
+                            {
+
+                                /* Error trap. */
+                                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, status);
+                            }
+
+                        }
+#else
 
                         /* Is there enough space for this packet in the transfer buffer?  */
                         if (transfer_length <= UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE)
@@ -200,6 +320,7 @@ ULONG                           copied;
                             /* Report error to application. */
                             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
                         }
+#endif
                     }        
                
                     /* Free the packet that was just sent.  First do some housekeeping.  */

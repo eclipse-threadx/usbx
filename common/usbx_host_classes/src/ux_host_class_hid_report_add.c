@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_report_add                       PORTABLE C      */ 
-/*                                                           6.1.8        */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,6 +78,10 @@
 /*  08-02-2021     Wen Wang                 Modified comment(s),          */
 /*                                            fixed spelling error,       */
 /*                                            resulting in version 6.1.8  */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed field managing issue, */
+/*                                            improved usage handling,    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_add(UX_HOST_CLASS_HID *hid, UCHAR *descriptor, UX_HOST_CLASS_HID_ITEM *item)
@@ -193,13 +197,9 @@ ULONG                       current_field_address;
     /* Take care of the bit padding if necessary.  */
     if (new_hid_report -> ux_host_class_hid_report_bit_length & 7)
         new_hid_report -> ux_host_class_hid_report_byte_length++;
-    
-    /* Get the number of field usage for this report, this value depends on the report type. If this is 
-       an array, we use the number of usages; if this a variable, we use the report count.  */
-    if (hid_field_value & UX_HOST_CLASS_HID_ITEM_VARIABLE)
-        hid_field_count =  hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_count;
-    else
-        hid_field_count =  hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage;
+
+    /* Get the number of fields for this report.  */
+    hid_field_count =  hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_count;
 
     /* If the field count is null, this is only padding and there is no field to be allocated to the report.  */
     if (hid_field_count == 0)       
@@ -210,27 +210,6 @@ ULONG                       current_field_address;
     if (new_hid_field == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
-    /* Attach the new field to the report. The report may already contain a field, if so parse the chain 
-       until we reach the end of the chain.  */    
-    new_hid_report -> ux_host_class_hid_report_number_item += hid_field_count;
-    if (new_hid_report -> ux_host_class_hid_report_field == UX_NULL)
-    {
-
-        /* This is the first field for the report.  */
-        new_hid_report -> ux_host_class_hid_report_field =  new_hid_field;
-    }
-    else
-    {    
-
-        /* We have previous HID fields, so search for the end of the chain.  */
-        hid_field =  new_hid_report -> ux_host_class_hid_report_field;
-        while(hid_field -> ux_host_class_hid_field_next_field != UX_NULL)
-            hid_field =  hid_field -> ux_host_class_hid_field_next_field;
-
-        /* Attach the new field to the end of the chain.  */
-        hid_field -> ux_host_class_hid_field_next_field =  new_hid_field;
-    } 
-                          
     /* From the parser structure, update the new field values. Start with logical values.  */
     new_hid_field -> ux_host_class_hid_field_logical_min =  hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_logical_min;
     new_hid_field -> ux_host_class_hid_field_logical_max =  hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_logical_max;
@@ -269,14 +248,15 @@ ULONG                       current_field_address;
         _ux_utility_memory_free(new_hid_field);
         return(UX_MEMORY_INSUFFICIENT);
     }
-    
+
     /* We need some memory for the usages, but only for variable items; usage
        values for array items can be calculated.  */
-    if (hid_field_value & UX_HOST_CLASS_HID_ITEM_VARIABLE)
+    if ((hid_field_value & UX_HOST_CLASS_HID_ITEM_VARIABLE) &&
+        (hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage > 0))
     {
 
         /* Allocate memory for the usages.  */
-        new_hid_field -> ux_host_class_hid_field_usages =  _ux_utility_memory_allocate_mulc_safe(UX_NO_ALIGN, UX_REGULAR_MEMORY, hid_field_count, 4);
+        new_hid_field -> ux_host_class_hid_field_usages =  _ux_utility_memory_allocate_mulc_safe(UX_NO_ALIGN, UX_REGULAR_MEMORY, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage, 4);
         if (new_hid_field -> ux_host_class_hid_field_usages == UX_NULL)                   
         {
 
@@ -286,11 +266,32 @@ ULONG                       current_field_address;
         }
         
         /* Copy the current usages in the field structure.  */
-        _ux_utility_memory_copy(new_hid_field -> ux_host_class_hid_field_usages, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_usages, hid_field_count*4); /* Use case of memcpy is verified. */
+        _ux_utility_memory_copy(new_hid_field -> ux_host_class_hid_field_usages, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_usages, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage * 4); /* Use case of memcpy is verified. */
     }
 
     /* Save the number of usages.  */
-    new_hid_field -> ux_host_class_hid_field_number_usage =  hid_field_count;
+    new_hid_field -> ux_host_class_hid_field_number_usage = hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage;
+
+    /* Attach the new field to the report. The report may already contain a field, if so parse the chain 
+       until we reach the end of the chain.  */    
+    new_hid_report -> ux_host_class_hid_report_number_item += hid_field_count;
+    if (new_hid_report -> ux_host_class_hid_report_field == UX_NULL)
+    {
+
+        /* This is the first field for the report.  */
+        new_hid_report -> ux_host_class_hid_report_field =  new_hid_field;
+    }
+    else
+    {
+
+        /* We have previous HID fields, so search for the end of the chain.  */
+        hid_field =  new_hid_report -> ux_host_class_hid_report_field;
+        while(hid_field -> ux_host_class_hid_field_next_field != UX_NULL)
+            hid_field =  hid_field -> ux_host_class_hid_field_next_field;
+
+        /* Attach the new field to the end of the chain.  */
+        hid_field -> ux_host_class_hid_field_next_field =  new_hid_field;
+    }
 
     /* Return successful completion.  */
     return(UX_SUCCESS);

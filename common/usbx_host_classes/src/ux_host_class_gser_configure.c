@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_gser_configure                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed interface link,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_gser_configure(UX_HOST_CLASS_GSER *gser)
@@ -147,29 +150,19 @@ UX_DEVICE               *parent_device;
 
         /* Get that interface.  */
         status =  _ux_host_stack_configuration_interface_get(configuration, interface_index, 0, &gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_interface);
-    
-        /* Should not fail. But do a sanity check.  */
-        if (status == UX_SUCCESS)
-        {
 
-            /* Store the instance in the interface container, this is for the USB stack
-               when it needs to invoke the class.  */        
-            gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_interface -> ux_interface_class_instance =  (VOID *) gser;
+        /* If any of interface expected not exist, reject the device.  */
+        if (status != UX_SUCCESS)
+            return(status);
 
-            /* Store the class container in the interface.  The device has the correct class, duplicate it to the 
-               interface.  */
-            gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_interface -> ux_interface_class =  gser -> ux_host_class_gser_device -> ux_device_class ;
+        /* Create the semaphore to protect 2 threads from accessing the same gser instance.  */
+        status =  _ux_host_semaphore_create(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore, "ux_host_class_gser_semaphore", 1);
 
-            /* Create the semaphore to protect 2 threads from accessing the same gser instance.  */
-            status =  _ux_host_semaphore_create(&gser -> ux_host_class_gser_interface_array[interface_index].ux_host_class_gser_semaphore, "ux_host_class_gser_semaphore", 1);
-
-            /* Check status.  */
-            if (status != UX_SUCCESS)
-                return(UX_SEMAPHORE_ERROR);
-
-        }
+        /* Check status.  */
+        if (status != UX_SUCCESS)
+            return(UX_SEMAPHORE_ERROR);
     }
-    
+
     /* Return completion status.  */
     return(UX_SUCCESS);
 }

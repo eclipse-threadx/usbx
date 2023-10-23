@@ -21,12 +21,12 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_pima.h                                PORTABLE C      */ 
-/*                                                           6.x          */
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_pima.h                                PORTABLE C      */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,11 +53,13 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved internal checks,   */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed unused semaphore,   */
+/*                                            optimized PIMA data sets,   */
 /*                                            increased default buffer    */
 /*                                            length to get device info,  */
-/*                                            added error checks support, */      
-/*                                            resulting in version 6.x    */
+/*                                            added error checks support, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -403,7 +405,6 @@ typedef struct UX_HOST_CLASS_PIMA_STRUCT
     struct UX_HOST_CLASS_PIMA_SESSION_STRUCT
                     *ux_host_class_pima_session;
     UCHAR           *ux_host_class_pima_container;
-    UX_SEMAPHORE    ux_host_class_pima_semaphore;
     VOID            *ux_host_class_pima_application;
     ULONG           ux_host_class_pima_zlp_flag;
 
@@ -447,10 +448,11 @@ typedef struct UX_HOST_CLASS_PIMA_OBJECT_STRUCT
 {
 
     ULONG           ux_host_class_pima_object_storage_id;
-    ULONG           ux_host_class_pima_object_format;
-    ULONG           ux_host_class_pima_object_protection_satus;
+    USHORT          ux_host_class_pima_object_format;
+    USHORT          ux_host_class_pima_object_protection_status;
     ULONG           ux_host_class_pima_object_compressed_size;
-    ULONG           ux_host_class_pima_object_thumb_format;
+    USHORT          ux_host_class_pima_object_thumb_format;
+    USHORT          _align_thumb_compressed_size;
     ULONG           ux_host_class_pima_object_thumb_compressed_size;
     ULONG           ux_host_class_pima_object_thumb_pix_width;
     ULONG           ux_host_class_pima_object_thumb_pix_height;
@@ -458,7 +460,8 @@ typedef struct UX_HOST_CLASS_PIMA_OBJECT_STRUCT
     ULONG           ux_host_class_pima_object_image_pix_height;
     ULONG           ux_host_class_pima_object_image_bit_depth;
     ULONG           ux_host_class_pima_object_parent_object;
-    ULONG           ux_host_class_pima_object_association_type;
+    USHORT          ux_host_class_pima_object_association_type;
+    USHORT          _align_association_desc;
     ULONG           ux_host_class_pima_object_association_desc;
     ULONG           ux_host_class_pima_object_sequence_number;
     UCHAR           ux_host_class_pima_object_filename[UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH]; /* Null terminated unicode string.  */
@@ -515,9 +518,10 @@ typedef struct UX_HOST_CLASS_PIMA_DEVICE_STRUCT
 typedef struct UX_HOST_CLASS_PIMA_STORAGE_STRUCT
 {
 
-    ULONG            ux_host_class_pima_storage_type;
-    ULONG            ux_host_class_pima_storage_file_system_type;
-    ULONG            ux_host_class_pima_storage_access_capability;
+    USHORT           ux_host_class_pima_storage_type;
+    USHORT           ux_host_class_pima_storage_file_system_type;
+    USHORT           ux_host_class_pima_storage_access_capability;
+    USHORT           _align_max_capacity_low;
     ULONG            ux_host_class_pima_storage_max_capacity_low;
     ULONG            ux_host_class_pima_storage_max_capacity_high;
     ULONG            ux_host_class_pima_storage_free_space_bytes_low;

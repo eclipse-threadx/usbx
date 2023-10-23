@@ -163,7 +163,7 @@ ULONG       hcd_index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_stack_hcd_register                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -193,7 +193,7 @@ ULONG       hcd_index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_hcd_register(UCHAR *hcd_name,

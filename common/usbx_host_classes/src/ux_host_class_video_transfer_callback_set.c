@@ -83,7 +83,7 @@ VOID  _ux_host_class_video_transfer_callback_set(UX_HOST_CLASS_VIDEO *video, VOI
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_video_transfer_callback_set         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -115,7 +115,7 @@ VOID  _ux_host_class_video_transfer_callback_set(UX_HOST_CLASS_VIDEO *video, VOI
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _uxe_host_class_video_transfer_callback_set(UX_HOST_CLASS_VIDEO *video, VOID (*callback_function)(UX_TRANSFER*))

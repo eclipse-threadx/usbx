@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_host_class_video.h                               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -56,10 +56,12 @@
 /*                                            according to UVC 1.5 Class  */
 /*                                            specification,              */
 /*                                            resulting in version 6.1.8  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added format and frame data */
+/*                                            fields for H264 support,    */
 /*                                            optimized USB descriptors,  */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -607,6 +609,7 @@ typedef struct UX_HOST_CLASS_VIDEO_PARAMETER_FORMAT_DATA_STRUCT
 
     ULONG           ux_host_class_video_parameter_format_requested;
     ULONG           ux_host_class_video_parameter_format_subtype;
+    UCHAR           *ux_host_class_video_parameter_format_guid;         /* not NULL if GUID is available for the subtype.  */
     ULONG           ux_host_class_video_parameter_number_frame_descriptors;
 
 } UX_HOST_CLASS_VIDEO_PARAMETER_FORMAT_DATA;
@@ -619,7 +622,8 @@ typedef struct UX_HOST_CLASS_VIDEO_PARAMETER_FRAME_DATA_STRUCT
     ULONG           ux_host_class_video_parameter_frame_width;
     ULONG           ux_host_class_video_parameter_frame_height;
     ULONG           ux_host_class_video_parameter_default_frame_interval;
-    ULONG           ux_host_class_video_parameter_frame_interval_type;
+    ULONG           ux_host_class_video_parameter_frame_interval_type;  /* 0: continuous {min,max,step}, n: discrete  */
+    UCHAR           *ux_host_class_video_parameter_frame_intervals;     /* {dwMin,dwMax,dwStep},... or dw1,dw2,... depending on interval type.  */
 
 } UX_HOST_CLASS_VIDEO_PARAMETER_FRAME_DATA;
 

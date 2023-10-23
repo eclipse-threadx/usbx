@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_prolific_configure                   PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*                                            optimized based on compile  */
 /*                                            definitions,                */
 /*                                            resulting in version 6.1    */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed interface link,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_prolific_configure(UX_HOST_CLASS_PROLIFIC *prolific)
@@ -140,20 +143,6 @@ UX_DEVICE               *parent_device;
        active and the interrupt endpoint is now enabled. We have to memorize the first interface since 
        the interrupt endpoint is hooked to it. */
     status =  _ux_host_stack_configuration_interface_get(configuration, 0, 0, &prolific -> ux_host_class_prolific_interface);
-
-    /* Check status for error.  */
-    if (status == UX_SUCCESS)
-    {
-
-        /* Store the instance in the interface container, this is for the USB stack
-           when it needs to invoke the class.  */        
-        prolific -> ux_host_class_prolific_interface -> ux_interface_class_instance =  (VOID *) prolific;
-
-        /* Store the class container in the interface.  The device has the correct class, duplicate it to the 
-           interface.  */
-        prolific -> ux_host_class_prolific_interface -> ux_interface_class =  prolific -> ux_host_class_prolific_device -> ux_device_class ;
-
-    }
 
     /* Return completion status.  */
     return(status);

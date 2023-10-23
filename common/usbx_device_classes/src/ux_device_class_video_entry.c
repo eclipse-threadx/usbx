@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_entry                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,9 +72,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*  10-31-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_entry(UX_SLAVE_CLASS_COMMAND *command)

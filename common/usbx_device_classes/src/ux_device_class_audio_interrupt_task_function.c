@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_interrupt_task_function      PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -71,6 +71,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-31-2022     Yajun Xia                Initial Version 6.2.0         */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            removed an error trap,      */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio_interrupt_task_function(UX_DEVICE_CLASS_AUDIO *audio)
@@ -100,13 +103,10 @@ UCHAR                           *buff;
     /* Get endpoint instance.  */
     endpoint = audio -> ux_device_class_audio_interrupt;
 
-    /* Endpoint not available, maybe it's alternate setting 0.  */
+    /* Endpoint not available, maybe it's alternate setting 0,
+       or not exist in framework (accepted use case).  */
     if (endpoint == UX_NULL)
     {
-
-        /* Error trap. */
-        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_ENDPOINT_HANDLE_UNKNOWN);
-
         audio -> ux_device_class_audio_interrupt_task_state = UX_STATE_RESET;
         return(UX_STATE_IDLE);
     }

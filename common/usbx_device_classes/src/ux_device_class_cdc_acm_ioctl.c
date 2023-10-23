@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_acm_ioctl                      PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -96,8 +96,8 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun Xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
@@ -365,7 +365,7 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_cdc_acm_ioctl                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -397,7 +397,7 @@ UX_SLAVE_TRANSFER                                   *transfer_request;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,

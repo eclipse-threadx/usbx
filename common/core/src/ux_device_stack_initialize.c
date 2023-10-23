@@ -54,7 +54,7 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_initialize                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -109,10 +109,10 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*                                            added CCID support,         */
 /*                                            added video support,        */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,
@@ -474,7 +474,7 @@ UCHAR                           *memory;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_stack_initialize                        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -505,7 +505,7 @@ UCHAR                           *memory;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,

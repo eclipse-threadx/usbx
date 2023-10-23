@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_uninitialize               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -75,10 +75,10 @@
 /*  10-31-2022     Yajun Xia                Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -104,7 +104,7 @@ UX_SLAVE_CLASS              *class_ptr;
         _ux_device_mutex_delete(&printer -> ux_device_class_printer_endpoint_out_mutex);
 #endif
         /* Free the resources.  */
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if defined(UX_DEVICE_CLASS_PRINTER_OWN_ENDPOINT_BUFFER)
         _ux_utility_memory_free(printer -> ux_device_class_printer_endpoint_buffer);
 #endif
         _ux_utility_memory_free(printer);

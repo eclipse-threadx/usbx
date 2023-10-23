@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_system.h                                         PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -53,9 +53,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added device CCID name,     */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   System                                                              */
 /**                                                                       */
@@ -64,46 +64,46 @@ UCHAR _ux_system_usb_2_0_extension_descriptor_structure[] =                 {1,1
 UCHAR _ux_system_container_id_descriptor_structure[] =                      {1,1,1,1,4,4,4,4};
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_system_initialize                               PORTABLE C      */ 
-/*                                                           6.x          */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_system_initialize                               PORTABLE C      */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the various control data structures for   */ 
-/*    the USBX system.                                                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the various control data structures for   */
+/*    the USBX system.                                                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    regular_memory_pool_start        Start of non cached memory pool    */
-/*    regular_memory_size              Size of non cached memory pool     */ 
+/*    regular_memory_size              Size of non cached memory pool     */
 /*    cache_safe_memory_pool_start     Start of cached memory pool        */
-/*    cache_safe_memory_size           Size of cached memory pool         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
+/*    cache_safe_memory_size           Size of cached memory pool         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_memory_allocate           Allocate memory               */
-/*    _ux_utility_memory_set                Set memory                    */ 
+/*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_utility_mutex_create              Create mutex                  */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            verified memset and memcpy  */
@@ -115,24 +115,28 @@ UCHAR _ux_system_container_id_descriptor_structure[] =                      {1,1
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined memory management,  */
 /*                                            added UX_ASSERT check for   */
 /*                                            STD descriptor parse size,  */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
+UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size,
                             VOID *cache_safe_memory_pool_start, ULONG cache_safe_memory_size)
 {
-
-UX_MEMORY_BLOCK     *memory_block;
 ALIGN_TYPE          int_memory_pool_start;
 VOID                *regular_memory_pool_end;
+VOID                *cache_safe_memory_pool_end;
 ULONG               memory_pool_offset;
 #if !defined(UX_STANDALONE)
 UINT                status;
 #endif
+ULONG               pool_size;
 
+    /* Check if the regular memory pool is valid.  */
+    if ((regular_memory_pool_start == UX_NULL) || (regular_memory_size == 0))
+        return(UX_INVALID_PARAMETER);
 
     /* Reset memory block */
     _ux_utility_memory_set(regular_memory_pool_start, 0, regular_memory_size); /* Use case of memset is verified. */
@@ -150,8 +154,8 @@ UINT                status;
 
     /* Add to the memory offset the size of the allocated block.  */
     memory_pool_offset += (ULONG)sizeof(UX_SYSTEM_HOST);
-    
-#endif 
+
+#endif
 
 #ifndef UX_HOST_SIDE_ONLY
 
@@ -160,8 +164,8 @@ UINT                status;
 
     /* Add to the memory offset the size of the allocated block.  */
     memory_pool_offset += (ULONG)sizeof(UX_SYSTEM_SLAVE);
-    
-#endif 
+
+#endif
 
 
 #ifdef UX_OTG_SUPPORT
@@ -171,18 +175,36 @@ UINT                status;
 
     /* Add to the memory offset the size of the allocated block.  */
     memory_pool_offset += (ULONG)sizeof(UX_SYSTEM_OTG);
-#endif 
+#endif
 
+    /* Set the regular memory pool structure.  */
+    _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_REGULAR] = (UX_MEMORY_BYTE_POOL *) (((UCHAR *) regular_memory_pool_start) + memory_pool_offset);
 
-    /* Set the cache safe memory for the dynamic pool */
-    _ux_system -> ux_system_regular_memory_pool_start =  (UX_MEMORY_BLOCK *) (((UCHAR *) regular_memory_pool_start) 
-                                                            + memory_pool_offset);
+    /* Add to the memory offset the size of the allocated block.  */
+    memory_pool_offset += (ULONG)sizeof(UX_MEMORY_BYTE_POOL);
+
+    /* Check if the cache save memory pool is valid.  */
+    if ((cache_safe_memory_pool_start != UX_NULL) && (cache_safe_memory_size != 0))
+    {
+
+        /* Set the cache safe memory pool structure.  */
+        _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_CACHE_SAFE] = (UX_MEMORY_BYTE_POOL *) (((UCHAR *) regular_memory_pool_start) + memory_pool_offset);
+
+        /* Add to the memory offset the size of the allocated block.  */
+        memory_pool_offset += (ULONG)sizeof(UX_MEMORY_BYTE_POOL);
+    }
+    else
+    {
+
+        /* Set the cache safe memory pool structure to regular pool. */
+        _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_CACHE_SAFE] = _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_REGULAR];
+    }
 
     /* Make sure the regular memory pool is aligned properly */
-    int_memory_pool_start =   (ALIGN_TYPE) _ux_system -> ux_system_regular_memory_pool_start;
-    int_memory_pool_start +=  UX_ALIGN_MIN;
-    int_memory_pool_start &=  ~((ALIGN_TYPE)UX_ALIGN_MIN);
-    
+    int_memory_pool_start = (ALIGN_TYPE) (((UCHAR *) regular_memory_pool_start) + memory_pool_offset);
+    int_memory_pool_start += UX_ALIGN_MIN;
+    int_memory_pool_start &= ~((ALIGN_TYPE)UX_ALIGN_MIN);
+
     /* Set the end of the regular memory pool.  */
     regular_memory_pool_end =  (void *) (((UCHAR *) regular_memory_pool_start) + regular_memory_size);
 
@@ -194,53 +216,48 @@ UINT                status;
         return(UX_MEMORY_INSUFFICIENT);
     }
 
-    /* Now, we have a project structure allocated, save the regular memory allocation details */
-    _ux_system -> ux_system_regular_memory_pool_size =     (ULONG) (((ALIGN_TYPE) regular_memory_pool_end) - int_memory_pool_start);
-    _ux_system -> ux_system_regular_memory_pool_free =     _ux_system -> ux_system_regular_memory_pool_size;
-    _ux_system -> ux_system_regular_memory_pool_start =    (UX_MEMORY_BLOCK *) int_memory_pool_start;
+    /* get the regular memory pool size.  */
+    pool_size = (ULONG) (((ALIGN_TYPE) regular_memory_pool_end) - int_memory_pool_start);
 
-    /* Build the first free memory block */
-    memory_block =                             _ux_system -> ux_system_regular_memory_pool_start;
-    memory_block -> ux_memory_block_size =     _ux_system -> ux_system_regular_memory_pool_size - (ULONG)sizeof(UX_MEMORY_BLOCK);
-    memory_block -> ux_memory_block_status =   UX_MEMORY_UNUSED;
+    /* Create the regular memory pool.  */
+    _ux_utility_memory_byte_pool_create(_ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_REGULAR],
+                                        (UX_MEMORY_BYTE_POOL *)int_memory_pool_start,
+                                        pool_size);
 
     /* Check the definition of the cache safe pool. If the application or controller do not require any cache safe memory,
        define the cached safe memory region as the regular memory region.  */
-    if (cache_safe_memory_pool_start == UX_NULL)
+    if ((cache_safe_memory_pool_start != UX_NULL) && (cache_safe_memory_size != 0))
     {
 
-        /* Cache safe memory is the same as regular memory.  */
-        _ux_system -> ux_system_cache_safe_memory_pool_size =  _ux_system -> ux_system_regular_memory_pool_size;
-        _ux_system -> ux_system_cache_safe_memory_pool_free =  _ux_system -> ux_system_regular_memory_pool_free;
-        _ux_system -> ux_system_cache_safe_memory_pool_start = _ux_system -> ux_system_regular_memory_pool_start;
-    }
-    else
-    {
-    
+        /* Reset this memory block */
+        _ux_utility_memory_set(cache_safe_memory_pool_start, 0, cache_safe_memory_size); /* Use case of memset is verified. */
+
         /* Make sure the cache safe memory pool is aligned properly */
         int_memory_pool_start =   (ALIGN_TYPE) cache_safe_memory_pool_start;
         int_memory_pool_start +=  UX_ALIGN_MIN;
         int_memory_pool_start &=  ~((ALIGN_TYPE)UX_ALIGN_MIN);
-    
-        /* Save the cache safe memory allocation details */
-        _ux_system -> ux_system_cache_safe_memory_pool_size =     cache_safe_memory_size - UX_ALIGN_MIN;
-        _ux_system -> ux_system_cache_safe_memory_pool_free =     _ux_system -> ux_system_cache_safe_memory_pool_size;
-        _ux_system -> ux_system_cache_safe_memory_pool_start =    (UX_MEMORY_BLOCK *) int_memory_pool_start;
-    
-        /* Reset this memory block */
-        _ux_utility_memory_set(_ux_system -> ux_system_cache_safe_memory_pool_start, 0, _ux_system -> ux_system_cache_safe_memory_pool_size); /* Use case of memset is verified. */
-    
-        /* Build the first free memory block */
-        memory_block =                             _ux_system -> ux_system_cache_safe_memory_pool_start;
-        memory_block -> ux_memory_block_size =     _ux_system -> ux_system_cache_safe_memory_pool_size - (ULONG)sizeof(UX_MEMORY_BLOCK);
-        memory_block -> ux_memory_block_status =   UX_MEMORY_UNUSED;
+
+        cache_safe_memory_pool_end =  (void *) (((UCHAR *) cache_safe_memory_pool_start) + cache_safe_memory_size);
+
+        /* Check if we have memory available.  */
+        if (int_memory_pool_start >= (ALIGN_TYPE) cache_safe_memory_pool_end)
+        {
+
+            /* No memory available.  */
+            return(UX_MEMORY_INSUFFICIENT);
+        }
+
+        pool_size = (ULONG) (((ALIGN_TYPE) cache_safe_memory_pool_end) - int_memory_pool_start);
+
+        _ux_utility_memory_byte_pool_create(_ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_CACHE_SAFE],
+                                            (UX_MEMORY_BYTE_POOL *)int_memory_pool_start, pool_size);
     }
 
 #ifdef UX_ENABLE_MEMORY_STATISTICS
-    _ux_system -> ux_system_regular_memory_pool_base = (UCHAR *) _ux_system -> ux_system_regular_memory_pool_start;
-    _ux_system -> ux_system_regular_memory_pool_min_free = _ux_system -> ux_system_regular_memory_pool_free;
-    _ux_system -> ux_system_cache_safe_memory_pool_base = (UCHAR *) _ux_system -> ux_system_cache_safe_memory_pool_start;
-    _ux_system -> ux_system_cache_safe_memory_pool_min_free = _ux_system -> ux_system_cache_safe_memory_pool_free;
+    _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_REGULAR] -> ux_byte_pool_min_free =
+            _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_REGULAR] -> ux_byte_pool_available;
+    _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_CACHE_SAFE] -> ux_byte_pool_min_free =
+            _ux_system -> ux_system_memory_byte_pool[UX_MEMORY_BYTE_POOL_CACHE_SAFE] -> ux_byte_pool_available;
 
     /* Other fields are kept zero.  */
 #endif
@@ -255,10 +272,10 @@ UINT                status;
     /* Setup the head and tail pointers.  */
     _ux_system -> ux_system_debug_log_head = _ux_system -> ux_system_debug_log_buffer;
     _ux_system -> ux_system_debug_log_tail = _ux_system -> ux_system_debug_log_buffer;
-    
+
     /* Keep the size in system structure variable.  */
     _ux_system -> ux_system_debug_log_size = UX_DEBUG_LOG_SIZE;
-    
+
 #endif
 
 #if !defined(UX_STANDALONE)
@@ -278,7 +295,7 @@ UINT                status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_system_initialize                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -310,10 +327,10 @@ UINT                status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _uxe_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
+UINT  _uxe_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size,
                             VOID *cache_safe_memory_pool_start, ULONG cache_safe_memory_size)
 {
 
@@ -333,8 +350,8 @@ UINT  _uxe_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memo
     /* Sanity check.  */
     if ((regular_memory_pool_start == UX_NULL) || (regular_memory_size == 0))
             return(UX_INVALID_PARAMETER);
-    
+
     /* Invoke system initialization function.  */
-    return(_ux_system_initialize(regular_memory_pool_start, regular_memory_size, 
+    return(_ux_system_initialize(regular_memory_pool_start, regular_memory_size,
                                  cache_safe_memory_pool_start, cache_safe_memory_size));
 }

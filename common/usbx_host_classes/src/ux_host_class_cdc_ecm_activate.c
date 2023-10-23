@@ -104,6 +104,10 @@ UX_HOST_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE_ASSERT
 /*                                            deprecated ECM pool option, */
 /*                                            supported NX packet chain,  */
 /*                                            resulting in version 6.2.0  */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            rejected the CDC ECM data   */
+/*                                            interface not next to ctrl, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_activate(UX_HOST_CLASS_COMMAND *command)
@@ -163,8 +167,13 @@ UX_INTERFACE                        *cur_interface;
         if (cur_interface -> ux_interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_CONTROL_CLASS)
         {
 
-            /* Save it.  */
-            control_interface =  cur_interface;
+            /* Is this the right one before current interface?  */
+            if (cur_interface -> ux_interface_next_interface == interface_ptr)
+            {
+
+                /* Save it.  */
+                control_interface =  cur_interface;
+            }
         }
 
         /* Advance current interface.  */

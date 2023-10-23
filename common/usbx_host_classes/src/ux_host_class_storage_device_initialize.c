@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_device_initialize            PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,9 +58,6 @@
 /*  CALLS                                                                 */ 
 /*                                                                        */ 
 /*    _ux_host_class_storage_device_reset   Reset device                  */ 
-/*    _ux_host_class_storage_device_support_check                         */ 
-/*                                          Check protocol support        */ 
-/*    _ux_host_class_storage_endpoints_get  Get all endpoints             */ 
 /*    _ux_host_class_storage_max_lun_get    Get maximum number of LUNs    */ 
 /*    _ux_host_class_storage_media_characteristics_get                    */ 
 /*                                          Get media characteristics     */ 
@@ -90,6 +87,11 @@
 /*                                            improved media insert/eject */
 /*                                            management without FX,      */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            moved class/sub/protocol    */
+/*                                            check and endpoints get     */
+/*                                            into _activate function,    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_device_initialize(UX_HOST_CLASS_STORAGE *storage)
@@ -104,20 +106,9 @@ UINT                            inst_index;
 #endif
 
 
-    /* Check the device protocol support and initialize the transport layer.  */
-    status =  _ux_host_class_storage_device_support_check(storage);
-    if (status != UX_SUCCESS)
-        return(status);
-    
     /* Get the maximum number of LUN (Bulk Only device only, other device
        will set the LUN number to 0).  */
     status =  _ux_host_class_storage_max_lun_get(storage);
-    if (status != UX_SUCCESS)
-        return(status);
-
-    /* Search all the endpoints for the storage interface (Bulk Out, Bulk in,
-       and optional Interrupt endpoint).  */
-    status =  _ux_host_class_storage_endpoints_get(storage);
     if (status != UX_SUCCESS)
         return(status);
 

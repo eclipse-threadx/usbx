@@ -78,7 +78,7 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_initialize                   PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -139,11 +139,11 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            removed internal NX pool,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            checked compile options,    */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -156,7 +156,7 @@ UINT  _ux_device_class_rndis_initialize(UX_SLAVE_CLASS_COMMAND *command)
 UX_SLAVE_CLASS_RNDIS                        *rndis;
 UX_SLAVE_CLASS_RNDIS_PARAMETER              *rndis_parameter;
 UX_SLAVE_CLASS                              *class_ptr;
-UINT                                        status;
+UINT                                        status = UX_SUCCESS;
 
 
     /* Compile option checks.  */

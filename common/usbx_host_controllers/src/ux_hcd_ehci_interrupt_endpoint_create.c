@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_hcd_ehci_interrupt_endpoint_create              PORTABLE C      */ 
-/*                                                           6.1.11       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -104,6 +104,9 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed split transfer issue, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_interrupt_endpoint_create(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -240,7 +243,11 @@ UINT                            i;
 
     /* Keep interval < 1ms for micro-frame calculation.  */
     /* Make it index steps to move.  */
-    if (interval > 0)
+    if (interval >= 4)
+    {
+        interval = 3; /* Uses 3 for 1ms calculation  */
+    }
+    else if (interval > 0)
     {
         interval --;
         interval &= 0x3;

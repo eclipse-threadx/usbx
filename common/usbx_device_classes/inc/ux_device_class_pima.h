@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_pima.h                              PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,11 +58,12 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed standalone compile,   */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            optimized PIMA data sets,   */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -729,10 +730,11 @@ typedef struct UX_SLAVE_CLASS_PIMA_OBJECT_STRUCT
 {
 
     ULONG                   ux_device_class_pima_object_storage_id;
-    ULONG                   ux_device_class_pima_object_format;
-    ULONG                   ux_device_class_pima_object_protection_status;
+    USHORT                  ux_device_class_pima_object_format;
+    USHORT                  ux_device_class_pima_object_protection_status;
     ULONG                   ux_device_class_pima_object_compressed_size;
-    ULONG                   ux_device_class_pima_object_thumb_format;
+    USHORT                  ux_device_class_pima_object_thumb_format;
+    USHORT                  _align_thumb_compressed_size;
     ULONG                   ux_device_class_pima_object_thumb_compressed_size;
     ULONG                   ux_device_class_pima_object_thumb_pix_width;
     ULONG                   ux_device_class_pima_object_thumb_pix_height;
@@ -740,7 +742,8 @@ typedef struct UX_SLAVE_CLASS_PIMA_OBJECT_STRUCT
     ULONG                   ux_device_class_pima_object_image_pix_height;
     ULONG                   ux_device_class_pima_object_image_bit_depth;
     ULONG                   ux_device_class_pima_object_parent_object;
-    ULONG                   ux_device_class_pima_object_association_type;
+    USHORT                  ux_device_class_pima_object_association_type;
+    USHORT                  _align_association_desc;
     ULONG                   ux_device_class_pima_object_association_desc;
     ULONG                   ux_device_class_pima_object_sequence_number;
     UCHAR                   ux_device_class_pima_object_filename[UX_DEVICE_CLASS_PIMA_UNICODE_MAX_LENGTH];
@@ -798,9 +801,10 @@ typedef struct UX_SLAVE_CLASS_PIMA_DEVICE_STRUCT
 typedef struct UX_SLAVE_CLASS_PIMA_STORAGE_STRUCT                                        
 {                                                                                       
                                                                                         
-    ULONG                   ux_device_class_pima_storage_type;                                               
-    ULONG                   ux_device_class_pima_storage_file_system_type;                                   
-    ULONG                   ux_device_class_pima_storage_access_capability;                                  
+    USHORT                  ux_device_class_pima_storage_type;                                               
+    USHORT                  ux_device_class_pima_storage_file_system_type;                                   
+    USHORT                  ux_device_class_pima_storage_access_capability;                                  
+    USHORT                  _align_max_capacity_low;
     ULONG                   ux_device_class_pima_storage_max_capacity_low;                                   
     ULONG                   ux_device_class_pima_storage_max_capacity_high;                                  
     ULONG                   ux_device_class_pima_storage_free_space_bytes_low;                               

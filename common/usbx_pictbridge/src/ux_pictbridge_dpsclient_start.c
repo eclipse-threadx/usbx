@@ -148,7 +148,7 @@ static UINT _dpsclient_storage_format(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_pictbridge_dpsclient_start                      PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -185,9 +185,9 @@ static UINT _dpsclient_storage_format(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used macros for RTOS calls, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            initialized PIMA callbacks, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_start(UX_PICTBRIDGE *pictbridge)

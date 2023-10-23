@@ -82,7 +82,7 @@ ULONG  _ux_host_class_video_max_payload_get(UX_HOST_CLASS_VIDEO *video)
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_video_max_payload_get               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -111,7 +111,7 @@ ULONG  _ux_host_class_video_max_payload_get(UX_HOST_CLASS_VIDEO *video)
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _uxe_host_class_video_max_payload_get(UX_HOST_CLASS_VIDEO *video)

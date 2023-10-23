@@ -156,7 +156,7 @@ ULONG                       class_index;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_stack_class_unregister                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -187,7 +187,7 @@ ULONG                       class_index;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_stack_class_unregister(UCHAR *class_name,

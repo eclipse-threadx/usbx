@@ -185,6 +185,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_memory_copy.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_memory_free.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_memory_free_block_best_get.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_memory_byte_pool_create.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_memory_byte_pool_search.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_memory_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_mutex_create.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_utility_mutex_delete.c

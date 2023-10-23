@@ -41,7 +41,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_descriptor_send                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -89,11 +89,11 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            moved compile option check, */
 /*                                            added support for get string*/
 /*                                            requests with zero wIndex,  */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_descriptor_send(ULONG descriptor_type, ULONG request_index, ULONG host_length)

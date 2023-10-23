@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_audio20.h                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -58,9 +58,9 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized USB descriptors,  */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

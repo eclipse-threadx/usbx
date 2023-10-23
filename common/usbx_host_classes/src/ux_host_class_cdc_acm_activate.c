@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_cdc_acm_activate                     PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,6 +87,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved control searching, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_activate(UX_HOST_CLASS_COMMAND *command)
@@ -214,14 +217,15 @@ UX_HOST_CLASS_CDC_ACM_LINE_STATE    line_state;
             while(cdc_acm_inst)
             {
 
-                /* If this data interface is inside the associate list, link it.  */
-                if (cdc_acm_inst -> ux_host_class_cdc_acm_interfaces_bitmap &
-                    (1ul << interface_ptr -> ux_interface_descriptor.bInterfaceNumber))
+                /* If this data interface is on the same device and inside the associate list, link it.  */
+                if ((cdc_acm_inst -> ux_host_class_cdc_acm_device ==
+                        cdc_acm -> ux_host_class_cdc_acm_device) &&
+                    (cdc_acm_inst -> ux_host_class_cdc_acm_interfaces_bitmap &
+                        (1ul << interface_ptr -> ux_interface_descriptor.bInterfaceNumber)))
                 {
 
-                    /* Save control instance and we are done.  */
+                    /* Save control instance.  */
                     cdc_acm -> ux_host_class_cdc_acm_control = cdc_acm_inst;
-                    break;
                 }
 
                 /* Next instance.  */

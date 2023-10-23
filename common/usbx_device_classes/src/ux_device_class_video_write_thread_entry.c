@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_write_thread_entry           PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -72,6 +72,10 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added error statistics,     */
 /*                                            resulting in version 6.2.0  */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            useed zero copy when class  */
+/*                                            owns endpoint buffer,       */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID _ux_device_class_video_write_thread_entry(ULONG video_stream)
@@ -112,9 +116,19 @@ ULONG                           actual_length;
 
             /* Start payload transfer anyway (even ZLP).  */
             transfer_length = stream -> ux_device_class_video_stream_transfer_pos -> ux_device_class_video_payload_length;
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+            /* Zero copy: directly use frame buffer for transfer.  */
+            transfer -> ux_slave_transfer_request_data_pointer = stream ->
+                        ux_device_class_video_stream_transfer_pos -> ux_device_class_video_payload_data;
+#else
+
+            /* Copy frame buffer to transfer buffer.  */
             if (transfer_length)
                 _ux_utility_memory_copy(transfer -> ux_slave_transfer_request_data_pointer,
                     stream -> ux_device_class_video_stream_transfer_pos -> ux_device_class_video_payload_data, transfer_length); /* Use case of memcpy is verified. */
+#endif
 
             /* Issue transfer request, thread blocked until transfer done.  */
             status = _ux_device_stack_transfer_request(transfer, transfer_length, transfer_length);

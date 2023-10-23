@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_asix_activate                        PORTABLE C      */ 
-/*                                                           6.2.0        */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -91,15 +91,18 @@
 /*                                            added reception buffer,     */
 /*                                            removed internal NX pool,   */
 /*                                            resulting in version 6.2.0  */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            masked in standalone build, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_activate(UX_HOST_CLASS_COMMAND *command)
 {
-#if NX_PHYSICAL_HEADER < 20
+#if (NX_PHYSICAL_HEADER < 20) || defined(UX_HOST_STANDALONE)
 
     UX_PARAMETER_NOT_USED(command);
 
-    /* Error trap - function not supported due to NX lib settings.  */
+    /* Function not supported due to NX lib settings/standalone mode.  */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_FUNCTION_NOT_SUPPORTED);
     return(UX_FUNCTION_NOT_SUPPORTED);
 #else

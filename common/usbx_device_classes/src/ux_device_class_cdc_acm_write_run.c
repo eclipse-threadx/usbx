@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_write_run                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -87,12 +87,12 @@
 /*  10-31-2022     Yajun Xia                Modified comment(s),          */
 /*                                            fixed return code,          */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Yajun Xia, CQ Xiao       Modified comment(s),          */
+/*  10-31-2023     Yajun Xia, CQ Xiao       Modified comment(s),          */
 /*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            fixed return code,          */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
@@ -341,7 +341,7 @@ UINT                        zlp = UX_FALSE;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_cdc_acm_write_run                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -381,7 +381,7 @@ UINT                        zlp = UX_FALSE;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,

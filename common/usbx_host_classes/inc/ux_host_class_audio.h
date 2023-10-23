@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_host_class_audio.h                               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,9 +57,10 @@
 /*                                            added feedback support,     */
 /*                                            added Audio 2.0 support,    */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved AC AS management,  */
 /*                                            optimized USB descriptors,  */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -458,6 +459,7 @@ typedef struct UX_HOST_CLASS_AUDIO_STRUCT
 #if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
     UX_HOST_CLASS_AUDIO_AC
                     *ux_host_class_audio_ac;
+    ULONG           ux_host_class_audio_ac_as;
 #endif
     struct UX_HOST_CLASS_AUDIO_TRANSFER_REQUEST_STRUCT
                     *ux_host_class_audio_head_transfer_request;

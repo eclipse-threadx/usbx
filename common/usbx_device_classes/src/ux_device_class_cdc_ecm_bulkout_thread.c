@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_bulkout_thread             PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,10 +88,11 @@
 /*                                            used pool from NX IP inst,  */
 /*                                            used NX API to copy data,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_bulkout_thread(ULONG cdc_ecm_class)
@@ -171,10 +172,20 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
             
                 /* Reset the queue pointer of this packet.  */
                 packet -> nx_packet_queue_next = UX_NULL;
-            
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
+
+                /* Send the request to the device controller.  */
+                transfer_request -> ux_slave_transfer_request_data_pointer = packet -> nx_packet_prepend_ptr + sizeof(USHORT);
+                status =  _ux_device_stack_transfer_request(transfer_request,
+                        packet -> nx_packet_pool_owner -> nx_packet_pool_payload_size - sizeof(USHORT),
+                        packet -> nx_packet_pool_owner -> nx_packet_pool_payload_size - sizeof(USHORT));
+#else
+
                 /* Send the request to the device controller.  */
                 status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE,
                                                                     UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE);
+#endif
 
                 /* Check the completion code. */
                 if (status == UX_SUCCESS)
@@ -187,6 +198,15 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
                     /* Adjust the prepend pointer to take into account the non 3 bit alignment of the ethernet header.  */
                     packet -> nx_packet_prepend_ptr += sizeof(USHORT);
                     packet -> nx_packet_append_ptr += sizeof(USHORT);
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
+
+                    /* Data already in packet.  */
+                    packet -> nx_packet_length = transfer_request -> ux_slave_transfer_request_actual_length;
+
+                    /* Send that packet to the NetX USB broker.  */
+                    _ux_network_driver_packet_received(cdc_ecm -> ux_slave_class_cdc_ecm_network_handle, packet);
+#else
 
                     /* Copy the received packet in the IP packet data area.  */
                     status = nx_packet_data_append(packet,
@@ -207,6 +227,7 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
                         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_MALFORMED_PACKET_RECEIVED_ERROR);
                         nx_packet_release(packet);
                     }
+#endif
                 }
                 else
 

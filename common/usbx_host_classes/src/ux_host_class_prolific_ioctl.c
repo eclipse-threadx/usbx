@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_prolific_ioctl                       PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -80,8 +80,8 @@
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_prolific_ioctl(UX_HOST_CLASS_PROLIFIC *prolific, ULONG ioctl_function,
@@ -342,7 +342,7 @@ VOID                                (*callback_function) (struct UX_HOST_CLASS_P
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_prolific_ioctl                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -373,7 +373,7 @@ VOID                                (*callback_function) (struct UX_HOST_CLASS_P
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_prolific_ioctl(UX_HOST_CLASS_PROLIFIC *prolific, ULONG ioctl_function,

@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_write_run                   PORTABLE C     */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -78,10 +78,10 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-31-2022         Yajun Xia            Initial Version 6.2.0         */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_printer_write_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
@@ -91,8 +91,10 @@ UINT _ux_device_class_printer_write_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR 
 UX_SLAVE_ENDPOINT           *endpoint;
 UX_SLAVE_DEVICE             *device;
 UX_SLAVE_TRANSFER           *transfer_request;
-UINT                        zlp = UX_FALSE;
 UINT                        status = 0;
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER != 1) || !defined(UX_DEVICE_CLASS_CDC_ACM_ZERO_COPY)
+UINT                        zlp = UX_FALSE;
+#endif
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_PRINTER_WRITE, printer, buffer, requested_length, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
@@ -134,6 +136,54 @@ UINT                        status = 0;
 
     /* We are writing to the IN endpoint.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_PRINTER_ZERO_COPY)
+
+    /* Run the transfer state machine.  */
+    if (printer -> ux_device_class_printer_write_state == UX_STATE_RESET)
+    {
+
+        /* Set the state to WRITE_WAIT.  */
+        printer -> ux_device_class_printer_write_state = UX_DEVICE_CLASS_PRINTER_WRITE_WAIT;
+        printer -> ux_device_class_printer_write_status = UX_TRANSFER_NO_ANSWER;
+        transfer_request -> ux_slave_transfer_request_data_pointer = buffer;
+        UX_SLAVE_TRANSFER_STATE_RESET(transfer_request);
+    }
+
+    /* Issue the transfer request.  */
+#if defined(UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP)
+    status = _ux_device_stack_transfer_run(transfer_request, requested_length, requested_length + 1);
+#else
+    status = _ux_device_stack_transfer_run(transfer_request, requested_length, requested_length);
+#endif
+
+    /* Error case.  */
+    if (status < UX_STATE_NEXT)
+    {
+
+        printer -> ux_device_class_printer_write_state = UX_STATE_RESET;
+        printer -> ux_device_class_printer_write_status =
+                transfer_request -> ux_slave_transfer_request_completion_code;
+        return(UX_STATE_ERROR);
+    }
+
+    /* Success case.  */
+    if (status == UX_STATE_NEXT)
+    {
+
+        /* Last transfer status.  */
+        printer -> ux_device_class_printer_write_status =
+                transfer_request -> ux_slave_transfer_request_completion_code;
+
+        /* Update actual length.  */
+        *actual_length = transfer_request -> ux_slave_transfer_request_actual_length;
+
+        /* It's done.  */
+        printer -> ux_device_class_printer_write_state = UX_STATE_RESET;
+    }
+    return(status);
+
+#else
 
     /* Handle state cases.  */
     switch(printer -> ux_device_class_printer_write_state)
@@ -254,6 +304,7 @@ UINT                        status = 0;
         printer -> ux_device_class_printer_write_state = UX_STATE_RESET;
         break;
     }
+#endif
 
     /* Error case.  */
     return(UX_STATE_EXIT);
@@ -264,7 +315,7 @@ UINT                        status = 0;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_printer_write_run                 PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -305,7 +356,7 @@ UINT                        status = 0;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_printer_write_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,

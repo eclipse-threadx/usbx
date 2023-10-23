@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_field_decompress                 PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -69,6 +69,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved usage handling,    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_field_decompress(UX_HOST_CLASS_HID_FIELD *hid_field, UCHAR *report_buffer, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report)
@@ -130,8 +133,11 @@ ULONG       report_content;
         if (hid_field -> ux_host_class_hid_field_value & UX_HOST_CLASS_HID_ITEM_VARIABLE)
         {
 
-            /* Take the usage directly from the usage array.  */
-            field_usage =  *(hid_field -> ux_host_class_hid_field_usages + field_report_count);
+            /* Take the usage directly from the usage array (if specified).  */
+            if (hid_field -> ux_host_class_hid_field_usages)
+                field_usage =  *(hid_field -> ux_host_class_hid_field_usages + field_report_count);
+            else
+                field_usage = 0;
         }
         else
         {

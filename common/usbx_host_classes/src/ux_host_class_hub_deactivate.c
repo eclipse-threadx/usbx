@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hub_deactivate                       PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -84,6 +84,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved deactivate flow,   */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -91,7 +94,7 @@ UINT  _ux_host_class_hub_deactivate(UX_HOST_CLASS_COMMAND *command)
 
 UX_HOST_CLASS_HUB       *hub;
 UX_HCD                  *hcd;
-UX_TRANSFER             *transfer_request;
+UX_TRANSFER             *transfer_request = UX_NULL;
 UINT                    port_index;
 
 
@@ -105,7 +108,16 @@ UINT                    port_index;
     hub -> ux_host_class_hub_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
     
     /* We need to abort transactions on the interrupt pipe.  */
-    _ux_host_stack_endpoint_transfer_abort(hub -> ux_host_class_hub_interrupt_endpoint);
+#if defined(UX_HOST_STANDALONE)
+    if (hub -> ux_host_class_hub_interrupt_endpoint)
+#endif
+    {
+        _ux_host_stack_endpoint_transfer_abort(hub -> ux_host_class_hub_interrupt_endpoint);
+
+        /* If the Hub class instance has a interrupt pipe with a data payload associated with it
+           it must be freed.  First get the transfer request. */
+        transfer_request =  &hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_transfer_request;
+    }
 
     /* Each device which is downstream on the HUB ports must be removed.  */
     for (port_index = 1; port_index <= hub -> ux_host_class_hub_descriptor.bNbPorts; port_index++)
@@ -120,20 +132,22 @@ UINT                    port_index;
         }
     }
 
-    /* If the Hub class instance has a interrupt pipe with a data payload associated with it
-       it must be freed.  First get the transfer request. */
-    transfer_request =  &hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_transfer_request;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
     _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
 
     /* Then de allocate the memory.  */
+#if defined(UX_HOST_STANDALONE)
+    if (transfer_request)
+#endif
     _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
 
 #if defined(UX_HOST_STANDALONE)
     if (hub -> ux_host_class_hub_allocated)
+    {
         _ux_utility_memory_free(hub -> ux_host_class_hub_allocated);
+    }
 #endif
 
     /* Destroy the instance.  */
@@ -154,10 +168,15 @@ UINT                    port_index;
     /* If trace is enabled, register this object.  */
     UX_TRACE_OBJECT_UNREGISTER(hub);
 
+#if defined(UX_HOST_STANDALONE)
+
+    /* Unlink from device class instance.  */        
+    hub -> ux_host_class_hub_device -> ux_device_class_instance =  (VOID *) hub;
+#endif
+
     /* Free the memory block used by the class.  */
     _ux_utility_memory_free(hub);
 
     /* Return successful completion.  */
     return(UX_SUCCESS);         
 }
-

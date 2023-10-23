@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_pima_command                         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,8 +79,8 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_command(UX_HOST_CLASS_PIMA *pima, UX_HOST_CLASS_PIMA_COMMAND *command,

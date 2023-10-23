@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_bulkout_thread               PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,10 +88,11 @@
 /*                                            used NX API to copy data,   */
 /*                                            used linked NX IP pool,     */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class)
@@ -165,10 +166,41 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
             
                 /* Reset the queue pointer of this packet.  */
                 packet -> nx_packet_queue_next = UX_NULL;
-                        
+
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
+
+                /* Adjust the prepend pointer to take into account the RNDIS header and
+                   non 3 bit alignment of the ethernet header.  */
+                packet -> nx_packet_append_ptr += UX_DEVICE_CLASS_RNDIS_PACKET_BUFFER;
+                switch(((ALIGN_TYPE)packet -> nx_packet_append_ptr) & 0x3)
+                {
+                case 0:
+                    packet -> nx_packet_append_ptr += 2;
+                    break;
+                case 1:
+                    packet -> nx_packet_append_ptr += 1;
+                    break;
+                case 3:
+                    packet -> nx_packet_append_ptr += 3;
+                    break;
+                default:
+                    break;
+                }
+                packet -> nx_packet_prepend_ptr = packet -> nx_packet_append_ptr - UX_DEVICE_CLASS_RNDIS_PACKET_BUFFER;
+
+                /* Get actual size of transfer buffer.  */
+                packet_payload = (ULONG)(packet -> nx_packet_data_end - packet -> nx_packet_prepend_ptr);
+
+                /* Send the request to the device controller.  */
+                transfer_request -> ux_slave_transfer_request_data_pointer = packet -> nx_packet_prepend_ptr;
+                status =  _ux_device_stack_transfer_request(transfer_request,
+                                    packet_payload, packet_payload);
+#else
+
                 /* Send the request to the device controller.  */
                 status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE,
                                                                 UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE);
+#endif
 
                 /* Check the completion code. */
                 if (status == UX_SUCCESS)
@@ -195,6 +227,17 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
                         if (packet_payload <= transfer_request -> ux_slave_transfer_request_actual_length - UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
                         {
 
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
+
+                            /* Data already in buffer, adjust packet start and save length.  */
+                            packet -> nx_packet_prepend_ptr += UX_DEVICE_CLASS_RNDIS_PACKET_BUFFER;
+                            packet -> nx_packet_length = packet_payload;
+                            packet -> nx_packet_append_ptr += packet -> nx_packet_length;
+
+                            /* Send that packet to the NetX USB broker.  */
+                            _ux_network_driver_packet_received(rndis -> ux_slave_class_rndis_network_handle, packet);
+#else
+
                             /* Adjust the prepend pointer to take into account the non 3 bit alignment of the ethernet header.  */
                             packet -> nx_packet_prepend_ptr += sizeof(USHORT);
                             packet -> nx_packet_append_ptr += sizeof(USHORT);
@@ -219,6 +262,7 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
                                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_ETH_PACKET_ERROR);
                                 nx_packet_release(packet);
                             }
+#endif
                         }
                         else
                         {

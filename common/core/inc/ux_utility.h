@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Utility                                                             */
 /**                                                                       */
@@ -26,20 +26,20 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_utility.h                                        PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX components that utilize utility functions.                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    USBX components that utilize utility functions.                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added timer delete, used UX */
@@ -57,10 +57,11 @@
 /*                                            added macros for RTOS calls,*/
 /*                                            fixed OHCI PRSC issue,      */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            refined memory management,  */
 /*                                            added new function to check */
 /*                                            parsed size of descriptor,  */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -86,9 +87,10 @@ VOID             _ux_utility_memory_copy(VOID *memory_destination, VOID *memory_
 VOID             _ux_utility_memory_free(VOID *memory);
 ULONG            _ux_utility_string_length_get(UCHAR *string);
 UINT             _ux_utility_string_length_check(UCHAR *input_string, UINT *string_length_ptr, UINT max_string_length);
-UX_MEMORY_BLOCK *_ux_utility_memory_free_block_best_get(ULONG memory_cache_flag, ULONG memory_size_requested);
+UCHAR           *_ux_utility_memory_byte_pool_search(UX_MEMORY_BYTE_POOL *pool_ptr, ULONG memory_size);
+UINT             _ux_utility_memory_byte_pool_create(UX_MEMORY_BYTE_POOL *pool_ptr, VOID *pool_start, ULONG pool_size);
 VOID             _ux_utility_memory_set(VOID *destination, UCHAR value, ULONG length);
-ULONG            _ux_utility_pci_class_scan(ULONG pci_class, ULONG bus_number, ULONG device_number, 
+ULONG            _ux_utility_pci_class_scan(ULONG pci_class, ULONG bus_number, ULONG device_number,
                             ULONG function_number, ULONG *current_bus_number,
                             ULONG *current_device_number, ULONG *current_function_number);
 ULONG            _ux_utility_pci_read(ULONG bus_number, ULONG device_number, ULONG function_number,
@@ -116,9 +118,9 @@ UINT             _ux_utility_semaphore_create(UX_SEMAPHORE *semaphore, CHAR *sem
 UINT             _ux_utility_semaphore_delete(UX_SEMAPHORE *semaphore);
 UINT             _ux_utility_semaphore_get(UX_SEMAPHORE *semaphore, ULONG semaphore_signal);
 UINT             _ux_utility_semaphore_put(UX_SEMAPHORE *semaphore);
-UINT             _ux_utility_thread_create(UX_THREAD *thread_ptr, CHAR *name, 
+UINT             _ux_utility_thread_create(UX_THREAD *thread_ptr, CHAR *name,
                              VOID (*entry_function)(ULONG), ULONG entry_input,
-                             VOID *stack_start, ULONG stack_size, 
+                             VOID *stack_start, ULONG stack_size,
                              UINT priority, UINT preempt_threshold,
                              ULONG time_slice, UINT auto_start);
 UINT             _ux_utility_thread_delete(UX_THREAD *thread_ptr);
@@ -129,12 +131,12 @@ UINT             _ux_utility_thread_sleep(ULONG ticks);
 UINT             _ux_utility_thread_suspend(UX_THREAD *thread_ptr);
 UX_THREAD       *_ux_utility_thread_identify(VOID);
 UINT             _ux_utility_timer_create(UX_TIMER *timer, CHAR *timer_name, VOID (*expiration_function) (ULONG),
-                             ULONG expiration_input, ULONG initial_ticks, ULONG reschedule_ticks, 
+                             ULONG expiration_input, ULONG initial_ticks, ULONG reschedule_ticks,
                              UINT activation_flag);
 UINT             _ux_utility_timer_delete(UX_TIMER *timer);
 UINT             _ux_utility_event_flags_create(UX_EVENT_FLAGS_GROUP*group_ptr, CHAR *name);
 UINT             _ux_utility_event_flags_delete(UX_EVENT_FLAGS_GROUP*group_ptr);
-UINT             _ux_utility_event_flags_get(UX_EVENT_FLAGS_GROUP*group_ptr, ULONG requested_flags, 
+UINT             _ux_utility_event_flags_get(UX_EVENT_FLAGS_GROUP*group_ptr, ULONG requested_flags,
                                                  UINT get_option, ULONG *actual_flags_ptr, ULONG wait_option);
 UINT             _ux_utility_event_flags_set(UX_EVENT_FLAGS_GROUP*group_ptr, ULONG flags_to_set,
                                                  UINT set_option);
@@ -399,7 +401,7 @@ VOID*            _ux_utility_memory_allocate_add_safe(ULONG align,ULONG cache,UL
 
 
 /* Define the system API mappings.
-   Note: this section is only applicable to 
+   Note: this section is only applicable to
    application source code, hence the conditional that turns off this
    stuff when the include file is processed by the ThreadX source. */
 
@@ -450,8 +452,8 @@ VOID*            _ux_utility_memory_allocate_add_safe(ULONG align,ULONG cache,UL
 #define ux_utility_event_flags_set                     _ux_utility_event_flags_set
 #define ux_utility_unicode_to_string                   _ux_utility_unicode_to_string
 #define ux_utility_string_to_unicode                   _ux_utility_string_to_unicode
-#define ux_utility_delay_ms                            _ux_utility_delay_ms 
-#define ux_utility_error_callback_register             _ux_utility_error_callback_register 
+#define ux_utility_delay_ms                            _ux_utility_delay_ms
+#define ux_utility_error_callback_register             _ux_utility_error_callback_register
 #define ux_system_error_handler                        _ux_system_error_handler
 
 #define ux_utility_time_get                            _ux_utility_time_get

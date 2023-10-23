@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_event_check                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,7 +65,7 @@
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_event_check(UX_SLAVE_CLASS_HID *hid,
@@ -98,7 +98,7 @@ UX_SLAVE_DEVICE                 *device;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_event_free                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -125,7 +125,7 @@ UX_SLAVE_DEVICE                 *device;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_hid_event_free(UX_SLAVE_CLASS_HID *hid)
@@ -145,7 +145,7 @@ UCHAR                           *pos;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_hid_event_get                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -180,9 +180,9 @@ UCHAR                           *pos;
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added zero copy support,    */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid,
@@ -225,7 +225,7 @@ UINT                            status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_hid_event_get                     PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -255,7 +255,7 @@ UINT                            status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid,

@@ -12,8 +12,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Simulator Controller Driver                                    */
 /**                                                                       */
@@ -30,43 +30,43 @@
 #include "ux_dcd_sim_slave.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_initialize                         PORTABLE C      */ 
-/*                                                           6.1.10       */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_sim_host_initialize                         PORTABLE C      */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the simulated host controller             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    HCD                                   Pointer to HCD                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_periodic_tree_create Create periodic tree          */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_semaphore_put             Semaphore put                 */ 
-/*    _ux_utility_timer_create              Create timer                  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the simulated host controller             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    HCD                                   Pointer to HCD                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_sim_host_periodic_tree_create Create periodic tree          */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_semaphore_put             Semaphore put                 */
+/*    _ux_utility_timer_create              Create timer                  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized based on compile  */
@@ -81,6 +81,9 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2023     Yajun Xia                Modified comment(s),          */
+/*                                            refined memory management,  */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_initialize(UX_HCD *hcd)
@@ -89,12 +92,12 @@ UINT  _ux_hcd_sim_host_initialize(UX_HCD *hcd)
 UX_SLAVE_DCD        *dcd;
 UX_DCD_SIM_SLAVE    *dcd_sim_slave;
 UX_HCD_SIM_HOST     *hcd_sim_host;
-UINT                status;
+UINT                status = UX_ERROR;
 
 
     /* The controller initialized here is of host simulator type.  */
     hcd -> ux_hcd_controller_type =  UX_HCD_SIM_HOST_CONTROLLER;
-    
+
     /* Allocate memory for this host simulator HCD instance.  */
     hcd_sim_host =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_HCD_SIM_HOST));
     if (hcd_sim_host == UX_NULL)
@@ -119,14 +122,17 @@ UINT                status;
     hcd -> ux_hcd_status =  UX_HCD_STATUS_HALTED;
 
     /* Allocate the list of EDs. All EDs are allocated on 16 byte memory boundary.  */
-    hcd_sim_host -> ux_hcd_sim_host_ed_list =  _ux_utility_memory_allocate(UX_ALIGN_16, UX_REGULAR_MEMORY, (ULONG)sizeof(UX_HCD_SIM_HOST_ED) * _ux_system_host -> ux_system_host_max_ed);
-    if (hcd_sim_host -> ux_hcd_sim_host_ed_list == UX_NULL)
-        status = UX_MEMORY_INSUFFICIENT;
-    else
-        status = UX_SUCCESS;
+    if (_ux_system_host -> ux_system_host_max_ed != 0)
+    {
+        hcd_sim_host -> ux_hcd_sim_host_ed_list =  _ux_utility_memory_allocate(UX_ALIGN_16, UX_REGULAR_MEMORY, (ULONG)sizeof(UX_HCD_SIM_HOST_ED) * _ux_system_host -> ux_system_host_max_ed);
+        if (hcd_sim_host -> ux_hcd_sim_host_ed_list == UX_NULL)
+            status = UX_MEMORY_INSUFFICIENT;
+        else
+            status = UX_SUCCESS;
+    }
 
     /* Allocate the list of TDs. All TDs are allocated on 32 byte memory boundary.  */
-    if (status == UX_SUCCESS)
+    if ((status == UX_SUCCESS) && (_ux_system_host -> ux_system_host_max_td != 0))
     {
         hcd_sim_host -> ux_hcd_sim_host_td_list =  _ux_utility_memory_allocate(UX_ALIGN_32, UX_REGULAR_MEMORY, (ULONG)sizeof(UX_HCD_SIM_HOST_TD) * _ux_system_host -> ux_system_host_max_td);
         if (hcd_sim_host -> ux_hcd_sim_host_td_list == UX_NULL)
@@ -134,7 +140,7 @@ UINT                status;
     }
 
     /* Allocate the list of isochronous TDs. All TDs are allocated on 32 byte memory boundary.  */
-    if (status == UX_SUCCESS)
+    if ((status == UX_SUCCESS) && (_ux_system_host -> ux_system_host_max_iso_td != 0))
     {
         hcd_sim_host -> ux_hcd_sim_host_iso_td_list =  _ux_utility_memory_allocate(UX_ALIGN_32, UX_REGULAR_MEMORY, (ULONG)sizeof(UX_HCD_SIM_HOST_ISO_TD) * _ux_system_host -> ux_system_host_max_iso_td);
         if (hcd_sim_host -> ux_hcd_sim_host_iso_td_list == UX_NULL)
@@ -156,7 +162,7 @@ UINT                status;
 
         /* The periodic scheduler is not active.  */
         hcd_sim_host -> ux_hcd_sim_host_periodic_scheduler_active =  0;
-        
+
         /* We start a timer that will invoke the simulator every timer tick.  */
         status = _ux_host_timer_create(&hcd_sim_host -> ux_hcd_sim_host_timer, "USBX Simulation Timer",
                         _ux_hcd_sim_host_timer_function, (ULONG) (ALIGN_TYPE) hcd_sim_host, 1, 1, UX_AUTO_ACTIVATE);
@@ -197,7 +203,7 @@ UINT                status;
         }
     }
 
-    /* Get the number of ports on the controller. The number of ports needs to be reflected both 
+    /* Get the number of ports on the controller. The number of ports needs to be reflected both
        for the generic HCD container and the local sim_host container. In the simulator,
        the number of ports is hardwired to 1 only.  */
     hcd -> ux_hcd_nb_root_hubs =  1;

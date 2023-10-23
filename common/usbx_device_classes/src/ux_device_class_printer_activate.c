@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_activate                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -68,10 +68,10 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -108,7 +108,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
             if (endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_IN)
             {
                 printer -> ux_device_class_printer_endpoint_in = endpoint;
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if defined(UX_DEVICE_CLASS_PRINTER_OWN_ENDPOINT_BUFFER)
                 endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
                                 UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER(printer);
 #endif
@@ -118,7 +118,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
             else
             {
                 printer -> ux_device_class_printer_endpoint_out = endpoint;
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if defined(UX_DEVICE_CLASS_PRINTER_OWN_ENDPOINT_BUFFER)
                 endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
                                 UX_DEVICE_CLASS_PRINTER_READ_BUFFER(printer);
 #endif

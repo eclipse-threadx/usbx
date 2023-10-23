@@ -36,7 +36,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_hid_remote_control_deactivate        PORTABLE C      */ 
-/*                                                           6.1          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved unload sequence,   */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_remote_control_deactivate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -93,14 +96,8 @@ UINT                                status;
     /* Get the remote control local instance.  */
     remote_control_instance =  (UX_HOST_CLASS_HID_REMOTE_CONTROL *) hid_client -> ux_host_class_hid_client_local_instance;
 
-    /* Unload all the memory used by the remote control client.  */
-    _ux_utility_memory_free(remote_control_instance -> ux_host_class_hid_remote_control_usage_array);
-
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_HID_REMOTE_CONTROL_DEACTIVATE, hid, remote_control_instance, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
-
-    /* Now free the instance memory.  */
-    _ux_utility_memory_free(hid_client -> ux_host_class_hid_client_local_instance);
 
     /* We may need to inform the application
        if a function has been programmed in the system structure.  */
@@ -110,6 +107,12 @@ UINT                                status;
         /* Call system change function.  */
         _ux_system_host ->  ux_system_host_change_function(UX_HID_CLIENT_REMOVAL, hid -> ux_host_class_hid_class, (VOID *) hid_client);
     }
+
+    /* Unload all the memory used by the remote control client.  */
+    _ux_utility_memory_free(remote_control_instance -> ux_host_class_hid_remote_control_usage_array);
+
+    /* Now free the instance memory.  */
+    _ux_utility_memory_free(hid_client -> ux_host_class_hid_client_local_instance);
 
     /* Return completion status.  */
     return(status);    

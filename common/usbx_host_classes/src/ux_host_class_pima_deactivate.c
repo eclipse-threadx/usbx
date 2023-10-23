@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_host_class_pima_deactivate                      PORTABLE C      */ 
-/*                                                           6.1.10       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -59,8 +59,6 @@
 /*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
 /*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
 /*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
 /*                                                                        */ 
 /*  CALLED BY                                                             */ 
 /*                                                                        */ 
@@ -76,6 +74,10 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            refined macros names,       */
 /*                                            resulting in version 6.1.10 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved INT EP support,    */
+/*                                            removed unused semaphore,   */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -84,8 +86,7 @@ UINT  _ux_host_class_pima_deactivate(UX_HOST_CLASS_COMMAND *command)
 UX_HOST_CLASS_PIMA              *pima;
 UX_HOST_CLASS_PIMA_SESSION      *pima_session;
 UX_TRANSFER                     *transfer_request;
-UINT                            status;
-                            
+
 
     /* Get the instance for this class.  */
     pima =  (UX_HOST_CLASS_PIMA *) command -> ux_host_class_command_instance;
@@ -93,13 +94,6 @@ UINT                            status;
     /* The pima is being shut down.  */
     pima -> ux_host_class_pima_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
 
-    /* Protect thread reentry to this instance.  */
-    status =  _ux_host_semaphore_get(&pima -> ux_host_class_pima_semaphore, UX_WAIT_FOREVER);
-    if (status != UX_SUCCESS)
-
-        /* Return error. */
-        return(status);
-    
     /* We come to this point when the device has been extracted. So there may have been a transaction
        being scheduled. We make sure the transaction has been completed by the controller driver.
        When the device is extracted, the controller tries multiple times the transaction and retires it
@@ -122,12 +116,18 @@ UINT                            status;
 
        
     /* Then interrupt endpoint.  */
-    transfer_request =  &pima -> ux_host_class_pima_interrupt_endpoint -> ux_endpoint_transfer_request;
-    if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
-       
-        /* We need to abort transactions on the Interrupt pipe.  */
-        _ux_host_stack_endpoint_transfer_abort(pima -> ux_host_class_pima_interrupt_endpoint);
-    
+    if (pima -> ux_host_class_pima_interrupt_endpoint != UX_NULL)
+    {
+        transfer_request =  &pima -> ux_host_class_pima_interrupt_endpoint -> ux_endpoint_transfer_request;
+        if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
+        
+            /* We need to abort transactions on the Interrupt pipe.  */
+            _ux_host_stack_endpoint_transfer_abort(pima -> ux_host_class_pima_interrupt_endpoint);
+
+        /* Free the interrupt transfer buffer.  */
+        _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
+    }
+
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
     _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
@@ -163,9 +163,6 @@ UINT                            status;
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(pima -> ux_host_class_pima_class, (VOID *) pima);
-
-    /* Destroy the semaphore.  */
-    _ux_host_semaphore_delete(&pima -> ux_host_class_pima_semaphore);
 
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */

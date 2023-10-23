@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_ccid.h                              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -42,9 +42,9 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Yajun xia, CQ Xiao       Modified comment(s),          */
+/*  10-31-2023     Yajun xia, CQ Xiao       Modified comment(s),          */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

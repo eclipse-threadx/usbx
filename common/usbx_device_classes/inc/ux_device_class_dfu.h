@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */ 
 /*                                                                        */ 
 /*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -60,9 +60,9 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added macros for req types, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*  10-31-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

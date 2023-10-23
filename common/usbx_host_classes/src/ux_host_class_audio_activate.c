@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_audio_activate                       PORTABLE C      */
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,6 +88,11 @@
 /*                                            added feedback support,     */
 /*                                            refined error handling,     */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            improved AC AS management,  */
+/*                                            improved error handling,    */
+/*                                            improved descriptors check, */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_activate(UX_HOST_CLASS_COMMAND *command)
@@ -195,6 +200,11 @@ UINT                    status;
 
                 /* In this case, bFirstInterface@2 is AC, followed ASes.  */
                 /* Use bInterfaceCount@3.  */
+                if (iad[3] <= 1)
+                {
+                    _ux_utility_memory_free(ac);
+                    return(UX_DESCRIPTOR_CORRUPTED);
+                }
                 as_count = (ULONG)iad[3] - 1;
                 break;
             }
@@ -204,6 +214,11 @@ UINT                    status;
             {
 
                 /* In this case, bInCollection@7 is AS count.  */
+                if (desc[7] < 1 || (8 + desc[7]) != desc[0])
+                {
+                    _ux_utility_memory_free(ac);
+                    return(UX_DESCRIPTOR_CORRUPTED);
+                }
                 as_count = (ULONG)uac10_acd[7];
                 break;
             }
@@ -341,47 +356,58 @@ UINT                    status;
 
 #if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
 
-    /* Find AC and link them.  */
-    ac = (UX_HOST_CLASS_AUDIO_AC *)audio -> ux_host_class_audio_class -> ux_host_class_first_instance;
-    while(ac)
+    /* Find AC and link it if there is no error.  */
+    if (status == UX_SUCCESS)
     {
 
-        /* Check interface number to see if it's right AC.  */
-        if (audio -> ux_host_class_audio_control_interface_number ==
-            ac -> ux_host_class_audio_interface -> ux_interface_descriptor.bInterfaceNumber)
+        ac = (UX_HOST_CLASS_AUDIO_AC *)audio -> ux_host_class_audio_class -> ux_host_class_first_instance;
+        while(ac)
         {
 
-            /* Save AS to AC controlled list.  */
-            for (pos = 0; pos < ac -> ux_host_class_audio_as_count; pos ++)
+            /* Check interface number to see if it's right AC.  */
+            if ((ac -> ux_host_class_audio_interface -> ux_interface_configuration == 
+                    interface_ptr -> ux_interface_configuration) &&
+                (ac -> ux_host_class_audio_interface -> ux_interface_descriptor.bInterfaceNumber ==
+                    audio -> ux_host_class_audio_control_interface_number) &&
+                (ac -> ux_host_class_audio_interface -> ux_interface_descriptor.bInterfaceClass ==
+                    UX_HOST_CLASS_AUDIO_CLASS) &&
+                (ac -> ux_host_class_audio_interface -> ux_interface_descriptor.bInterfaceSubClass ==
+                    UX_HOST_CLASS_AUDIO_SUBCLASS_CONTROL))
             {
-                if (ac -> ux_host_class_audio_as[pos] == UX_NULL)
-                {
 
-                    /* This AC is for current AS.  */
-                    audio -> ux_host_class_audio_ac = ac;
-                    ac -> ux_host_class_audio_as[pos] = audio;
+                /* Save AS to AC controlled list.  */
+                for (pos = 0; pos < ac -> ux_host_class_audio_as_count; pos ++)
+                {
+                    if (ac -> ux_host_class_audio_as[pos] == UX_NULL)
+                    {
+
+                        /* This AC is for current AS.  */
+                        audio -> ux_host_class_audio_ac = ac;
+                        audio -> ux_host_class_audio_ac_as = pos;
+                        ac -> ux_host_class_audio_as[pos] = audio;
+                        break;
+                    }
+                }
+
+                /* If there is no place for AS, something wrong.  */
+                if (pos >= ac -> ux_host_class_audio_as_count)
+                {
+                    status = UX_DESCRIPTOR_CORRUPTED;
                     break;
                 }
             }
 
-            /* If there is no place for AS, something wrong.  */
-            if (pos >= ac -> ux_host_class_audio_as_count)
-            {
-                status = UX_DESCRIPTOR_CORRUPTED;
+            /* If AC is found and linked, done.  */
+            if (audio -> ux_host_class_audio_ac != UX_NULL)
                 break;
-            }
+
+            /* If there is error, break.  */
+            if (status != UX_SUCCESS)
+                break;
+
+            /* Check next AC/AS.  */
+            ac = (UX_HOST_CLASS_AUDIO_AC *)ac -> ux_host_class_audio_next_instance;
         }
-
-        /* If AC is found and linked, done.  */
-        if (audio -> ux_host_class_audio_ac != UX_NULL)
-            break;
-
-        /* If there is error, break.  */
-        if (status != UX_SUCCESS)
-            break;
-
-        /* Check next AC/AS.  */
-        ac = (UX_HOST_CLASS_AUDIO_AC *)ac -> ux_host_class_audio_next_instance;
     }
 #endif
 
@@ -416,6 +442,11 @@ UINT                    status;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, status, audio, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+#if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
+
+    /* When there is error, AC is not linked (last possible error), no need to unlink.  */
+#endif
 
     /* Error, destroy the class instance.  */
     _ux_host_stack_class_instance_destroy(audio -> ux_host_class_audio_class, (VOID *) audio);

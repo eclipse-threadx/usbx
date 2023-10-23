@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_audio_read_task_function           PORTABLE C      */
-/*                                                           6.2.0        */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -71,6 +71,11 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  10-31-2022     Yajun Xia                Initial Version 6.2.0         */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added a new mode to manage  */
+/*                                            endpoint buffer in classes  */
+/*                                            with zero copy enabled,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_audio_read_task_function(UX_DEVICE_CLASS_AUDIO_STREAM *stream)
@@ -116,6 +121,13 @@ UINT                            status;
         /* Next state: transfer wait.  */
         stream -> ux_device_class_audio_stream_task_state = UX_DEVICE_CLASS_AUDIO_STREAM_RW_WAIT;
 
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+
+        /* Zero copy: directly use stream buffer for transfer.  */
+        transfer -> ux_slave_transfer_request_data_pointer =
+            stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_data;
+#endif
+
         /* Reset transfer state.  */
         UX_SLAVE_TRANSFER_STATE_RESET(transfer);
     }
@@ -153,9 +165,14 @@ UINT                            status;
         /* Frame received, log it.  */
         stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_length = actual_length;
         stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_pos = 0;
+
+#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 0
+
+        /* Copy data from endpoint buffer.  */
         _ux_utility_memory_copy(stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_data,
                         transfer -> ux_slave_transfer_request_data_pointer,
                         actual_length); /* Use case of memcpy is verified. */
+#endif
 
         /* For simple, do not advance the transfer position if there is overflow.  */
         next_pos = (UCHAR *)stream -> ux_device_class_audio_stream_transfer_pos;

@@ -26,7 +26,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_host_class_printer.h                             PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -57,9 +57,9 @@
 /*                                            added standalone support,   */
 /*                                            added a new protocol const, */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
+/*  10-31-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

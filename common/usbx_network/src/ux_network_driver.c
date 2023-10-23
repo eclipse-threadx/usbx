@@ -743,7 +743,7 @@ UINT                            i;
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_network_driver_packet_received                  PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -781,6 +781,10 @@ UINT                            i;
 /*  07-29-2022     Yajun Xia                Modified comment(s),          */
 /*                                            fixed ipv6 support issue,   */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            checked packet data length  */
+/*                                            before process the packet,  */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -800,6 +804,18 @@ NX_IP           *nx_ip;
         nx_packet_release(packet_ptr);
         return;
 
+    }
+
+    /* Check if the packet is valid for ethernet header process.  */
+    if (packet_ptr -> nx_packet_length < NX_ETHERNET_SIZE)
+    {
+
+        /* We received a malformed packet. Report to application.  */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CLASS_MALFORMED_PACKET_RECEIVED_ERROR);
+
+        /* Invalid ethernet header... release the packet.  */
+        nx_packet_release(packet_ptr);
+        return;
     }
 
     /* Pickup the packet header to determine where the packet needs to be

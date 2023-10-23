@@ -24,7 +24,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_printer.h                           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -50,11 +50,11 @@
 /*  03-08-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Yajun Xia, CQ Xiao       Modified comment(s),          */
+/*  10-31-2023     Yajun Xia, CQ Xiao       Modified comment(s),          */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            fixed error checking issue, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -77,6 +77,16 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PRINTER_ENABLE_ERROR_CHECKING
 #endif
 
+
+/* Option: defined, it enables zero copy support (works if PRINTER owns endpoint buffer).
+    Defined, it enables zero copy for bulk in/out endpoints (write/read). In this case, the endpoint
+    buffer is not allocated in class, application must provide the buffer for read/write, and the
+    buffer must meet device controller driver (DCD) buffer requirements (e.g., aligned and cache
+    safe if buffer is for DMA).
+ */
+/* #define UX_DEVICE_CLASS_PRINTER_ZERO_COPY  */
+
+
 /* Defined, _write is pending ZLP automatically (complete transfer) after buffer is sent.  */
 
 /* #define UX_DEVICE_CLASS_PRINTER_WRITE_AUTO_ZLP  */
@@ -90,6 +100,13 @@ extern   "C" {
 /* Option: bulk in endpoint / write buffer size, must be larger than max packet size in framework, and aligned in 4-bytes.  */
 #ifndef UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE
 #define UX_DEVICE_CLASS_PRINTER_WRITE_BUFFER_SIZE                        UX_SLAVE_REQUEST_DATA_MAX_LENGTH
+#endif
+
+
+/* Internal: check if class own endpoint buffer  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) &&                                   \
+    (!defined(UX_DEVICE_CLASS_PRINTER_ZERO_COPY))
+#define UX_DEVICE_CLASS_PRINTER_OWN_ENDPOINT_BUFFER
 #endif
 
 

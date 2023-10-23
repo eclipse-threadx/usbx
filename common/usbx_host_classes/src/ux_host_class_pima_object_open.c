@@ -109,7 +109,7 @@ UINT  _ux_host_class_pima_object_open(UX_HOST_CLASS_PIMA *pima,
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_pima_object_open                    PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -141,7 +141,7 @@ UINT  _ux_host_class_pima_object_open(UX_HOST_CLASS_PIMA *pima,
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_pima_object_open(UX_HOST_CLASS_PIMA *pima,

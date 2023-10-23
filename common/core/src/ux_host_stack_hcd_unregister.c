@@ -202,7 +202,7 @@ UINT        hcd_name_length =  0;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_stack_hcd_unregister                      PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -234,7 +234,7 @@ UINT        hcd_name_length =  0;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_hcd_unregister(UCHAR *hcd_name,

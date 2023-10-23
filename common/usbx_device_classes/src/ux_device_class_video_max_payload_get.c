@@ -96,7 +96,7 @@ UX_SLAVE_DEVICE             *device;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_video_max_payload_length          PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -129,7 +129,7 @@ UX_SLAVE_DEVICE             *device;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 ULONG _uxe_device_class_video_max_payload_length(UX_DEVICE_CLASS_VIDEO_STREAM *stream)

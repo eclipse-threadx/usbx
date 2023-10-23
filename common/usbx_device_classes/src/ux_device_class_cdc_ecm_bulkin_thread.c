@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_bulkin_thread              PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,10 +86,11 @@
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used NX API to copy data,   */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_bulkin_thread(ULONG cdc_ecm_class)
@@ -104,6 +105,9 @@ ULONG                           actual_flags;
 NX_PACKET                       *current_packet;
 ULONG                           transfer_length;
 ULONG                           copied;
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY) && !defined(NX_DISABLE_PACKET_CHAIN)
+NX_PACKET                       *packet;
+#endif
 
     /* Cast properly the cdc_ecm instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, cdc_ecm_class)
@@ -154,7 +158,84 @@ ULONG                           copied;
                     /* If the link is down no need to rearm a packet. */
                     if (cdc_ecm -> ux_slave_class_cdc_ecm_link_state == UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_UP)
                     {
-                
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
+
+                        /* Default to success.  */
+                        status = UX_SUCCESS;
+
+#ifndef NX_DISABLE_PACKET_CHAIN
+
+                        /* Check if packet is chained, allocate a new packet to fill the total data.  */
+                        if (current_packet -> nx_packet_next)
+                        {
+
+                            /* Check if collection of chained data can fit in one packet.  */
+                            if (current_packet -> nx_packet_length >
+                                current_packet -> nx_packet_pool_owner -> nx_packet_pool_payload_size)
+                                status = UX_TRANSFER_BUFFER_OVERFLOW;
+                            else
+                            {
+
+                                /* Allocate a new packet for chain data collection.  */
+                                status = nx_packet_allocate(cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool, &packet, 
+                                            NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_WAIT));
+                                if (status == UX_SUCCESS)
+                                {
+
+                                    /* Copy the packet to the buffer.  */
+                                    status = nx_packet_data_extract_offset(current_packet, 0,
+                                            packet -> nx_packet_prepend_ptr,
+                                            current_packet -> nx_packet_length, &copied);
+                                    if (status == NX_SUCCESS)
+                                    {
+                                        packet -> nx_packet_length = current_packet -> nx_packet_length;
+
+                                        /* Release the chained packet.  */
+                                        nx_packet_transmit_release(current_packet);
+
+                                        /* Use copied packet instead.  */
+                                        current_packet = packet;
+                                    }
+                                }
+                            }
+
+
+                            /* Can not copy/buffer issue.  */
+                            if (status != UX_SUCCESS)
+                                status = UX_TRANSFER_BUFFER_OVERFLOW;
+
+                        }
+#endif
+                        if (status == UX_SUCCESS)
+                        {
+
+                            /* Set the transfer request data pointer to the packet buffer.  */
+                            transfer_request -> ux_slave_transfer_request_data_pointer = current_packet -> nx_packet_prepend_ptr;
+
+                            /* Calculate the transfer length.  */
+                            transfer_length =  current_packet -> nx_packet_length;
+                            
+                            /* If trace is enabled, insert this event into the trace buffer.  */
+                            UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ECM_PACKET_TRANSMIT, cdc_ecm, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
+
+                            /* Send the request to the device controller.  */
+                            status =  _ux_device_stack_transfer_request(transfer_request, transfer_length, transfer_length + 1);
+                        }
+
+                        /* Check error code. */
+                        if (status != UX_SUCCESS)
+                        {
+
+                            /* Is this not a transfer abort? (this is expected to happen)  */
+                            if (status != UX_TRANSFER_BUS_RESET)
+                            {
+
+                                /* Error trap. */
+                                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, status);
+                            }
+                        }
+#else
+
                         /* Can the packet fit in the transfer requests data buffer?  */
                         if (current_packet -> nx_packet_length <= UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE)
                         {
@@ -197,6 +278,7 @@ ULONG                           copied;
                             /* Report error to application.  */
                             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_TRANSFER_BUFFER_OVERFLOW);
                         }
+#endif
                     }
 
                     /* Free the packet that was just sent.  First do some housekeeping.  */

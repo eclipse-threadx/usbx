@@ -26,7 +26,7 @@
 /*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
 /*                                                                        */ 
 /*    ux_port.h                                            ARM9/IAR       */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
@@ -46,10 +46,10 @@
 /*                                            moved tx_api.h include and  */
 /*                                            typedefs from ux_api.h,     */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added basic types guards,   */
 /*                                            improved SLONG typedef,     */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -256,7 +256,7 @@ VOID    outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] = 
-                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX ARM9/IAR Version 6.2.0 *";
+                                    "Copyright (c) Microsoft Corporation. All rights reserved. * USBX ARM9/IAR Version 6.3.0 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_rndis_activate                     PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -79,10 +79,11 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -157,7 +158,7 @@ ULONG                       physical_address_lsw;
 
                 /* We have found the bulk in endpoint, save it.  */
                 rndis -> ux_slave_class_rndis_bulkin_endpoint =  endpoint;
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
                 endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
                                 UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER(rndis);
 #endif
@@ -171,7 +172,7 @@ ULONG                       physical_address_lsw;
 
                 /* We have found the bulk out endpoint, save it.  */
                 rndis -> ux_slave_class_rndis_bulkout_endpoint =  endpoint;
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
                 endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
                                 UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER(rndis);
 #endif
@@ -209,12 +210,14 @@ ULONG                       physical_address_lsw;
                                         physical_address_lsw);
                 
         /* Reset the endpoint buffers.  */
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)
         _ux_utility_memory_set(rndis -> ux_slave_class_rndis_bulkout_endpoint -> ux_slave_endpoint_transfer_request. 
-                                        ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
+                                        ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE); /* Use case of memset is verified. */
         _ux_utility_memory_set(rndis -> ux_slave_class_rndis_bulkin_endpoint -> ux_slave_endpoint_transfer_request. 
-                                        ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
+                                        ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_RNDIS_BULKIN_BUFFER_SIZE); /* Use case of memset is verified. */
+#endif
         _ux_utility_memory_set(rndis -> ux_slave_class_rndis_interrupt_endpoint -> ux_slave_endpoint_transfer_request. 
-                                        ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
+                                        ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_RNDIS_INTERRUPTIN_BUFFER_SIZE); /* Use case of memset is verified. */
     
         /* Resume the endpoint threads.  */
         _ux_device_thread_resume(&rndis -> ux_slave_class_rndis_interrupt_thread); 

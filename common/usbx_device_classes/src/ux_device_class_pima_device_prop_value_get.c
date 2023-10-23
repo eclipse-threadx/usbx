@@ -40,7 +40,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_pima_device_prop_value_get         PORTABLE C      */
-/*                                                           6.X          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,10 +85,10 @@
 /*                                            updated status handling,    */
 /*                                            improved sanity checks,     */
 /*                                            resulting in version 6.1.10 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            checked compiling options   */
 /*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_device_prop_value_get(UX_SLAVE_CLASS_PIMA *pima,

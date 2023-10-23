@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_video_transfer_buffer_add            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -88,8 +88,8 @@
 /*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            set pending on endpoint,    */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Yajun xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_transfer_buffer_add(UX_HOST_CLASS_VIDEO *video, UCHAR* buffer)
@@ -189,7 +189,7 @@ ULONG           packet_size;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_video_transfer_buffer_add           PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -221,7 +221,7 @@ ULONG           packet_size;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_video_transfer_buffer_add(UX_HOST_CLASS_VIDEO *video, UCHAR* buffer)

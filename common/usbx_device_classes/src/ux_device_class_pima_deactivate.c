@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_pima_deactivate                    PORTABLE C      */ 
-/*                                                           6.1.12       */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            supported optional INT EP,  */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_deactivate(UX_SLAVE_CLASS_COMMAND *command)
@@ -87,7 +90,8 @@ UX_SLAVE_CLASS              *class_ptr;
     /* Terminate the transactions pending on the endpoints.  */
     _ux_device_stack_transfer_all_request_abort(pima -> ux_device_class_pima_bulk_in_endpoint, UX_TRANSFER_BUS_RESET);
     _ux_device_stack_transfer_all_request_abort(pima -> ux_device_class_pima_bulk_out_endpoint, UX_TRANSFER_BUS_RESET);
-    _ux_device_stack_transfer_all_request_abort(pima -> ux_device_class_pima_interrupt_endpoint, UX_TRANSFER_BUS_RESET);
+    if (pima -> ux_device_class_pima_interrupt_endpoint)
+        _ux_device_stack_transfer_all_request_abort(pima -> ux_device_class_pima_interrupt_endpoint, UX_TRANSFER_BUS_RESET);
 
     /* Session is now closed.  */
     pima -> ux_device_class_pima_session_id = 0;

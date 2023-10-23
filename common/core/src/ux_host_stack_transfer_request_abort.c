@@ -153,7 +153,7 @@ ULONG           completion_code;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_stack_transfer_request_abort              PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -183,7 +183,7 @@ ULONG           completion_code;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request)

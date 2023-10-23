@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_stack_control_request_process            PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -94,10 +94,10 @@
 /*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed vendor request issue, */
 /*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            improved interface request  */
 /*                                            process with print class,   */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_control_request_process(UX_SLAVE_TRANSFER *transfer_request)

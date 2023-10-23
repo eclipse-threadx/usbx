@@ -186,7 +186,7 @@ UX_HOST_CLASS_HID_REPORT    *next_hid_report;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_hid_report_id_get                   PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -216,7 +216,7 @@ UX_HOST_CLASS_HID_REPORT    *next_hid_report;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Initial Version 6.x           */
+/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_hid_report_id_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_REPORT_GET_ID *report_id)

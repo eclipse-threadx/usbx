@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_write_payload_commit         PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -65,8 +65,8 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
-/*                                            resulting in version 6.x    */
+/*  10-31-2023     Yajun Xia                Modified comment(s),          */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_video_write_payload_commit(UX_DEVICE_CLASS_VIDEO_STREAM *stream, ULONG length)
@@ -129,7 +129,7 @@ UCHAR                       *next_pos;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_device_class_video_write_payload_commit        PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -162,7 +162,7 @@ UCHAR                       *next_pos;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx     Yajun Xia                Initial Version 6.x           */
+/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_video_write_payload_commit(UX_DEVICE_CLASS_VIDEO_STREAM *stream, ULONG length)

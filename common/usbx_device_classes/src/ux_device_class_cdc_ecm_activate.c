@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_cdc_ecm_activate                   PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -82,10 +82,11 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_activate(UX_SLAVE_CLASS_COMMAND *command)
@@ -200,7 +201,7 @@ ULONG                       physical_address_lsw;
 
                         /* We have found the bulk in endpoint, save it.  */
                         cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint =  endpoint;
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
                         endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
                                 UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER(cdc_ecm);
 #endif
@@ -215,7 +216,7 @@ ULONG                       physical_address_lsw;
 
                         /* We have found the bulk out endpoint, save it.  */
                         cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint =  endpoint;
-#if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
                         endpoint -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
                                 UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER(cdc_ecm);
 #endif
@@ -240,11 +241,17 @@ ULONG                       physical_address_lsw;
             /* Wake up the Interrupt thread and send a network notification to the host.  */
             _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                
 
+#if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
+
+            /* There is no endpoint buffer.  */
+#else
+
             /* Reset the endpoint buffers.  */
             _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint -> ux_slave_endpoint_transfer_request. 
                                             ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE); /* Use case of memset is verified. */
             _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint -> ux_slave_endpoint_transfer_request. 
                                             ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE); /* Use case of memset is verified. */
+#endif
 
             /* Resume the endpoint threads.  */
             _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread); 

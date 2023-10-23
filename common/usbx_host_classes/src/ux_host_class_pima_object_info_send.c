@@ -35,7 +35,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_pima_object_info_send                PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -78,10 +78,10 @@
 /*                                            verified memset and memcpy  */
 /*                                            cases,                      */
 /*                                            resulting in version 6.1    */
-/*  xx-xx-xxxx     Yajun Xia                Modified comment(s),          */
+/*  10-31-2023     Yajun Xia                Modified comment(s),          */
 /*                                            fixed allocated buffer      */
 /*                                            pointer checking issue,     */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_object_info_send(UX_HOST_CLASS_PIMA *pima,
@@ -263,7 +263,7 @@ UINT                                 status;
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _uxe_host_class_pima_object_info_send               PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Yajun Xia, Microsoft Corporation                                    */
@@ -296,7 +296,7 @@ UINT                                 status;
 /*                                                                        */
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
-/*  xx-xx-xxxx        Yajun xia             Initial Version 6.x           */
+/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_pima_object_info_send(UX_HOST_CLASS_PIMA *pima,

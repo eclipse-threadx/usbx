@@ -43,7 +43,7 @@ static inline VOID _ux_device_class_cdc_acm_transmission_write_run(UX_SLAVE_CLAS
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_cdc_acm_tasks_run                  PORTABLE C      */
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -86,11 +86,11 @@ static inline VOID _ux_device_class_cdc_acm_transmission_write_run(UX_SLAVE_CLAS
 /*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            fixed compile warnings,     */
 /*                                            resulting in version 6.2.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added zero copy support,    */
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_tasks_run(VOID *instance)

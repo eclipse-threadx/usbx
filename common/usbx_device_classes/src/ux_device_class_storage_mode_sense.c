@@ -66,7 +66,7 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  FUNCTION                                               RELEASE        */ 
 /*                                                                        */ 
 /*    _ux_device_class_storage_mode_sense                 PORTABLE C      */ 
-/*                                                           6.x          */
+/*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -116,10 +116,10 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            internal clean up,          */
 /*                                            resulting in version 6.1.11 */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            checked compiling options   */
 /*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, 
