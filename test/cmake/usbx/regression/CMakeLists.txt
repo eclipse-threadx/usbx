@@ -3,7 +3,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(regression_test LANGUAGES C)
 
-get_filename_component(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../Regression
+get_filename_component(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../regression
                        ABSOLUTE)
 
 set(ux_class_dfu_test_cases
