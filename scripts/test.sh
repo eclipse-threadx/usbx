@@ -1,2 +1,2 @@
 #!/bin/bash
-CTEST_PARALLEL_LEVEL=4 $(dirname `realpath $0`)/../test/cmake/usbx/run.sh test default_build_coverage standalone_device_zero_copy_build
+CTEST_PARALLEL_LEVEL=4 $(dirname `realpath $0`)/../test/cmake/usbx/run.sh test all
