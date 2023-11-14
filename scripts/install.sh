@@ -17,7 +17,7 @@ sudo apt-get install -y \
 
 wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
 CODENAME=$(lsb_release -c | cut -f2 -d':' | sed 's/\t//')
-sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $CODENAME main"
+sudo apt-add-repository -y "deb https://apt.kitware.com/ubuntu/ $CODENAME main"
 sudo apt-get -y install cmake
 
 python3 -m pip install --upgrade pip
