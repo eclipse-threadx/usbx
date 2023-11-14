@@ -165,10 +165,12 @@ ULONG                               temp;
                 return(UX_STATE_NEXT);
             }
 
+            /* Get current position.  */
+            pos = receiver -> ux_device_class_hid_receiver_event_save_pos;
+
 #if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && defined(UX_DEVICE_CLASS_HID_ZERO_COPY)
 
             /* Save received event length.  */
-            pos = receiver -> ux_device_class_hid_receiver_event_save_pos;
             temp = transfer -> ux_slave_transfer_request_actual_length;
 #else
 
