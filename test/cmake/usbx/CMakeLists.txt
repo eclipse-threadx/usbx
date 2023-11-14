@@ -8,6 +8,14 @@ project(usbx_test LANGUAGES C)
 # Use customized ux_user.h
 set(UX_USER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ux_user.h)
 
+# Copy files instead of using symlink
+# libs/ -> ../libs/
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../libs/CMakeLists.txt
+               ${CMAKE_CURRENT_SOURCE_DIR}/libs/CMakeLists.txt COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../libs/nx_user.h
+               ${CMAKE_CURRENT_SOURCE_DIR}/libs/nx_user.h COPYONLY)
+
 # Set build configurations
 # TODO: add when available : standalone_otg_build
 set(BUILD_CONFIGURATIONS 
