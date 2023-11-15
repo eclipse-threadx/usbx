@@ -87,14 +87,14 @@ jobs:
         
       # Deploing GitHub Pages artifacts.
     - name: Deploy GitHub Pages site
-      id: deployment
+      #id: deployment
       uses: actions/deploy-pages@v1.2.9
       with:
         artifact_name: default_build_coverage_USBX
 
       # Deploing GitHub Pages artifacts.
     - name: Deploy GitHub Pages site
-      id: deployment
+      #id: deployment1
       uses: actions/deploy-pages@v1.2.9
       with:
         artifact_name: test_reports_USBX
