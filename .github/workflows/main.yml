@@ -84,20 +84,21 @@ jobs:
       with:
         name: default_build_coverage_USBX
         path: ./test/cmake/usbx/coverage_report/default_build_coverage
-        
+
+      # Deploing GitHub Pages artifacts.
+    - name: Deploy GitHub Pages site
+      #id: deployment
+      uses: actions/deploy-pages@v1.2.9
+      with:
+        artifact_name: test_reports_USBX
+        target_folder: ./test_reports
+
       # Deploing GitHub Pages artifacts.
     - name: Deploy GitHub Pages site
       #id: deployment
       uses: actions/deploy-pages@v1.2.9
       with:
         artifact_name: default_build_coverage_USBX
-
-      # Deploing GitHub Pages artifacts.
-    - name: Deploy GitHub Pages site
-      #id: deployment1
-      uses: actions/deploy-pages@v1.2.9
-      with:
-        artifact_name: test_reports_USBX
 
       # Gegenerate code coverage results summary to code-coverage-results.md
     - name: Generate Code Coverage Results Summary
