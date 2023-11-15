@@ -6,6 +6,13 @@ name: regression_test
 on:
   # Enable the workflow to be triggered manually.
   workflow_dispatch:
+    # Get inputs
+    inputs:
+      # inputs.tests_to_run
+      tests_to_run:
+        description: 'Tests to run, all or default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
+        required: true
+        default: 'all'
   # Triggers the workflow on push or pull request events but only for the master branch.
   pull_request: 
     branches: [ master ]
@@ -50,11 +57,11 @@ jobs:
 
       # Build tests.
     - name: Build USBX
-      run: ./scripts/build.sh
+      run: ./scripts/build.sh ${{ inputs.tests_to_run }}
 
       # Run tests.
     - name: Test USBX
-      run: ./scripts/test.sh
+      run: ./scripts/test.sh ${{ inputs.tests_to_run }}
       
       # Use "EnricoMi/publish-unit-test-result-action" action to publish test results.
     - name: Publish Test Results
