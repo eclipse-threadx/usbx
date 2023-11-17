@@ -68,7 +68,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2.11.0
       # By default, if the previous step fails, this step will not be executed.
       # Add if condition to run this step even if the previous step fails
-      if: success() || failure()
+      if: failure() || always()
       with:
         files: ./test/cmake/usbx/build/*/*.xml
           
@@ -129,3 +129,13 @@ jobs:
         output: |
           {"summary":"Coverage Report"}
         output_text_description_file: code-coverage-summary.md
+
+    - name: Sticky Pull Request Comment
+      uses: marocchino/sticky-pull-request-comment@v2.8.0
+      if: github.event_name == 'pull_request'
+      with:
+        # Indicate if new comment messages should be appended to previous comment message. Only `true` is allowed. Just skip this item when you don't need it.
+        append: true # optional, default is false
+        # glob path to file(s) containing comment message
+        path: code-coverage-summary.md
+          
