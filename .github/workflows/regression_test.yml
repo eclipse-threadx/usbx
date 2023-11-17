@@ -70,7 +70,8 @@ jobs:
       # Add if condition to run this step even if the previous step fails
       if: always()
       with:
-        files: ./test/cmake/usbx/build/*/*.xml
+        files: |
+          ./test/cmake/usbx/build/*/*.xml
           
       # Upload test results to artifacts
     - name: Upload Test Results
