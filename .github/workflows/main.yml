@@ -68,7 +68,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2.11.0
       # By default, if the previous step fails, this step will not be executed.
       # Add if condition to run this step even if the previous step fails
-      if: failure() || always()
+      if: always()
       with:
         files: ./test/cmake/usbx/build/*/*.xml
           
