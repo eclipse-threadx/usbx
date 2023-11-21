@@ -12,7 +12,7 @@ on:
       tests_to_run:
         description: 'all, single or multiple of default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
         required: true
-        default: 'all'
+        default: 'default_build_coverage'
   # Triggers the workflow on push or pull request events but only for the master branch.
   pull_request: 
     branches: [ master ]
@@ -24,9 +24,9 @@ jobs:
 
     # Enviroments are used to describe a general deployment target like "production", "staging", or "development".
     # When a GitHub Actions workflow deploys to an environment, the environment is displayed on the main page of the repository.
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    #environment:
+    #  name: github-pages
+    #  url: ${{ steps.deployment.outputs.page_url }}
 
     # Use "permissions" to modify the default permissions granted to the "GITHUB_TOKEN".
     permissions:
@@ -94,11 +94,11 @@ jobs:
         path: ./test/cmake/usbx/coverage_report/default_build_coverage
 
       # Deploing GitHub Pages artifacts.
-    - name: Deploy GitHub Pages site
-      id: deployment
-      uses: actions/deploy-pages@v1.2.9
-      with:
-        artifact_name: default_build_coverage_USBX
+    - #name: Deploy GitHub Pages site
+      #id: deployment
+      #uses: actions/deploy-pages@v1.2.9
+      #with:
+      #  artifact_name: default_build_coverage_USBX
 
       # Gegenerate code coverage results summary to code-coverage-results.md
     - name: Generate Code Coverage Results Summary
