@@ -14,27 +14,25 @@ on:
         required: true
         default: 'default_build_coverage'
   # Triggers the workflow on push or pull request events but only for the master branch.
+  push:
+    branches: [ master ]
   pull_request: 
     branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+
   # This workflow contains a single job called "run_tests".
   run_tests:
 
     # Enviroments are used to describe a general deployment target like "production", "staging", or "development".
     # When a GitHub Actions workflow deploys to an environment, the environment is displayed on the main page of the repository.
-    #environment:
-    #  name: github-pages
-    #  url: ${{ steps.deployment.outputs.page_url }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     # Use "permissions" to modify the default permissions granted to the "GITHUB_TOKEN".
     permissions:
-      # Required by "deploy-pages" action.
-      pages: write
-      id-token: write
-
-      # Required by "nricoMi/publish-unit-test-result-action" action.
       contents: read
       issues: read
       checks: write
@@ -93,12 +91,6 @@ jobs:
         name: default_build_coverage_USBX
         path: ./test/cmake/usbx/coverage_report/default_build_coverage
 
-      # Deploing GitHub Pages artifacts.
-    #- name: Deploy GitHub Pages site
-      #id: deployment
-      #uses: actions/deploy-pages@v1.2.9
-      #with:
-      #  artifact_name: default_build_coverage_USBX
 
       # Gegenerate code coverage results summary to code-coverage-results.md
     - name: Generate Code Coverage Results Summary
@@ -110,17 +102,6 @@ jobs:
         hide_complexity: true
         output: file
 
-      # Create a new markdown file "code-coverage-summary.md".
-      # Put the coverage summary and report url to the new markdown file.
-      # Write the coverage summary to job summary.
-    - name: Write Code Coverage Report URL
-      run: |
-        cat code-coverage-results.md > code-coverage-summary.md
-        echo -e "\n" >> code-coverage-summary.md
-        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }})' >> code-coverage-summary.md
-        echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
-        cat code-coverage-summary.md >> $GITHUB_STEP_SUMMARY
- 
     - name: Create CheckRun for Code Coverage # Create check run to publish the code coverage summary to the check summary
       uses: LouisBrunner/checks-action@v1.6.2
       with:
@@ -139,4 +120,30 @@ jobs:
         append: true # optional, default is false
         # glob path to file(s) containing comment message
         path: code-coverage-summary.md
-          
+
+  deploy_code_coverage:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    needs: run_tests
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:        
+
+      # Deploing GitHub Pages artifacts for coverages.
+    - name: Deploy GitHub Pages site
+      id: deployment
+      uses: actions/deploy-pages@v1.2.9
+      with:
+        artifact_name: default_build_coverage_USBX
+
+    - name: Write Code Coverage Report URL
+      run: |
+        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }})' >>  $GITHUB_STEP_SUMMARY
+
