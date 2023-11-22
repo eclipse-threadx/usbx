@@ -111,7 +111,7 @@ jobs:
         conclusion: ${{ job.status }}
         output: |
           {"summary":"Coverage Report"}
-        output_text_description_file: code-coverage-summary.md
+        output_text_description_file: code-coverage-results.md
 
     - name: Sticky Pull Request Comment
       uses: marocchino/sticky-pull-request-comment@v2.8.0
