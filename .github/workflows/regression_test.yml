@@ -120,7 +120,7 @@ jobs:
         # Indicate if new comment messages should be appended to previous comment message. Only `true` is allowed. Just skip this item when you don't need it.
         append: true # optional, default is false
         # glob path to file(s) containing comment message
-        path: code-coverage-summary.md
+        path: code-coverage-results.md
 
   deploy_code_coverage:
     runs-on: ubuntu-latest
