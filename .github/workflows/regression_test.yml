@@ -105,6 +105,7 @@ jobs:
 
     - name: Create CheckRun for Code Coverage # Create check run to publish the code coverage summary to the check summary
       uses: LouisBrunner/checks-action@v1.6.2
+      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Code Coverage
@@ -115,7 +116,7 @@ jobs:
 
     - name: Sticky Pull Request Comment
       uses: marocchino/sticky-pull-request-comment@v2.8.0
-      if: github.event_name == 'pull_request'
+      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
       with:
         # Indicate if new comment messages should be appended to previous comment message. Only `true` is allowed. Just skip this item when you don't need it.
         append: true # optional, default is false
