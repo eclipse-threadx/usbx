@@ -20,8 +20,8 @@ on:
 jobs:
   # This workflow contains a single job called "linux_job"
   run_tests:
-    # xiaocq2001, azure-rtos
-    uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
+    # xiaocq2001, azure-rtos, chxiao/test_workflow
+    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
     with:
       cmake_path: ./test/cmake/usbx
       build_script: ./scripts/build.sh $*
