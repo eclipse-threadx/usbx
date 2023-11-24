@@ -1,151 +1,31 @@
-# The name of the workflow. GitHub displays the names of your 
-# workflows under your repository's "Action" tab.
-name: regression_test 
+name: USBX Regression Test
 
-# Controls when the action will run.
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
 on:
-  # Enable the workflow to be triggered manually.
   workflow_dispatch:
-    # Get inputs
     inputs:
-      # inputs.tests_to_run
       tests_to_run:
         description: 'all, single or multiple of default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
         required: true
         default: 'default_build_coverage'
-  # Triggers the workflow on push or pull request events but only for the master branch.
   push:
     branches: [ master ]
-  pull_request: 
+  pull_request:
     branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-
-  # This workflow contains a single job called "run_tests".
+  # This workflow contains a single job called "linux_job"
   run_tests:
-
-    # Use "permissions" to modify the default permissions granted to the "GITHUB_TOKEN".
     permissions:
       contents: read
       issues: read
       checks: write
       pull-requests: write
-      
-    # The type of runner that the job will run on.
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job.
-    steps:
-      # Check out the repository.
-    - name: Check out the repository
-      uses: actions/checkout@v4
-      with:
-        submodules: true
-    
-      # Install software.
-    - name: Install softwares
-      run: ./scripts/install.sh
-
-      # Build tests.
-    - name: Build USBX
-      run: ./scripts/build.sh ${{ inputs.tests_to_run }}
-
-      # Run tests.
-    - name: Test USBX
-      run: ./scripts/test.sh ${{ inputs.tests_to_run }}
-      
-      # Use "EnricoMi/publish-unit-test-result-action" action to publish test results.
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2.11.0
-      # By default, if the previous step fails, this step will not be executed.
-      # Add if condition to run this step even if the previous step fails
-      if: always()
-      with:
-        files: |
-          ./test/cmake/usbx/build/*/*.xml
-          
-      # Upload test results to artifacts
-    - name: Upload Test Results
-      if: success() || failure()
-      uses: actions/upload-artifact@v3.1.3
-      with:
-        name: test_reports_USBX
-        path: |
-          ./test/cmake/usbx/build/*.txt
-          ./test/cmake/usbx/build/*/Testing/**/*.xml
-
-    - name: Configure GitHub Pages # Enable GitHub Pages and extract various metadata about a site.
-      uses: actions/configure-pages@v3.0.6
-        
-      # Package and upload GitHub Pages artifact.
-    - name: Upload GitHub Pages artifact
-      uses: actions/upload-pages-artifact@v2.0.0
-      with:
-        name: default_build_coverage_USBX
-        path: ./test/cmake/usbx/coverage_report/default_build_coverage
-
-      # Gegenerate code coverage results summary to code-coverage-results.md
-    - name: Generate Code Coverage Results Summary
-      uses: irongut/CodeCoverageSummary@v1.3.0
-      with:
-        filename: ./test/cmake/usbx/coverage_report/default_build_coverage.xml
-        format: markdown
-        badge: true
-        hide_complexity: true
-        output: file
-
-      # Create a new markdown file "code-coverage-summary.md".
-      # Put the coverage summary and report url to the new markdown file.
-      # Write the coverage summary to job summary.
-    - name: Write Code Coverage Report URL
-      run: |
-        echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
-        cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-
-    - name: Create CheckRun for Code Coverage # Create check run to publish the code coverage summary to the check summary
-      uses: LouisBrunner/checks-action@v1.6.2
-      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Code Coverage
-        conclusion: ${{ job.status }}
-        output: |
-          {"summary":"Coverage Report"}
-        output_text_description_file: code-coverage-results.md
-
-    - name: Sticky Pull Request Comment
-      uses: marocchino/sticky-pull-request-comment@v2.8.0
-      if: (github.event_name == 'push') || (github.event.pull_request.head.repo.full_name == github.repository)
-      with:
-        # Indicate if new comment messages should be appended to previous comment message. Only `true` is allowed. Just skip this item when you don't need it.
-        append: true # optional, default is false
-        # glob path to file(s) containing comment message
-        path: code-coverage-results.md
-
-  deploy_code_coverage:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    
-    needs: run_tests
-    
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
       pages: write
       id-token: write
-
-    steps:        
-
-      # Deploing GitHub Pages artifacts for coverages.
-    - name: Deploy GitHub Pages site
-      id: deployment
-      uses: actions/deploy-pages@v1.2.9
-      with:
-        artifact_name: default_build_coverage_USBX
-
-    - name: Write Code Coverage Report URL
-      run: |
-        echo '[Open Coverage Report](${{ steps.deployment.outputs.page_url }})' >>  $GITHUB_STEP_SUMMARY
-
+    uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
+    with:
+      cmake_path: ./test/cmake/usbx
+      build_script: ./scripts/build.sh $*
