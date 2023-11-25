@@ -16,9 +16,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "linux_job"
   run_tests:
-    runs-on: ubuntu-lates
+    needs: prepare_env
     permissions:
       contents: read
       issues: read
@@ -27,6 +26,16 @@ jobs:
       pages: write
       id-token: write
 
+    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
+    with:
+      cmake_path: ./test/cmake/usbx
+      build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
+      test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
+      coverage_name: ${{ inputs.tests_to_run }}
+      skip_coverage: ${{ env.skip_coverage }}
+
+  prepare_env:
+    runs-on: ubuntu-latest
     steps:
     
     - name: Decide Coverage Name
@@ -36,12 +45,3 @@ jobs:
           else
             echo "skip_coverage=${{ inputs.coverage_name }}" >> $GITHUB_ENV
           fi
-
-    - name: Run test template
-      uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
-      with:
-        cmake_path: ./test/cmake/usbx
-        build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
-        test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
-        coverage_name: ${{ inputs.tests_to_run }}
-        
