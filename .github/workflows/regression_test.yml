@@ -22,6 +22,12 @@ jobs:
     - name: Check Settings
       run: |
         echo inputs.tests_to_run: ${{ inputs.tests_to_run }}
+        trimmed=$(echo -e "${{ inputs.tests_to_run }}" | sed 's/[[:space:]]*$//')
+        echo "tests_to_run=$trimmed" >> $GITHUB_ENV
+
+    - name: Dump Settings
+      run: |
+        echo env.tests_to_run: ${{ env.tests_to_run }}
 
   # run_tests:
   #   needs: check_env
