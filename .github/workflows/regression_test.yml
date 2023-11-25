@@ -10,11 +10,11 @@ on:
         required: true
         default: 'default_build_coverage'
       coverage_name:
-        description: 'single of tests_to_run with _coverage suffix'
         required: true
         default: 'default_build_coverage'
       skip_coverage:
         required: true
+        type: boolean
         default: false
   push:
     branches: [ master ]
