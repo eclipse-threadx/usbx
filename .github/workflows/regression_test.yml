@@ -16,7 +16,15 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  check_env:
+    runs-on: ubuntu-latest
+      steps:
+      - name: Check Settings
+        run: |
+          echo inputs.tests_to_run: ${{ inputs.tests_to_run }}
+      - 
   run_tests:
+    needs: check_env
     permissions:
       contents: read
       issues: read
@@ -25,11 +33,11 @@ jobs:
       pages: write
       id-token: write
 
-    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
-    with:
-      cmake_path: ./test/cmake/usbx
-      build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
-      test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
-      coverage_name: ${{ inputs.tests_to_run }}
-      skip_coverage: ${{ !endsWith(inputs.tests_to_run, '_coverage') }}
+    # uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
+    # with:
+    #   cmake_path: ./test/cmake/usbx
+    #   build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
+    #   test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
+    #   coverage_name: ${{ inputs.tests_to_run }}
+    #   skip_coverage: ${{ !endsWith(inputs.tests_to_run, '_coverage') }}
 
