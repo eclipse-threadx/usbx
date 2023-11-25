@@ -8,7 +8,11 @@ on:
       tests_to_run:
         description: 'all, single or multiple of default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
         required: true
-        default: 'generic_build'
+        default: 'default_build_coverage'
+      coverage_name:
+        description: 'single of tests_to_run with _coverage suffix'
+        required: true
+        default: 'default_build_coverage'
   push:
     branches: [ master ]
   pull_request:
