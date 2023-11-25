@@ -22,7 +22,7 @@ jobs:
     - name: Check Settings
       run: |
         echo inputs.tests_to_run: ${{ inputs.tests_to_run }}
-        coverage=$(echo "${{ env.TRIMMED }}" | grep -o '[^ ]*\(_coverage\|_all\)')
+        coverage=$(echo "${{ inputs.tests_to_run }}" | grep -o '[^ ]*\(_coverage\|_all\)')
         echo "coverage=$coverage_name" >> $GITHUB_ENV
         
 
