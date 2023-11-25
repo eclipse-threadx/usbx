@@ -16,20 +16,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  prepare_env:
-    runs-on: ubuntu-latest
-    steps:
-    
-    - name: Decide Coverage Name
-      run: |
-          if [[ "${{ inputs.tests_to_run }}" == *"_coverage" ]]; then
-            echo "skip_coverage=default_build_coverage" >> $GITHUB_ENV
-          else
-            echo "skip_coverage=${{ inputs.coverage_name }}" >> $GITHUB_ENV
-          fi
-
   run_tests:
-    needs: prepare_env
     permissions:
       contents: read
       issues: read
@@ -44,5 +31,5 @@ jobs:
       build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
       test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
       coverage_name: ${{ inputs.tests_to_run }}
-      skip_coverage: ${{ jobs.prepare_env.env.skip_coverage }}
+      skip_coverage: ${{ !endsWith(inputs.tests_to_run, '_coverage') }}
 
