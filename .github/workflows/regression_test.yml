@@ -9,13 +9,13 @@ on:
         description: 'all, single or multiple of default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
         required: true
         default: 'default_build_coverage'
-      coverage_name:
-        required: true
-        default: 'default_build_coverage'
       skip_coverage:
         required: true
         type: boolean
         default: false
+      coverage_name:
+        required: true
+        default: 'default_build_coverage'
   push:
     branches: [ master ]
   pull_request:
@@ -23,35 +23,20 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  check_env:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check Settings
-      run: |
-        echo inputs.tests_to_run: ${{ inputs.tests_to_run }}
-        coverage=$(echo "${{ inputs.tests_to_run }}" | grep -o '[^ ]*\(_coverage\|all\)' | awk 'NR==1{print $1}')
-        echo "coverage=$coverage_name" >> $GITHUB_ENV
-        
+  run_tests:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
 
-    - name: Dump Settings
-      run: |
-        echo env.coverage: ${{ env.coverage }}
-
-  # run_tests:
-  #   needs: check_env
-  #   permissions:
-  #     contents: read
-  #     issues: read
-  #     checks: write
-  #     pull-requests: write
-  #     pages: write
-  #     id-token: write
-
-  #   uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
-  #   with:
-  #     cmake_path: ./test/cmake/usbx
-  #     build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
-  #     test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
-  #     coverage_name: ${{ inputs.tests_to_run }}
-  #     skip_coverage: ${{ !endsWith(inputs.tests_to_run, '_coverage') }}
+    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
+    with:
+      cmake_path: ./test/cmake/usbx
+      build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
+      test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
+      coverage_name: ${{ inputs.coverage_name }}
+      skip_coverage: ${{ inputs.skip_coverage }}
 
