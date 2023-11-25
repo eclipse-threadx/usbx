@@ -22,12 +22,13 @@ jobs:
     - name: Check Settings
       run: |
         echo inputs.tests_to_run: ${{ inputs.tests_to_run }}
-        trimmed=$(echo -e "${{ inputs.tests_to_run }}" | sed 's/[[:space:]]*$//')
-        echo "tests_to_run=$trimmed" >> $GITHUB_ENV
+        coverage_name=$(echo "${{ env.TRIMMED }}" | grep -o '[^ ]*_coverage' | awk 'NR==1{print $1}')
+        echo "coverage_name=$coverage_name" >> $GITHUB_ENV
+        
 
     - name: Dump Settings
       run: |
-        echo env.tests_to_run: ${{ env.tests_to_run }}
+        echo env.coverage_name: ${{ env.coverage_name }}
 
   # run_tests:
   #   needs: check_env
