@@ -24,6 +24,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   run_tests_with_coverage:
+    if: ! inputs.skip_coverage
     permissions:
       contents: read
       issues: read
@@ -41,6 +42,7 @@ jobs:
       skip_coverage: false
 
   run_tests_without_coverage:
+    if: inputs.skip_coverage
     permissions:
       contents: read
       issues: read
