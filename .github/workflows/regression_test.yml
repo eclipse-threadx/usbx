@@ -32,7 +32,7 @@ jobs:
       pages: write
       id-token: write
 
-    uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
+    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
     with:
       cmake_path: './test/cmake/usbx'
       build_script: './scripts/build.sh ${{ inputs.tests_to_run }}'
