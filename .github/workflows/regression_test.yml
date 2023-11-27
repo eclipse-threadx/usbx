@@ -7,14 +7,14 @@ on:
     inputs:
       tests_to_run:
         description: 'all, single or multiple of default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
-        required: true
+        required: false
         default: 'default_build_coverage'
       skip_coverage:
-        required: true
+        required: false
         type: boolean
         default: false
       coverage_name:
-        required: true
+        required: false
         default: 'default_build_coverage'
   push:
     branches: [ master ]
@@ -24,7 +24,6 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   run_tests:
-    # if: ${{ !inputs.skip_coverage }}
     permissions:
       contents: read
       issues: read
@@ -40,21 +39,3 @@ jobs:
       test_script: './scripts/test.sh ${{ inputs.tests_to_run }}'
       coverage_name: '${{ inputs.coverage_name }}'
       skip_coverage: ${{ !!inputs.skip_coverage }}
-
-  # run_tests_without_coverage:
-  #   if: inputs.skip_coverage
-  #   permissions:
-  #     contents: read
-  #     issues: read
-  #     checks: write
-  #     pull-requests: write
-  #     pages: write
-  #     id-token: write
-
-  #   uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
-  #   with:
-  #     cmake_path: './test/cmake/usbx'
-  #     build_script: './scripts/build.sh ${{ inputs.tests_to_run }}'
-  #     test_script: './scripts/test.sh ${{ inputs.tests_to_run }}'
-  #     coverage_name: '${{ inputs.coverage_name }}'
-  #     skip_coverage: true
