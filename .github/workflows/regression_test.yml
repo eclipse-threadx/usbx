@@ -24,14 +24,21 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   
-  dump_inputs:
+  setup_usbx_env:
     runs-on: ubuntu-latest
     steps:
-    - name: Dump USBX Inputs
+    - name: USBX Inputs to ENV
       run: |
         echo tests_to_run: ${{ inputs.tests_to_run }}
         echo skip_coverage: ${{ inputs.skip_coverage }}
         echo coverage_name: ${{ inputs.coverage_name }}
+        echo "TESTS_TO_RUN=${{ inputs.tests_to_run }}" >> $GITHUB_ENV
+        echo "SKIP_COVERAGE=${{ inputs.skip_coverage }}" >> $GITHUB_ENV
+        echo "COVERAGE_NAME=${{ inputs.coverage_name }}" >> $GITHUB_ENV
+      env:
+        TESTS_TO_RUN: default_build_coverage
+        COVERAGE_NAME: default_build_coverage
+        SKIP_COVERAGE: default_build_coverage
 
   run_tests:
     permissions:
@@ -45,7 +52,7 @@ jobs:
     uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
     with:
       cmake_path: ./test/cmake/usbx
-      build_script: ./scripts/build.sh "${{ inputs.tests_to_run:-default_build_coverage }}
-      test_script: ./scripts/test.sh "${{ inputs.tests_to_run:-default_build_coverage }}"
-      coverage_name: "${{ inputs.tests_to_run:-default_build_coverage }}"
-      skip_coverage: ${{ !!inputs.skip_coverage:-false }}
+      build_script: ./scripts/build.sh ${{ env.TESTS_TO_RUN }}
+      test_script: ./scripts/test.sh ${{ env.TESTS_TO_RUN }}
+      coverage_name: ${{ env.COVERAGE_NSME }}
+      skip_coverage: ${{ !!env.SKIP_COVERAGE }}
