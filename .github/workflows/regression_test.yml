@@ -21,6 +21,11 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  TESTS_TO_RUN: default_build_coverage
+  COVERAGE_NAME: default_build_coverage
+  SKIP_COVERAGE: default_build_coverage
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   
@@ -35,10 +40,6 @@ jobs:
         echo "TESTS_TO_RUN=${{ inputs.tests_to_run }}" >> $GITHUB_ENV
         echo "SKIP_COVERAGE=${{ inputs.skip_coverage }}" >> $GITHUB_ENV
         echo "COVERAGE_NAME=${{ inputs.coverage_name }}" >> $GITHUB_ENV
-      env:
-        TESTS_TO_RUN: default_build_coverage
-        COVERAGE_NAME: default_build_coverage
-        SKIP_COVERAGE: default_build_coverage
 
   run_tests:
     needs: setup_usbx_env
