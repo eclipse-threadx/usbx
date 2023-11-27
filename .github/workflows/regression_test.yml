@@ -23,6 +23,15 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  
+  dump_inputs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Dump USBX Inputs
+      run: |
+        echo tests_to_run: inputs.tests_to_run
+        echo skip_coverage: inputs.skip_coverage
+        echo coverage_name: inputs.coverage_name
   run_tests:
     permissions:
       contents: read
