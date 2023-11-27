@@ -44,8 +44,8 @@ jobs:
 
     uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
     with:
-      cmake_path: './test/cmake/usbx'
-      build_script: './scripts/build.sh ${{ inputs.tests_to_run:-default_build_coverage }}'
-      test_script: './scripts/test.sh ${{ inputs.tests_to_run:-default_build_coverage }}'
-      coverage_name: '${{ inputs.tests_to_run:-default_build_coverage }}'
+      cmake_path: ./test/cmake/usbx
+      build_script: ./scripts/build.sh "${{ inputs.tests_to_run:-default_build_coverage }}
+      test_script: ./scripts/test.sh "${{ inputs.tests_to_run:-default_build_coverage }}"
+      coverage_name: "${{ inputs.tests_to_run:-default_build_coverage }}"
       skip_coverage: ${{ !!inputs.skip_coverage:-false }}
