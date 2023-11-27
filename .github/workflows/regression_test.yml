@@ -29,9 +29,9 @@ jobs:
     steps:
     - name: Dump USBX Inputs
       run: |
-        echo tests_to_run: inputs.tests_to_run
-        echo skip_coverage: inputs.skip_coverage
-        echo coverage_name: inputs.coverage_name
+        echo tests_to_run: ${{ inputs.tests_to_run }}
+        echo skip_coverage: ${{ inputs.skip_coverage }}
+        echo coverage_name: ${{ inputs.coverage_name }}
   run_tests:
     permissions:
       contents: read
