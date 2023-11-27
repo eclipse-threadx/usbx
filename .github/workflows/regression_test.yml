@@ -41,6 +41,7 @@ jobs:
         SKIP_COVERAGE: default_build_coverage
 
   run_tests:
+    needs: setup_usbx_env
     permissions:
       contents: read
       issues: read
