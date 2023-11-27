@@ -23,7 +23,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  run_tests:
+  run_tests_with_coverage:
     permissions:
       contents: read
       issues: read
@@ -38,4 +38,21 @@ jobs:
       build_script: './scripts/build.sh ${{ inputs.tests_to_run }}'
       test_script: './scripts/test.sh ${{ inputs.tests_to_run }}'
       coverage_name: '${{ inputs.coverage_name }}'
-      skip_coverage: $([ "$inputs.skip_coverage" = "true" ] && echo true || echo false)
+      skip_coverage: false
+
+  run_tests_without_coverage:
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
+
+    uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
+    with:
+      cmake_path: './test/cmake/usbx'
+      build_script: './scripts/build.sh ${{ inputs.tests_to_run }}'
+      test_script: './scripts/test.sh ${{ inputs.tests_to_run }}'
+      coverage_name: '${{ inputs.coverage_name }}'
+      skip_coverage: true
