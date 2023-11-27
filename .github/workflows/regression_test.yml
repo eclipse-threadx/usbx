@@ -32,6 +32,7 @@ jobs:
         echo tests_to_run: ${{ inputs.tests_to_run }}
         echo skip_coverage: ${{ inputs.skip_coverage }}
         echo coverage_name: ${{ inputs.coverage_name }}
+
   run_tests:
     permissions:
       contents: read
@@ -44,7 +45,7 @@ jobs:
     uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
     with:
       cmake_path: './test/cmake/usbx'
-      build_script: './scripts/build.sh ${{ inputs.tests_to_run }}'
-      test_script: './scripts/test.sh ${{ inputs.tests_to_run }}'
-      coverage_name: '${{ inputs.coverage_name }}'
-      skip_coverage: ${{ !!inputs.skip_coverage }}
+      build_script: './scripts/build.sh ${{ inputs.tests_to_run:-default_build_coverage }}'
+      test_script: './scripts/test.sh ${{ inputs.tests_to_run:-default_build_coverage }}'
+      coverage_name: '${{ inputs.tests_to_run:-default_build_coverage }}'
+      skip_coverage: ${{ !!inputs.skip_coverage:-false }}
