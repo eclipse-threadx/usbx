@@ -42,7 +42,7 @@ jobs:
         echo skip_coverage: ${{ inputs.skip_coverage }}
         echo coverage_name: ${{ inputs.coverage_name }}
 
-    - name: Run USBX Tests Flow:
+    - name: Run USBX Tests Flow
       uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
       with:
         cmake_path: ./test/cmake/usbx
