@@ -34,9 +34,9 @@ jobs:
 
     uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
     with:
-      cmake_path: ./test/cmake/usbx
-      build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
-      test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
+      cmake_path: './test/cmake/usbx'
+      build_script: './scripts/build.sh ${{ inputs.tests_to_run }}'
+      test_script: './scripts/test.sh ${{ inputs.tests_to_run }}'
       skip_coverage: ${{ !!inputs.skip_coverage }}
-      coverage_name: ${{ inputs.coverage_name }}
+      coverage_name: '${{ inputs.coverage_name }}'
 
