@@ -38,4 +38,4 @@ jobs:
       build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
       test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
       coverage_name: ${{ inputs.coverage_name }}
-      skip_coverage: ${{ inputs.skip_coverage }}
+      skip_coverage: false
