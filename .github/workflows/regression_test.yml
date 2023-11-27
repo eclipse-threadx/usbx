@@ -7,14 +7,14 @@ on:
     inputs:
       tests_to_run:
         description: 'all, single or multiple of default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
-        required: true
+        required: false
         default: 'default_build_coverage'
       skip_coverage:
-        required: true
+        required: false
         type: boolean
         default: false
       coverage_name:
-        required: true
+        required: false
         default: 'default_build_coverage'
   push:
     branches: [ master ]
@@ -23,7 +23,19 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  run_tests:
+  dump_usbx_inputs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Dump USBX Inputs
+      run: |
+        echo event_name: ${{ github.event_name }}
+        echo tests_to_run: ${{ inputs.tests_to_run }}
+        echo tests_to_run: ${{ github.event.inputs.tests_to_run }}
+        echo skip_coverage: ${{ inputs.skip_coverage }}
+        echo coverage_name: ${{ inputs.coverage_name }}
+
+  manual_tests:
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
       issues: read
@@ -32,11 +44,28 @@ jobs:
       pages: write
       id-token: write
 
-    uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
+    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
     with:
-      cmake_path: './test/cmake/usbx'
-      build_script: './scripts/build.sh ${{ inputs.tests_to_run }}'
-      test_script: './scripts/test.sh ${{ inputs.tests_to_run }}'
+      cmake_path: ./test/cmake/usbx
+      build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
+      test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
+      coverage_name: ${{ inputs.coverage_name }}
       skip_coverage: ${{ !!inputs.skip_coverage }}
-      coverage_name: '${{ inputs.coverage_name }}'
 
+  auto_tests:
+    if: github.event_name != 'workflow_dispatch'
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      pages: write
+      id-token: write
+
+    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
+    with:
+      cmake_path: ./test/cmake/usbx
+      build_script: ./scripts/build.sh default_build_coverage
+      test_script: ./scripts/test.sh default_build_coverage
+      coverage_name: default_build_coverage
+      skip_coverage: false
