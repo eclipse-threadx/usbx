@@ -1,0 +1,740 @@
+cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_policy(SET CMP0057 NEW)
+
+project(regression_test LANGUAGES C)
+
+get_filename_component(SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../regression
+                       ABSOLUTE)
+
+set(ux_class_dfu_test_cases
+    ${SOURCE_DIR}/usbx_device_dfu_basic_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_dfu_test.c
+)
+
+set(ux_class_hub_test_cases
+    ${SOURCE_DIR}/usbx_host_class_hub_port_change_connection_process_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hub_descriptor_get_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hub_status_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hub_transfer_request_completed_test.c
+    ${SOURCE_DIR}/usbx_hub_hub_status_get_invalid_length_test.c
+    ${SOURCE_DIR}/usbx_hub_no_power_switching_test.c
+    ${SOURCE_DIR}/usbx_hub_get_hub_status_fails_during_port_reset_test.c
+    ${SOURCE_DIR}/usbx_hub_port_never_reset_test.c
+    ${SOURCE_DIR}/usbx_hub_port_change_reset_test.c
+    ${SOURCE_DIR}/usbx_hub_port_change_over_current_test.c
+    ${SOURCE_DIR}/usbx_hub_port_change_suspend_test.c
+    ${SOURCE_DIR}/usbx_hub_get_hub_status_fails_during_hub_device_enum_test.c
+    ${SOURCE_DIR}/usbx_hub_basic_test.c
+    ${SOURCE_DIR}/usbx_hub_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_hub_get_status_fails_during_configuration_test.c
+    ${SOURCE_DIR}/usbx_hub_invalid_hub_descriptor_length_test.c
+    ${SOURCE_DIR}/usbx_bus_powered_hub_conn_to_self_and_bus_powered_hub_test.c
+    ${SOURCE_DIR}/usbx_hub_full_speed_hub_test.c
+    ${SOURCE_DIR}/usbx_hub_multiple_tt_test.c
+    ${SOURCE_DIR}/usbx_hub_invalid_device_protocol_test.c
+    ${SOURCE_DIR}/usbx_hub_request_to_hub_itself_test.c
+    ${SOURCE_DIR}/usbx_hub_single_tt_too_many_hub_ports_test.c
+    ${SOURCE_DIR}/usbx_hub_multiple_tt_too_many_hub_ports_test.c
+    ${SOURCE_DIR}/usbx_hub_no_endpoints_test.c
+    ${SOURCE_DIR}/usbx_hub_interrupt_out_endpoint_test.c
+    ${SOURCE_DIR}/usbx_hub_non_interrupt_in_endpoint_test.c
+    ${SOURCE_DIR}/usbx_hub_hub_device_connect_test.c
+    ${SOURCE_DIR}/usbx_hub_hub_device_disconnect_test.c
+    ${SOURCE_DIR}/usbx_hub_quick_hub_device_reconnection_test.c
+    ${SOURCE_DIR}/usbx_hub_hub_device_enumeration_keeps_failing_test.c
+    ${SOURCE_DIR}/usbx_hub_port_reset_fails_during_hub_device_enum_test.c
+    ${SOURCE_DIR}/usbx_hub_get_port_status_fails_during_hub_device_enum_test.c
+    ${SOURCE_DIR}/usbx_hub_low_speed_hub_device_test.c
+    ${SOURCE_DIR}/usbx_hub_full_speed_hub_device_test.c
+    ${SOURCE_DIR}/usbx_hub_quick_hub_device_disconnection_test.c
+    ${SOURCE_DIR}/usbx_hub_port_change_enable_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hub_entry_test.c)
+
+set(ux_class_hub_standalone_test_cases
+    ${SOURCE_DIR}/usbx_hub_basic_test.c
+    ${SOURCE_DIR}/usbx_hub_basic_memory_test.c
+)
+
+set(ux_class_audio_test_cases
+    ${SOURCE_DIR}/usbx_audio10_device_basic_test.c
+    ${SOURCE_DIR}/usbx_audio10_device_feedback_test.c
+    ${SOURCE_DIR}/usbx_audio10_iad_device_basic_test.c
+    ${SOURCE_DIR}/usbx_audio10_iad_device_control_test.c
+    ${SOURCE_DIR}/usbx_audio10_iad_device_interrupt_test.c
+    ${SOURCE_DIR}/usbx_audio20_device_basic_test.c
+    ${SOURCE_DIR}/usbx_audio20_device_controls_test.c
+    ${SOURCE_DIR}/usbx_audio20_device_feedback_test.c
+    ${SOURCE_DIR}/usbx_audio10_iad_host_basic_test.c
+    ${SOURCE_DIR}/usbx_audio20_host_basic_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_audio_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_audio_test.c
+)
+
+set(ux_class_audio_device_standalone_test_cases
+    ${SOURCE_DIR}/usbx_audio10_device_basic_test.c
+    ${SOURCE_DIR}/usbx_audio20_device_basic_test.c
+    ${SOURCE_DIR}/usbx_audio10_device_feedback_test.c
+    ${SOURCE_DIR}/usbx_audio20_device_feedback_test.c
+    ${SOURCE_DIR}/usbx_audio10_iad_device_interrupt_test.c
+)
+
+set(ux_class_rndis_test_cases ${SOURCE_DIR}/usbx_rndis_basic_test.c)
+
+set(ux_class_cdc_ecm_test_cases
+    ${SOURCE_DIR}/usbx_cdc_ecm_basic_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_basic_ipv6_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_nx_packet_chain_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_disconnect_and_reconnect_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_alternate_setting_change_to_zero_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_ecm_transmission_callback_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulko_transfer_arming_during_link_dn_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulk_out_transfer_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulki_arm_err_dueto_link_dn_thread_wait_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_non_ip_packet_received_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulk_in_transfer_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_thread_link_down_before_transfer_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_thread_packet_allocate_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_thread_packet_append_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_mac_address_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_mac_address_invalid_length_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_no_functional_descriptor_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_ecm_mac_address_get_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulk_in_transfer_arming_during_link_down_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_ecm_interrupt_notification_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_ecm_entry_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulk_in_transfer_arming_during_deactivate_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_first_interrupt_transfer_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_packet_pool_create_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_thread_create_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_int_notification_semaphore_create_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulk_out_semaphore_create_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_host_bulk_in_semaphore_create_fail_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_control_interface_no_interrupt_endpoint_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_data_iface_non_bulko_and_non_bulki_endpt_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_data_interface_setting_select_fails_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_non_data_iface_after_zero_endpt_data_iface_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_invalid_alt_setting_after_zero_endpt_data_iface_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_default_data_interface_setting_with_endpoints_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_one_data_interface_with_no_endpoints_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_no_control_interface_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_interface_before_control_interface_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_data_interface_no_bulk_out_endpoint_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_data_interface_no_bulk_in_endpoint_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_link_down_while_ongoing_transfers_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_ecm_write_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_bulkin_thread_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_bulkout_thread_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_control_request_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_change_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_deactivate_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_initialize_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_interrupt_thread_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_ecm_uninitialize_test.c)
+
+set(ux_class_hid_test_cases
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_activate_test2.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_activate_test3.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_control_request_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_initialize_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_interrupt_thread_test2.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_read_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_receiver_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_receiver_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_report_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_report_set_test2.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_idle_rate_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_wMaxPacketSize_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_client_register_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_deactivate_test3.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_descriptor_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_descriptor_get_test4.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_idle_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_interrupt_endpoint_search_int_out_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_interrupt_endpoint_search_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_keyboard_callback_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_keyboard_ioctl_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_main_item_parse_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_main_item_parse_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_mouse_entry_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_mouse_entry_test3.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_periodic_report_start_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_remote_control_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_remote_control_activate_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_remote_control_entry_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_remote_control_entry_test3.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_get_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_transfer_request_completed_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_deactivate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_test4.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_test5.c
+    ${SOURCE_DIR}/usbx_hid_keyboard_extraction_test2.c
+    ${SOURCE_DIR}/usbx_hid_mouse_extraction_test2.c
+    ${SOURCE_DIR}/usbx_hid_remote_control_extraction_test2.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_keyboard_thread_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_keyboard_thread_test2.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_deactivate_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_configure_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_idle_set_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_interrupt_endpoint_search_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_keyboard_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_keyboard_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_local_item_parse_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_mouse_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_mouse_buttons_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_mouse_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_mouse_positions_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_mouse_wheel_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_periodic_report_start_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_periodic_report_stop_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_remote_control_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_remote_control_usage_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_add_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_callback_register_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_id_get_test.c
+    ${SOURCE_DIR}/usbx_hid_interrupt_endpoint_get_report_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_event_get_AND_set_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_client_register_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_client_search_test.c
+    ${SOURCE_DIR}/usbx_control_transfer_stall_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_descriptor_send_test.c
+    ${SOURCE_DIR}/usbx_hid_keyboard_key_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_interrupt_thread_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_report_set_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_set_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_set_int_out_test.c
+    ${SOURCE_DIR}/usbx_hid_keyboard_key_get_test.c
+    ${SOURCE_DIR}/usbx_hid_transfer_request_completed_decompressed_test.c
+    ${SOURCE_DIR}/usbx_hid_transfer_request_completed_raw_test.c
+    ${SOURCE_DIR}/usbx_hid_transfer_request_completed_test.c
+    ${SOURCE_DIR}/usbx_hid_remote_control_extraction_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_compress_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_compress_array_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_compress_and_decompress_test.c
+    ${SOURCE_DIR}/usbx_hid_keyboard_extraction_test.c
+    ${SOURCE_DIR}/usbx_hid_keyboard_basic_test.c
+    ${SOURCE_DIR}/usbx_hid_mouse_basic_test.c
+    ${SOURCE_DIR}/usbx_hid_mouse_extraction_test.c
+    ${SOURCE_DIR}/usbx_hid_remote_control_tests.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_collection_overflow_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_decompress_array_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_decompress_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_delimiter_nested_close_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_delimiter_nested_open_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_delimiter_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_delimiter_unknown_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_end_collection_error_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_andisplay_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_delimit_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_digit_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_display_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_joystk_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_keybrd_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_monitor_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_mouse_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_remote_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_example_tele_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_get_zero_length_item_data_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_global_item_persist_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_global_item_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_incoherent_usage_min_max_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_invalid_item_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_invalid_length_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_item_size_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_multiple_collections_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_multiple_fields_and_reports_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_multiple_fields_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_multiple_reports_feature_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_multiple_reports_input_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_multiple_reports_output_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_pop_underflow_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_push_overflow_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_push_pop_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_report_count_overflow_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_report_size_overflow_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_unknown_global_tag_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_unknown_local_tag_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_usages_min_max_test.c
+    ${SOURCE_DIR}/usbx_hid_report_descriptor_usages_single_test.c
+    ${SOURCE_DIR}/usbx_hid_report_multiple_reports_ids_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_hid_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_hid_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_logitech_pro_x_superlight_test.c
+)
+set(ux_class_hid_device_standalone_test_cases
+    ${SOURCE_DIR}/usbx_hid_mouse_basic_test.c
+    ${SOURCE_DIR}/usbx_hid_keyboard_basic_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_control_request_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_read_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_receiver_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_receiver_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_hid_test.c
+)
+set(ux_class_hid_host_standalone_test_cases
+    ${SOURCE_DIR}/usbx_class_hid_basic_test.c
+    ${SOURCE_DIR}/usbx_class_hid_keyboard_basic_test.c
+    ${SOURCE_DIR}/usbx_class_hid_mouse_basic_test.c
+    ${SOURCE_DIR}/usbx_class_hid_remote_control_basic_test.c
+    ${SOURCE_DIR}/usbx_class_hid_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_set_int_out_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_hid_test.c
+)
+set(ux_class_hid_standalone_test_cases
+)
+
+set(ux_class_cdc_acm_test_cases
+    ${SOURCE_DIR}/usbx_cdc_acm_basic_test.c
+    ${SOURCE_DIR}/usbx_cdc_acm_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_cdc_acm_configure_test.c
+    ${SOURCE_DIR}/usbx_cdc_acm_device_dtr_rts_reset_on_disconnect_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_acm_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_acm_deactivate_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_acm_ioctl_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_acm_transmission_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_acm_write_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_acm_timeout_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_capabilities_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_deactivate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_endpoints_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_read_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_transfer_request_completed_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_cdc_acm_write_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_cdc_acm_bulkout_thread_test.c
+)
+
+set(ux_class_gser_test_cases
+  ${SOURCE_DIR}/usbx_uxe_host_gser_test.c
+)
+set(ux_class_prolific_test_cases
+  ${SOURCE_DIR}/usbx_uxe_host_prolific_test.c
+)
+set(ux_class_swar_test_cases
+  ${SOURCE_DIR}/usbx_uxe_host_swar_test.c
+)
+
+set(ux_dpump_test_cases ${SOURCE_DIR}/usbx_dpump_basic_test.c)
+
+set(ux_device_class_storage_tx_test_cases ${SOURCE_DIR}/usbx_storage_tests.c)
+
+set(ux_class_storage_test_cases
+    ${SOURCE_DIR}/usbx_host_class_storage_max_lun_get_coverage_test.c
+    ${SOURCE_DIR}/usbx_host_class_storage_entry_coverage_test.c
+    ${SOURCE_DIR}/usbx_storage_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_storage_multi_lun_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_request_sense_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_control_request_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_format_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_initialize_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_inquiry_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_mode_select_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_mode_sense_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_prevent_allow_media_removal_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_read_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_request_sense_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_start_stop_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_synchronize_cache_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_test_ready_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_thread_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_uninitialize_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_verify_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_vendor_strings_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_write_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_invalid_lun_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_configure_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_request_sense_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_media_capacity_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_max_lun_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_configure_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_device_support_check_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_device_initialize_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_media_mount_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_media_open_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_media_read_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_media_write_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_media_protection_check_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_media_recovery_sense_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_start_stop_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_transport_bo_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_driver_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_thread_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_fats_exfat_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_storage_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_storage_test.c
+)
+set(ux_class_memory_management_test_cases
+    ${SOURCE_DIR}/usbx_ux_host_device_basic_memory_tests.c
+    ${SOURCE_DIR}/usbx_ux_utility_memory_safe_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_basic_memory_management_test.c
+    ${SOURCE_DIR}/usbx_hub_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_cdc_ecm_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_hid_receiver_memory_test.c
+    ${SOURCE_DIR}/usbx_class_hid_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_cdc_acm_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_storage_basic_memory_test.c
+)
+set(ux_class_storage_device_standalone_test_cases
+    ${SOURCE_DIR}/usbx_standalone_device_storage_basic_test.c
+    ${SOURCE_DIR}/usbx_standalone_device_storage_read_write_test.c
+    ${SOURCE_DIR}/usbx_standalone_device_storage_error_cv_test.c
+)
+set(ux_class_storage_host_standalone_test_cases
+    ${SOURCE_DIR}/usbx_standalone_host_storage_basic_test.c
+    ${SOURCE_DIR}/usbx_standalone_host_storage_read_write_test.c
+    ${SOURCE_DIR}/usbx_standalone_host_storage_insert_eject_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_storage_test.c
+)
+set(ux_class_storage_standalone_test_cases
+)
+
+set(ux_stack_cdc_acm_test_cases
+    ${SOURCE_DIR}/usbx_ux_host_device_basic_tests.c
+    ${SOURCE_DIR}/usbx_ux_host_device_basic_memory_tests.c
+    ${SOURCE_DIR}/usbx_ux_host_device_initialize_tests.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_instance_verify_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_interface_setting_select_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_new_configuration_create_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_new_device_create_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_new_interface_create_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_rh_change_process_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_endpoint_reset_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_standard_request_tests.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_descriptor_send_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_remote_wakeup_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_vendor_request_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_cdc_acm_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_cdc_acm_test.c
+)
+set(ux_class_cdc_acm_device_standalone_test_cases
+    # ${SOURCE_DIR}/usbx_standalone_device_cdc_acm_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_standalone_cdc_acm_basic_memory_test.c
+    # ${SOURCE_DIR}/usbx_standalone_device_cdc_acm_basic_test.c
+    ${SOURCE_DIR}/usbx_standalone_cdc_acm_basic_test.c
+    ${SOURCE_DIR}/usbx_standalone_device_cdc_acm_transmission_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_cdc_acm_test.c
+)
+set(ux_class_cdc_acm_host_standalone_test_cases
+    ${SOURCE_DIR}/usbx_standalone_cdc_acm_basic_memory_test.c
+    ${SOURCE_DIR}/usbx_standalone_cdc_acm_basic_test.c
+)
+
+set(ux_stack_test_cases
+    ${SOURCE_DIR}/usbx_host_stack_class_unregister_coverage_test.c
+    ${SOURCE_DIR}/usbx_host_stack_new_endpoint_create_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_uninitialize_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_hcd_unregister_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_bandwidth_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_address_set_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_configuration_activate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_configuration_reset_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_remove_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_new_device_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_device_scan_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_instance_destroy_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_instance_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_interface_scan_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_register_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_configuration_descriptor_parse_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_configuration_enumerate_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_configuration_instance_delete_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_configuration_interface_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_configuration_set_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_descriptor_read_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_endpoint_instance_create_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_endpoint_instance_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_hcd_register_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_hcd_transfer_request_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_interfaces_scan_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_interface_endpoint_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_rh_device_insertion_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_configuration_get_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_configuration_reset_select_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_hcd_thread_entry_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_transfer_request_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_enum_bMaxPacketSize0_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_enum_wMaxPacketSize_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_transfer_request_abort_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_class_register_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_class_unregister_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_set_feature_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_alternate_setting_get_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_alternate_setting_set_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_configuration_set_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_control_request_process_coverage_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_control_request_process_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_class_control_request_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_interface_delete_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_interface_set_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_interface_start_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_transfer_request_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_endpoint_stall_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_bos_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_initialize_test.c
+    ${SOURCE_DIR}/usbx_ux_device_stack_clear_feature_coverage_test.c
+    ${SOURCE_DIR}/usbx_uxe_system_test.c
+    ${SOURCE_DIR}/usbx_uxe_device_stack_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_stack_test.c
+)
+set(ux_stack_test_cases_hid
+    ${SOURCE_DIR}/usbx_ux_device_stack_get_status_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_class_unregister_test.c
+)
+set(ux_stack_test_cases_cdc
+)
+set(ux_utility_test_cases
+    ${SOURCE_DIR}/usbx_ux_api_tracex_id_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_descriptor_pack_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_descriptor_parse_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_descriptor_struct_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_memory_safe_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_memory_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_pci_write_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_pci_read_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_pci_class_scan_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_physical_address_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_string_length_check_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_unicode_to_string_test.c
+)
+set(ux_utility_os_test_cases
+    ${SOURCE_DIR}/usbx_ux_utility_event_flags_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_mutex_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_semaphore_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_thread_create_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_thread_schedule_other_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_thread_suspend_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_thread_identify_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_timer_test.c
+)
+
+set(ux_class_video_test_cases
+    ${SOURCE_DIR}/usbx_ux_device_class_video_basic_tests.c
+    ${SOURCE_DIR}/usbx_ux_host_class_video_basic_tests.c
+    ${SOURCE_DIR}/usbx_ux_host_class_video_dwMaxPayloadTransferSize_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_video_format_frame_based_test.c # device control buffer > 512
+    ${SOURCE_DIR}/usbx_ux_host_class_video_format_h264_test.c        # device control buffer > 512
+    ${SOURCE_DIR}/usbx_uxe_device_video_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_video_test.c
+)
+
+set(ux_class_video_device_standalone_test_cases
+    ${SOURCE_DIR}/usbx_ux_device_class_video_basic_tests.c
+    ${SOURCE_DIR}/usbx_uxe_device_video_test.c
+)
+
+set(ux_class_print_test_cases
+    ${SOURCE_DIR}/usbx_class_printer_basic_tests.c
+    ${SOURCE_DIR}/usbx_uxe_device_printer_test.c
+    ${SOURCE_DIR}/usbx_uxe_host_printer_test.c
+)
+
+set(ux_class_printer_device_standalone_test_cases
+  ${SOURCE_DIR}/usbx_class_printer_device_standalone_basic_tests.c
+  ${SOURCE_DIR}/usbx_uxe_device_printer_test.c
+)
+
+set(ux_msrc_test_cases
+  ${SOURCE_DIR}/usbx_msrc_69702_dfu_dnload_test.c
+  ${SOURCE_DIR}/usbx_msrc_71934_dfu_upload_test.c
+)
+set(ux_msrc_test_cases_rtos
+  ${SOURCE_DIR}/usbx_msrc_66679_test.c
+  ${SOURCE_DIR}/usbx_msrc_72427_ecm_host_mac_test.c
+  ${SOURCE_DIR}/usbx_msrc_72525_host_pima_obj_handles_get_test.c
+  ${SOURCE_DIR}/usbx_msrc_72619_host_pima_stor_ids_get_test.c
+  ${SOURCE_DIR}/usbx_msrc_72526_pictbridge_dps_host_start_test.c
+  ${SOURCE_DIR}/usbx_msrc_72227_host_pima_read_test.c
+  ${SOURCE_DIR}/usbx_msrc_73386_host_storage_media_open_buffer_test.c
+  ${SOURCE_DIR}/usbx_msrc_73716_cdc_ecm_mac_get_desc_check.c
+  ${SOURCE_DIR}/usbx_msrc_73492_host_vc_header_parse.c
+  ${SOURCE_DIR}/usbx_msrc_80947_device_cdc_ecm_rx_length_less_than_14.c
+  ${SOURCE_DIR}/usbx_msrc_81024_host_cdc_ecm_rx_length_less_than_14.c
+  ${SOURCE_DIR}/usbx_msrc_80991_device_rndis_rx_length_less_than_14_test.c
+  ${SOURCE_DIR}/usbx_msrc_81251_host_hid_report_add_fail_mem_test.c
+  ${SOURCE_DIR}/usbx_msrc_81206_81225_ecm_multiple_data_reject_test.c
+  ${SOURCE_DIR}/usbx_msrc_81230_host_asix_inst_free_tests.c
+  ${SOURCE_DIR}/usbx_msrc_81231_host_prolific_inst_free_tests.c
+  ${SOURCE_DIR}/usbx_msrc_81232_host_gser_inst_free_tests.c
+  ${SOURCE_DIR}/usbx_msrc_81233_host_swar_inst_free_tests.c
+  ${SOURCE_DIR}/usbx_msrc_81112_host_cdc_ecm_endpoints_get_tests.c
+  ${SOURCE_DIR}/usbx_msrc_81142_host_storage_endpoints_get_tests.c
+  ${SOURCE_DIR}/usbx_msrc_81143_host_cdc_acm_endpoints_get_tests.c
+  ${SOURCE_DIR}/usbx_msrc_81108_pictbridge_object_parse_test.c
+  ${SOURCE_DIR}/usbx_msrc_81325_host_hid_remote_control_free_callback_test.c
+  ${SOURCE_DIR}/usbx_msrc_81326_host_hid_keyboard_free_callback_test.c
+  ${SOURCE_DIR}/usbx_msrc_81327_host_hid_mouse_free_callback_test.c
+  ${SOURCE_DIR}/usbx_msrc_81109_pictbridge_array_element_to_hexa_test.c
+  ${SOURCE_DIR}/usbx_msrc_81292_host_pima_deactivate_semaphore_test.c
+  ${SOURCE_DIR}/usbx_msrc_81323_host_pima_deactivate_no_int_ep_test.c
+  ${SOURCE_DIR}/usbx_msrc_81184_host_audio_desc_validate_test.c
+  ${SOURCE_DIR}/usbx_msrc_81426_host_audio_type_get_fail_ac_link_test.c
+  ${SOURCE_DIR}/usbx_msrc_81428_81429_host_audio_ac_search_test.c
+)
+set(ux_msrc_test_cases_standalone
+  ${SOURCE_DIR}/usbx_msrc_81489_81570_host_cdc_acm_standalone_ac_search_test.c
+  ${SOURCE_DIR}/usbx_msrc_81572_standalone_host_printer_allocated_enum_free_test.c
+  ${SOURCE_DIR}/usbx_msrc_81573_standalone_host_hub_allocated_enum_free_test.c
+  ${SOURCE_DIR}/usbx_msrc_81574_standalone_host_hid_allocated_enum_free_test.c
+  ${SOURCE_DIR}/usbx_msrc_81575_standalone_host_cdc_acm_allocated_enum_free_test.c
+  ${SOURCE_DIR}/usbx_msrc_81691_standalone_host_stack_enum_double_free_test.c
+)
+
+set(ux_class_ccid_test_cases
+    ${SOURCE_DIR}/usbx_device_class_ccid_basic_tests.c
+    ${SOURCE_DIR}/usbx_device_class_ccid_busy_abort_tests.c
+    ${SOURCE_DIR}/usbx_uxe_device_ccid_test.c
+)
+
+set(ux_basic_test_cases
+    ${SOURCE_DIR}/usbx_class_device_enumeration_test.c
+    ${SOURCE_DIR}/usbx_class_interface_enumeration_test.c
+    ${SOURCE_DIR}/usbx_class_multi_interface_enumeration_test.c
+    ${SOURCE_DIR}/usbx_ux_host_stack_device_string_get_test.c
+)
+
+set(ux_class_pima_test_cases
+  ${SOURCE_DIR}/usbx_pima_basic_test.c
+  ${SOURCE_DIR}/usbx_pictbridge_basic_test.c
+  ${SOURCE_DIR}/usbx_uxe_device_pima_test.c
+  ${SOURCE_DIR}/usbx_uxe_host_pima_test.c
+)
+
+
+if("-DNX_BSD_ENABLE" IN_LIST ${CMAKE_BUILD_TYPE})
+
+endif()
+
+set(test_utility_files
+    ${SOURCE_DIR}/usbxtestcontrol.c
+    ${SOURCE_DIR}/ux_test.c
+    ${SOURCE_DIR}/ux_host_class_dummy.c
+    ${SOURCE_DIR}/ux_host_class_dummy.h
+    ${SOURCE_DIR}/ux_device_class_dummy.c
+    ${SOURCE_DIR}/ux_device_class_dummy.h
+    ${SOURCE_DIR}/ux_device_class_dummy_hub.c
+    ${SOURCE_DIR}/ux_device_class_dummy_hub.h
+    # ${SOURCE_DIR}/ux_device_class_dummy_printer.c
+    # ${SOURCE_DIR}/ux_device_class_dummy_printer.h
+    ${SOURCE_DIR}/ux_test_utility_sim_no_overriding.c
+    ${SOURCE_DIR}/ux_test_race_condition_overrides.c
+    ${SOURCE_DIR}/ux_test_dcd_sim_slave.c
+    ${SOURCE_DIR}/ux_test_hcd_sim_host.c
+    ${SOURCE_DIR}/ux_test_utility_sim.c
+    ${SOURCE_DIR}/ux_test_standalone_references.c
+    ${SOURCE_DIR}/usbx_ux_host_class_storage_fx_driver.c)
+add_library(test_utility ${test_utility_files})
+target_link_libraries(test_utility PUBLIC azrtos::usbx azrtos::threadx azrtos::netxduo azrtos::filex)
+target_compile_definitions(test_utility PUBLIC CTEST FX_ENABLE_EXFAT)
+
+if (CMAKE_BUILD_TYPE MATCHES "msrc_rtos_build")
+  set(test_cases
+    ${ux_msrc_test_cases}
+    ${ux_msrc_test_cases_rtos}
+  )
+elseif (CMAKE_BUILD_TYPE MATCHES "msrc_standalone_build")
+  set(test_cases
+    ${ux_msrc_test_cases}
+    ${ux_msrc_test_cases_standalone}
+  )
+elseif(NOT (CMAKE_BUILD_TYPE MATCHES "standalone.*"))
+  if (CMAKE_BUILD_TYPE MATCHES "nofx_.*")
+    set(test_cases
+      ${ux_class_storage_test_cases}
+    )
+  elseif (CMAKE_BUILD_TYPE MATCHES "memory_management_.*")
+    set(test_cases
+      ${ux_class_memory_management_test_cases}
+    )
+  else()
+    set(test_cases
+      ${ux_basic_test_cases}
+      ${ux_utility_test_cases}
+      ${ux_utility_os_test_cases}
+      ${ux_stack_test_cases}
+      ${ux_dpump_test_cases}
+      ${ux_class_hub_test_cases}
+      ${ux_device_class_storage_tx_test_cases}
+      ${ux_class_dfu_test_cases}
+      ${ux_class_print_test_cases}
+      ${ux_class_ccid_test_cases}
+      )
+    if(NOT (CMAKE_BUILD_TYPE MATCHES "optimized.*"))
+      list(APPEND test_cases
+        ${ux_stack_test_cases_hid}
+        ${ux_stack_test_cases_cdc}
+        ${ux_stack_cdc_acm_test_cases}
+        ${ux_class_cdc_acm_test_cases}
+        ${ux_class_audio_test_cases}
+        ${ux_class_rndis_test_cases}
+        ${ux_class_cdc_ecm_test_cases}
+        ${ux_class_hid_test_cases}
+        ${ux_class_video_test_cases}
+        ${ux_class_storage_test_cases}
+        ${ux_class_pima_test_cases}
+        ${ux_class_gser_test_cases}
+        ${ux_class_prolific_test_cases}
+        ${ux_class_swar_test_cases}
+        ${ux_msrc_test_cases}
+        )
+    endif()
+  endif()
+else()
+  set(test_cases
+      ${ux_basic_test_cases}
+      ${ux_utility_test_cases}
+      ${ux_dpump_test_cases}
+    )
+  if (CMAKE_BUILD_TYPE MATCHES "standalone_device.*")
+    list(APPEND test_cases
+      ${ux_utility_os_test_cases}
+      ${ux_class_storage_device_standalone_test_cases}
+      ${ux_class_cdc_acm_device_standalone_test_cases}
+      ${ux_class_video_device_standalone_test_cases}
+      ${ux_class_hid_device_standalone_test_cases}
+      ${ux_class_dfu_test_cases}
+      ${ux_msrc_test_cases}
+      ${ux_class_printer_device_standalone_test_cases}
+      ${ux_class_audio_device_standalone_test_cases}
+      ${ux_class_ccid_test_cases}
+      )
+  elseif (CMAKE_BUILD_TYPE MATCHES "standalone_host.*")
+    list(APPEND test_cases
+      ${ux_utility_os_test_cases}
+      ${ux_class_storage_host_standalone_test_cases}
+      ${ux_class_cdc_acm_host_standalone_test_cases}
+      ${ux_class_hid_host_standalone_test_cases}
+      ${ux_class_print_test_cases}
+      ${ux_class_hub_standalone_test_cases}
+    )
+  else ()
+    list(APPEND test_cases
+      ${ux_class_dfu_test_cases}
+    )
+  endif()
+endif()
+
+foreach(test_case ${test_cases})
+  get_filename_component(test_name ${test_case} NAME_WE)
+  add_executable(${test_name} ${test_case})
+  target_link_libraries(${test_name} PRIVATE test_utility)
+  add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_name})
+endforeach()
