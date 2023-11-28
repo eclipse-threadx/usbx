@@ -23,16 +23,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  dump_usbx_inputs:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Dump USBX Inputs
-      run: |
-        echo event_name: ${{ github.event_name }}
-        echo tests_to_run: ${{ inputs.tests_to_run }}
-        echo tests_to_run: ${{ github.event.inputs.tests_to_run }}
-        echo skip_coverage: ${{ inputs.skip_coverage }}
-        echo coverage_name: ${{ inputs.coverage_name }}
 
   manual_tests:
     if: github.event_name == 'workflow_dispatch'
@@ -44,7 +34,7 @@ jobs:
       pages: write
       id-token: write
 
-    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
+    uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
     with:
       cmake_path: ./test/cmake/usbx
       build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
@@ -62,7 +52,7 @@ jobs:
       pages: write
       id-token: write
 
-    uses: xiaocq2001/threadx/.github/workflows/regression_template.yml@chxiao/test_workflow
+    uses: azure-rtos/threadx/.github/workflows/regression_template.yml@master
     with:
       cmake_path: ./test/cmake/usbx
       build_script: ./scripts/build.sh default_build_coverage
