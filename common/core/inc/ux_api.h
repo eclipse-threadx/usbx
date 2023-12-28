@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    ux_api.h                                            PORTABLE C      */
-/*                                                           6.3.0        */
+/*                                                           6.4.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -140,6 +140,8 @@
 /*                                            optimized USB descriptors,  */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.3.0  */
+/*  12-31-2023     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            resulting in version 6.4.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -340,7 +342,7 @@ typedef signed char               SCHAR;
 /* Define basic constants for the USBX Stack.  */
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
-#define USBX_MINOR_VERSION            3
+#define USBX_MINOR_VERSION            4
 #define USBX_PATCH_VERSION            0
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
