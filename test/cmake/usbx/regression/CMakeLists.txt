@@ -374,7 +374,6 @@ set(ux_class_storage_test_cases
     ${SOURCE_DIR}/usbx_ux_host_class_storage_driver_entry_test.c
     ${SOURCE_DIR}/usbx_ux_host_class_storage_entry_test.c
     ${SOURCE_DIR}/usbx_ux_host_class_storage_thread_entry_test.c
-    ${SOURCE_DIR}/usbx_ux_host_class_storage_fats_exfat_test.c
     ${SOURCE_DIR}/usbx_uxe_device_storage_test.c
     ${SOURCE_DIR}/usbx_uxe_host_storage_test.c
 )
@@ -643,7 +642,7 @@ set(test_utility_files
     ${SOURCE_DIR}/usbx_ux_host_class_storage_fx_driver.c)
 add_library(test_utility ${test_utility_files})
 target_link_libraries(test_utility PUBLIC azrtos::usbx azrtos::threadx azrtos::netxduo azrtos::filex)
-target_compile_definitions(test_utility PUBLIC CTEST FX_ENABLE_EXFAT)
+target_compile_definitions(test_utility PUBLIC CTEST)
 
 if (CMAKE_BUILD_TYPE MATCHES "msrc_rtos_build")
   set(test_cases

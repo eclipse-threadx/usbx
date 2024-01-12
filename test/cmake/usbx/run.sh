@@ -3,10 +3,10 @@
 cd $(dirname $0)
 
 # Checkout externals
-[ -d externals] || mkdir ../../externals
-git clone https://github.com/azure-rtos/threadx.git ../../externals/threadx
-git clone https://github.com/azure-rtos/netxduo.git ../../externals/netxduo
-git clone https://github.com/azure-rtos/filex.git   ../../externals/filex
+[ -d externals ] || mkdir ../../externals
+git clone https://github.com/eclipse-threadx/threadx.git ../../externals/threadx
+git clone https://github.com/eclipse-threadx/netxduo.git ../../externals/netxduo
+git clone https://github.com/eclipse-threadx/filex.git   ../../externals/filex
 
 # Add junit output for ctest generation
 if ! grep -q "\-\-output\-junit \$1.xml" ../../externals/threadx/scripts/cmake_bootstrap.sh; then
