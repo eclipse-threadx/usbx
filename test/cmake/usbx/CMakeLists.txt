@@ -304,8 +304,7 @@ target_compile_options(
           -Wshadow
           -Wlogical-op
           -Waggregate-return
-          -Wfloat-equal
-          -DFX_ENABLE_EXFAT)
+          -Wfloat-equal)
 
 # Remove includes and files not needed from usbx build
 set(UX_STANDALONE_HOST_EXCLUDES
