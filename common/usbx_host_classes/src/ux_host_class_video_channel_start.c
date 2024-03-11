@@ -107,6 +107,7 @@ UX_ENDPOINT             *endpoint;
 ULONG                   endpoint_index;
 UINT                    streaming_interface;
 UINT                    max_payload_size;
+ULONG                   clock_frequency;
 
 
     /* Protect thread reentry to this instance.  */
@@ -201,6 +202,9 @@ UINT                    max_payload_size;
                         max_payload_size = video_parameter -> ux_host_class_video_parameter_channel_bandwidth_selection;
                     }
 
+                    /* Save clock frequency of the video stream */
+                    clock_frequency = _ux_utility_long_get(control_buffer + UX_HOST_CLASS_VIDEO_PROBE_COMMIT_CLOCK_FREQUENCY);
+
                     /* Search for the non zero alternate setting of the video stream.  */
                     status =  _ux_host_class_video_alternate_setting_locate(video, max_payload_size, &alternate_setting);
 
@@ -256,7 +260,10 @@ UINT                    max_payload_size;
                                                 It's not exceeding endpoint bandwidth since the interface alternate
                                                 setting is located by max payload size.  */
                                                 video -> ux_host_class_video_current_max_payload_size = max_payload_size;
-                        
+
+                                                /* Save the clock frequecny */
+                                                video -> ux_host_class_video_current_clock_frequency = clock_frequency;
+
                                                 /* Free all used resources.  */
                                                 _ux_utility_memory_free(control_buffer);
 
