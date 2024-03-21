@@ -29,7 +29,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_speed_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_stream_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_transmission_start.c
-	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_unitialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_frame_commit.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_frame_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_audio_write_thread_entry.c
@@ -66,7 +66,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_read.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_read_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_tasks_run.c
-	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_unitialize.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_write.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_write_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_cdc_acm_write_with_callback.c
