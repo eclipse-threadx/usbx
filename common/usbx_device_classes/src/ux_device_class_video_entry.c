@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_video_entry                        PORTABLE C      */
-/*                                                           6.3.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  10-31-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.3.0  */
+/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
+/*                                            fix typo,                   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -94,7 +97,7 @@ UINT        status;
         status =  _uxe_device_class_video_initialize(command);
 #else
 
-        /* Call the init function of the Video class.  */
+        /* Call the uninit function of the Video class.  */
         status =  _ux_device_class_video_initialize(command);
 #endif  /* UX_DEVICE_CLASS_VIDEO_ENABLE_ERROR_CHECKING */
 
