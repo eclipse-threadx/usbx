@@ -46,7 +46,7 @@
 /*                                                                        */ 
 /*  INPUT                                                                 */ 
 /*                                                                        */ 
-/*    command                               Pointer to storage command    */ 
+/*    command                               Pointer to cdc ecm command    */
 /*                                                                        */ 
 /*  OUTPUT                                                                */ 
 /*                                                                        */ 

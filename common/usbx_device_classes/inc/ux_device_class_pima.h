@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -20,25 +20,25 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_device_class_pima.h                              PORTABLE C      */ 
-/*                                                           6.3.0        */
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_device_class_pima.h                              PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX PIMA class.                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    USBX PIMA class.                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -63,21 +63,25 @@
 /*                                            endpoint buffer in classes, */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.3.0  */
+/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
+/*                                            added pima deinit function, */
+/*                                            remove extra spaces,        */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_PIMA_H
 #define UX_DEVICE_CLASS_PIMA_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -109,7 +113,7 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_PROTOCOL                                               0X01
 #define UX_DEVICE_CLASS_PIMA_MAGIC_NUMBER                                           0x50494D41
 #define UX_DEVICE_CLASS_PIMA_UNICODE_MAX_LENGTH                                     256
-#define UX_DEVICE_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH                            64 
+#define UX_DEVICE_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH                            64
 #define UX_DEVICE_CLASS_PIMA_MAX_EVENTS_QUEUE                                       16
 #define UX_DEVICE_CLASS_PIMA_MAX_STORAGE_IDS                                        1
 #define UX_DEVICE_CLASS_PIMA_ARRAY_MAX_LENGTH                                       256
@@ -117,13 +121,13 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_OBJECT_PROPERTIES_ARRAY_MAX_ITEMS                      128
 #define UX_DEVICE_CLASS_PIMA_PROP_VALUE_SIZE                                        256
 #define UX_DEVICE_CLASS_PIMA_MICROSOFT_VENDOR_COMMAND_CODE                          0x54
-                                                                                    
-/* Define PIMA versions.  */                                                        
+
+/* Define PIMA versions.  */
 #define UX_DEVICE_CLASS_PIMA_STANDARD_VERSION                                       100
 #define UX_DEVICE_CLASS_PIMA_VENDOR_EXTENSION_ID                                    6
 #define UX_DEVICE_CLASS_PIMA_EXTENSION_VERSION                                      100
 #define UX_DEVICE_CLASS_PIMA_STANDARD_MODE                                          0
-                                                                                    
+
 
 /* Define PIMA phases.  */
 
@@ -133,80 +137,80 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_PHASE_DATA_IN                                          3
 #define UX_DEVICE_CLASS_PIMA_PHASE_DATA_OUT                                         4
 
-/* Define PIMA data phases.  */                                                        
-                                                                                    
+/* Define PIMA data phases.  */
+
 #define UX_DEVICE_CLASS_PIMA_DATA_PHASE_NONE                                        0
 #define UX_DEVICE_CLASS_PIMA_DATA_PHASE_IN                                          1
 #define UX_DEVICE_CLASS_PIMA_DATA_PHASE_OUT                                         2
-                                                                                    
-/* Define PIMA session states.  */                                                    
-                                                                                    
+
+/* Define PIMA session states.  */
+
 #define UX_DEVICE_CLASS_PIMA_SESSION_STATE_CLOSED                                   0
 #define UX_DEVICE_CLASS_PIMA_SESSION_STATE_OPENED                                   1
-                                                                                    
-/* Define PIMA object and thumb states.  */                                            
-                                                                                    
+
+/* Define PIMA object and thumb states.  */
+
 #define UX_DEVICE_CLASS_PIMA_OBJECT_STATE_CLOSED                                    0
 #define UX_DEVICE_CLASS_PIMA_OBJECT_STATE_OPENED                                    1
-                                                                                    
-/* Define PIMA object and thumb transfer status.  */                                
-                                                                                    
+
+/* Define PIMA object and thumb transfer status.  */
+
 #define UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_STATUS_INACTIVE                        0
 #define UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_STATUS_ACTIVE                          1
 #define UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_STATUS_COMPLETED                       2
 #define UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_STATUS_ABORTED                         3
-                                                                                    
-/* Define PIMA object and thumb transfer phase.  */                                    
-                                                                                    
+
+/* Define PIMA object and thumb transfer phase.  */
+
 #define UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_ACTIVE                           0
 #define UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_COMPLETED                        1
 #define UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_COMPLETED_ERROR                  2
-                                                                                    
-                                                                                    
-/* Define PIMA Cancel Request equivalences.  */                                        
-                                                                                    
+
+
+/* Define PIMA Cancel Request equivalences.  */
+
 #define UX_DEVICE_CLASS_PIMA_REQUEST_CANCEL_COMMAND                                 0x64
 #define UX_DEVICE_CLASS_PIMA_REQUEST_CANCEL_DATA_LENGTH                             0x06
 #define UX_DEVICE_CLASS_PIMA_REQUEST_CANCEL_CODE                                    0x04001
 #define UX_DEVICE_CLASS_PIMA_REQUEST_CANCEL_OFFSET_CODE                             0x00
 #define UX_DEVICE_CLASS_PIMA_REQUEST_CANCEL_OFFSET_TRANSACTION_ID                   0x02
-                                                                                    
-/* Define PIMA Reset Request equivalences.  */                                        
-                                                                                    
+
+/* Define PIMA Reset Request equivalences.  */
+
 #define UX_DEVICE_CLASS_PIMA_REQUEST_RESET_DEVICE                                   0x66
-                                                                                    
-/* Define PIMA Status Request equivalences.  */                                        
-                                                                                    
+
+/* Define PIMA Status Request equivalences.  */
+
 #define UX_DEVICE_CLASS_PIMA_REQUEST_STATUS_COMMAND                                 0x67
 #define UX_DEVICE_CLASS_PIMA_REQUEST_STATUS_DATA_LENGTH                             0x40
 #define UX_DEVICE_CLASS_PIMA_REQUEST_STATUS_OFFSET_LENGTH                           0x00
 #define UX_DEVICE_CLASS_PIMA_REQUEST_STATUS_OFFSET_CODE                             0x02
 #define UX_DEVICE_CLASS_PIMA_REQUEST_STATUS_COMMAND_COUNTER                         16
-#define UX_DEVICE_CLASS_PIMA_REQUEST_STATUS_COMMAND_DELAY                           (1 * UX_PERIODIC_RATE) 
-                                                                                    
-/* Define PIMA command container type.  */                                            
-                                                                                    
+#define UX_DEVICE_CLASS_PIMA_REQUEST_STATUS_COMMAND_DELAY                           (1 * UX_PERIODIC_RATE)
+
+/* Define PIMA command container type.  */
+
 #define UX_DEVICE_CLASS_PIMA_CT_UNDEFINED                                           0x00
 #define UX_DEVICE_CLASS_PIMA_CT_COMMAND_BLOCK                                       0x01
 #define UX_DEVICE_CLASS_PIMA_CT_DATA_BLOCK                                          0x02
 #define UX_DEVICE_CLASS_PIMA_CT_RESPONSE_BLOCK                                      0x03
 #define UX_DEVICE_CLASS_PIMA_CT_EVENT_BLOCK                                         0x04
-                                                                                    
-/* Define PIMA Extended Event Data Request payload Format.  */                        
-                                                                                    
+
+/* Define PIMA Extended Event Data Request payload Format.  */
+
 #define UX_DEVICE_CLASS_PIMA_EEDR_EVENT_CODE                                        0x00
 #define UX_DEVICE_CLASS_PIMA_EEDR_TRANSACTION_ID                                    0x02
 #define UX_DEVICE_CLASS_PIMA_EEDR_NUMBER_PARAMETERS                                 0x06
 #define UX_DEVICE_CLASS_PIMA_EEDR_SIZE_PARAMETER                                    0x08
-                                                                                    
-/* Define PIMA Device Status Data Format.  */                                        
-                                                                                    
+
+/* Define PIMA Device Status Data Format.  */
+
 #define UX_DEVICE_CLASS_PIMA_DSD_LENGTH                                             0x00
 #define UX_DEVICE_CLASS_PIMA_DSD_CODE                                               0x02
 #define UX_DEVICE_CLASS_PIMA_DSD_PARAMETER                                          0x04
-                                                                                    
-/* Define PIMA Command Header Format.  */                                            
-                                                                                    
+
+/* Define PIMA Command Header Format.  */
+
 #define UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_LENGTH                                  0x00
 #define UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_TYPE                                    0x04
 #define UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_CODE                                    0x06
@@ -216,31 +220,31 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_PARAMETER_3                             0x14
 #define UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_PARAMETER_4                             0x18
 #define UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_PARAMETER_5                             0x1C
-                                                                                    
+
 #define UX_DEVICE_CLASS_PIMA_COMMAND_HEADER_SIZE                                    0x0C
-#define UX_DEVICE_CLASS_PIMA_CONTAINER_SIZE                                         0x40 
+#define UX_DEVICE_CLASS_PIMA_CONTAINER_SIZE                                         0x40
 #define UX_DEVICE_CLASS_PIMA_ALL_HEADER_SIZE                                        0x20
-                                                                                    
-/* Define PIMA Data Header Format.  */                                                
-                                                                                    
+
+/* Define PIMA Data Header Format.  */
+
 #define UX_DEVICE_CLASS_PIMA_DATA_HEADER_LENGTH                                     0x00
 #define UX_DEVICE_CLASS_PIMA_DATA_HEADER_TYPE                                       0x04
 #define UX_DEVICE_CLASS_PIMA_DATA_HEADER_CODE                                       0x06
 #define UX_DEVICE_CLASS_PIMA_DATA_HEADER_TRANSACTION_ID                             0x08
 #define UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE                                       0x0C
-                                                                                    
-                                                                                    
-/* Define PIMA Response Header Format.  */                                            
-                                                                                    
+
+
+/* Define PIMA Response Header Format.  */
+
 #define UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_LENGTH                                 0x00
 #define UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_TYPE                                   0x04
 #define UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_CODE                                   0x06
 #define UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_TRANSACTION_ID                         0x08
 #define UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_PARAMETERS                             0x0C
 #define UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_SIZE                                   0x0C
-                                                                                    
-/* Define PIMA Asynchronous Event Interrupt Data Format.  */                        
-                                                                                    
+
+/* Define PIMA Asynchronous Event Interrupt Data Format.  */
+
 #define UX_DEVICE_CLASS_PIMA_AEI_DATA_LENGTH                                        0x00
 #define UX_DEVICE_CLASS_PIMA_AEI_TYPE                                               0x04
 #define UX_DEVICE_CLASS_PIMA_AEI_EVENT_CODE                                         0x06
@@ -249,9 +253,9 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_2                                        0x10
 #define UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_3                                        0x14
 #define UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH                                         0x18
-                                                                                    
-/* Define PIMA Operation Commands.  */                                                
-                                                                                    
+
+/* Define PIMA Operation Commands.  */
+
 #define UX_DEVICE_CLASS_PIMA_OC_UNDEFINED                                           0x1000
 #define UX_DEVICE_CLASS_PIMA_OC_GET_DEVICE_INFO                                     0x1001
 #define UX_DEVICE_CLASS_PIMA_OC_OPEN_SESSION                                        0x1002
@@ -270,7 +274,7 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_OC_FORMAT_STORE                                        0x100F
 #define UX_DEVICE_CLASS_PIMA_OC_RESET_DEVICE                                        0x1010
 #define UX_DEVICE_CLASS_PIMA_OC_SELF_TEST                                           0x1011
-#define UX_DEVICE_CLASS_PIMA_OC_SET_OBJECT_PROTECTION                               0x1012  
+#define UX_DEVICE_CLASS_PIMA_OC_SET_OBJECT_PROTECTION                               0x1012
 #define UX_DEVICE_CLASS_PIMA_OC_POWER_DOWN                                          0x1013
 #define UX_DEVICE_CLASS_PIMA_OC_GET_DEVICE_PROP_DESC                                0x1014
 #define UX_DEVICE_CLASS_PIMA_OC_GET_DEVICE_PROP_VALUE                               0x1015
@@ -288,8 +292,8 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_OC_GET_OBJECT_REFERENCES                               0x9810
 #define UX_DEVICE_CLASS_PIMA_OC_SET_OBJECT_REFERENCES                               0x9811
 
-/* Define PIMA Response Codes.  */                                                    
-                                                                                    
+/* Define PIMA Response Codes.  */
+
 #define UX_DEVICE_CLASS_PIMA_RC_UNDEFINED                                           0x2000
 #define UX_DEVICE_CLASS_PIMA_RC_OK                                                  0x2001
 #define UX_DEVICE_CLASS_PIMA_RC_GENERAL_ERROR                                       0x2002
@@ -326,7 +330,7 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_RC_OBJECT_ALREADY_OPENED                               0x2021
 #define UX_DEVICE_CLASS_PIMA_RC_OBJECT_ALREADY_CLOSED                               0x2022
 #define UX_DEVICE_CLASS_PIMA_RC_OBJECT_NOT_OPENED                                   0x2023
-                                                                                    
+
 #define UX_DEVICE_CLASS_PIMA_RC_INVALID_OBJECT_PROP_CODE                            0xA801
 #define UX_DEVICE_CLASS_PIMA_RC_INVALID_OBJECT_PROP_FORMAT                          0xA802
 #define UX_DEVICE_CLASS_PIMA_RC_INVALID_OBJECT_PROP_VALUE                           0xA803
@@ -336,9 +340,9 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_RC_SPECIFICATION_BY_DEPTH_UNSUPPORTED                  0xA808
 #define UX_DEVICE_CLASS_PIMA_RC_OBJECT_TOO_LARGE                                    0xA809
 #define UX_DEVICE_CLASS_PIMA_RC_OBJECT_PROP_NOT_SUPPORTED                           0xA80A
-                                                                                    
-/* Define PIMA Event Codes.  */                                                        
-                                                                                    
+
+/* Define PIMA Event Codes.  */
+
 #define UX_DEVICE_CLASS_PIMA_EC_UNDEFINED                                           0x4000
 #define UX_DEVICE_CLASS_PIMA_EC_CANCEL_TRANSACTION                                  0x4001
 #define UX_DEVICE_CLASS_PIMA_EC_OBJECT_ADDED                                        0x4002
@@ -354,9 +358,9 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_EC_STORAGE_INFO_CHANGED                                0x400C
 #define UX_DEVICE_CLASS_PIMA_EC_CAPTURE_COMPLETE                                    0x400D
 #define UX_DEVICE_CLASS_PIMA_EC_UNREPORTED_STATUS                                   0x400E
-                                                                                    
-/* Define PIMA Object Format Codes.  */                                                
-                                                                                    
+
+/* Define PIMA Object Format Codes.  */
+
 #define UX_DEVICE_CLASS_PIMA_OFC_UNDEFINED                                          0x3000
 #define UX_DEVICE_CLASS_PIMA_OFC_ASSOCIATION                                        0x3001
 #define UX_DEVICE_CLASS_PIMA_OFC_SCRIPT                                             0x3002
@@ -429,41 +433,41 @@ extern   "C" {
 #define UX_DEVICE_CLASS_PIMA_OFC_UNDEFINED_CONTACT                                  0xBB80
 #define UX_DEVICE_CLASS_PIMA_OFC_ABSTRACT_CONTACT                                   0xBB81
 #define UX_DEVICE_CLASS_PIMA_OFC_VCARD2                                             0xBB82
-                                                                                    
-/* Define PIMA Device Format Codes.  */                                                
-                                                                                    
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_UNDEFINED                                     0x5000 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_BATTERY_LEVEL                                 0x5001 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FUNCTIONAL_MODE                               0x5002 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_IMAGE_SIZE                                    0x5003 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_COMPRESSION_SETTING                           0x5004 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_WHITE_BALANCE                                 0x5005 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_RGB_GAIN                                      0x5006 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_F_NUMBER                                      0x5007 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCAL_LENGTH                                  0x5008 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCUS_DISTANCE                                0x5009 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCUS_MODE                                    0x500A 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_METERING_MODE                        0x500B 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FLASH_MODE                                    0x500C 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_TIME                                 0x500D 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_PROGRAM_MODE                         0x500E 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_INDEX                                0x500F 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_BIAS_COMPENSATION                    0x5010 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_DATE_TIME                                     0x5011 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_CAPTURE_DELAY                                 0x5012 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_STILL_CAPTURE_MODE                            0x5013 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_CONTRAST                                      0x5014 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_SHARPNESS                                     0x5015 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_DIGITAL_ZOOM                                  0x5016 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EFFECT_MODE                                   0x5017 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_BURST_NUMBER                                  0x5018 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_BURST_INTERVAL                                0x5019 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_TIME_LAPSE_NUMBER                             0x501A 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_TIME_LAPSE_INTERVAL                           0x501B 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCUS_METERING_MODE                           0x501C 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_UPLOAD_URL                                    0x501D 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_ARTIST                                        0x501E 
-#define UX_DEVICE_CLASS_PIMA_DEV_PROP_COPYRIGHT_INFO                                0x501F 
+
+/* Define PIMA Device Format Codes.  */
+
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_UNDEFINED                                     0x5000
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_BATTERY_LEVEL                                 0x5001
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FUNCTIONAL_MODE                               0x5002
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_IMAGE_SIZE                                    0x5003
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_COMPRESSION_SETTING                           0x5004
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_WHITE_BALANCE                                 0x5005
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_RGB_GAIN                                      0x5006
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_F_NUMBER                                      0x5007
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCAL_LENGTH                                  0x5008
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCUS_DISTANCE                                0x5009
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCUS_MODE                                    0x500A
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_METERING_MODE                        0x500B
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FLASH_MODE                                    0x500C
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_TIME                                 0x500D
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_PROGRAM_MODE                         0x500E
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_INDEX                                0x500F
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EXPOSURE_BIAS_COMPENSATION                    0x5010
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_DATE_TIME                                     0x5011
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_CAPTURE_DELAY                                 0x5012
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_STILL_CAPTURE_MODE                            0x5013
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_CONTRAST                                      0x5014
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_SHARPNESS                                     0x5015
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_DIGITAL_ZOOM                                  0x5016
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_EFFECT_MODE                                   0x5017
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_BURST_NUMBER                                  0x5018
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_BURST_INTERVAL                                0x5019
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_TIME_LAPSE_NUMBER                             0x501A
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_TIME_LAPSE_INTERVAL                           0x501B
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_FOCUS_METERING_MODE                           0x501C
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_UPLOAD_URL                                    0x501D
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_ARTIST                                        0x501E
+#define UX_DEVICE_CLASS_PIMA_DEV_PROP_COPYRIGHT_INFO                                0x501F
 #define UX_DEVICE_CLASS_PIMA_DEV_PROP_SYNCHRONIZATION_PARTNER                       0xD401
 #define UX_DEVICE_CLASS_PIMA_DEV_PROP_DEVICE_FRIENDLY_NAME                          0xD402
 #define UX_DEVICE_CLASS_PIMA_DEV_PROP_VOLUME                                        0xD403
@@ -648,24 +652,24 @@ extern   "C" {
 
 #define UX_DEVICE_CLASS_PIMA_OPS_NO_PROTECTION                                      0x0000
 #define UX_DEVICE_CLASS_PIMA_OPS_READ_ONLY                                          0x0001
-                                                                    
-/* Define PIMA Storage Types Codes.  */                                                
-                                                                                    
+
+/* Define PIMA Storage Types Codes.  */
+
 #define UX_DEVICE_CLASS_PIMA_STC_UNDEFINED                                          0x0000
 #define UX_DEVICE_CLASS_PIMA_STC_FIXED_ROM                                          0x0001
 #define UX_DEVICE_CLASS_PIMA_STC_REMOVABLE_ROM                                      0x0002
 #define UX_DEVICE_CLASS_PIMA_STC_FIXED_RAM                                          0x0003
 #define UX_DEVICE_CLASS_PIMA_STC_REMOVABLE_RAM                                      0x0004
-                                                                                    
-/* Define PIMA File System Types Codes.  */                                            
-                                                                                    
+
+/* Define PIMA File System Types Codes.  */
+
 #define UX_DEVICE_CLASS_PIMA_FSTC_UNDEFINED                                         0x0000
 #define UX_DEVICE_CLASS_PIMA_FSTC_GENERIC_FLAT                                      0x0001
 #define UX_DEVICE_CLASS_PIMA_FSTC_GENERIC_HIERARCHICAL                              0x0002
 #define UX_DEVICE_CLASS_PIMA_FSTC_DCF                                               0x0003
-                                                                                    
-/* Define PIMA File System Access Types Codes.  */                                    
-                                                                                    
+
+/* Define PIMA File System Access Types Codes.  */
+
 #define UX_DEVICE_CLASS_PIMA_AC_READ_WRITE                                          0x0000
 #define UX_DEVICE_CLASS_PIMA_AC_RO_WITHOUT_OBJECT_DELETION                          0x0001
 #define UX_DEVICE_CLASS_PIMA_AC_RO_WITH_OBJECT_DELETION                             0x0002
@@ -720,7 +724,7 @@ typedef struct UX_SLAVE_CLASS_PIMA_EVENT_STRUCT
     ULONG                   ux_device_class_pima_event_parameter_1;
     ULONG                   ux_device_class_pima_event_parameter_2;
     ULONG                   ux_device_class_pima_event_parameter_3;
-    
+
 } UX_SLAVE_CLASS_PIMA_EVENT;
 
 /* Define PIMA object info structure.  */
@@ -755,7 +759,7 @@ typedef struct UX_SLAVE_CLASS_PIMA_OBJECT_STRUCT
     ULONG                   ux_device_class_pima_object_handle_id;
     ULONG                   ux_device_class_pima_object_length;
     UCHAR                   *ux_device_class_pima_object_buffer;
-    
+
 } UX_SLAVE_CLASS_PIMA_OBJECT;
 
 #define UX_SLAVE_CLASS_PIMA_OBJECT_DATA_LENGTH ((15 * sizeof(ULONG)) + \
@@ -770,7 +774,7 @@ typedef struct UX_SLAVE_CLASS_PIMA_SESSION_STRUCT
 {
 
     ULONG                   ux_device_class_pima_session_id;
-    
+
 } UX_SLAVE_CLASS_PIMA_SESSION;
 
 /* Define PIMA device info structure.  */
@@ -792,28 +796,28 @@ typedef struct UX_SLAVE_CLASS_PIMA_DEVICE_STRUCT
     UCHAR                   ux_device_class_pima_device_model[UX_DEVICE_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
     UCHAR                   ux_device_class_pima_device_version[UX_DEVICE_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH];
     UCHAR                   ux_device_class_pima_device_serial_number[UX_DEVICE_CLASS_PIMA_UNICODE_MAX_LENGTH];
-    
+
 } UX_SLAVE_CLASS_PIMA_DEVICE;
 
-/* Define PIMA storage info structure.  */                                              
-                                                                                        
-typedef struct UX_SLAVE_CLASS_PIMA_STORAGE_STRUCT                                        
-{                                                                                       
-                                                                                        
-    USHORT                  ux_device_class_pima_storage_type;                                               
-    USHORT                  ux_device_class_pima_storage_file_system_type;                                   
-    USHORT                  ux_device_class_pima_storage_access_capability;                                  
+/* Define PIMA storage info structure.  */
+
+typedef struct UX_SLAVE_CLASS_PIMA_STORAGE_STRUCT
+{
+
+    USHORT                  ux_device_class_pima_storage_type;
+    USHORT                  ux_device_class_pima_storage_file_system_type;
+    USHORT                  ux_device_class_pima_storage_access_capability;
     USHORT                  _align_max_capacity_low;
-    ULONG                   ux_device_class_pima_storage_max_capacity_low;                                   
-    ULONG                   ux_device_class_pima_storage_max_capacity_high;                                  
-    ULONG                   ux_device_class_pima_storage_free_space_bytes_low;                               
-    ULONG                   ux_device_class_pima_storage_free_space_bytes_high;                              
-    ULONG                   ux_device_class_pima_storage_free_space_images;                                  
-    UCHAR                   ux_device_class_pima_storage_description[UX_DEVICE_CLASS_PIMA_UNICODE_MAX_LENGTH]; 
+    ULONG                   ux_device_class_pima_storage_max_capacity_low;
+    ULONG                   ux_device_class_pima_storage_max_capacity_high;
+    ULONG                   ux_device_class_pima_storage_free_space_bytes_low;
+    ULONG                   ux_device_class_pima_storage_free_space_bytes_high;
+    ULONG                   ux_device_class_pima_storage_free_space_images;
+    UCHAR                   ux_device_class_pima_storage_description[UX_DEVICE_CLASS_PIMA_UNICODE_MAX_LENGTH];
     UCHAR                   ux__class_pima_storage_volume_label[UX_DEVICE_CLASS_PIMA_UNICODE_MAX_LENGTH];
-                                                                                        
-} UX_SLAVE_CLASS_PIMA_STORAGE;                                                           
-                                                                                        
+
+} UX_SLAVE_CLASS_PIMA_STORAGE;
+
 /* Define PIMA structure.  */
 
 typedef struct UX_SLAVE_CLASS_PIMA_STRUCT
@@ -852,13 +856,13 @@ typedef struct UX_SLAVE_CLASS_PIMA_STRUCT
     UCHAR                   *ux_device_class_pima_interrupt_thread_stack;
     UX_SEMAPHORE            ux_device_class_pima_interrupt_thread_semaphore;
 #endif
-    UX_SLAVE_CLASS_PIMA_EVENT    
+    UX_SLAVE_CLASS_PIMA_EVENT
                             *ux_device_class_pima_event_array;
-    UX_SLAVE_CLASS_PIMA_EVENT    
+    UX_SLAVE_CLASS_PIMA_EVENT
                             *ux_device_class_pima_event_array_head;
-    UX_SLAVE_CLASS_PIMA_EVENT    
+    UX_SLAVE_CLASS_PIMA_EVENT
                             *ux_device_class_pima_event_array_tail;
-    UX_SLAVE_CLASS_PIMA_EVENT    
+    UX_SLAVE_CLASS_PIMA_EVENT
                             *ux_device_class_pima_event_array_end;
     USHORT                  *ux_device_class_pima_device_properties_list;
     USHORT                  *ux_device_class_pima_supported_capture_formats_list;
@@ -866,16 +870,16 @@ typedef struct UX_SLAVE_CLASS_PIMA_STRUCT
     USHORT                  *ux_device_class_pima_object_properties_list;
     UINT                    (*ux_device_class_pima_cancel)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima);
     UINT                    (*ux_device_class_pima_device_reset)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima);
-    
+
     UINT                    (*ux_device_class_pima_device_prop_desc_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG device_property, UCHAR **device_prop_dataset, ULONG *device_prop_dataset_length);
     UINT                    (*ux_device_class_pima_device_prop_value_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG device_property, UCHAR **device_prop_value, ULONG *device_prop_value_length);
     UINT                    (*ux_device_class_pima_device_prop_value_set)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG device_property, UCHAR *device_prop_value, ULONG device_prop_value_length);
-    
+
     UINT                    (*ux_device_class_pima_storage_format)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG storage_id);
     UINT                    (*ux_device_class_pima_storage_info_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG storage_id);
     UINT                    (*ux_device_class_pima_object_number_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_format_code, ULONG object_association, ULONG *object_number);
-    UINT                    (*ux_device_class_pima_object_handles_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handles_format_code, 
-                                                                        ULONG object_handles_association, 
+    UINT                    (*ux_device_class_pima_object_handles_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handles_format_code,
+                                                                        ULONG object_handles_association,
                                                                         ULONG *object_handles_array,
                                                                         ULONG object_handles_max_number);
     UINT                    (*ux_device_class_pima_object_info_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handle, UX_SLAVE_CLASS_PIMA_OBJECT **object);
@@ -893,8 +897,8 @@ typedef struct UX_SLAVE_CLASS_PIMA_STRUCT
     VOID                    *ux_device_class_pima_application;
     VOID                    (*ux_device_class_pima_instance_activate)(VOID *);
     VOID                    (*ux_device_class_pima_instance_deactivate)(VOID *);
-    
-                                                                
+
+
 } UX_SLAVE_CLASS_PIMA;
 
 /* Define PIMA endpoint buffer settings (when PIMA owns buffer).  */
@@ -944,14 +948,14 @@ typedef struct UX_SLAVE_CLASS_PIMA_PARAMETER_STRUCT
     UINT                    (*ux_device_class_pima_parameter_storage_format)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG storage_id);
     UINT                    (*ux_device_class_pima_parameter_storage_info_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG storage_id);
     UINT                    (*ux_device_class_pima_parameter_object_number_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_format_code, ULONG object_association, ULONG *object_number);
-    UINT                    (*ux_device_class_pima_parameter_object_handles_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handles_format_code, 
-                                                                        ULONG object_handles_association, 
+    UINT                    (*ux_device_class_pima_parameter_object_handles_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handles_format_code,
+                                                                        ULONG object_handles_association,
                                                                         ULONG *object_handles_array,
                                                                         ULONG object_handles_max_number);
     UINT                    (*ux_device_class_pima_parameter_object_info_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handle, UX_SLAVE_CLASS_PIMA_OBJECT **object);
     UINT                    (*ux_device_class_pima_parameter_object_data_get)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handle, UCHAR *object_buffer, ULONG object_offset,
                                                                 ULONG object_length_requested, ULONG *object_actual_length);
-                                                                        
+
     UINT                    (*ux_device_class_pima_parameter_object_info_send)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, UX_SLAVE_CLASS_PIMA_OBJECT *object, ULONG storage_id, ULONG parent_object_handle, ULONG *object_handle);
     UINT                    (*ux_device_class_pima_parameter_object_data_send)(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima, ULONG object_handle, ULONG phase ,UCHAR *object_buffer, ULONG object_offset,
                                                                 ULONG object_length);
@@ -970,7 +974,7 @@ typedef struct UX_SLAVE_CLASS_PIMA_PARAMETER_STRUCT
 /* Define PIMA Object decompaction structure.  */
 
 #define UX_DEVICE_CLASS_PIMA_OBJECT_MAX_LENGTH                              512
-#define UX_DEVICE_CLASS_PIMA_OBJECT_VARIABLE_OFFSET                         52  
+#define UX_DEVICE_CLASS_PIMA_OBJECT_VARIABLE_OFFSET                         52
 #define UX_DEVICE_CLASS_PIMA_OBJECT_ENTRIES                                 15
 
 
@@ -980,12 +984,12 @@ typedef struct UX_SLAVE_CLASS_PIMA_PARAMETER_STRUCT
 #define UX_DEVICE_CLASS_PIMA_STORAGE_FILE_SYSTEM_TYPE                       (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 2 )
 #define UX_DEVICE_CLASS_PIMA_STORAGE_ACCESS_CAPABILITY                      (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 4 )
 #define UX_DEVICE_CLASS_PIMA_STORAGE_MAX_CAPACITY_LOW                       (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 6 )
-#define UX_DEVICE_CLASS_PIMA_STORAGE_MAX_CAPACITY_HIGH                      (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 10) 
+#define UX_DEVICE_CLASS_PIMA_STORAGE_MAX_CAPACITY_HIGH                      (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 10)
 #define UX_DEVICE_CLASS_PIMA_STORAGE_FREE_SPACE_LOW                         (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 14)
-#define UX_DEVICE_CLASS_PIMA_STORAGE_FREE_SPACE_HIGH                        (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 18) 
+#define UX_DEVICE_CLASS_PIMA_STORAGE_FREE_SPACE_HIGH                        (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 18)
 #define UX_DEVICE_CLASS_PIMA_STORAGE_FREE_SPACE_IMAGE                       (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 22)
 #define UX_DEVICE_CLASS_PIMA_STORAGE_FREE_STORAGE_DESCRIPTION               (UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE + 26)
- 
+
 /* Define Pima Class function prototypes.  */
 UINT  _ux_device_class_pima_initialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_pima_activate(UX_SLAVE_CLASS_COMMAND *command);
@@ -993,16 +997,17 @@ UINT  _ux_device_class_pima_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_pima_control_request(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_pima_device_info_send(UX_SLAVE_CLASS_PIMA *pima);
 UINT  _ux_device_class_pima_entry(UX_SLAVE_CLASS_COMMAND *command);
-UINT  _ux_device_class_pima_event_get(UX_SLAVE_CLASS_PIMA *pima, 
+UINT  _ux_device_class_pima_uninitialize(UX_SLAVE_CLASS_COMMAND *command);
+UINT  _ux_device_class_pima_event_get(UX_SLAVE_CLASS_PIMA *pima,
                                       UX_SLAVE_CLASS_PIMA_EVENT *pima_event);
-UINT  _ux_device_class_pima_event_set(UX_SLAVE_CLASS_PIMA *pima, 
+UINT  _ux_device_class_pima_event_set(UX_SLAVE_CLASS_PIMA *pima,
                                       UX_SLAVE_CLASS_PIMA_EVENT *pima_event);
 VOID  _ux_device_class_pima_interrupt_thread(ULONG pima_class);
-UINT  _ux_device_class_pima_response_send(UX_SLAVE_CLASS_PIMA *pima, ULONG response_code, 
-                                            ULONG number_parameters, 
+UINT  _ux_device_class_pima_response_send(UX_SLAVE_CLASS_PIMA *pima, ULONG response_code,
+                                            ULONG number_parameters,
                                             ULONG parameter_1, ULONG parameter_2, ULONG paramater_3);
 VOID  _ux_device_class_pima_thread(ULONG pima_class);
-UINT  _ux_device_class_pima_object_handles_send(UX_SLAVE_CLASS_PIMA *pima, 
+UINT  _ux_device_class_pima_object_handles_send(UX_SLAVE_CLASS_PIMA *pima,
                                                     ULONG storage_id,
                                                     ULONG object_format_code,
                                                     ULONG object_association);
@@ -1020,9 +1025,9 @@ UINT  _ux_device_class_pima_object_data_get(UX_SLAVE_CLASS_PIMA *pima, ULONG obj
 UINT  _ux_device_class_pima_object_data_send(UX_SLAVE_CLASS_PIMA *pima);
 UINT  _ux_device_class_pima_object_delete(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, ULONG object_format);
 UINT  _ux_device_class_pima_object_add(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle);
-UINT  _ux_device_class_pima_partial_object_data_get(UX_SLAVE_CLASS_PIMA *pima, 
-                                                    ULONG object_handle, 
-                                                    ULONG offset_requested, 
+UINT  _ux_device_class_pima_partial_object_data_get(UX_SLAVE_CLASS_PIMA *pima,
+                                                    ULONG object_handle,
+                                                    ULONG offset_requested,
                                                     ULONG length_requested);
 
 UINT  _ux_device_class_pima_storage_id_send(UX_SLAVE_CLASS_PIMA *pima);
@@ -1060,13 +1065,13 @@ UINT  _uxe_device_class_pima_initialize(UX_SLAVE_CLASS_COMMAND *command);
 #define ux_device_class_pima_initialize         _ux_device_class_pima_initialize
 #define ux_device_class_pima_activate           _ux_device_class_pima_activate
 #define ux_device_class_pima_dectivate          _ux_device_class_pima_dectivate
-#define ux_device_class_pima_entry              _ux_device_class_pima_entry   
+#define ux_device_class_pima_entry              _ux_device_class_pima_entry
 #define ux_device_class_pima_control_request    _ux_device_class_pima_control_request
 #define ux_device_class_pima_object_add         _ux_device_class_pima_object_add
 
 /* Define Pima Class data prototypes.  */
 
-extern UCHAR  _ux_device_class_pima_vendor_extension_descriptor[]; 
+extern UCHAR  _ux_device_class_pima_vendor_extension_descriptor[];
 extern USHORT _ux_device_class_pima_supported_operations[];
 extern USHORT _ux_device_class_pima_supported_events[];
 extern USHORT _ux_device_class_pima_supported_capture_formats[];
@@ -1075,10 +1080,10 @@ extern USHORT _ux_device_class_pima_device_prop_supported[];
 
 
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif
