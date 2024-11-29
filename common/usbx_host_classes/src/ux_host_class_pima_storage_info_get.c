@@ -34,7 +34,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_host_class_pima_storage_info_get                PORTABLE C      */
-/*                                                           6.3.0        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -77,6 +77,9 @@
 /*                                            resulting in version 6.1    */
 /*  10-31-2023     Yajun xia                Modified comment(s),          */
 /*                                            resulting in version 6.3.0  */
+/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
+/*                                            fixed unicode string copy,  */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima,
@@ -88,7 +91,7 @@ UX_HOST_CLASS_PIMA_COMMAND           command;
 UINT                                 status;
 UCHAR                                *storage_buffer;
 UCHAR                                *storage_pointer;
-ULONG                                unicode_string_length;
+ULONG                                unicode_string_length, unicode_string_bytes;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_PIMA_STORAGE_INFO_GET, pima, storage_id, storage, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
@@ -140,17 +143,43 @@ ULONG                                unicode_string_length;
         /* Get the unicode string length.  */
         unicode_string_length =  (ULONG) *storage_pointer ;
 
+        /* unicode_string_length is a byte so
+           unicode_string_length * 2 + 1 will not overflow.  */
+        unicode_string_bytes = (unicode_string_length << 1) + 1;
+
+        /* Check target buffer length.  */
+        if (unicode_string_bytes > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH)
+        {
+            _ux_utility_memory_free(storage_buffer);
+            return(UX_BUFFER_OVERFLOW);
+        }
+
         /* Copy that string into the storage description field.  */
-        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_description, storage_pointer, unicode_string_length); /* Use case of memcpy is verified. */
+        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_description,
+                                storage_pointer,
+                                unicode_string_bytes); /* Use case of memcpy is verified. */
 
         /* Point to the volume label.  */
-        storage_pointer =  storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET + unicode_string_length;
+        storage_pointer =  storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET + unicode_string_bytes;
 
         /* Get the unicode string length.  */
         unicode_string_length =  (ULONG) *storage_pointer ;
 
+        /* unicode_string_length is a byte so
+           unicode_string_length * 2 + 1 will not overflow.  */
+        unicode_string_bytes = (unicode_string_length << 1) + 1;
+
+        /* Check target buffer length.  */
+        if (unicode_string_bytes > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH)
+        {
+            _ux_utility_memory_free(storage_buffer);
+            return(UX_BUFFER_OVERFLOW);
+        }
+
         /* Copy that string into the storage volume label field.  */
-        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_volume_label, storage_pointer, unicode_string_length); /* Use case of memcpy is verified. */
+        _ux_utility_memory_copy(storage -> ux_host_class_pima_storage_volume_label,
+                                storage_pointer,
+                                unicode_string_bytes); /* Use case of memcpy is verified. */
 
     }
 
