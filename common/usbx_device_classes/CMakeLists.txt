@@ -90,6 +90,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_state_sync.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_tasks_run.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_thread.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_dfu_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_control_request.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_hid_deactivate.c
@@ -145,6 +146,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_storage_id_send.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_storage_info_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_thread.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_pima_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_control_request.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_printer_deactivate.c
@@ -170,6 +172,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_msg_query.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_msg_reset.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_msg_set.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_rndis_write.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_activate.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_device_class_storage_control_request.c
