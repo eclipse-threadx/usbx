@@ -86,6 +86,10 @@ UX_SLAVE_CLASS             *class_ptr;
     /* Terminate the transactions pending on the endpoints.  */
     _ux_device_stack_transfer_all_request_abort(hid -> ux_device_class_hid_interrupt_endpoint, UX_TRANSFER_BUS_RESET);
 
+#if defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
+    _ux_device_stack_transfer_all_request_abort(hid->ux_device_class_hid_read_endpoint, UX_TRANSFER_BUS_RESET);
+#endif
+
     /* If there is a deactivate function call it.  */
     if (hid -> ux_slave_class_hid_instance_deactivate != UX_NULL)
     {
