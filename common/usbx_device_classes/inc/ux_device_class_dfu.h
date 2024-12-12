@@ -1,42 +1,42 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   DFU Class                                                           */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_device_class_dfu.h                               PORTABLE C      */ 
-/*                                                           6.3.0        */
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_device_class_dfu.h                               PORTABLE C      */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the equivalences for the USBX Device Class DFU    */ 
-/*    ACM component.                                                      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This file defines the equivalences for the USBX Device Class DFU    */
+/*    ACM component.                                                      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -62,21 +62,25 @@
 /*  10-31-2023     Yajun xia                Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.3.0  */
+/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
+/*                                            added dfu deinit function,  */
+/*                                            remove extra spaces,        */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_DFU_H
 #define UX_DEVICE_CLASS_DFU_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
    while debugging application.  */
@@ -84,7 +88,7 @@ extern   "C" {
 #define UX_DEVICE_CLASS_DFU_ENABLE_ERROR_CHECKING
 #endif
 
-/* Define DFU class descriptor capabilities.  */                    
+/* Define DFU class descriptor capabilities.  */
 #define UX_SLAVE_CLASS_DFU_CAPABILITY_WILL_DETACH                   0x08
 #define UX_SLAVE_CLASS_DFU_CAPABILITY_MANIFESTATION_TOLERANT        0x04
 #define UX_SLAVE_CLASS_DFU_CAPABILITY_CAN_UPLOAD                    0x02
@@ -187,7 +191,7 @@ extern   "C" {
 /* Define DFU application notification signals.  */
 #define UX_SLAVE_CLASS_DFU_MEDIA_STATUS_OK                          0
 #define UX_SLAVE_CLASS_DFU_MEDIA_STATUS_BUSY                        1
-#define UX_SLAVE_CLASS_DFU_MEDIA_STATUS_ERROR                       2 
+#define UX_SLAVE_CLASS_DFU_MEDIA_STATUS_ERROR                       2
 
 /* Define DFU thread event signals.  */
 #define UX_DEVICE_CLASS_DFU_THREAD_EVENT_DISCONNECT                 0x1u
@@ -257,6 +261,7 @@ UINT  _ux_device_class_dfu_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_dfu_entry(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command);
 VOID  _ux_device_class_dfu_thread(ULONG dfu_class);
+UINT  _ux_device_class_dfu_uninitialize(UX_SLAVE_CLASS_COMMAND *command);
 
 UCHAR _ux_device_class_dfu_state_get(UX_SLAVE_CLASS_DFU *dfu);
 VOID  _ux_device_class_dfu_state_sync(UX_SLAVE_CLASS_DFU *dfu);
@@ -270,10 +275,10 @@ UINT  _uxe_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command);
 #define ux_device_class_dfu_state_get    _ux_device_class_dfu_state_get
 #define ux_device_class_dfu_state_sync   _ux_device_class_dfu_state_sync
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif /* UX_DEVICE_CLASS_DFU_H */
