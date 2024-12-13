@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_ccid_entry                         PORTABLE C      */
-/*                                                           6.1.11       */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -70,6 +70,9 @@
 /*    DATE              NAME                      DESCRIPTION             */
 /*                                                                        */
 /*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
+/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
+/*                                            fix typo,                   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_ccid_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -93,7 +96,7 @@ UINT        status;
 
     case UX_SLAVE_CLASS_COMMAND_UNINITIALIZE:
 
-        /* Call the init function of the CCID class.  */
+        /* Call the uninit function of the CCID class.  */
         status =  _ux_device_class_ccid_uninitialize(command);
 
         /* Return the completion status.  */

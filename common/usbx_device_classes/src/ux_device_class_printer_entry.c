@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -33,7 +33,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_printer_entry                      PORTABLE C      */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -74,6 +74,9 @@
 /*  03-08-2023     Yajun Xia                Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
+/*                                            fix typo,                   */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -101,7 +104,7 @@ UINT        status;
 
     case UX_SLAVE_CLASS_COMMAND_UNINITIALIZE:
 
-        /* Call the init function of the Printer class.  */
+        /* Call the uninit function of the Printer class.  */
         status =  _ux_device_class_printer_uninitialize(command);
 
         /* Return the completion status.  */
