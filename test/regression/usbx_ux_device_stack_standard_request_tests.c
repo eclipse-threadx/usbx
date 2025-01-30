@@ -1024,7 +1024,7 @@ CHAR *                  memory_pointer;
 #endif
 
     /* MS extensions.  */
-    status = _ux_device_stack_microsoft_extension_register(UX_DEMO_VENDOR_REQUEST, test_ms_vendor_request);
+    status = ux_device_stack_microsoft_extension_register(UX_DEMO_VENDOR_REQUEST, test_ms_vendor_request);
 
     if(status!=UX_SUCCESS)
     {

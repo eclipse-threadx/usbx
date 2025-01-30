@@ -744,7 +744,7 @@ CHAR *                  memory_pointer;
     }
 
     /* MS extensions.  */
-    status = _ux_device_stack_microsoft_extension_register(UX_DEMO_VENDOR_REQUEST, test_ms_vendor_request);
+    status = ux_device_stack_microsoft_extension_register(UX_DEMO_VENDOR_REQUEST, test_ms_vendor_request);
 
     if(status!=UX_SUCCESS)
     {
@@ -883,7 +883,7 @@ UX_SLAVE_TRANSFER                                  *slave_transfer_request;
     }
 
     stepinfo(">>>>>>>>>>>>>>>> Test vendor request NULL case\n");
-    status = _ux_device_stack_microsoft_extension_register(UX_DEMO_VENDOR_REQUEST, UX_NULL);
+    status = ux_device_stack_microsoft_extension_register(UX_DEMO_VENDOR_REQUEST, UX_NULL);
     if(status!=UX_SUCCESS)
     {
 

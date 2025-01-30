@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -2838,6 +2838,7 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_device_stack_interface_start                         _ux_device_stack_interface_start
 #define ux_device_stack_transfer_request                        _ux_device_stack_transfer_request
 #define ux_device_stack_transfer_abort                          _ux_device_stack_transfer_abort
+#define ux_device_stack_microsoft_extension_register            _ux_device_stack_microsoft_extension_register
 
 #define ux_device_stack_tasks_run                               _ux_device_stack_tasks_run
 #define ux_device_stack_transfer_run                            _ux_device_stack_transfer_run
