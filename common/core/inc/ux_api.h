@@ -2685,6 +2685,10 @@ typedef struct UX_SYSTEM_SLAVE_STRUCT
 #define UX_SYSTEM_DEVICE_MAX_CLASS_GET()        (1)
 #endif
 
+#define UX_SLAVE_DEVICE_CHECK_STATE(state)                                                        \
+  (_ux_system_slave->ux_system_slave_device.ux_slave_device_state & (state)) ? UX_TRUE : UX_FALSE \
+
+
 typedef struct UX_SYSTEM_OTG_STRUCT
 {
 
