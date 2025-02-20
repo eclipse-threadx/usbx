@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -2842,6 +2842,7 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_device_stack_interface_start                         _ux_device_stack_interface_start
 #define ux_device_stack_transfer_request                        _ux_device_stack_transfer_request
 #define ux_device_stack_transfer_abort                          _ux_device_stack_transfer_abort
+#define ux_device_stack_microsoft_extension_register            _ux_device_stack_microsoft_extension_register
 
 #define ux_device_stack_tasks_run                               _ux_device_stack_tasks_run
 #define ux_device_stack_transfer_run                            _ux_device_stack_transfer_run
@@ -2942,6 +2943,8 @@ UINT    ux_device_stack_interface_set(UCHAR * device_framework, ULONG device_fra
 UINT    ux_device_stack_interface_start(UX_SLAVE_INTERFACE *ux_interface);
 UINT    ux_device_stack_transfer_request(UX_SLAVE_TRANSFER *transfer_request, ULONG slave_length, ULONG host_length);
 UINT    ux_device_stack_transfer_request_abort(UX_SLAVE_TRANSFER *transfer_request, ULONG completion_code);
+UINT    ux_device_stack_microsoft_extension_register(ULONG vendor_request,
+                                    UINT (*vendor_request_function)(ULONG, ULONG, ULONG, ULONG, UCHAR *, ULONG *));
 
 UINT    ux_device_stack_tasks_run(VOID);
 UINT    ux_device_stack_transfer_run(UX_SLAVE_TRANSFER *transfer_request, ULONG slave_length, ULONG host_length);
