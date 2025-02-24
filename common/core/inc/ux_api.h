@@ -2747,9 +2747,9 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 /* Define USBX Services.  */
 
 #if defined(UX_SYSTEM_ENABLE_ERROR_CHECKING)
-#define ux_system_initialize                                    _ux_system_initialize
-#else
 #define ux_system_initialize                                    _uxe_system_initialize
+#else
+#define ux_system_initialize                                    _ux_system_initialize
 #endif
 
 #define ux_system_uninitialize                                  _ux_system_uninitialize
