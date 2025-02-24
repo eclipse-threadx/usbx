@@ -141,9 +141,12 @@
 /*                                            resulting in version 6.3.0  */
 /*  12-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.4.0  */
-/*  03-01-2024      Tiejun Zhou             Modified comment(s),          */
+/*  03-01-2024     Tiejun Zhou              Modified comment(s),          */
 /*                                            update version number,      */
 /*                                            resulting in version 6.4.1  */
+/*  02-19-2025     Frédéric Desbiens        Modified comment(s),          */
+/*                                            update version number,      */
+/*                                            resulting in version 6.4.2  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -345,7 +348,7 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            4
-#define USBX_PATCH_VERSION            1
+#define USBX_PATCH_VERSION            2
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
