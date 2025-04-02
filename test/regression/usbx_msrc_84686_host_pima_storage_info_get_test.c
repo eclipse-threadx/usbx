@@ -875,7 +875,7 @@ ULONG                   test_n;
     }
 
     /* MTP requires MTP extensions.  */
-    status = _ux_device_stack_microsoft_extension_register(UX_TEST_VENDOR_REQUEST, pima_device_vendor_request);
+    status = ux_device_stack_microsoft_extension_register(UX_TEST_VENDOR_REQUEST, pima_device_vendor_request);
     if (status != UX_SUCCESS)
     {
         printf("ERROR #%d\n", __LINE__);
