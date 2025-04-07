@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -34,48 +34,48 @@
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_inquiry                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_inquiry                    PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a INQUIRY command.                           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a INQUIRY command.                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_storage_csw_send     Send CSW                      */
+/*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_device_stack_endpoint_stall       Stall endpoint                */
-/*    _ux_utility_memory_copy               Copy memory                   */ 
-/*    _ux_utility_memory_set                Set memory                    */ 
+/*    _ux_utility_memory_copy               Copy memory                   */
+/*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_utility_short_put_big_endian      Put 16-bit big endian         */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Storage Class                                                */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized command logic,    */
@@ -97,8 +97,9 @@
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb)
+UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                       UX_SLAVE_ENDPOINT *endpoint_in,
+                                       UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb)
 {
 
 UINT                    status = UX_SUCCESS;
@@ -113,7 +114,8 @@ UCHAR                   *inquiry_buffer;
     UX_ASSERT(UX_SLAVE_REQUEST_DATA_MAX_LENGTH >= 24);
 
     /* If trace is enabled, insert this event into the trace buffer.  */
-    UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_INQUIRY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
+    UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_INQUIRY, storage, lun, 0, 0,
+                            UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
 #if !defined(UX_DEVICE_STANDALONE)
 
@@ -125,11 +127,11 @@ UCHAR                   *inquiry_buffer;
         storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR;
         return(UX_ERROR);
     }
-#endif
+#endif /* UX_DEVICE_STANDALONE */
 
     /* From the SCSI Inquiry payload, get the page code.  */
     inquiry_page_code =  *(cbwcb + UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE);
-    
+
     /* And the length to be returned. */
     inquiry_length =  storage -> ux_slave_class_storage_host_length;
 
@@ -140,7 +142,7 @@ UCHAR                   *inquiry_buffer;
     inquiry_buffer = transfer_request -> ux_slave_transfer_request_data_pointer;
 
     /* Ensure the data buffer is cleaned.  */
-    _ux_utility_memory_set(inquiry_buffer, 0, UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH); /* Use case of memset is verified. */
+    _ux_utility_memory_set(inquiry_buffer, 0, UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH);
 
     /* Check for the maximum length to be returned. */
     if (inquiry_length > UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH)
@@ -154,54 +156,65 @@ UCHAR                   *inquiry_buffer;
     {
 
     case UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE_STANDARD:
-            
+
         /* Store the product type.  */
-        inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PERIPHERAL_TYPE] =  (UCHAR)storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_type;
+        inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PERIPHERAL_TYPE] =
+            (UCHAR)storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_type;
 
         /* Store the Media Removable bit.  */
-        inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_REMOVABLE_MEDIA] =  (UCHAR)storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_removable_flag;
+        inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_REMOVABLE_MEDIA] =
+            (UCHAR)storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_removable_flag;
 
-        /* Store the Data Format bit.  */
-        if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_type == UX_SLAVE_CLASS_STORAGE_MEDIA_CDROM)
+        /* Store the Data Format bitn and the length of the response.
+           There is a hack here. For CD-ROM, the data lg is fixed to 0x5B !  */
+        if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_type ==
+              UX_SLAVE_CLASS_STORAGE_MEDIA_CDROM)
+        {
             inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_DATA_FORMAT] =  0x32;
+            inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_ADDITIONAL_LENGTH] =
+                UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH_CD_ROM;
+        }
         else
+        {
             inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_DATA_FORMAT] =  0x00;
-
-        /* Store the length of the response.  There is a hack here. For CD-ROM, the data lg is fixed to 0x5B !  */
-        if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_type != UX_SLAVE_CLASS_STORAGE_MEDIA_CDROM)
-            inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_ADDITIONAL_LENGTH] =  UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH;
-        else            
-            inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_ADDITIONAL_LENGTH] =  UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH_CD_ROM;
+            inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_ADDITIONAL_LENGTH] =
+                UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH;
+        }
 
         /* Fill in the storage vendor ID.  */
         _ux_utility_memory_copy(inquiry_buffer + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_VENDOR_INFORMATION,
-                                                                    storage -> ux_slave_class_storage_vendor_id, 8); /* Use case of memcpy is verified. */
+                                storage -> ux_slave_class_storage_vendor_id,
+                                UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_VENDOR_ID_LENGTH);
 
         /* Fill in the product vendor ID.  */
         _ux_utility_memory_copy(inquiry_buffer + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_ID,
-                                                                    storage -> ux_slave_class_storage_product_id, 16); /* Use case of memcpy is verified. */
+                                storage -> ux_slave_class_storage_product_id,
+                                UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_ID_LENGTH);
 
         /* Fill in the product revision number.  */
         _ux_utility_memory_copy(inquiry_buffer + UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_REVISION,
-                                                                    storage -> ux_slave_class_storage_product_rev, 4); /* Use case of memcpy is verified. */
+                                storage -> ux_slave_class_storage_product_rev,
+                                UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_REVISION_LENGTH);
 
         break;
 
     case UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE_SERIAL:
 
         /* Initialize the page code in response buffer.  */
-        _ux_utility_short_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer, UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE_SERIAL);
+        _ux_utility_short_put_big_endian(inquiry_buffer, UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE_SERIAL);
 
         /* Initialize the length of the serial number in response buffer.  */
-        _ux_utility_short_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer + 2, 20);
+        _ux_utility_short_put_big_endian(inquiry_buffer + 2, 20);
 
         /* Copy the serial number buffer into the transfer request memory.  */
-        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + 4, storage -> ux_slave_class_storage_product_serial, 20); /* Use case of memcpy is verified. */
+        _ux_utility_memory_copy(inquiry_buffer + 4,
+                                storage -> ux_slave_class_storage_product_serial,
+                                UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PRODUCT_SERIAL_LENGTH);
 
         /* Send a data payload with the inquiry response buffer.  */
         if (inquiry_length > 24)
             inquiry_length = 24;
-    
+
         break;
 
     default:
@@ -209,11 +222,11 @@ UCHAR                   *inquiry_buffer;
 #if !defined(UX_DEVICE_STANDALONE)
         /* The page code is not supported.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
-#endif
+#endif /* !UX_DEVICE_STANDALONE */
 
         /* And update the REQUEST_SENSE codes.  */
         storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
-                                               UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(0x05,0x26,0x01);
+            UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(0x05, 0x26, 0x01);
 
         /* Now we set the CSW with failure.  */
         storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
@@ -221,8 +234,8 @@ UCHAR                   *inquiry_buffer;
         /* Return error.  */
         status =  UX_ERROR;
 
-        break;            
-    }    
+        break;
+    }
 
     /* Error cases.  */
     if (status != UX_SUCCESS)
@@ -239,7 +252,7 @@ UCHAR                   *inquiry_buffer;
     storage -> ux_device_class_storage_data_length = inquiry_length;
     storage -> ux_device_class_storage_data_count = 0;
 
-#else
+#else /* UX_DEVICE_STANDALONE */
 
     /* Send a data payload with the inquiry response buffer.  */
     if (inquiry_length)
@@ -248,12 +261,13 @@ UCHAR                   *inquiry_buffer;
     /* Check length.  */
     if (storage -> ux_slave_class_storage_host_length != inquiry_length)
     {
-        storage -> ux_slave_class_storage_csw_residue = storage -> ux_slave_class_storage_host_length - inquiry_length;
+        storage -> ux_slave_class_storage_csw_residue =
+            storage -> ux_slave_class_storage_host_length - inquiry_length;
+
         _ux_device_stack_endpoint_stall(endpoint_in);
     }
-#endif
+#endif /* UX_DEVICE_STANDALONE */
 
     /* Return completion status.  */
     return(status);
 }
-

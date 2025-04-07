@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -30,10 +30,10 @@
 
 /* Define the Slave Storage Class Inquiry data : DO NOT CHANGE THE LENGTH OF THESE ITEMS */
 
-UCHAR _ux_system_slave_class_storage_vendor_id[] =                          "AzureRTO";
-UCHAR _ux_system_slave_class_storage_product_id[] =                         "USBX storage dev";
-UCHAR _ux_system_slave_class_storage_product_rev[] =                        "2000";
-UCHAR _ux_system_slave_class_storage_product_serial[] =                     "12345678901234567890";
+UCHAR _ux_system_slave_class_storage_vendor_id[] =      "Eclipse ";
+UCHAR _ux_system_slave_class_storage_product_id[] =     "USBX STORAGE DEV";
+UCHAR _ux_system_slave_class_storage_product_rev[] =    "2000";
+UCHAR _ux_system_slave_class_storage_product_serial[] = "12345678901234567890";
 
 /**************************************************************************/
 /*                                                                        */
@@ -92,6 +92,8 @@ UINT  _ux_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command)
 
 UINT                                    status = UX_SUCCESS;
 UX_SLAVE_CLASS_STORAGE                  *storage;
+UX_SLAVE_CLASS_STORAGE_LUN              *lun;
+UX_SLAVE_CLASS_STORAGE_LUN              *parameter_lun;
 UX_SLAVE_CLASS_STORAGE_PARAMETER        *storage_parameter;
 UX_SLAVE_CLASS                          *class_inst;
 ULONG                                   lun_index;
@@ -119,18 +121,20 @@ ULONG                                   lun_index;
 
     /* Allocate bulk endpoint buffer.  */
     UX_ASSERT(!UX_DEVICE_CLASS_STORAGE_ENDPOINT_BUFFER_SIZE_CALC_OVERFLOW);
-    storage -> ux_device_class_storage_endpoint_buffer = _ux_utility_memory_allocate(UX_NO_ALIGN,
-                UX_CACHE_SAFE_MEMORY, UX_DEVICE_CLASS_STORAGE_ENDPOINT_BUFFER_SIZE);
-#else
+
+    storage -> ux_device_class_storage_endpoint_buffer =
+        _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, UX_DEVICE_CLASS_STORAGE_ENDPOINT_BUFFER_SIZE);
+#else /* UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1 */
     status = UX_SUCCESS;
-#endif
+#endif /* UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1 */
 
 #if !defined(UX_DEVICE_STANDALONE)
 
     /* Allocate some memory for the thread stack. */
     if (status == UX_SUCCESS)
     {
-        class_inst -> ux_slave_class_thread_stack = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
+        class_inst -> ux_slave_class_thread_stack = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY,
+                                                                                UX_THREAD_STACK_SIZE);
 
         /* If it's OK, create thread.  */
         if (class_inst -> ux_slave_class_thread_stack != UX_NULL)
@@ -139,18 +143,18 @@ ULONG                                   lun_index;
             a new thread. We pass a pointer to the class to the new thread.  This thread
             does not start until we have a instance of the class. */
             status =  _ux_device_thread_create(&class_inst -> ux_slave_class_thread, "ux_slave_storage_thread",
-                        _ux_device_class_storage_thread,
-                        (ULONG) (ALIGN_TYPE) class_inst, (VOID *) class_inst -> ux_slave_class_thread_stack,
-                        UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
-                        UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
+                                               _ux_device_class_storage_thread, (ULONG) (ALIGN_TYPE) class_inst,
+                                               (VOID *) class_inst -> ux_slave_class_thread_stack,
+                                               UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
+                                               UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
         else
             status = UX_MEMORY_INSUFFICIENT;
     }
-#else
+#else /* !UX_DEVICE_STANDALONE */
 
     /* Save tasks run entry.  */
     class_inst -> ux_slave_class_task_function = _ux_device_class_storage_tasks_run;
-#endif
+#endif /* !UX_DEVICE_STANDALONE */
 
     /* If thread resources allocated, go on.  */
     if (status == UX_SUCCESS)
@@ -159,14 +163,18 @@ ULONG                                   lun_index;
         UX_THREAD_EXTENSION_PTR_SET(&(class_inst -> ux_slave_class_thread), class_inst)
 
         /* Store the number of LUN declared.  */
-        storage -> ux_slave_class_storage_number_lun = storage_parameter -> ux_slave_class_storage_parameter_number_lun;
+        storage -> ux_slave_class_storage_number_lun =
+            storage_parameter -> ux_slave_class_storage_parameter_number_lun;
 
         /* Copy each individual LUN parameters.  */
         for (lun_index = 0; lun_index < storage -> ux_slave_class_storage_number_lun; lun_index++)
         {
 
+            lun = &storage -> ux_slave_class_storage_lun[lun_index];
+            parameter_lun = &storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index];
+
             /* Check block length size. */
-            if (storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_block_length > UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE)
+            if (parameter_lun -> ux_slave_class_storage_media_block_length > UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE)
             {
                 /* Cannot proceed.  */
                 status = (UX_MEMORY_INSUFFICIENT);
@@ -174,16 +182,35 @@ ULONG                                   lun_index;
             }
 
             /* Store all the application parameter information about the media.  */
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_last_lba       = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_last_lba;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_block_length   = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_block_length;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_type           = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_type;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_removable_flag = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_removable_flag;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_read_only_flag = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_read_only_flag;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_read           = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_read;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_flush          = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_flush;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_write          = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_write;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_status         = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_status;
-            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_notification   = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_notification;
+            lun -> ux_slave_class_storage_media_last_lba =
+                parameter_lun -> ux_slave_class_storage_media_last_lba;
+
+            lun -> ux_slave_class_storage_media_block_length =
+                parameter_lun -> ux_slave_class_storage_media_block_length;
+
+            lun -> ux_slave_class_storage_media_type =
+                parameter_lun -> ux_slave_class_storage_media_type;
+
+            lun -> ux_slave_class_storage_media_removable_flag =
+                parameter_lun -> ux_slave_class_storage_media_removable_flag;
+
+            lun -> ux_slave_class_storage_media_read_only_flag =
+                parameter_lun -> ux_slave_class_storage_media_read_only_flag;
+
+            lun -> ux_slave_class_storage_media_read =
+                parameter_lun -> ux_slave_class_storage_media_read;
+
+            lun -> ux_slave_class_storage_media_flush =
+                parameter_lun -> ux_slave_class_storage_media_flush;
+
+            lun -> ux_slave_class_storage_media_write =
+                parameter_lun -> ux_slave_class_storage_media_write;
+
+            lun -> ux_slave_class_storage_media_status =
+                parameter_lun -> ux_slave_class_storage_media_status;
+
+            lun -> ux_slave_class_storage_media_notification =
+                parameter_lun -> ux_slave_class_storage_media_notification;
         }
 
         /* If it's OK, complete it.  */
@@ -191,27 +218,42 @@ ULONG                                   lun_index;
         {
 
             /* Store the start and stop signals if needed by the application.  */
-            storage -> ux_slave_class_storage_instance_activate = storage_parameter -> ux_slave_class_storage_instance_activate;
-            storage -> ux_slave_class_storage_instance_deactivate = storage_parameter -> ux_slave_class_storage_instance_deactivate;
+            storage -> ux_slave_class_storage_instance_activate =
+                storage_parameter -> ux_slave_class_storage_instance_activate;
+
+            storage -> ux_slave_class_storage_instance_deactivate =
+                storage_parameter -> ux_slave_class_storage_instance_deactivate;
 
             /* Store the vendor id, product id, product revision and product serial.  */
             if (storage_parameter -> ux_slave_class_storage_parameter_vendor_id)
-                storage -> ux_slave_class_storage_vendor_id = storage_parameter -> ux_slave_class_storage_parameter_vendor_id;
+            {
+                storage -> ux_slave_class_storage_vendor_id =
+                    storage_parameter -> ux_slave_class_storage_parameter_vendor_id;
+            }
             else
                 storage -> ux_slave_class_storage_vendor_id = _ux_system_slave_class_storage_vendor_id;
 
             if (storage_parameter -> ux_slave_class_storage_parameter_product_id)
-                storage -> ux_slave_class_storage_product_id = storage_parameter -> ux_slave_class_storage_parameter_product_id;
+            {
+                storage -> ux_slave_class_storage_product_id =
+                    storage_parameter -> ux_slave_class_storage_parameter_product_id;
+            }
             else
                 storage -> ux_slave_class_storage_product_id = _ux_system_slave_class_storage_product_id;
 
             if (storage_parameter -> ux_slave_class_storage_parameter_product_rev)
-                storage -> ux_slave_class_storage_product_rev = storage_parameter -> ux_slave_class_storage_parameter_product_rev;
+            {
+                storage -> ux_slave_class_storage_product_rev =
+                    storage_parameter -> ux_slave_class_storage_parameter_product_rev;
+            }
             else
                 storage -> ux_slave_class_storage_product_rev = _ux_system_slave_class_storage_product_rev;
 
             if (storage_parameter -> ux_slave_class_storage_parameter_product_serial)
-                storage -> ux_slave_class_storage_product_serial = storage_parameter -> ux_slave_class_storage_parameter_product_serial;
+            {
+                storage -> ux_slave_class_storage_product_serial =
+                    storage_parameter -> ux_slave_class_storage_parameter_product_serial;
+            }
             else
                 storage -> ux_slave_class_storage_product_serial = _ux_system_slave_class_storage_product_serial;
 
@@ -228,12 +270,12 @@ ULONG                                   lun_index;
 #if !defined(UX_DEVICE_STANDALONE)
     if (class_inst -> ux_slave_class_thread_stack != UX_NULL)
         _ux_utility_memory_free(&class_inst -> ux_slave_class_thread_stack);
-#endif
+#endif /* !UX_DEVICE_STANDALONE*/
 
 #if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
     if (storage -> ux_device_class_storage_endpoint_buffer != UX_NULL)
         _ux_utility_memory_free(storage -> ux_device_class_storage_endpoint_buffer);
-#endif
+#endif /* UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1 */
 
     /* Free instance.  */
     _ux_utility_memory_free(storage);
@@ -242,7 +284,7 @@ ULONG                                   lun_index;
     return(status);
 }
 
-
+#ifdef UX_ENABLE_ERROR_CHECKING
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -284,7 +326,8 @@ UINT  _uxe_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
 
 UX_SLAVE_CLASS_STORAGE_PARAMETER        *storage_parameter;
-UINT                                    i;
+UX_SLAVE_CLASS_STORAGE_LUN              *lun;
+UINT                                    lun_index;
 
     /* Get the pointer to the application parameters for the storage class.  */
     storage_parameter =  command -> ux_slave_class_command_parameter;
@@ -292,18 +335,27 @@ UINT                                    i;
     /* Sanity checks.  */
     if (storage_parameter -> ux_slave_class_storage_parameter_number_lun > UX_MAX_SLAVE_LUN)
         return(UX_INVALID_PARAMETER);
-    for (i = 0; i < storage_parameter -> ux_slave_class_storage_parameter_number_lun; i ++)
+
+    if ((storage_parameter -> ux_slave_class_storage_parameter_vendor_id != UX_NULL) &&
+        (( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_vendor_id) != 8)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_id != UX_NULL) &&
+         ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_id) != 16)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_rev != UX_NULL) &&
+         ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_rev) != 4)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_serial != UX_NULL) &&
+         ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_serial) != 20)))
+        return(UX_INVALID_PARAMETER);
+
+    for (lun_index = 0; lun_index < storage_parameter -> ux_slave_class_storage_parameter_number_lun; lun_index ++)
     {
-        if ((storage_parameter -> ux_slave_class_storage_parameter_lun[i].
-                            ux_slave_class_storage_media_read == UX_NULL) ||
-            (storage_parameter -> ux_slave_class_storage_parameter_lun[i].
-                            ux_slave_class_storage_media_write == UX_NULL) ||
-            (storage_parameter -> ux_slave_class_storage_parameter_lun[i].
-                            ux_slave_class_storage_media_status == UX_NULL)
+        lun = &storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index];
+
+        if ((lun -> ux_slave_class_storage_media_read == UX_NULL) ||
+            (lun -> ux_slave_class_storage_media_write == UX_NULL) ||
+            (lun -> ux_slave_class_storage_media_status == UX_NULL)
 #if defined(UX_SLAVE_CLASS_STORAGE_INCLUDE_MMC)
-            || (storage_parameter -> ux_slave_class_storage_parameter_lun[i].
-                            ux_slave_class_storage_media_notification == UX_NULL)
-#endif
+            || (lun -> ux_slave_class_storage_media_notification == UX_NULL)
+#endif /* UX_SLAVE_CLASS_STORAGE_INCLUDE_MMC */
            )
         {
             return(UX_INVALID_PARAMETER);
@@ -313,3 +365,4 @@ UINT                                    i;
     /* Invoke storage initialize function.  */
     return(_ux_device_class_storage_initialize(command));
 }
+#endif /* UX_ENABLE_ERROR_CHECKING */
