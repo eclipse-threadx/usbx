@@ -128,10 +128,16 @@ ULONG                   object_references_length;
     
         /* Send the object references to the application.  */
         status = pima -> ux_device_class_pima_object_references_set(pima, object_handle, object_references, object_references_length);
-    
-        /* Now we return a response with success.  */
-        status = (status == UX_SUCCESS) ? UX_DEVICE_CLASS_PIMA_RC_OK : status;
-        _ux_device_class_pima_response_send(pima, status, 0, 0, 0, 0);
+
+        /* Check error code from application.  */
+        if (status == UX_SUCCESS)
+
+            /* Now we return a response with success.  */
+            _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 0, 0, 0, 0);
+        else
+
+            /* We return an error.  The code is passed by the application.  */
+            _ux_device_class_pima_response_send(pima, status, 0, 0, 0, 0);
 
     }
     else
