@@ -1,4 +1,4 @@
-/* This test is designed to test the ux_utility_timer_....  */
+/* This test is designed to test the ux_utility_time_elapsed macro....  */
 
 #include <stdio.h>
 #include "tx_api.h"
