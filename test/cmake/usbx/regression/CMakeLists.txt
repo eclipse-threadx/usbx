@@ -512,6 +512,7 @@ set(ux_utility_test_cases
     ${SOURCE_DIR}/usbx_ux_utility_pci_class_scan_test.c
     ${SOURCE_DIR}/usbx_ux_utility_physical_address_test.c
     ${SOURCE_DIR}/usbx_ux_utility_string_length_check_test.c
+    ${SOURCE_DIR}/usbx_ux_utility_time_elapsed_test.c
     ${SOURCE_DIR}/usbx_ux_utility_unicode_to_string_test.c
 )
 set(ux_utility_os_test_cases
