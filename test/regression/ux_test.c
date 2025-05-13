@@ -2,10 +2,6 @@
 #include "ux_test_hcd_sim_host.h"
 #include "ux_test_dcd_sim_slave.h"
 
-#ifndef _ux_utility_time_elapsed
-#define _ux_utility_time_elapsed(t0,t1) ((t1)>=(t0) ? ((t1)-(t0)) : (0xFFFFFFFF - (t0) + (t1)))
-#endif
-
 #define UX_TEST_TIMEOUT_MS 3000
 
 static UX_TEST_ACTION ux_test_action_handler_check(UX_TEST_ACTION *action, UX_TEST_FUNCTION usbx_function, void *params, UCHAR advance);
