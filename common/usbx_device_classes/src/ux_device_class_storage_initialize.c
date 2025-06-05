@@ -30,7 +30,7 @@
 
 /* Define the Slave Storage Class Inquiry data : DO NOT CHANGE THE LENGTH OF THESE ITEMS */
 
-UCHAR _ux_system_slave_class_storage_vendor_id[] =                          "Eclipse ";
+UCHAR _ux_system_slave_class_storage_vendor_id[] =                          "Eclipse ThreadX";
 UCHAR _ux_system_slave_class_storage_product_id[] =                         "USBX storage dev";
 UCHAR _ux_system_slave_class_storage_product_rev[] =                        "2000";
 UCHAR _ux_system_slave_class_storage_product_serial[] =                     "12345678901234567890";
