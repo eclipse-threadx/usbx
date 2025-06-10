@@ -290,8 +290,17 @@ UINT                                    i;
     storage_parameter =  command -> ux_slave_class_command_parameter;
 
     /* Sanity checks.  */
-    if (storage_parameter -> ux_slave_class_storage_parameter_number_lun > UX_MAX_SLAVE_LUN)
+    if ((storage_parameter -> ux_slave_class_storage_parameter_number_lun > UX_MAX_SLAVE_LUN) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_vendor_id != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_vendor_id) != 8)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_id != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_id) != 16)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_rev != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_rev) != 4)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_serial != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_serial) != 20)))
         return(UX_INVALID_PARAMETER);
+
     for (i = 0; i < storage_parameter -> ux_slave_class_storage_parameter_number_lun; i ++)
     {
         if ((storage_parameter -> ux_slave_class_storage_parameter_lun[i].
