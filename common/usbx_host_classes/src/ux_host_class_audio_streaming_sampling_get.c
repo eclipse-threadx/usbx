@@ -237,7 +237,7 @@ UINT                                     previous_match_found;
                     else
                     {
 
-                        if (descriptor_length < (UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + (3 * audio_interface_descriptor.bSamFreqType)))
+                        if (descriptor_length < (UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + (UINT)(3 * audio_interface_descriptor.bSamFreqType)))
                         {
                           /* Error trap. */
                           _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
@@ -315,7 +315,7 @@ UINT                                     previous_match_found;
                         else
                         {
 
-                            if (descriptor_length < UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + (3 * audio_interface_descriptor.bSamFreqType))
+                            if (descriptor_length < UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + (UINT)(3 * audio_interface_descriptor.bSamFreqType))
                             {
                               /* Error trap. */
                               _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);

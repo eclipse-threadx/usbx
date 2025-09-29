@@ -246,7 +246,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
     }
     else
     {
-        if (descriptor_length < (8 + (3 * packed_audio_descriptor[7])))
+        if (descriptor_length < (UINT)(8 + (3 * packed_audio_descriptor[7])))
         {
           /* Error trap. */
           _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);

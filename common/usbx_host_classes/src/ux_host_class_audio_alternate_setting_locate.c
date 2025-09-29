@@ -225,7 +225,7 @@ UINT                                     specific_frequency_count;
                 else
                 {
 
-                    if (descriptor_length < (UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + (3 * audio_interface_descriptor.bSamFreqType)))
+                    if (descriptor_length < (UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + (UINT)(3 * audio_interface_descriptor.bSamFreqType)))
                     {
                       return(UX_DESCRIPTOR_CORRUPTED);
                     }
