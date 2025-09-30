@@ -1,17 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device HID Class                                                    */
 /**                                                                       */
@@ -28,40 +28,40 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_hid_deactivate                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_hid_deactivate                     PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function deactivate an instance of the hid class.              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to a class command    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_all_request_abort Abort all transfers     */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function deactivate an instance of the hid class.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to a class command    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_all_request_abort Abort all transfers     */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    HID Class                                                           */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -73,9 +73,10 @@
 /**************************************************************************/
 UINT  _ux_device_class_hid_deactivate(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
+
 UX_SLAVE_CLASS_HID         *hid;
 UX_SLAVE_CLASS             *class_ptr;
+UX_SLAVE_ENDPOINT          *endpoint;
 
     /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;
@@ -83,11 +84,21 @@ UX_SLAVE_CLASS             *class_ptr;
     /* Get the class instance in the container.  */
     hid = (UX_SLAVE_CLASS_HID *) class_ptr -> ux_slave_class_instance;
 
-    /* Terminate the transactions pending on the endpoints.  */
-    _ux_device_stack_transfer_all_request_abort(hid -> ux_device_class_hid_interrupt_endpoint, UX_TRANSFER_BUS_RESET);
+    /* Locate the interrupt in endpoint.  */
+    endpoint = hid -> ux_device_class_hid_interrupt_endpoint;
+
+    /* Terminate the transactions pending on the endpoint.  */
+    if (endpoint)
+        _ux_device_stack_transfer_all_request_abort(endpoint, UX_TRANSFER_BUS_RESET);
 
 #if defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
-    _ux_device_stack_transfer_all_request_abort(hid -> ux_device_class_hid_read_endpoint, UX_TRANSFER_BUS_RESET);
+
+    /* Locate the interrupt out endpoint.  */
+    endpoint = hid -> ux_device_class_hid_interrupt_endpoint;
+
+    /* Terminate the transactions pending on the endpoint.  */
+    if (endpoint)
+        _ux_device_stack_transfer_all_request_abort(endpoint, UX_TRANSFER_BUS_RESET);
 #endif
 
     /* If there is a deactivate function call it.  */
