@@ -73,7 +73,7 @@ UINT  _ux_host_class_hid_report_item_analyse(UCHAR *descriptor, UX_HOST_CLASS_HI
 {
 
 UCHAR       item_byte;
-    
+UINT        result = UX_SUCCESS;    
 
     /* Get the first byte from the descriptor.  */
     item_byte =  *descriptor;
@@ -89,11 +89,19 @@ UCHAR       item_byte;
         /* Set the type.  */
         item -> ux_host_class_hid_item_report_type =  (item_byte >> 2) & 3;
 
-        /* Get its length (byte 1).  */
-        item -> ux_host_class_hid_item_report_length =  (USHORT) *(descriptor + 1);
+        /* Make sure descriptor has minimal length.*/
+        if (sizeof(descriptor) >= 3)
+        {
+            /* Get its length (byte 1).  */
+            item -> ux_host_class_hid_item_report_length =  (USHORT) *(descriptor + 1);
 
-        /* Then the tag (byte 2).  */
-        item -> ux_host_class_hid_item_report_tag =  *(descriptor + 2);
+            /* Then the tag (byte 2).  */
+            item -> ux_host_class_hid_item_report_tag =  *(descriptor + 2);
+        }
+        else 
+        {
+            result = UX_DESCRIPTOR_CORRUPTED;
+        }
     }
     else
     {

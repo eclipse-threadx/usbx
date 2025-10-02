@@ -112,15 +112,15 @@ UINT                    status;
     /* Check for correct transfer and entire descriptor returned.  */
     if ((status == UX_SUCCESS) && (transfer_request -> ux_transfer_request_actual_length == length))
     {
-
+        UINT analysis_failure;
         /* Parse the report descriptor and build the report items.  */
         while (length)
         {
-
+            /* Get one item from the report and analyze it.  */
             /* Make sure this descriptor has at least the minimum length.  */
-            if(length < 3)
+            analysis_failure = _ux_host_class_hid_report_item_analyse(descriptor, &item);
+            if (analysis_failure)
             {
-
               /* Error trap. */
               _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
@@ -130,10 +130,7 @@ UINT                    status;
               /* Return error status.  */
               status = (UX_DESCRIPTOR_CORRUPTED);
             }
-
-            /* Get one item from the report and analyze it.  */
-            _ux_host_class_hid_report_item_analyse(descriptor, &item);
-
+            
             /* Point the descriptor right after the item identifier.  */
             descriptor +=  item.ux_host_class_hid_item_report_format;
 
