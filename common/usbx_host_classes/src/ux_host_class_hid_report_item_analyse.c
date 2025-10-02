@@ -132,6 +132,6 @@ UINT        result = UX_SUCCESS;
     }
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);
+    return(result);
 }
 
