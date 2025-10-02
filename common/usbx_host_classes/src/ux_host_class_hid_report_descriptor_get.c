@@ -11,8 +11,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,47 +29,47 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_report_descriptor_get            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_report_descriptor_get            PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function gets the report descriptor and analyzes it.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*    length                                Length of descriptor          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_global_item_parse  Parse global item             */ 
-/*    _ux_host_class_hid_local_item_parse   Parse local item              */ 
-/*    _ux_host_class_hid_report_item_analyse Analyze report               */ 
-/*    _ux_host_class_hid_resources_free     Free HID resources            */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function gets the report descriptor and analyzes it.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*    length                                Length of descriptor          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_global_item_parse  Parse global item             */
+/*    _ux_host_class_hid_local_item_parse   Parse local item              */
+/*    _ux_host_class_hid_report_item_analyse Analyze report               */
+/*    _ux_host_class_hid_resources_free     Free HID resources            */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -112,14 +112,25 @@ UINT                    status;
     /* Check for correct transfer and entire descriptor returned.  */
     if ((status == UX_SUCCESS) && (transfer_request -> ux_transfer_request_actual_length == length))
     {
-
+        UINT analysis_failure;
         /* Parse the report descriptor and build the report items.  */
         while (length)
         {
-
             /* Get one item from the report and analyze it.  */
-            _ux_host_class_hid_report_item_analyse(descriptor, &item);
+            /* Make sure this descriptor has at least the minimum length.  */
+            analysis_failure = _ux_host_class_hid_report_item_analyse(descriptor, &item);
+            if (analysis_failure)
+            {
+              /* Error trap. */
+              _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
+              /* If trace is enabled, insert this event into the trace buffer.  */
+              UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+              /* Return error status.  */
+              status = (UX_DESCRIPTOR_CORRUPTED);
+            }
+            
             /* Point the descriptor right after the item identifier.  */
             descriptor +=  item.ux_host_class_hid_item_report_format;
 
@@ -133,7 +144,7 @@ UINT                    status;
                 status =  _ux_host_class_hid_global_item_parse(hid, &item, descriptor);
                 break;
 
-            
+
             case UX_HOST_CLASS_HID_TYPE_MAIN:
 
                 /* This is a main item.  */
@@ -145,13 +156,13 @@ UINT                    status;
 
                 /* This is a local item.  */
                 status =  _ux_host_class_hid_local_item_parse(hid, &item, descriptor);
-                break;          
+                break;
 
             default:
 
                 /* This is a reserved item, meaning it shouldn't be used!  */
 
-                /* Set status to error. The check after this switch statement 
+                /* Set status to error. The check after this switch statement
                     will handle the rest.  */
                 status =  UX_DESCRIPTOR_CORRUPTED;
                 break;
@@ -165,10 +176,16 @@ UINT                    status;
 
             /* Jump to the next item.  */
             descriptor +=  item.ux_host_class_hid_item_report_length;
-        
+
             /* Verify that the report descriptor is not corrupted.  */
-            if (length < item.ux_host_class_hid_item_report_length)
+            if (length < (item.ux_host_class_hid_item_report_length + item.ux_host_class_hid_item_report_format))
             {
+
+                /* Error trap. */
+                _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+                /* If trace is enabled, insert this event into the trace buffer.  */
+                UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
                 /* Return error status.  */
                 status = (UX_DESCRIPTOR_CORRUPTED);

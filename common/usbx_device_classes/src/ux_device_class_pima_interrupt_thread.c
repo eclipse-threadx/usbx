@@ -169,10 +169,10 @@ UCHAR                       *buffer;
                 _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_1, pima_event.ux_device_class_pima_event_parameter_1);
                 
                 /* Put the value of parameter 2.   */
-                _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_2, pima_event.ux_device_class_pima_event_parameter_3);
+                _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_2, pima_event.ux_device_class_pima_event_parameter_2);
 
                 /* Put the value of parameter 3.   */
-                _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_2, pima_event.ux_device_class_pima_event_parameter_3);
+                _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_AEI_PARAMETER_3, pima_event.ux_device_class_pima_event_parameter_3);
                 
                 /* Send the request to the device controller.  */
                 status =  _ux_device_stack_transfer_request(transfer_request_in, UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH, UX_DEVICE_CLASS_PIMA_AEI_MAX_LENGTH);
