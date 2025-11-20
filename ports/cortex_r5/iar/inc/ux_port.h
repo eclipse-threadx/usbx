@@ -204,6 +204,10 @@ typedef LONG                        SLONG;
 #define UX_HOST_CLASS_STORAGE_MAX_MEDIA                     2
 #endif
 
+#ifndef UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT
+#define UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT          8
+#endif
+
 #ifndef UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH
 #define UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH                 256
 #endif

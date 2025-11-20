@@ -166,6 +166,12 @@ UINT                            inst_index;
         case UX_HOST_CLASS_STORAGE_MEDIA_IOMEGA_CLICK:
 
 #if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+            /* the ux_host_class_storage_mounted_partitions_count is needed to avoid
+             infinite recursive loops when mounting extended partions.
+             The value is checked against the UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT
+             */
+            storage -> ux_host_class_storage_mounted_partitions_count = 0;
+
             /* Try to read the device media in search for a partition table or boot sector.
                We are at the root of the disk, so use sector 0 as the starting point.  */
             _ux_host_class_storage_media_mount(storage, 0);

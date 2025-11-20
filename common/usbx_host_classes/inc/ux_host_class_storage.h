@@ -486,6 +486,8 @@ typedef struct UX_HOST_CLASS_STORAGE_STRUCT
     UINT            ux_host_class_storage_lun_types[UX_MAX_HOST_LUN];
 #if defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
     ULONG           ux_host_class_storage_last_sector_number;
+#else
+    ULONG           ux_host_class_storage_mounted_partitions_count;
 #endif
     ULONG           ux_host_class_storage_sector_size;
     ULONG           ux_host_class_storage_data_phase_length;
