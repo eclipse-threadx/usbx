@@ -97,6 +97,10 @@
 /*                                            improved interface request  */
 /*                                            process with print class,   */
 /*                                            resulting in version 6.3.0  */
+/*  26-11-2025     Sean Howson              Modified comment(s),          */
+/*                                            Fixed initial request       */
+/*                                            filter to evaluate correct  */
+/*                                            byte of transfer request.   */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_control_request_process(UX_SLAVE_TRANSFER *transfer_request)
@@ -136,7 +140,7 @@ ULONG                       application_data_length;
 
         /* Filter for GET_DESCRIPTOR/SET_DESCRIPTOR commands. If the descriptor to be returned is not a standard descriptor,
            treat the command as a CLASS command.  */
-        if ((request == UX_GET_DESCRIPTOR || request == UX_SET_DESCRIPTOR) && (((request_value >> 8) & UX_REQUEST_TYPE) != UX_REQUEST_TYPE_STANDARD))
+        if ((request == UX_GET_DESCRIPTOR || request == UX_SET_DESCRIPTOR) && (((request_type >> 8) & UX_REQUEST_TYPE) != UX_REQUEST_TYPE_STANDARD))
         {        
 
             /* This request is to be handled by the class layer.  */
