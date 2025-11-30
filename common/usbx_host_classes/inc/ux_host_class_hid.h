@@ -1,44 +1,44 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
 /**                                                                       */
-/**   HID Class                                                           */
+/** USBX Component                                                        */
+/**                                                                       */
+/**   Host HID Class                                                      */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_hid.h                                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_hid.h                                 PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX HID class.                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    USBX HID class.                                                     */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -63,15 +63,15 @@
 #ifndef UX_HOST_CLASS_HID_H
 #define UX_HOST_CLASS_HID_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -112,7 +112,7 @@ extern   "C" {
 #define UX_HOST_CLASS_HID_TYPE_GLOBAL                           0x1
 #define UX_HOST_CLASS_HID_TYPE_LOCAL                            0x2
 #define UX_HOST_CLASS_HID_TYPE_RESERVED                         0x3
-                                                
+
 
 /* Define HID Class main tags.  */
 
@@ -121,7 +121,7 @@ extern   "C" {
 #define UX_HOST_CLASS_HID_MAIN_TAG_FEATURE                      0xb
 #define UX_HOST_CLASS_HID_MAIN_TAG_COLLECTION                   0xa
 #define UX_HOST_CLASS_HID_MAIN_TAG_END_COLLECTION               0xc
-                                                
+
 
 /* Define HID Class global tags.  */
 
@@ -181,10 +181,10 @@ extern   "C" {
 
 /* Define HID Class commands.  */
 
-#define UX_HOST_CLASS_HID_GET_REPORT                            0x01       
+#define UX_HOST_CLASS_HID_GET_REPORT                            0x01
 #define UX_HOST_CLASS_HID_GET_IDLE                              0x02
 #define UX_HOST_CLASS_HID_GET_PROTOCOL                          0x03
-#define UX_HOST_CLASS_HID_SET_REPORT                            0x09       
+#define UX_HOST_CLASS_HID_SET_REPORT                            0x09
 #define UX_HOST_CLASS_HID_SET_IDLE                              0x0A
 #define UX_HOST_CLASS_HID_SET_PROTOCOL                          0x0B
 
@@ -202,133 +202,133 @@ extern   "C" {
 
 /* Define HID Class page constants.  */
 
-#define UX_HOST_CLASS_HID_PAGE_GENERIC_DESKTOP_CONTROLS         0x01 
-#define UX_HOST_CLASS_HID_PAGE_SIMULATION_CONTROLS              0x02 
-#define UX_HOST_CLASS_HID_PAGE_VR_CONTROLS                      0x03 
-#define UX_HOST_CLASS_HID_PAGE_SPORT_CONTROLS                   0x04 
-#define UX_HOST_CLASS_HID_PAGE_GAME_CONTROLS                    0x05 
-#define UX_HOST_CLASS_HID_PAGE_GENERIC_DEVICE_CONTROLS          0x06 
-#define UX_HOST_CLASS_HID_PAGE_KEYBOARD_KEYPAD                  0x07 
-#define UX_HOST_CLASS_HID_PAGE_LEDS                             0x08 
-#define UX_HOST_CLASS_HID_PAGE_BUTTON                           0x09 
-#define UX_HOST_CLASS_HID_PAGE_ORDINAL                          0x0A 
-#define UX_HOST_CLASS_HID_PAGE_TELEPHONY                        0x0B 
-#define UX_HOST_CLASS_HID_PAGE_CONSUMER                         0x0C 
-#define UX_HOST_CLASS_HID_PAGE_DIGITIZER                        0x0D 
-#define UX_HOST_CLASS_HID_PAGE_PHYSICAL_INTERFACE_DEVICE        0x0F 
-#define UX_HOST_CLASS_HID_PAGE_UNICODE                          0x10 
-#define UX_HOST_CLASS_HID_PAGE_ALPHANUMERIC_DISPLAY             0x14 
-#define UX_HOST_CLASS_HID_PAGE_MEDICAL_INSTRUMENTS              0x40 
-#define UX_HOST_CLASS_HID_PAGE_BAR_CODE_SCANNER                 0x8C 
-#define UX_HOST_CLASS_HID_PAGE_SCALE_PAGE                       0x8D 
-#define UX_HOST_CLASS_HID_PAGE_MAGNETIC_STRIPE_READING          0x8E 
-#define UX_HOST_CLASS_HID_PAGE_CAMERA_CONTROL_PAGE              0x90 
+#define UX_HOST_CLASS_HID_PAGE_GENERIC_DESKTOP_CONTROLS         0x01
+#define UX_HOST_CLASS_HID_PAGE_SIMULATION_CONTROLS              0x02
+#define UX_HOST_CLASS_HID_PAGE_VR_CONTROLS                      0x03
+#define UX_HOST_CLASS_HID_PAGE_SPORT_CONTROLS                   0x04
+#define UX_HOST_CLASS_HID_PAGE_GAME_CONTROLS                    0x05
+#define UX_HOST_CLASS_HID_PAGE_GENERIC_DEVICE_CONTROLS          0x06
+#define UX_HOST_CLASS_HID_PAGE_KEYBOARD_KEYPAD                  0x07
+#define UX_HOST_CLASS_HID_PAGE_LEDS                             0x08
+#define UX_HOST_CLASS_HID_PAGE_BUTTON                           0x09
+#define UX_HOST_CLASS_HID_PAGE_ORDINAL                          0x0A
+#define UX_HOST_CLASS_HID_PAGE_TELEPHONY                        0x0B
+#define UX_HOST_CLASS_HID_PAGE_CONSUMER                         0x0C
+#define UX_HOST_CLASS_HID_PAGE_DIGITIZER                        0x0D
+#define UX_HOST_CLASS_HID_PAGE_PHYSICAL_INTERFACE_DEVICE        0x0F
+#define UX_HOST_CLASS_HID_PAGE_UNICODE                          0x10
+#define UX_HOST_CLASS_HID_PAGE_ALPHANUMERIC_DISPLAY             0x14
+#define UX_HOST_CLASS_HID_PAGE_MEDICAL_INSTRUMENTS              0x40
+#define UX_HOST_CLASS_HID_PAGE_BAR_CODE_SCANNER                 0x8C
+#define UX_HOST_CLASS_HID_PAGE_SCALE_PAGE                       0x8D
+#define UX_HOST_CLASS_HID_PAGE_MAGNETIC_STRIPE_READING          0x8E
+#define UX_HOST_CLASS_HID_PAGE_CAMERA_CONTROL_PAGE              0x90
 
 
 /* Define HID Class generic desktop page constants.  */
 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_UNDEFINED             0x00 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_POINTER               0x01 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_MOUSE                 0x02 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RESERVED              0x03 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_JOYSTICK              0x04 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_GAME PAD              0x05 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_KEYBOARD              0x06 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_KEYPAD                0x07 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_MULTI_AXIS_CONTROLLER 0x08 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_X                     0x30 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_Y                     0x31 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_Z                     0x32 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RX                    0x33 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RY                    0x34 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RZ                    0x35 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SLIDER                0x36 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_DIAL                  0x37 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_WHEEL                 0x38 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_HAT_SWITCH            0x39 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_COUNTED_BUFFER        0x3A 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_BYTE_COUNT            0x3B 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_MOTION_WAKEUP         0x3C 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_START                 0x3D 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SELECT                0x3E 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VX                    0x40 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VY                    0x41 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VZ                    0x42 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VBRX                  0x43 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VBRY                  0x44 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VBRZ                  0x45 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VNO                   0x46 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_FEATURE_NOTIFICATION  0x47 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_CONTROL        0x80 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_POWER_DOWN     0x81 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_SLEEP          0x82 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_WAKE_UP        0x83 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_CONTEXT_MENU   0x84 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MAIN_MENU      0x85 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_APP_MENU       0x86 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_HELP      0x87 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_EXIT      0x88 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_SELECT    0x89 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_RIGHT     0x8A 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_LEFT      0x8B 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_UP        0x8C 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_DOWN      0x8D 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_COLD_RESTART   0x8E 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_WARM_RESTART   0x8F 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_UP              0x90 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_DOWN            0x91 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_RIGHT           0x92 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_LEFT            0x93 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DOCK           0xA0 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_UNDOCK         0xA1 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_SETUP          0xA2 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_BREAK          0xA3 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DEBUGGER_BREAK 0xA4 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_APPLICAION_BREAK      0xA5 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_APPLICATION_DEBUGGER_BREAK 0xA6 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_SPEAKER_MUTE   0xA7 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_HIBERNATE      0xA8 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_INVERT 0xB0 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_INTERNAL 0xB1 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_EXTERNAL 0xB2 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_BOTH   0xB3 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_DUAL   0xB4 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_TOGGLE 0xB5 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_SWAP   0xB6 
-#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_LCD_AUTOSCALE 0xB7 
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_UNDEFINED             0x00
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_POINTER               0x01
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_MOUSE                 0x02
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RESERVED              0x03
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_JOYSTICK              0x04
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_GAME PAD              0x05
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_KEYBOARD              0x06
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_KEYPAD                0x07
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_MULTI_AXIS_CONTROLLER 0x08
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_X                     0x30
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_Y                     0x31
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_Z                     0x32
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RX                    0x33
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RY                    0x34
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_RZ                    0x35
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SLIDER                0x36
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_DIAL                  0x37
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_WHEEL                 0x38
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_HAT_SWITCH            0x39
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_COUNTED_BUFFER        0x3A
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_BYTE_COUNT            0x3B
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_MOTION_WAKEUP         0x3C
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_START                 0x3D
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SELECT                0x3E
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VX                    0x40
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VY                    0x41
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VZ                    0x42
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VBRX                  0x43
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VBRY                  0x44
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VBRZ                  0x45
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_VNO                   0x46
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_FEATURE_NOTIFICATION  0x47
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_CONTROL        0x80
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_POWER_DOWN     0x81
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_SLEEP          0x82
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_WAKE_UP        0x83
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_CONTEXT_MENU   0x84
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MAIN_MENU      0x85
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_APP_MENU       0x86
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_HELP      0x87
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_EXIT      0x88
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_SELECT    0x89
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_RIGHT     0x8A
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_LEFT      0x8B
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_UP        0x8C
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_MENU_DOWN      0x8D
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_COLD_RESTART   0x8E
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_WARM_RESTART   0x8F
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_UP              0x90
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_DOWN            0x91
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_RIGHT           0x92
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_D_PAD_LEFT            0x93
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DOCK           0xA0
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_UNDOCK         0xA1
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_SETUP          0xA2
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_BREAK          0xA3
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DEBUGGER_BREAK 0xA4
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_APPLICAION_BREAK      0xA5
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_APPLICATION_DEBUGGER_BREAK 0xA6
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_SPEAKER_MUTE   0xA7
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_HIBERNATE      0xA8
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_INVERT 0xB0
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_INTERNAL 0xB1
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_EXTERNAL 0xB2
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_BOTH   0xB3
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_DUAL   0xB4
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_TOGGLE 0xB5
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_SWAP   0xB6
+#define UX_HOST_CLASS_HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_LCD_AUTOSCALE 0xB7
 
 
 /* Define HID Class game control page constants.  */
 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_UNDEFINED                0x00 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_3D_GAME_CONTROLLER       0x01 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_PINBALL_DEVICE           0x02 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_DEVICE               0x03 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_POINT_OF_VIEW            0x20 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_TURN_RIGHT_LEFT          0x21 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_PITCH_FORWARD_BACKWARD   0x22 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_ROLL_RIGHT_LEFT          0x23 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_MOVE_RIGHT_LEFT          0x24 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_MOVE_FORWARD_BACKWARD    0x25 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_MOVE_UP_DOWN             0x26 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_LEAN_RIGHT_LEFT          0x27 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_LEAN_FORWARD_BACKWARD    0x28 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_HEIGHT_OF_POV            0x29 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_FLIPPER                  0x2A 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_SECONDARY_FLIPPER        0x2B 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_BUMP                     0x2C 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_NEW_GAME                 0x2D 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_SHOOT_BALL               0x2E 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_PLAYER                   0x2F 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_BOLT                 0x30 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_CLIP                 0x31 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_SELECTOR             0x32 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_SINGLE_SHOT          0x33        
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_BURST                0x34 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_AUTOMATIC            0x35 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_SAFETY               0x36    
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GAMEAD_FIRE_JUMP         0x37 
-#define UX_HOST_CLASS_HID_GAME_CONTROL_GAMEPAD_TRIGGER          0x39 
+#define UX_HOST_CLASS_HID_GAME_CONTROL_UNDEFINED                0x00
+#define UX_HOST_CLASS_HID_GAME_CONTROL_3D_GAME_CONTROLLER       0x01
+#define UX_HOST_CLASS_HID_GAME_CONTROL_PINBALL_DEVICE           0x02
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_DEVICE               0x03
+#define UX_HOST_CLASS_HID_GAME_CONTROL_POINT_OF_VIEW            0x20
+#define UX_HOST_CLASS_HID_GAME_CONTROL_TURN_RIGHT_LEFT          0x21
+#define UX_HOST_CLASS_HID_GAME_CONTROL_PITCH_FORWARD_BACKWARD   0x22
+#define UX_HOST_CLASS_HID_GAME_CONTROL_ROLL_RIGHT_LEFT          0x23
+#define UX_HOST_CLASS_HID_GAME_CONTROL_MOVE_RIGHT_LEFT          0x24
+#define UX_HOST_CLASS_HID_GAME_CONTROL_MOVE_FORWARD_BACKWARD    0x25
+#define UX_HOST_CLASS_HID_GAME_CONTROL_MOVE_UP_DOWN             0x26
+#define UX_HOST_CLASS_HID_GAME_CONTROL_LEAN_RIGHT_LEFT          0x27
+#define UX_HOST_CLASS_HID_GAME_CONTROL_LEAN_FORWARD_BACKWARD    0x28
+#define UX_HOST_CLASS_HID_GAME_CONTROL_HEIGHT_OF_POV            0x29
+#define UX_HOST_CLASS_HID_GAME_CONTROL_FLIPPER                  0x2A
+#define UX_HOST_CLASS_HID_GAME_CONTROL_SECONDARY_FLIPPER        0x2B
+#define UX_HOST_CLASS_HID_GAME_CONTROL_BUMP                     0x2C
+#define UX_HOST_CLASS_HID_GAME_CONTROL_NEW_GAME                 0x2D
+#define UX_HOST_CLASS_HID_GAME_CONTROL_SHOOT_BALL               0x2E
+#define UX_HOST_CLASS_HID_GAME_CONTROL_PLAYER                   0x2F
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_BOLT                 0x30
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_CLIP                 0x31
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_SELECTOR             0x32
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_SINGLE_SHOT          0x33
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_BURST                0x34
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_AUTOMATIC            0x35
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GUN_SAFETY               0x36
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GAMEAD_FIRE_JUMP         0x37
+#define UX_HOST_CLASS_HID_GAME_CONTROL_GAMEPAD_TRIGGER          0x39
 
 
 /* Define HID Class LED page constants.  */
@@ -570,7 +570,7 @@ extern   "C" {
 #define UX_HOST_CLASS_HID_CONSUMER_ALTERNATE_AUDIO_DECREMENT    0x173
 #define UX_HOST_CLASS_HID_CONSUMER_APPLICATION_LAUNCH_BUTTONS   0x174
 #define UX_HOST_CLASS_HID_CONSUMER_AL_LAUNCH_BUTTON_CONFIGURATION 0x180
-#define UX_HOST_CLASS_HID_CONSUMER_AL_PROGRAMMABLE_BUTTON       0x181
+#define UX_HOST_CLASS_HID_CONSUMER_AL_PROGRAMMABLE_BUTTON         0x181
 #define UX_HOST_CLASS_HID_CONSUMER_AL_CONSUMER_CONTROL_CONFIGURATION 0x182
 #define UX_HOST_CLASS_HID_CONSUMER_AL_WORD_PROCESSOR            0x183
 #define UX_HOST_CLASS_HID_CONSUMER_AL_TEXT_EDITOR               0x184
@@ -786,6 +786,10 @@ extern   "C" {
 #define UX_HOST_CLASS_HID_REPORT_TRANSFER_TIMEOUT               10000
 #endif
 
+/* HID protocol values for SET_PROTOCOL. */
+#define UX_HOST_CLASS_HID_PROTOCOL_BOOT                         0x00
+#define UX_HOST_CLASS_HID_PROTOCOL_REPORT                       0x01
+
 /* Define HID Class descriptor.  */
 
 typedef struct UX_HID_DESCRIPTOR_STRUCT
@@ -806,7 +810,7 @@ typedef struct UX_HID_DESCRIPTOR_STRUCT
 typedef struct UX_HOST_CLASS_HID_REPORT_CALLBACK_STRUCT
 {
 
-    struct UX_HOST_CLASS_HID_CLIENT_STRUCT        
+    struct UX_HOST_CLASS_HID_CLIENT_STRUCT
                     *ux_host_class_hid_report_callback_client;
     ULONG           ux_host_class_hid_report_callback_id;
     ULONG           ux_host_class_hid_report_callback_status;
@@ -826,7 +830,7 @@ typedef struct UX_HOST_CLASS_HID_REPORT_GET_ID_STRUCT
 
     ULONG           ux_host_class_hid_report_get_id;
     ULONG           ux_host_class_hid_report_get_type;
-    struct UX_HOST_CLASS_HID_REPORT_STRUCT           
+    struct UX_HOST_CLASS_HID_REPORT_STRUCT
                     *ux_host_class_hid_report_get_report;
 } UX_HOST_CLASS_HID_REPORT_GET_ID;
 
@@ -890,9 +894,9 @@ typedef struct UX_HOST_CLASS_HID_FIELD_STRUCT
     ULONG           ux_host_class_hid_field_number_usage;
     ULONG           *ux_host_class_hid_field_values;
     ULONG           ux_host_class_hid_field_number_values;
-    struct UX_HOST_CLASS_HID_REPORT_STRUCT 
+    struct UX_HOST_CLASS_HID_REPORT_STRUCT
                     *ux_host_class_hid_field_report;
-    struct UX_HOST_CLASS_HID_FIELD_STRUCT 
+    struct UX_HOST_CLASS_HID_FIELD_STRUCT
                     *ux_host_class_hid_field_next_field;
 } UX_HOST_CLASS_HID_FIELD;
 
@@ -904,7 +908,7 @@ typedef struct UX_HOST_CLASS_HID_REPORT_STRUCT
 
     ULONG           ux_host_class_hid_report_id;
     ULONG           ux_host_class_hid_report_type;
-    struct UX_HOST_CLASS_HID_FIELD_STRUCT 
+    struct UX_HOST_CLASS_HID_FIELD_STRUCT
                     *ux_host_class_hid_report_field;
     ULONG           ux_host_class_hid_report_number_item;
     ULONG           ux_host_class_hid_report_byte_length;
@@ -913,7 +917,7 @@ typedef struct UX_HOST_CLASS_HID_REPORT_STRUCT
     VOID            *ux_host_class_hid_report_callback_buffer;
     ULONG           ux_host_class_hid_report_callback_length;
     VOID            (*ux_host_class_hid_report_callback_function) (struct UX_HOST_CLASS_HID_REPORT_CALLBACK_STRUCT *);
-    struct UX_HOST_CLASS_HID_REPORT_STRUCT 
+    struct UX_HOST_CLASS_HID_REPORT_STRUCT
                     *ux_host_class_hid_report_next_report;
 } UX_HOST_CLASS_HID_REPORT;
 
@@ -925,21 +929,21 @@ typedef struct UX_HOST_CLASS_HID_PARSER_STRUCT
 
     UX_HOST_CLASS_HID_GLOBAL_ITEM
                     ux_host_class_hid_parser_global;
-    UX_HOST_CLASS_HID_GLOBAL_ITEM                
+    UX_HOST_CLASS_HID_GLOBAL_ITEM
                     ux_host_class_hid_parser_global_pool[UX_HOST_CLASS_HID_MAX_GLOBAL];
     ULONG           ux_host_class_hid_parser_number_global;
-    UX_HOST_CLASS_HID_LOCAL_ITEM                 
+    UX_HOST_CLASS_HID_LOCAL_ITEM
                     ux_host_class_hid_parser_local;
     ULONG           ux_host_class_hid_parser_application;
     ULONG           ux_host_class_hid_parser_collection[UX_HOST_CLASS_HID_MAX_COLLECTION];
     ULONG           ux_host_class_hid_parser_number_collection;
     ULONG           ux_host_class_hid_parser_main_page;
     ULONG           ux_host_class_hid_parser_main_usage;
-    UX_HOST_CLASS_HID_REPORT                     
+    UX_HOST_CLASS_HID_REPORT
                     *ux_host_class_hid_parser_input_report;
-    UX_HOST_CLASS_HID_REPORT                     
+    UX_HOST_CLASS_HID_REPORT
                     *ux_host_class_hid_parser_output_report;
-    UX_HOST_CLASS_HID_REPORT                     
+    UX_HOST_CLASS_HID_REPORT
                     *ux_host_class_hid_parser_feature_report;
 } UX_HOST_CLASS_HID_PARSER;
 
@@ -961,7 +965,7 @@ typedef struct UX_HOST_CLASS_HID_ITEM_STRUCT
 typedef struct UX_HOST_CLASS_HID_STRUCT
 {
 
-    struct UX_HOST_CLASS_HID_STRUCT              
+    struct UX_HOST_CLASS_HID_STRUCT
                     *ux_host_class_hid_next_instance;
     UX_HOST_CLASS   *ux_host_class_hid_class;
     UX_DEVICE       *ux_host_class_hid_device;
@@ -972,11 +976,11 @@ typedef struct UX_HOST_CLASS_HID_STRUCT
     UINT            ux_host_class_hid_interrupt_endpoint_status;
     UX_INTERFACE    *ux_host_class_hid_interface;
     ULONG           ux_host_class_hid_state;
-    struct UX_HID_DESCRIPTOR_STRUCT         
+    struct UX_HID_DESCRIPTOR_STRUCT
                     ux_host_class_hid_descriptor;
-    UX_HOST_CLASS_HID_PARSER                     
+    UX_HOST_CLASS_HID_PARSER
                     ux_host_class_hid_parser;
-    struct UX_HOST_CLASS_HID_CLIENT_STRUCT       
+    struct UX_HOST_CLASS_HID_CLIENT_STRUCT
                     *ux_host_class_hid_client;
 #if !defined(UX_HOST_STANDALONE)
     UX_SEMAPHORE    ux_host_class_hid_semaphore;
@@ -1037,8 +1041,8 @@ typedef struct UX_HOST_CLASS_HID_CLIENT_REPORT_STRUCT
     UX_HOST_CLASS_HID_REPORT
                     *ux_host_class_hid_client_report;
     ULONG           *ux_host_class_hid_client_report_buffer;
-    ULONG           ux_host_class_hid_client_report_length; 
-    ULONG           ux_host_class_hid_client_report_actual_length; 
+    ULONG           ux_host_class_hid_client_report_length;
+    ULONG           ux_host_class_hid_client_report_actual_length;
     UINT            ux_host_class_hid_client_report_flags;
 } UX_HOST_CLASS_HID_CLIENT_REPORT;
 
@@ -1055,7 +1059,7 @@ typedef struct UX_HOST_CLASS_HID_CLIENT_STRUCT
     UCHAR           ux_host_class_hid_client_name[UX_HOST_CLASS_HID_MAX_CLIENT_NAME_LENGTH + 1]; /* "+1" for string null-terminator */
 #endif
     UINT            (*ux_host_class_hid_client_handler) (struct UX_HOST_CLASS_HID_CLIENT_COMMAND_STRUCT *);
-    VOID            *ux_host_class_hid_client_local_instance;  
+    VOID            *ux_host_class_hid_client_local_instance;
 #if defined(UX_HOST_STANDALONE)
     VOID            (*ux_host_class_hid_client_function)(struct UX_HOST_CLASS_HID_CLIENT_STRUCT *);
 #endif
@@ -1099,7 +1103,8 @@ VOID    _ux_host_class_hid_transfer_request_completed(UX_TRANSFER *transfer_requ
 UINT    _ux_host_class_hid_tasks_run(UX_HOST_CLASS *hid_class);
 UINT    _ux_host_class_hid_idle_set_run(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id);
 UINT    _ux_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
-
+UINT    _ux_host_class_hid_protocol_set(UX_HOST_CLASS_HID *hid, USHORT protocol);
+UINT    _ux_host_class_hid_protocol_get(UX_HOST_CLASS_HID *hid, USHORT *protocol);
 
 UINT    _uxe_host_class_hid_client_register(UCHAR *hid_client_name,
                                 UINT (*hid_client_handler)(struct UX_HOST_CLASS_HID_CLIENT_COMMAND_STRUCT *));
@@ -1117,7 +1122,8 @@ UINT    _uxe_host_class_hid_report_set(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID
 
 UINT    _uxe_host_class_hid_idle_set_run(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id);
 UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
-
+UINT    _uxe_host_class_hid_protocol_set(UX_HOST_CLASS_HID *hid, USHORT protocol);
+UINT    _uxe_host_class_hid_protocol_get(UX_HOST_CLASS_HID *hid, USHORT *protocol);
 
 /* Define HID Class API prototypes.  */
 
@@ -1144,6 +1150,8 @@ UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS
 #define ux_host_class_hid_report_id_get                     _uxe_host_class_hid_report_id_get
 #define ux_host_class_hid_report_get                        _uxe_host_class_hid_report_get
 #define ux_host_class_hid_report_set                        _uxe_host_class_hid_report_set
+#define ux_host_class_hid_protocol_set                      _uxe_host_class_hid_protocol_set
+#define ux_host_class_hid_protocol_get                      _uxe_host_class_hid_protocol_get
 
 #else
 
@@ -1159,15 +1167,16 @@ UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS
 #define ux_host_class_hid_report_id_get                     _ux_host_class_hid_report_id_get
 #define ux_host_class_hid_report_get                        _ux_host_class_hid_report_get
 #define ux_host_class_hid_report_set                        _ux_host_class_hid_report_set
+#define ux_host_class_hid_protocol_set                      _ux_host_class_hid_protocol_set
+#define ux_host_class_hid_protocol_get                      _ux_host_class_hid_protocol_get
 
 #endif
 
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
-
+}
 #endif
 
+#endif
