@@ -62,7 +62,7 @@
 /*                                                                        */
 /*    _ux_utility_string_length_check       Check C string and return     */
 /*                                          its length if null-terminated */
-/*    _tx_time_get                          Return system clock time      */
+/*    _ux_utility_time_get                  Return system clock time      */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
@@ -79,6 +79,10 @@
 /*                                            refer to TX symbols instead */
 /*                                            of using them directly,     */
 /*                                            resulting in version 6.1    */
+/*  30-11-2025     Mohamed Ayed             Modified comment(s),          */
+/*                                            used UX prefix to refer to  */
+/*                                            TX symbols instead of using */
+/*                                            them directly,              */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_debug_log(UCHAR *debug_location, UCHAR *debug_message, ULONG debug_code,
@@ -136,8 +140,8 @@ UX_INTERRUPT_SAVE_AREA
     _ux_utility_memory_copy(_ux_system -> ux_system_debug_log_head, "At time : ", 10); /* Use case of memcpy is verified. */
     _ux_system -> ux_system_debug_log_head += 10;
 
-    /* Get the time value from TX.  */
-    current_time = _tx_time_get();
+    /* Get the time value.  */
+    current_time = _ux_utility_time_get();
 
     /* Reset the value of the length.*/
     parameter_length = 0;
