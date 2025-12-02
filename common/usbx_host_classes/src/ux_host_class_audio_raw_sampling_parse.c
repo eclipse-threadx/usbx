@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -185,7 +185,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_DESCRIPTOR_CORRUPTED);
     }
@@ -200,7 +200,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_DESCRIPTOR_CORRUPTED);
     }
@@ -225,7 +225,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
           _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
           /* If trace is enabled, insert this event into the trace buffer.  */
-          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
           return(UX_DESCRIPTOR_CORRUPTED);
         }
@@ -252,7 +252,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
           _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
           /* If trace is enabled, insert this event into the trace buffer.  */
-          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
           return(UX_DESCRIPTOR_CORRUPTED);
         }
@@ -339,7 +339,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(0);
     }
@@ -634,7 +634,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         parser -> status = UX_DESCRIPTOR_CORRUPTED;
         return(1);
