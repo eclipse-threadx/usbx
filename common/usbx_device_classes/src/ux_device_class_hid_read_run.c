@@ -1,12 +1,13 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -274,7 +275,7 @@ UINT                        status= UX_SUCCESS;
 
         /* Keep waiting.  */
         return(UX_STATE_WAIT);
-    
+
     /* Receiver running states.  */
     case UX_DEVICE_CLASS_HID_RECEIVER_START:    /* Fall through.  */
     case UX_DEVICE_CLASS_HID_RECEIVER_WAIT:     /* Fall through.  */
@@ -337,7 +338,7 @@ UINT                        status= UX_SUCCESS;
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid, UCHAR *buffer,
-                                   ULONG requested_length, ULONG *actual_length)
+                                    ULONG requested_length, ULONG *actual_length)
 {
 
     /* Sanity checks.  */
@@ -351,4 +352,4 @@ UINT _uxe_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid, UCHAR *buffer,
     /* Invoke function to run reading state machine.  */
     return(_ux_device_class_hid_read_run(hid, buffer, requested_length, actual_length));
 }
-#endif
+#endif  /* UX_DEVICE_STANDALONE */

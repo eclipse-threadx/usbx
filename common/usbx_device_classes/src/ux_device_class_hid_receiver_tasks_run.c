@@ -1,12 +1,13 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -213,4 +214,4 @@ ULONG                               temp;
     /* Task is idle.  */
     return(UX_STATE_IDLE);
 }
-#endif
+#endif  /* UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT && UX_DEVICE_STANDALONE */

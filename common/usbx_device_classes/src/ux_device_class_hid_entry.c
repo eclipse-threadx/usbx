@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -75,10 +76,10 @@
 /*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.3.0  */
-/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
+/*  24-02-2025     Mohamed ayed             Modified comment(s),          */
 /*                                            fix typo,                   */
 /*                                            remove extra spaces,        */
-/*                                            resulting in version 6.x    */
+/*                                            resulting in version 6.4.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -156,4 +157,3 @@ UINT        status;
         return(UX_FUNCTION_NOT_SUPPORTED);
     }
 }
-
