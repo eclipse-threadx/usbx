@@ -9,6 +9,7 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -22,7 +23,7 @@
 /**                                                                       */
 /**  This demonstration is not optimized, to optimize application user    */
 /**  should configure related class flag in ux_user.h and adjust          */
-/**  DEMO_STACK_SIZE and UX_DEVICE_MEMORY_STACK_SIZE                      */
+/**  UX_DEVICE_MEMORY_STACK_SIZE                                          */
 /**                                                                       */
 /**                                                                       */
 /**  AUTHOR                                                               */
@@ -34,6 +35,18 @@
 
 #include "ux_api.h"
 #include "ux_device_class_hid.h"
+
+#ifndef UX_DEVICE_SIDE_ONLY
+#error UX_DEVICE_SIDE_ONLY must be defined
+#endif
+
+#ifndef UX_STANDALONE
+#warning UX_STANDALONE must be define for this sample.
+#endif
+
+#if UX_PERIODIC_RATE != 1000
+#warning UX_PERIODIC_RATE should be 1000 for 1ms tick.
+#endif
 
 /* if defined mouse with absolute positioning is a type of USB HID mouse that reports its position using
    absolute coordinates rather than relative movement deltas. This is common in touch devices, graphics tablets,
@@ -47,7 +60,7 @@
 /**************************************************/
 /**  Define constants                             */
 /**************************************************/
-#define UX_DEVICE_MEMORY_STACK_SIZE     7*1024
+#define UX_DEVICE_MEMORY_STACK_SIZE     (7*1024)
 
 #define UX_DEMO_HID_DEVICE_VID          0x090A
 #define UX_DEMO_HID_DEVICE_PID          0x4036
@@ -68,10 +81,10 @@
 #endif
 
 #ifdef UX_DEMO_MOUSE_ABSOLUTE
-#define UX_DEMO_HID_MOUSE_CURSOR_MOVE           350
+#define UX_DEMO_HID_MOUSE_CURSOR_MOVE   350
 #else /* UX_DEMO_MOUSE_ABSOLUTE */
-#define UX_DEMO_HID_MOUSE_CURSOR_MOVE           3
-#define UX_DEMO_HID_MOUSE_CURSOR_MOVE_N         100
+#define UX_DEMO_HID_MOUSE_CURSOR_MOVE   3
+#define UX_DEMO_HID_MOUSE_CURSOR_MOVE_N 100
 #endif /* UX_DEMO_MOUSE_ABSOLUTE */
 
 #define UX_MOUSE_CURSOR_MOVE_RIGHT      0x00
@@ -88,20 +101,8 @@ UINT ux_demo_device_hid_callback(UX_SLAVE_CLASS_HID *hid_instance, UX_SLAVE_CLAS
 UINT ux_demo_device_hid_get_callback(UX_SLAVE_CLASS_HID *hid_instance, UX_SLAVE_CLASS_HID_EVENT *hid_event);
 
 /**************************************************/
-/**  usbx application initialization with RTOS    */
-/**************************************************/
-VOID tx_application_define(VOID *first_unused_memory);
-
-/**************************************************/
-/**  usbx device hid demo thread                  */
-/**************************************************/
-VOID ux_demo_device_hid_thread_entry(ULONG thread_input);
-
-/**************************************************/
 /**  usbx device hid demo mouse                   */
 /**************************************************/
-UINT ux_demo_hid_mouse_buttons(UX_SLAVE_CLASS_HID *device_hid);
-UINT ux_demo_hid_mouse_scroll_wheel(UX_SLAVE_CLASS_HID *device_hid);
 #ifndef UX_DEMO_MOUSE_ABSOLUTE
 UINT ux_demo_hid_mouse_cursor_move(UX_SLAVE_CLASS_HID *device_hid);
 #else
@@ -109,23 +110,25 @@ UINT ux_demo_hid_mouse_absolute_cursor_move(UX_SLAVE_CLASS_HID *device_hid);
 #endif /* UX_DEMO_MOUSE_ABSOLUTE */
 
 /**************************************************/
+/**  usbx device hid mouse instance               */
+/**************************************************/
+UX_SLAVE_CLASS_HID *hid_mouse;
+
+/**************************************************/
 /**  usbx callback error                          */
 /**************************************************/
-VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code);
+static VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code);
+static VOID demo_delay_with_tasks_running(ULONG ms_wait);
+
+VOID ux_application_define(VOID);
+VOID ux_demo_device_hid_task(VOID);
+
+static CHAR ux_system_memory_pool[UX_DEVICE_MEMORY_STACK_SIZE];
 
 #ifndef EXTERNAL_MAIN
 extern int board_setup(void);
 #endif /* EXTERNAL_MAIN */
 extern int usb_device_dcd_initialize(void *param);
-
-/**************************************************/
-/**  usbx device hid mouse instance               */
-/**************************************************/
-UX_SLAVE_CLASS_HID *hid_mouse;
-
-VOID ux_application_define(VOID);
-VOID ux_demo_device_hid_task(VOID);
-static CHAR ux_system_memory_pool[UX_DEVICE_MEMORY_STACK_SIZE];
 
 /**************************************************/
 /**  HID Report descriptor                        */
@@ -518,8 +521,8 @@ static UCHAR                mouse_y;
 static UCHAR                mouse_move_dir;
 static UCHAR                mouse_move_count;
 
-    /* Sleep thread for 10ms.  */
-    ux_utility_delay_ms(MS_TO_TICK(10));
+    /* Delay for 10ms.  */
+    demo_delay_with_tasks_running(10);
 
     /* Initialize mouse event.  */
     device_hid_event.ux_device_class_hid_event_report_id = 0;
@@ -623,8 +626,8 @@ static ULONG                mouse_x;
 static ULONG                mouse_y;
 static UCHAR                mouse_move_dir;
 
-    /* Sleep thread for 100ms.  */
-    ux_utility_delay_ms(MS_TO_TICK(100));
+    /* Delay for 100ms.  */
+    demo_delay_with_tasks_running(100);
 
     /* Initialize mouse event.  */
     device_hid_event.ux_device_class_hid_event_report_id = 0;
@@ -708,7 +711,24 @@ static UCHAR                mouse_move_dir;
 }
 #endif /* UX_DEMO_MOUSE_ABSOLUTE */
 
-VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code)
+/********************************************************************/
+/**  demo_delay_with_tasks_running: delay with tasks               */
+/********************************************************************/
+static VOID demo_delay_with_tasks_running(ULONG ms_wait)
+{
+ULONG ticks;
+
+    /* Get current time.  */
+    ticks = ux_utility_time_get();
+
+    /* Wait until timeout.  */
+    while(ux_utility_time_elapsed(ticks, ux_utility_time_get()) < UX_MS_TO_TICK_NON_ZERO(ms_wait))
+    {
+        ux_system_tasks_run();
+    }
+}
+
+static VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code)
 {
     /*
      * Refer to ux_api.h. For example,
