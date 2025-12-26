@@ -140,7 +140,7 @@ ULONG                       application_data_length;
 
         /* Filter for GET_DESCRIPTOR/SET_DESCRIPTOR commands. If the descriptor to be returned is not a standard descriptor,
            treat the command as a CLASS command.  */
-        if ((request == UX_GET_DESCRIPTOR || request == UX_SET_DESCRIPTOR) && (((request_type >> 8) & UX_REQUEST_TYPE) != UX_REQUEST_TYPE_STANDARD))
+        if ((request == UX_GET_DESCRIPTOR || request == UX_SET_DESCRIPTOR) && ((request_type & UX_REQUEST_TYPE) != UX_REQUEST_TYPE_STANDARD))
         {        
 
             /* This request is to be handled by the class layer.  */
