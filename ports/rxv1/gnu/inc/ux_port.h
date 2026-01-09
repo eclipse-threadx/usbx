@@ -119,7 +119,7 @@ typedef uint64_t                                ULONG64;
 /* For X86 systems, the define #define UX_USE_IO_INSTRUCTIONS should be used.  */
 
 
-/* Define additionaRXgeneric USBX types.  */
+/* Define additional generic USBX types.  */
 
 #ifndef SLONG_DEFINED
 typedef LONG                        SLONG;
@@ -150,11 +150,11 @@ typedef LONG                        SLONG;
 #endif
 
 #ifndef UX_MAX_ED
-#define UX_MAX_ED                                           80
+#define UX_MAX_ED                                           16
 #endif
 
 #ifndef UX_MAX_TD
-#define UX_MAX_TD                                           32
+#define UX_MAX_TD                                           20
 #endif
 
 #ifndef UX_MAX_ISO_TD
@@ -211,7 +211,7 @@ typedef LONG                        SLONG;
 
 
 #ifndef UX_SLAVE_REQUEST_DATA_MAX_LENGTH
-#define UX_SLAVE_REQUEST_DATA_MAX_LENGTH                    2048
+#define UX_SLAVE_REQUEST_DATA_MAX_LENGTH                    1024
 #endif
 
 #ifndef UX_USE_IO_INSTRUCTIONS
@@ -237,10 +237,6 @@ VOID    outpb(ULONG,UCHAR);
 VOID    outpw(ULONG,USHORT);
 VOID    outpl(ULONG,ULONG);
 
-#endif
-/* Define local delay function for board specific bsps.  */
-#ifdef TI_AM335
-    #define UX_BSP_SPECIFIC_DELAY_FUNCTION
 #endif
 
 
