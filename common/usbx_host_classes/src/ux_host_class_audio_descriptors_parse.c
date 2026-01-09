@@ -102,7 +102,7 @@ UINT                                            status;
 
     /* Ensure the instance is valid.  */
     if (_ux_host_stack_class_instance_verify(_ux_system_host_class_audio_name, (VOID *) audio) != UX_SUCCESS)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -134,11 +134,12 @@ UINT                                            status;
 
         /* Gather the length, type and subtype of the descriptor.  */
         descriptor_length =   *descriptor;
-        descriptor_type =     *(descriptor + 1);
 
-        /* Make sure this descriptor has at least the minimum length.  */
+                /* Make sure this descriptor has at least the minimum length.  */
         if (descriptor_length < 3)
             return(UX_DESCRIPTOR_CORRUPTED);
+
+        descriptor_type =     *(descriptor + 1);
 
         /* Process relative to descriptor type.  */
         switch (descriptor_type)
@@ -173,7 +174,6 @@ UINT                                            status;
             /* Have we found the audio interface yet?  */
             if (interface_descriptor != UX_NULL)
             {
-
                 /* Yes, parse the audio specific descriptor.  */
                 status = parse_function(arg, interface_descriptor, endpoint_descriptor, descriptor);
 

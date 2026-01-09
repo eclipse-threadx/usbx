@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -30,7 +30,7 @@
 
 /* Define the Slave Storage Class Inquiry data : DO NOT CHANGE THE LENGTH OF THESE ITEMS */
 
-UCHAR _ux_system_slave_class_storage_vendor_id[] =                          "AzureRTO";
+UCHAR _ux_system_slave_class_storage_vendor_id[] =                          "Eclipse ";
 UCHAR _ux_system_slave_class_storage_product_id[] =                         "USBX storage dev";
 UCHAR _ux_system_slave_class_storage_product_rev[] =                        "2000";
 UCHAR _ux_system_slave_class_storage_product_serial[] =                     "12345678901234567890";
@@ -290,8 +290,17 @@ UINT                                    i;
     storage_parameter =  command -> ux_slave_class_command_parameter;
 
     /* Sanity checks.  */
-    if (storage_parameter -> ux_slave_class_storage_parameter_number_lun > UX_MAX_SLAVE_LUN)
+    if ((storage_parameter -> ux_slave_class_storage_parameter_number_lun > UX_MAX_SLAVE_LUN) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_vendor_id != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_vendor_id) != 8)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_id != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_id) != 16)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_rev != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_rev) != 4)) ||
+        ((storage_parameter -> ux_slave_class_storage_parameter_product_serial != UX_NULL) &&
+        ( _ux_utility_string_length_get(storage_parameter -> ux_slave_class_storage_parameter_product_serial) != 20)))
         return(UX_INVALID_PARAMETER);
+
     for (i = 0; i < storage_parameter -> ux_slave_class_storage_parameter_number_lun; i ++)
     {
         if ((storage_parameter -> ux_slave_class_storage_parameter_lun[i].

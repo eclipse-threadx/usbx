@@ -161,6 +161,7 @@ struct UX_HOST_CLASS_AUDIO10_SAM_PARSER           *parser = (struct UX_HOST_CLAS
 UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS    sam_attr;
 ULONG                                           n, offset;
 UINT                                            status;
+UINT descriptor_length = packed_audio_descriptor[0];
 
     UX_PARAMETER_NOT_USED(packed_endpoint_descriptor);
 
@@ -178,9 +179,31 @@ UINT                                            status;
     if (packed_audio_descriptor[2] != UX_HOST_CLASS_AUDIO_CS_FORMAT_TYPE)
         return(0);
 
+    if (descriptor_length < 4)
+    {
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_DESCRIPTOR_CORRUPTED);
+    }
+
     /* Check bFormatType @ 3.  */
     if (packed_audio_descriptor[3] != UX_HOST_CLASS_AUDIO_FORMAT_TYPE_I)
         return(0);
+
+    if (descriptor_length < 8)
+    {
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_DESCRIPTOR_CORRUPTED);
+    }
 
     /* Get bNrChannels @ 4.  */
     sam_attr.ux_host_class_audio_sampling_characteristics_channels = packed_audio_descriptor[4];
@@ -196,6 +219,16 @@ UINT                                            status;
     /* Check bSamFreqType @ 7.  */
     if (packed_audio_descriptor[7] == 0)
     {
+        if (descriptor_length < 14)
+        {
+          /* Error trap. */
+          _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+          /* If trace is enabled, insert this event into the trace buffer.  */
+          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+          return(UX_DESCRIPTOR_CORRUPTED);
+        }
 
         /* Continuous, get dLowSamFreq and dHighSamFreq.  */
         sam_attr.ux_host_class_audio_sampling_characteristics_frequency_low =
@@ -213,6 +246,16 @@ UINT                                            status;
     }
     else
     {
+        if (descriptor_length < (UINT)(8 + (3 * packed_audio_descriptor[7])))
+        {
+          /* Error trap. */
+          _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+          /* If trace is enabled, insert this event into the trace buffer.  */
+          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+          return(UX_DESCRIPTOR_CORRUPTED);
+        }
 
         /* Parse list of sampling characteristics.  */
         for (n = 0, offset = 8;
@@ -271,6 +314,7 @@ static UINT  _ux_host_class_audio_ac_find_parse(VOID  *arg,
                               UCHAR *packed_audio_descriptor)
 {
 struct UX_HOST_CLASS_AUDIO_AC_DESCR_FINDER_STRUCT *finder = (struct UX_HOST_CLASS_AUDIO_AC_DESCR_FINDER_STRUCT *)arg;
+UINT descriptor_length = packed_audio_descriptor[0];
 
     UX_PARAMETER_NOT_USED(packed_endpoint_descriptor);
 
@@ -288,6 +332,17 @@ struct UX_HOST_CLASS_AUDIO_AC_DESCR_FINDER_STRUCT *finder = (struct UX_HOST_CLAS
     /* Check bDescriptorSubType @ 2.  */
     if (packed_audio_descriptor[2] != finder -> subtype)
         return(0);
+
+    if (descriptor_length < 4)
+    {
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(0);
+    }
 
     /* Check bEntityID @ 3.  */
     if (packed_audio_descriptor[3] != finder -> id)
@@ -332,7 +387,7 @@ UINT            status;
 
     if (audio -> ux_host_class_audio_type == UX_HOST_CLASS_AUDIO_INPUT)
     {
-    
+
         /* If audio input, streaming is from output terminal (OT).  */
         descriptor = _ux_host_class_audio_ac_find(audio,
                                         UX_CLASS_AUDIO20_AC_OUTPUT_TERMINAL,
@@ -546,6 +601,7 @@ UX_TRANSFER                                     *transfer;
 UCHAR                                           *buffer;
 ULONG                                           n_sub, param_len, offset;
 UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS    sam_attr;
+UINT descriptor_length = packed_audio_descriptor[0];
 
     UX_PARAMETER_NOT_USED(packed_endpoint_descriptor);
 
@@ -571,6 +627,19 @@ UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS    sam_attr;
     /* Check bDescriptorSubType@2, bFormatType@3 to confirm FORMAT_TYPE_I.  */
     if (packed_audio_descriptor[2] != UX_CLASS_AUDIO20_AS_FORMAT_TYPE)
         return(0);
+
+    if (descriptor_length < 6)
+    {
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        parser -> status = UX_DESCRIPTOR_CORRUPTED;
+        return(1);
+    }
+
     if (packed_audio_descriptor[3] != UX_CLASS_AUDIO20_FORMAT_TYPE_I)
         return(0);
 
@@ -654,7 +723,7 @@ UX_HOST_CLASS_AUDIO_SAMPLING_CHARACTERISTICS    sam_attr;
         parser -> status = UX_MATH_OVERFLOW;
         return(1);
     }
- 
+
     /* Allocate buffer for GET_RANGE.  */
     buffer = _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, param_len);
     if (buffer == UX_NULL)

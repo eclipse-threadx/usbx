@@ -11,8 +11,8 @@
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Audio Class                                                         */
 /**                                                                       */
@@ -37,44 +37,44 @@ static inline UINT _ux_host_class_audio_alternate_setting_locate_2(
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_audio_alternate_setting_locate       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_audio_alternate_setting_locate       PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function finds the right alternate setting according to the   */
-/*     sampling desired.                                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    audio                                 Pointer to audio class        */ 
-/*    audio_sampling                        Pointer to audio sampling     */ 
-/*    alternate_setting                     Pointer to located alternate  */ 
-/*                                            setting                     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Audio Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*     sampling desired.                                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio class        */
+/*    audio_sampling                        Pointer to audio sampling     */
+/*    alternate_setting                     Pointer to located alternate  */
+/*                                            setting                     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Audio Class                                                         */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -101,23 +101,21 @@ UINT                                     interface_found;
 ULONG                                    lower_frequency;
 ULONG                                    higher_frequency;
 UINT                                     specific_frequency_count;
-    
+
 
     /* Get the descriptor to the entire configuration.  */
     descriptor =  audio -> ux_host_class_audio_configuration_descriptor;
     total_descriptor_length =  audio -> ux_host_class_audio_configuration_descriptor_length;
-    
-    /* Default is Interface descriptor not yet found.  */    
+
+    /* Default is Interface descriptor not yet found.  */
     interface_found =  UX_FALSE;
-    
+
     /* Scan the descriptor for the Audio Streaming interface.  */
     while (total_descriptor_length)
     {
 
         /* Gather the length, type and subtype of the descriptor.  */
         descriptor_length =   *descriptor;
-        descriptor_type =     *(descriptor + 1);
-        descriptor_subtype =  *(descriptor + 2);
 
         /* Make sure this descriptor has at least the minimum length.  */
         if (descriptor_length < 3)
@@ -131,6 +129,10 @@ UINT                                     specific_frequency_count;
 
             return(UX_DESCRIPTOR_CORRUPTED);
         }
+
+        descriptor_type =     *(descriptor + 1);
+        descriptor_subtype =  *(descriptor + 2);
+
         /* Process relative to descriptor type.  */
         switch (descriptor_type)
         {
@@ -149,7 +151,7 @@ UINT                                     specific_frequency_count;
 
                 /* Mark we have found it.  */
                 interface_found =  UX_TRUE;
-                    
+
                 /* And memorize the alternate setting.  */
                 *alternate_setting =  interface_descriptor.bAlternateSetting;
             }
@@ -160,8 +162,8 @@ UINT                                     specific_frequency_count;
                 interface_found =  UX_FALSE;
             }
             break;
-        
-                
+
+
         case UX_HOST_CLASS_AUDIO_CS_INTERFACE:
 
             /* First make sure we have found the correct generic interface descriptor.  */
@@ -173,7 +175,7 @@ UINT                                     specific_frequency_count;
                                                 UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_ENTRIES, (UCHAR *) &audio_interface_descriptor);
 
                 /* This descriptor must refer to a PCM audio type.  */
-                if (audio_interface_descriptor.bFormatType != UX_HOST_CLASS_AUDIO_FORMAT_TYPE_I)    
+                if (audio_interface_descriptor.bFormatType != UX_HOST_CLASS_AUDIO_FORMAT_TYPE_I)
                     break;
 
                 /* The number of channels demanded by the application must match.  */
@@ -188,18 +190,30 @@ UINT                                     specific_frequency_count;
                    as a min and max frequency or an array of specified values.  */
                 if (audio_interface_descriptor.bSamFreqType == 0)
                 {
-                        
+
+                    if (descriptor_length < (UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + 6))
+                    {
+
+                      /* Error trap. */
+                      _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+                      /* If trace is enabled, insert this event into the trace buffer.  */
+                      UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+                      return(UX_DESCRIPTOR_CORRUPTED);
+                    }
+
                     /* The declaration of frequency is contiguous, so get the minimum and maximum */
                     lower_frequency =  (ULONG)  *(descriptor + UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH) |
                                        ((ULONG) *(descriptor + UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + 1)) << 8 |
                                        ((ULONG) *(descriptor + UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + 2)) << 16;
 
                     higher_frequency =  (ULONG)  *(descriptor + UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + 3) |
-                                        ((ULONG) *(descriptor + UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + 4)) << 8 |                                       
+                                        ((ULONG) *(descriptor + UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + 4)) << 8 |
                                         ((ULONG) *(descriptor + UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + 5)) << 16;
 
                     /* Now compare with what is required.  */
-                    if ((audio_sampling -> ux_host_class_audio_sampling_frequency >= lower_frequency) && 
+                    if ((audio_sampling -> ux_host_class_audio_sampling_frequency >= lower_frequency) &&
                         (audio_sampling -> ux_host_class_audio_sampling_frequency <= higher_frequency))
                     {
 
@@ -210,6 +224,11 @@ UINT                                     specific_frequency_count;
                 }
                 else
                 {
+
+                    if (descriptor_length < (UX_HOST_CLASS_AUDIO_INTERFACE_DESCRIPTOR_LENGTH + (UINT)(3 * audio_interface_descriptor.bSamFreqType)))
+                    {
+                      return(UX_DESCRIPTOR_CORRUPTED);
+                    }
 
                     /* The declaration of the frequency is declared as an array of specific values.  */
                     for (specific_frequency_count = 0; specific_frequency_count < audio_interface_descriptor.bSamFreqType;
@@ -229,10 +248,10 @@ UINT                                     specific_frequency_count;
                             return(UX_SUCCESS);
                         }
                     }
-                }                        
+                }
             }
             break;
-        }       
+        }
 
         /* Verify if the descriptor is still valid.  */
         if (descriptor_length > total_descriptor_length)
@@ -243,7 +262,7 @@ UINT                                     specific_frequency_count;
 
             return(UX_DESCRIPTOR_CORRUPTED);
         }
-        
+
         /* Jump to the next descriptor if we have not reached the end.  */
         descriptor +=  descriptor_length;
 
