@@ -451,6 +451,7 @@ VOID*            _ux_utility_memory_allocate_add_safe(ULONG align,ULONG cache,UL
 #define ux_utility_event_flags_set                     _ux_utility_event_flags_set
 #define ux_utility_unicode_to_string                   _ux_utility_unicode_to_string
 #define ux_utility_string_to_unicode                   _ux_utility_string_to_unicode
+#define ux_utility_debug_callback_register             _ux_utility_debug_callback_register
 #define ux_utility_delay_ms                            _ux_utility_delay_ms
 #define ux_utility_error_callback_register             _ux_utility_error_callback_register
 #define ux_system_error_handler                        _ux_system_error_handler
