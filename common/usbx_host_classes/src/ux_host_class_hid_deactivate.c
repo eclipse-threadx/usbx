@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,50 +29,49 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_deactivate                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_deactivate                       PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called when this instance of the HID has been      */
-/*    removed from the bus either directly or indirectly. The interrupt   */ 
-/*    pipe will be destroyed and the instanced removed.                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to command            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_host_class_hid_client_handler)    HID client handler            */ 
-/*    _ux_host_class_hid_instance_clean     HID instance clean            */ 
-/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
+/*    removed from the bus either directly or indirectly. The interrupt   */
+/*    pipe will be destroyed and the instanced removed.                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to command            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_host_class_hid_client_handler)    HID client handler            */
+/*    _ux_host_class_hid_instance_clean     HID instance clean            */
+/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */
 /*    _ux_host_stack_endpoint_transfer_abort                              */
-/*                                          Abort transfer                */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_host_semaphore_delete             Delete semaphore              */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_utility_thread_schedule_other     Schedule other threads        */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                          Abort transfer                */
+/*    _ux_utility_memory_free               Release memory block          */
+/*    _ux_host_semaphore_delete             Delete semaphore              */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -124,6 +123,22 @@ UINT                                status;
         _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
     }
 
+#if defined(UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT)
+    if (hid -> ux_host_class_hid_interrupt_out_endpoint)
+    {
+
+        /* We need to abort transactions on the interrupt pipe.  */
+        _ux_host_stack_endpoint_transfer_abort(hid -> ux_host_class_hid_interrupt_out_endpoint);
+
+        /* If the Hid class instance has a interrupt pipe with a data payload associated with it
+           it must be freed.  */
+        transfer_request =  &hid -> ux_host_class_hid_interrupt_out_endpoint -> ux_endpoint_transfer_request;
+
+        /* Then de allocate the memory.  */
+        _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
+    }
+#endif
+
 #if defined(UX_HOST_STANDALONE)
     if (hid -> ux_host_class_hid_allocated)
         _ux_utility_memory_free(hid -> ux_host_class_hid_allocated);
@@ -133,7 +148,7 @@ UINT                                status;
     hid_client_command.ux_host_class_hid_client_command_instance =   (VOID *) hid;
     hid_client_command.ux_host_class_hid_client_command_container =  (VOID *) hid -> ux_host_class_hid_class;
     hid_client_command.ux_host_class_hid_client_command_request =    UX_HOST_CLASS_COMMAND_DEACTIVATE;
-    
+
     /* Call the HID client with a deactivate command if there was a client registered.  */
     if (hid -> ux_host_class_hid_client != UX_NULL)
         hid -> ux_host_class_hid_client -> ux_host_class_hid_client_handler(&hid_client_command);
@@ -143,7 +158,7 @@ UINT                                status;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(hid -> ux_host_class_hid_class, (VOID *) hid);
@@ -155,7 +170,7 @@ UINT                                status;
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
     {
-        
+
         /* Inform the application the device is removed.  */
         _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, hid -> ux_host_class_hid_class, (VOID *) hid);
     }
@@ -170,6 +185,5 @@ UINT                                status;
     _ux_utility_memory_free(hid);
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
-
