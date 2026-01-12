@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
+/**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
@@ -82,8 +84,8 @@
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
-                                    UX_SLAVE_CLASS_HID_PARAMETER *parameter,
-                                    UX_DEVICE_CLASS_HID_RECEIVER **receiver)
+                                               UX_SLAVE_CLASS_HID_PARAMETER *parameter,
+                                               UX_DEVICE_CLASS_HID_RECEIVER **receiver)
 {
 #if !defined(UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT)
     UX_PARAMETER_NOT_USED(hid);

@@ -1,12 +1,13 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -47,7 +48,7 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    hid_class                                 Address of hid class      */
+/*    hid_instance                              Address of hid class      */
 /*                                                container               */
 /*                                                                        */
 /*  OUTPUT                                                                */
@@ -77,7 +78,7 @@
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT _ux_device_class_hid_tasks_run(VOID *instance)
+UINT _ux_device_class_hid_tasks_run(VOID *hid_instance)
 {
 
 UX_SLAVE_CLASS_HID          *hid;
@@ -89,7 +90,7 @@ UINT                        status;
 
 
     /* Get HID instance.  */
-    hid = (UX_SLAVE_CLASS_HID *) instance;
+    hid = (UX_SLAVE_CLASS_HID *) hid_instance;
 
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
@@ -208,4 +209,4 @@ UINT                        status;
         return(UX_STATE_IDLE);
     }
 }
-#endif
+#endif /* UX_DEVICE_STANDALONE */

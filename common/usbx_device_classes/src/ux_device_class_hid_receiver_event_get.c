@@ -1,12 +1,13 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -156,7 +157,7 @@ UX_DEVICE_CLASS_HID_RECEIVED_EVENT      *pos;
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
-                                UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event)
+                                               UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event)
 {
 
     /* Sanity check.  */

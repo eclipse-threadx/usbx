@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**************************************************************************/
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device HID Class                                                    */
 /**                                                                       */
@@ -27,46 +28,46 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_hid_initialize                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_hid_initialize                     PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the USB HID device.                       */ 
-/*    This function is called by the class register function. It is only  */ 
-/*    done once.                                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                              Pointer to hid command         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the USB HID device.                       */
+/*    This function is called by the class register function. It is only  */
+/*    done once.                                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                              Pointer to hid command         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
 /*    _ux_device_thread_create              Create thread                 */
 /*    _ux_device_thread_delete              Delete thread                 */
 /*    _ux_utility_event_flags_create        Create event flags group      */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Source Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Source Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -97,7 +98,7 @@
 /**************************************************************************/
 UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
+
 UX_SLAVE_CLASS_HID                      *hid;
 UX_SLAVE_CLASS_HID_PARAMETER            *hid_parameter;
 UX_SLAVE_CLASS                          *class_ptr;
@@ -149,9 +150,9 @@ UCHAR                                   *buffer;
 #if !defined(UX_DEVICE_STANDALONE)
 
     /* Allocate some memory for the thread stack. */
-    class_ptr -> ux_slave_class_thread_stack =  
+    class_ptr -> ux_slave_class_thread_stack =
             _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_DEVICE_CLASS_HID_THREAD_STACK_SIZE);
-    
+
     /* Check for successful allocation.  */
     if (class_ptr -> ux_slave_class_thread_stack == UX_NULL)
         status = UX_MEMORY_INSUFFICIENT;
@@ -160,7 +161,7 @@ UCHAR                                   *buffer;
        a new thread. We pass a pointer to the class to the new thread.  This thread
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
-        status =  _ux_device_thread_create(&class_ptr -> ux_slave_class_thread, "ux_slave_hid_thread", 
+        status =  _ux_device_thread_create(&class_ptr -> ux_slave_class_thread, "ux_slave_hid_thread",
                     _ux_device_class_hid_interrupt_thread,
                     (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) class_ptr -> ux_slave_class_thread_stack,
                     UX_DEVICE_CLASS_HID_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -263,7 +264,7 @@ UCHAR                                   *buffer;
         if (hid -> ux_device_class_hid_event_array != UX_NULL)
         {
 
-            /* Initialize the head and tail of the notification round robin buffers. 
+            /* Initialize the head and tail of the notification round robin buffers.
                At first, the head and tail are pointing to the beginning of the array.  */
             hid -> ux_device_class_hid_event_array_head =  hid -> ux_device_class_hid_event_array;
             hid -> ux_device_class_hid_event_array_tail =  hid -> ux_device_class_hid_event_array;
@@ -392,7 +393,7 @@ UCHAR                                   *buffer;
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    command                               Pointer to hid command        */ 
+/*    command                               Pointer to hid command        */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */

@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device HID Class                                                    */
 /**                                                                       */
@@ -51,23 +51,23 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_dcd_function)               DCD dispatch function         */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_dcd_function)               DCD dispatch function         */
 /*    _ux_device_stack_transfer_request     Process transfer request      */
-/*    _ux_utility_memory_copy               Memory copy                   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
+/*    _ux_utility_memory_copy               Memory copy                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*    Device Stack                                                        */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            verified memset and memcpy  */
@@ -78,8 +78,8 @@
 /*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_hid_descriptor_send(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type, 
-                                            ULONG request_index, ULONG host_length)
+UINT  _ux_device_class_hid_descriptor_send(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
+                                           ULONG request_index, ULONG host_length)
 {
 
 UX_SLAVE_DCD                    *dcd;
@@ -103,7 +103,7 @@ UCHAR                           interface_number = 0xFF;
 
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
-    
+
     /* Get the control endpoint associated with the device.  */
     endpoint =  &device -> ux_slave_device_control_endpoint;
 
@@ -112,7 +112,7 @@ UCHAR                           interface_number = 0xFF;
 
     /* Set the direction to OUT.  */
     transfer_request -> ux_slave_transfer_request_phase =  UX_TRANSFER_PHASE_DATA_OUT;
-    
+
     /* Shift the descriptor type in the low byte field.  */
     descriptor_type =  (UCHAR) ((descriptor_type >> 8) & 0xff);
 
@@ -121,12 +121,12 @@ UCHAR                           interface_number = 0xFF;
     {
 
     case UX_DEVICE_CLASS_HID_DESCRIPTOR_HID:
-    
+
         /* We should have a HID descriptor as part of the config descriptor.  */
         device_framework =  _ux_system_slave -> ux_system_slave_device_framework;
         device_framework_end = device_framework + _ux_system_slave -> ux_system_slave_device_framework_length;
 
-        /* Parse the device framework and locate the HID descriptor.  
+        /* Parse the device framework and locate the HID descriptor.
            There is only one HID descriptor.  */
         while (device_framework < device_framework_end)
         {
@@ -150,8 +150,8 @@ UCHAR                           interface_number = 0xFF;
                    and do not return more than what is allowed.  */
                 if (descriptor_length < host_length)
                     length =  descriptor_length;
-                else                            
-                    length =  host_length;                
+                else
+                    length =  host_length;
 
                 /* Check buffer length, since descriptor length may exceed buffer...  */
                 if (length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
@@ -169,13 +169,13 @@ UCHAR                           interface_number = 0xFF;
                 }
 
                 /* Copy the device descriptor into the transfer request memory.  */
-                _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
+                _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer,
                                             device_framework, length); /* Use case of memcpy is verified. */
 
                 /* We can return the configuration descriptor.  */
                 status =  _ux_device_stack_transfer_request(transfer_request, length, host_length);
                 break;
-                
+
             }
 
             /* Point to the next descriptor.  */
@@ -189,7 +189,7 @@ UCHAR                           interface_number = 0xFF;
         break;
 
     case UX_DEVICE_CLASS_HID_DESCRIPTOR_REPORT:
-        
+
         /* Get the length of entire configuration descriptor.  */
         descriptor_length =  hid -> ux_device_class_hid_report_length;
 
@@ -197,8 +197,8 @@ UCHAR                           interface_number = 0xFF;
            and do not return more than what is allowed.  */
         if (descriptor_length < host_length)
             length =  descriptor_length;
-        else                            
-            length =  host_length;                
+        else
+            length =  host_length;
 
         /* Check buffer length, since total descriptors length may exceed buffer...  */
         if (length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
@@ -216,17 +216,17 @@ UCHAR                           interface_number = 0xFF;
         }
 
         /* Copy the device descriptor into the transfer request memory.  */
-        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
+        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer,
                                     hid -> ux_device_class_hid_report_address, length); /* Use case of memcpy is verified. */
 
         /* We can return the report descriptor.  */
         status =  _ux_device_stack_transfer_request(transfer_request, length, host_length);
         break;
-        
+
     case UX_DEVICE_CLASS_HID_DESCRIPTOR_PHYSICAL:
-    
+
         /* Not treated for now.  Fall through and Stall endpoint.  */
-        
+
     default:
 
         /* Stall the endpoint.  */
@@ -237,4 +237,3 @@ UCHAR                           interface_number = 0xFF;
     /* Return the status to the caller.  */
     return(status);
 }
-
