@@ -1,12 +1,13 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -45,7 +46,7 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    hid_class                                 Address of hid class      */
+/*    hid_instance                              Address of hid class      */
 /*                                                container               */
 /*                                                                        */
 /*  OUTPUT                                                                */
@@ -145,7 +146,7 @@ ULONG                               temp;
 #endif
 
         /* Issue the transfer request.  */
-        status = _ux_device_stack_transfer_request(transfer, 
+        status = _ux_device_stack_transfer_request(transfer,
                     receiver -> ux_device_class_hid_receiver_event_buffer_size,
                     receiver -> ux_device_class_hid_receiver_event_buffer_size);
 
@@ -188,4 +189,4 @@ ULONG                               temp;
             receiver -> ux_device_class_hid_receiver_event_callback(hid);
     }
 }
-#endif
+#endif  /* UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT && !UX_DEVICE_STANDALONE */

@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device HID Class                                                    */
 /**                                                                       */
@@ -28,44 +29,44 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_hid_control_request                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_hid_control_request                PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function manages the based sent by the host on the control     */ 
-/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                 Pointer to hid class            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
+/*                                                                        */
+/*    This function manages the based sent by the host on the control     */
+/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                              Pointer to hid command         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_device_class_hid_report_get       Process Get_Report request    */
 /*    _ux_device_class_hid_report_set       Process Set_Report request    */
 /*    _ux_device_class_hid_descriptor_send  Send requested descriptor     */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    HID Class                                                           */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            prefixed UX to MS_TO_TICK,  */
@@ -119,10 +120,10 @@ UX_SLAVE_CLASS_HID          *hid;
 
     /* Duration - upper byte of wValue.  */
     duration       =   *(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_VALUE + 1);
-    
+
      /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;
-    
+
     /* Get the storage instance from this class container.  */
     hid =  (UX_SLAVE_CLASS_HID *) class_ptr -> ux_slave_class_instance;
 
@@ -149,8 +150,8 @@ UX_SLAVE_CLASS_HID          *hid;
 
             /* Send the requested descriptor to the host.  */
             _ux_device_class_hid_descriptor_send(hid, request_value, request_index, request_length);
-            break;            
-            
+            break;
+
         case UX_DEVICE_CLASS_HID_COMMAND_GET_IDLE:
         case UX_DEVICE_CLASS_HID_COMMAND_SET_IDLE:
 

@@ -201,7 +201,7 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 /* Define RNDIS Packet size and types supported.  */
 #define UX_DEVICE_CLASS_RNDIS_MAX_PACKET_PER_TRANSFER                           0x00000001
 #define UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE                          0x00000640
-#define UX_DEVICE_CLASS_RNDIS_PACKET_ALIGNEMENT_FACTOR                          0x00000003
+#define UX_DEVICE_CLASS_RNDIS_PACKET_ALIGNMENT_FACTOR                           0x00000003
 #define UX_DEVICE_CLASS_RNDIS_MAX_FRAME_SIZE                                    0x000005DC
 #define UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH                                 0x000005EA
 

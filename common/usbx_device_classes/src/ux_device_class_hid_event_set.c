@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device HID Class                                                    */
 /**                                                                       */
@@ -28,43 +29,43 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_hid_event_set                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_hid_event_set                      PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function sends an event to the hid class. It is processed      */ 
-/*    asynchronously by the interrupt thread.                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                      Address of hid class       */ 
-/*    event                                    Pointer of the event       */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                   UX_SUCCESS if there is an  */ 
-/*                                             event                      */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function sends an event to the hid class. It is processed      */
+/*    asynchronously by the interrupt thread.                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                      Address of hid class       */
+/*    event                                    Pointer of the event       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                   UX_SUCCESS if there is an  */
+/*                                             event                      */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_memory_copy                  Copy memory                */
 /*    _ux_device_event_flags_set               Set event flags            */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
@@ -83,8 +84,8 @@
 /*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid, 
-                                      UX_SLAVE_CLASS_HID_EVENT *hid_event)
+UINT  _ux_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
+                                     UX_SLAVE_CLASS_HID_EVENT *hid_event)
 {
 
 UX_DEVICE_CLASS_HID_EVENT   *current_hid_event;
@@ -100,7 +101,7 @@ UCHAR                       *next_position;
     /* If the pointer is NULL, the round robin buffer has not been activated.  */
     if (current_hid_event == UX_NULL)
         return (UX_ERROR);
-    
+
     /* Calculate the next position.  */
     next_position = (UCHAR *)current_hid_event + UX_DEVICE_CLASS_HID_EVENT_QUEUE_ITEM_SIZE(hid);
     if (next_position >= (UCHAR *)hid -> ux_device_class_hid_event_array_end)
@@ -143,13 +144,13 @@ UCHAR                       *next_position;
         _ux_utility_memory_copy(UX_DEVICE_CLASS_HID_EVENT_BUFFER(current_hid_event) + 1,
                                 hid_event -> ux_device_class_hid_event_buffer,
                                 hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
-    
+
         /* fill in the event structure from the user.  */
-        current_hid_event -> ux_device_class_hid_event_length =  hid_event -> ux_device_class_hid_event_length + 1;    
+        current_hid_event -> ux_device_class_hid_event_length =  hid_event -> ux_device_class_hid_event_length + 1;
     }
     else
     {
-    
+
         /* No report ID to consider.  */
 
         /* Store copy of data so application can free event there (easier use).  */
@@ -158,7 +159,7 @@ UCHAR                       *next_position;
                                 hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
 
         /* fill in the event structure from the user.  */
-        current_hid_event -> ux_device_class_hid_event_length = hid_event -> ux_device_class_hid_event_length;    
+        current_hid_event -> ux_device_class_hid_event_length = hid_event -> ux_device_class_hid_event_length;
     }
 
 #if defined(UX_DEVICE_STANDALONE)
@@ -170,7 +171,7 @@ UCHAR                       *next_position;
 #else
 
     /* Set an event to wake up the interrupt thread.  */
-    _ux_device_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_EVENT, UX_OR);                
+    _ux_device_event_flags_set(&hid -> ux_device_class_hid_event_flags_group, UX_DEVICE_CLASS_HID_NEW_EVENT, UX_OR);
 #endif
 
     /* Return event status to the user.  */
@@ -216,7 +217,7 @@ UCHAR                       *next_position;
 /*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _uxe_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid, 
+UINT  _uxe_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
                                       UX_SLAVE_CLASS_HID_EVENT *hid_event)
 {
 

@@ -1,42 +1,42 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   CDC_ECM Class                                                       */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_device_class_cdc_ecm.h                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_device_class_cdc_ecm.h                           PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the equivalences for the USBX Device Class        */ 
-/*    CDC_ECM component.                                                  */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This file defines the equivalences for the USBX Device Class        */
+/*    CDC_ECM component.                                                  */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -65,15 +65,15 @@
 #ifndef UX_DEVICE_CLASS_CDC_ECM_H
 #define UX_DEVICE_CLASS_CDC_ECM_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 #if !defined(UX_DEVICE_STANDALONE)
 #include "nx_api.h"
@@ -142,10 +142,10 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 #define UX_DEVICE_CLASS_CDC_ECM_ETHERNET_IP                                 0x0800
 #define UX_DEVICE_CLASS_CDC_ECM_ETHERNET_ARP                                0x0806
 #define UX_DEVICE_CLASS_CDC_ECM_ETHERNET_RARP                               0x8035
-#define UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE                        1536    
+#define UX_DEVICE_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE                        1536
 #define UX_DEVICE_CLASS_CDC_ECM_NX_ALIGN_PADDING                            2
 #ifndef UX_DEVICE_CLASS_CDC_ECM_NX_PKPOOL_ENTRIES
-#define UX_DEVICE_CLASS_CDC_ECM_NX_PKPOOL_ENTRIES                           16  
+#define UX_DEVICE_CLASS_CDC_ECM_NX_PKPOOL_ENTRIES                           16
 #endif
 
 #define UX_DEVICE_CLASS_CDC_ECM_NX_PACKET_SIZE                              sizeof(NX_PACKET)
@@ -174,10 +174,10 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 #define UX_DEVICE_CLASS_CDC_ECM_NX_ETHERNET_POOL_ALLOCSIZE                  (UX_DEVICE_CLASS_CDC_ECM_NX_PKPOOL_ENTRIES * UX_DEVICE_CLASS_CDC_ECM_NX_BUFF_SIZE + 32)
 
 #define UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE                               14
-#define UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH                              6  
-#define UX_DEVICE_CLASS_CDC_ECM_VENDOR_DESCRIPTION_MAX_LENGTH               64  
+#define UX_DEVICE_CLASS_CDC_ECM_NODE_ID_LENGTH                              6
+#define UX_DEVICE_CLASS_CDC_ECM_VENDOR_DESCRIPTION_MAX_LENGTH               64
 #define UX_DEVICE_CLASS_CDC_ECM_MAC_OPTIONS                                 8
-#define UX_DEVICE_CLASS_CDC_ECM_PACKET_HEADER_MSG                           1 
+#define UX_DEVICE_CLASS_CDC_ECM_PACKET_HEADER_MSG                           1
 
 /* Device CDC_ECM Requests */
 #define UX_DEVICE_CLASS_CDC_ECM_SEND_ENCAPSULATED_COMMAND                   0x00
@@ -202,7 +202,7 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 /* Define CDC_ECM Packet size and types supported.  */
 #define UX_DEVICE_CLASS_CDC_ECM_MAX_PACKET_PER_TRANSFER                     0x00000001
 #define UX_DEVICE_CLASS_CDC_ECM_MAX_PACKET_TRANSFER_SIZE                    0x00000640
-#define UX_DEVICE_CLASS_CDC_ECM_PACKET_ALIGNEMENT_FACTOR                    0x00000003
+#define UX_DEVICE_CLASS_CDC_ECM_PACKET_ALIGNMENT_FACTOR                     0x00000003
 #define UX_DEVICE_CLASS_CDC_ECM_MAX_FRAME_SIZE                              0x000005DC
 #define UX_DEVICE_CLASS_CDC_ECM_MAX_PACKET_LENGTH                           0x000005EA
 
@@ -381,7 +381,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
 
     ULONG                                   ux_slave_class_cdc_ecm_link_state;
     VOID                                    *ux_slave_class_cdc_ecm_network_handle;
-    
+
 } UX_SLAVE_CLASS_CDC_ECM;
 
 /* Define CDC ECM endpoint buffer settings (when CDC ECM owns buffer).  */
@@ -403,14 +403,14 @@ typedef struct UX_SLAVE_CLASS_CDC_ECM_STRUCT
 
 /* Requests - Ethernet Networking Control Model */
 
-#define UX_DEVICE_CLASS_CDC_ECM_SEND_ENCAPSULATED_COMMAND                        0x00        
+#define UX_DEVICE_CLASS_CDC_ECM_SEND_ENCAPSULATED_COMMAND                        0x00
                                         /* Issues a command in the format of the supported control
                                            protocol. The intent of this mechanism is to support
                                            networking devices (e.g., host-based cable modems)
                                            that require an additional vendor-defined interface for
                                            media specific hardware configuration and
                                            management.  */
-#define UX_DEVICE_CLASS_CDC_ECM_GET_ENCAPSULATED_RESPONSE                        0x01        
+#define UX_DEVICE_CLASS_CDC_ECM_GET_ENCAPSULATED_RESPONSE                        0x01
                                         /* Requests a response in the format of the supported
                                            control protocol.  */
 
@@ -438,13 +438,13 @@ VOID  _ux_device_class_cdc_ecm_interrupt_thread(ULONG cdc_ecm_class);
 /* Define Device CDC Class API prototypes.  */
 
 #define ux_device_class_cdc_ecm_entry    _ux_device_class_cdc_ecm_entry
-#define ux_device_class_cdc_ecm_read     _ux_device_class_cdc_ecm_read 
+#define ux_device_class_cdc_ecm_read     _ux_device_class_cdc_ecm_read
 #define ux_device_class_cdc_ecm_write    _ux_device_class_cdc_ecm_write
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif /* UX_DEVICE_CLASS_CDC_ECM_H */

@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -14,7 +14,7 @@
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   HID Class                                                           */
+/**   Device HID Class                                                    */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -389,7 +389,7 @@ typedef struct UX_SLAVE_CLASS_HID_PARAMETER_STRUCT
 
 /* Define HID Class function prototypes.  */
 UINT  _ux_device_class_hid_descriptor_send(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
-                                            ULONG request_index, ULONG host_length);
+                                           ULONG request_index, ULONG host_length);
 UINT  _ux_device_class_hid_activate(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command);
@@ -398,18 +398,18 @@ VOID  _ux_device_class_hid_interrupt_thread(ULONG hid_class);
 UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_uninitialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
-                                      UX_SLAVE_CLASS_HID_EVENT *hid_event);
+                                     UX_SLAVE_CLASS_HID_EVENT *hid_event);
 UINT  _ux_device_class_hid_event_check(UX_SLAVE_CLASS_HID *hid,
                                        UX_DEVICE_CLASS_HID_EVENT **hid_event);
 VOID  _ux_device_class_hid_event_free(UX_SLAVE_CLASS_HID *hid);
 UINT  _ux_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid,
-                                      UX_SLAVE_CLASS_HID_EVENT *hid_event);
+                                     UX_SLAVE_CLASS_HID_EVENT *hid_event);
 UINT  _ux_device_class_hid_report_set(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
-                                            ULONG request_index, ULONG host_length);
+                                      ULONG request_index, ULONG host_length);
 UINT  _ux_device_class_hid_report_get(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
-                                            ULONG request_index, ULONG host_length);
+                                      ULONG request_index, ULONG host_length);
 
-UINT  _ux_device_class_hid_tasks_run(VOID *class_instance);
+UINT  _ux_device_class_hid_tasks_run(VOID *hid_instance);
 
 UINT  _ux_device_class_hid_read(UX_SLAVE_CLASS_HID *hid,
                                 UCHAR *buffer, ULONG requested_length,
@@ -417,16 +417,16 @@ UINT  _ux_device_class_hid_read(UX_SLAVE_CLASS_HID *hid,
 
 VOID  _ux_device_class_hid_receiver_thread(ULONG hid_class);
 UINT  _ux_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
-                                    UX_SLAVE_CLASS_HID_PARAMETER *parameter,
-                                    UX_DEVICE_CLASS_HID_RECEIVER **receiver);
+                                               UX_SLAVE_CLASS_HID_PARAMETER *parameter,
+                                               UX_DEVICE_CLASS_HID_RECEIVER **receiver);
 VOID  _ux_device_class_hid_receiver_uninitialize(UX_DEVICE_CLASS_HID_RECEIVER *receiver);
 UINT  _ux_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
-                                UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
+                                              UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
 UINT  _ux_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 
 UINT  _ux_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid,
-                                UCHAR *buffer, ULONG requested_length,
-                                ULONG *actual_length);
+                                    UCHAR *buffer, ULONG requested_length,
+                                    ULONG *actual_length);
 UINT  _ux_device_class_hid_receiver_tasks_run(UX_SLAVE_CLASS_HID *hid);
 
 
@@ -436,16 +436,16 @@ UINT  _uxe_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
 UINT  _uxe_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid,
                                       UX_SLAVE_CLASS_HID_EVENT *hid_event);
 UINT  _uxe_device_class_hid_read(UX_SLAVE_CLASS_HID *hid,
-                                UCHAR *buffer, ULONG requested_length,
-                                ULONG *actual_length);
+                                 UCHAR *buffer, ULONG requested_length,
+                                 ULONG *actual_length);
 UINT  _uxe_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid,
-                                UCHAR *buffer, ULONG requested_length,
-                                ULONG *actual_length);
+                                     UCHAR *buffer, ULONG requested_length,
+                                     ULONG *actual_length);
 UINT  _uxe_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
-                                    UX_SLAVE_CLASS_HID_PARAMETER *parameter,
-                                    UX_DEVICE_CLASS_HID_RECEIVER **receiver);
+                                                UX_SLAVE_CLASS_HID_PARAMETER *parameter,
+                                                UX_DEVICE_CLASS_HID_RECEIVER **receiver);
 UINT  _uxe_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
-                                UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
+                                               UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
 UINT  _uxe_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 
 
@@ -493,4 +493,4 @@ UINT  _uxe_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 }
 #endif
 
-#endif
+#endif  /* UX_DEVICE_CLASS_HID_H */
