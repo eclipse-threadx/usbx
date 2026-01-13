@@ -215,6 +215,10 @@ typedef LONG                        SLONG;
 #define UX_SLAVE_REQUEST_DATA_MAX_LENGTH                    2048
 #endif
 
+#ifndef UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT
+#define UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT          8
+#endif
+
 #ifndef UX_USE_IO_INSTRUCTIONS
 
 /* Don't use IO instructions if this define is not set.  Default to memory mapped.  */
