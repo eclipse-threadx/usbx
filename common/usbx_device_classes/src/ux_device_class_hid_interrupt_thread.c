@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device HID Class                                                    */
 /**                                                                       */
@@ -29,47 +30,47 @@
 
 
 #if !defined(UX_DEVICE_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_hid_interrupt_thread               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_hid_interrupt_thread               PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the thread of the hid interrupt (IN) endpoint      */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is the thread of the hid interrupt (IN) endpoint      */
+/*                                                                        */
 /*    It's for RTOS mode.                                                 */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid_class                                 Address of hid class      */ 
-/*                                                container               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid_class                                 Address of hid class      */
+/*                                                container               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_event_flags_get           Get event flags               */
 /*    _ux_device_class_hid_event_get        Get HID event                 */
-/*    _ux_device_stack_transfer_request     Request transfer              */ 
-/*    _ux_utility_memory_copy               Copy memory                   */ 
+/*    _ux_device_stack_transfer_request     Request transfer              */
+/*    _ux_utility_memory_copy               Copy memory                   */
 /*    _ux_device_thread_suspend             Suspend thread                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            verified memset and memcpy  */
@@ -103,13 +104,13 @@ ULONG                       actual_flags;
 
     /* Cast properly the hid instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, hid_class)
-    
+
     /* Get the hid instance from this class container.  */
     hid =  (UX_SLAVE_CLASS_HID *) class_ptr -> ux_slave_class_instance;
-    
+
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
-    
+
     /* This thread runs forever but can be suspended or resumed.  */
     while(1)
     {
@@ -119,7 +120,7 @@ ULONG                       actual_flags;
 
         /* As long as the device is in the CONFIGURED state.  */
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
-        { 
+        {
 
             /* Wait until we have a event sent by the application
                or a change in the idle state to send last or empty report.  */
@@ -156,7 +157,7 @@ ULONG                       actual_flags;
                 }
 
                 /* Send the request to the device controller.  */
-                status =  _ux_device_stack_transfer_request(transfer_request_in, 
+                status =  _ux_device_stack_transfer_request(transfer_request_in,
                                 transfer_request_in -> ux_slave_transfer_request_requested_length,
                                 transfer_request_in -> ux_slave_transfer_request_requested_length);
 
@@ -195,13 +196,13 @@ ULONG                       actual_flags;
 #else
                 /* Prepare the event data payload from the hid event structure.  Get a pointer to the buffer area.  */
                 buffer =  transfer_request_in -> ux_slave_transfer_request_data_pointer;
-            
+
                 /* Copy the event buffer into the target buffer.  */
                 _ux_utility_memory_copy(buffer, UX_DEVICE_CLASS_HID_EVENT_BUFFER(hid_event), hid_event -> ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
 #endif
 
                 /* Send the request to the device controller.  */
-                status =  _ux_device_stack_transfer_request(transfer_request_in, hid_event -> ux_device_class_hid_event_length, 
+                status =  _ux_device_stack_transfer_request(transfer_request_in, hid_event -> ux_device_class_hid_event_length,
                                                             hid_event -> ux_device_class_hid_event_length);
 
                 /* The queue tail is handled and should be freed.  */
@@ -213,11 +214,11 @@ ULONG                       actual_flags;
 
                     /* Error trap. */
                     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, status);
-            }                
+            }
         }
-             
+
         /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
         _ux_device_thread_suspend(&class_ptr -> ux_slave_class_thread);
     }
 }
-#endif
+#endif  /* !UX_DEVICE_STANDALONE */

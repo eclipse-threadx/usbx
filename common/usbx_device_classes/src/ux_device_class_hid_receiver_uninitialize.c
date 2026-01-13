@@ -1,13 +1,15 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
+/**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
@@ -88,4 +90,4 @@ VOID _ux_device_class_hid_receiver_uninitialize(UX_DEVICE_CLASS_HID_RECEIVER *re
     /* Free receiver and events memory.  */
     _ux_utility_memory_free(receiver);
 }
-#endif
+#endif  /* UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT */
