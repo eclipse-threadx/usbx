@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Port Specific                                                       */
 /**                                                                       */
@@ -20,26 +20,26 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
-/*                                                                        */ 
-/*    ux_port.h                                         Cortex-A5x/AC6    */ 
-/*                                                           6.3.0        */ 
+/**************************************************************************/
 /*                                                                        */
-/*  AUTHOR                                                                */ 
-/*                                                                        */ 
-/*    TCRG, Express Logic, Inc.                                           */ 
-/*                                                                        */ 
-/*  DESCRIPTION                                                           */ 
-/*                                                                        */ 
-/*    This file contains data type definitions that make USBX function    */ 
-/*    identically on a variety of different processor architectures.      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    ux_port.h                                         Cortex-A5x/AC6    */
+/*                                                           6.3.0        */
+/*                                                                        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    TCRG, Express Logic, Inc.                                           */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file contains data type definitions that make USBX function    */
+/*    identically on a variety of different processor architectures.      */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            moved tx_api.h include and  */
@@ -49,8 +49,8 @@
 /*                                            added basic types guards,   */
 /*                                            improved SLONG typedef,     */
 /*                                            resulting in version 6.3.0  */
-/*                                                                        */ 
-/**************************************************************************/ 
+/*                                                                        */
+/**************************************************************************/
 
 #ifndef UX_PORT_H
 #define UX_PORT_H
@@ -61,7 +61,7 @@
 #ifdef UX_INCLUDE_USER_DEFINE_FILE
 
 
-/* Yes, include the user defines in ux_user.h. The defines in this file may 
+/* Yes, include the user defines in ux_user.h. The defines in this file may
    alternately be defined on the command line.  */
 
 #include "ux_user.h"
@@ -206,6 +206,10 @@ typedef LONG                        SLONG;
 #define UX_SLAVE_REQUEST_DATA_MAX_LENGTH                    4096
 #endif
 
+#ifndef UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT
+#define UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT          8
+#endif
+
 /* Define the extension to hold the control block for 64-bit mode.  */
 #define UX_THREAD_EXTENSION_PTR_SET(a, b)                   { \
                                                                 TX_THREAD *thread_ptr; \
@@ -271,7 +275,7 @@ VOID    outpl(ULONG,ULONG);
 /* Define the version ID of USBX.  This may be utilized by the application.  */
 
 #ifdef  UX_SYSTEM_INIT
-CHAR                            _ux_version_id[] = 
+CHAR                            _ux_version_id[] =
                                     "Copyright (c) 2024 Microsoft Corporation. * USBX Cortex-A5x/AC6 Version 6.4.1 *";
 #else
 extern  CHAR                    _ux_version_id[];
