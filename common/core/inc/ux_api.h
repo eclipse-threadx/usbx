@@ -350,7 +350,7 @@ typedef signed char               SCHAR;
 #define USBX_MINOR_VERSION            4
 #define USBX_PATCH_VERSION            5
 #define USBX_BUILD_VERSION            202504
-#define USBX_HOTFIX_VERSION           ' '
+#define USBX_HOTFIX_VERSION           'a'
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
 
