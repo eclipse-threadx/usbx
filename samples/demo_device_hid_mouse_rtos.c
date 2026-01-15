@@ -9,6 +9,7 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -22,7 +23,7 @@
 /**                                                                       */
 /**  This demonstration is not optimized, to optimize application user    */
 /**  should configure related class flag in ux_user.h and adjust          */
-/**  DEMO_STACK_SIZE and UX_DEVICE_MEMORY_STACK_SIZE                      */
+/**  UX_DEVICE_MEMORY_STACK_SIZE                                          */
 /**                                                                       */
 /**                                                                       */
 /**  AUTHOR                                                               */
@@ -32,9 +33,12 @@
 /**************************************************************************/
 /**************************************************************************/
 
-#include "tx_api.h"
 #include "ux_api.h"
 #include "ux_device_class_hid.h"
+
+#ifndef UX_DEVICE_SIDE_ONLY
+#error UX_DEVICE_SIDE_ONLY must be defined
+#endif
 
 /* if defined mouse with absolute positioning is a type of USB HID mouse that reports its position using
    absolute coordinates rather than relative movement deltas. This is common in touch devices, graphics tablets,
@@ -48,8 +52,8 @@
 /**************************************************/
 /**  Define constants                             */
 /**************************************************/
-#define DEMO_STACK_SIZE                 4*1024
-#define UX_DEVICE_MEMORY_STACK_SIZE     7*1024
+#define UX_DEVICE_MEMORY_STACK_SIZE     (7*1024)
+#define UX_DEMO_THREAD_STACK_SIZE       (1*1024)
 
 #define UX_DEMO_HID_DEVICE_VID          0x090A
 #define UX_DEMO_HID_DEVICE_PID          0x4036
@@ -70,10 +74,10 @@
 #endif
 
 #ifdef UX_DEMO_MOUSE_ABSOLUTE
-#define UX_DEMO_HID_MOUSE_CURSOR_MOVE           350
+#define UX_DEMO_HID_MOUSE_CURSOR_MOVE   350
 #else /* UX_DEMO_MOUSE_ABSOLUTE */
-#define UX_DEMO_HID_MOUSE_CURSOR_MOVE           3
-#define UX_DEMO_HID_MOUSE_CURSOR_MOVE_N         100
+#define UX_DEMO_HID_MOUSE_CURSOR_MOVE   3
+#define UX_DEMO_HID_MOUSE_CURSOR_MOVE_N 100
 #endif /* UX_DEMO_MOUSE_ABSOLUTE */
 
 #define UX_MOUSE_CURSOR_MOVE_RIGHT      0x00
@@ -102,23 +106,11 @@ VOID ux_demo_device_hid_thread_entry(ULONG thread_input);
 /**************************************************/
 /**  usbx device hid demo mouse                   */
 /**************************************************/
-UINT ux_demo_hid_mouse_buttons(UX_SLAVE_CLASS_HID *device_hid);
-UINT ux_demo_hid_mouse_scroll_wheel(UX_SLAVE_CLASS_HID *device_hid);
 #ifndef UX_DEMO_MOUSE_ABSOLUTE
 UINT ux_demo_hid_mouse_cursor_move(UX_SLAVE_CLASS_HID *device_hid);
 #else
 UINT ux_demo_hid_mouse_absolute_cursor_move(UX_SLAVE_CLASS_HID *device_hid);
 #endif /* UX_DEMO_MOUSE_ABSOLUTE */
-
-/**************************************************/
-/**  usbx callback error                          */
-/**************************************************/
-VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code);
-
-#ifndef EXTERNAL_MAIN
-extern int board_setup(void);
-#endif /* EXTERNAL_MAIN */
-extern int usb_device_dcd_initialize(void *param);
 
 /**************************************************/
 /**  usbx device hid mouse instance               */
@@ -128,7 +120,20 @@ UX_SLAVE_CLASS_HID *hid_mouse;
 /**************************************************/
 /**  thread object                                */
 /**************************************************/
-static TX_THREAD ux_hid_thread;
+static UX_THREAD ux_hid_thread;
+static ULONG ux_hid_thread_stack[UX_DEMO_THREAD_STACK_SIZE / sizeof(ULONG)];
+
+/**************************************************/
+/**  usbx callback error                          */
+/**************************************************/
+static VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code);
+
+static CHAR ux_system_memory_pool[UX_DEVICE_MEMORY_STACK_SIZE];
+
+#ifndef EXTERNAL_MAIN
+extern int board_setup(void);
+#endif /* EXTERNAL_MAIN */
+extern int usb_device_dcd_initialize(void *param);
 
 /**************************************************/
 /**  HID Report descriptor                        */
@@ -395,16 +400,14 @@ int main(void)
 
 VOID tx_application_define(VOID *first_unused_memory)
 {
-CHAR                            *stack_pointer;
 CHAR                            *memory_pointer;
 UINT                            status;
 UX_SLAVE_CLASS_HID_PARAMETER    hid_mouse_parameter;
 
-    /* Initialize the free memory pointer.  */
-    stack_pointer =  (CHAR *) first_unused_memory;
+    UX_PARAMETER_NOT_USED(first_unused_memory);
 
-    /* Initialize the RAM disk memory. */
-    memory_pointer =  stack_pointer +  DEMO_STACK_SIZE;
+    /* Use static memory block.  */
+    memory_pointer = ux_system_memory_pool;
 
     /* Initialize USBX Memory */
     status = ux_system_initialize(memory_pointer, UX_DEVICE_MEMORY_STACK_SIZE, UX_NULL, 0);
@@ -440,8 +443,8 @@ UX_SLAVE_CLASS_HID_PARAMETER    hid_mouse_parameter;
 
     /* Create the main demo thread.  */
     status = ux_utility_thread_create(&ux_hid_thread, "hid_usbx_app_thread_entry",
-                                      ux_demo_device_hid_thread_entry, 0, stack_pointer,
-                                      512, 20, 20, 1, TX_AUTO_START);
+                                      ux_demo_device_hid_thread_entry, 0, ux_hid_thread_stack,
+                                      UX_DEMO_THREAD_STACK_SIZE, 20, 20, 1, UX_AUTO_START);
 
     if(status != UX_SUCCESS)
         return;
@@ -723,7 +726,7 @@ static UCHAR                mouse_move_dir;
 }
 #endif /* UX_DEMO_MOUSE_ABSOLUTE */
 
-VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code)
+static VOID ux_demo_error_callback(UINT system_level, UINT system_context, UINT error_code)
 {
     /*
      * Refer to ux_api.h. For example,
