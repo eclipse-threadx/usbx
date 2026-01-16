@@ -440,7 +440,10 @@ USB_NETWORK_DEVICE_TYPE     *ux_nx_device;
             current_packet =  asix -> ux_host_class_asix_xmit_queue;
 
             /* Get the next packet associated with the first packet.  */
-            next_packet = current_packet -> nx_packet_queue_next;
+            if(current_packet != UX_NULL)
+                next_packet = current_packet -> nx_packet_queue_next;
+            else
+                next_packet = UX_NULL;
 
             /* Parse all these packets that were scheduled.  */
             while (current_packet != UX_NULL)
