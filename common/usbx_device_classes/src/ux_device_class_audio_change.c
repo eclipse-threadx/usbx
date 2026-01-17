@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -51,6 +51,7 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
+/*    _ux_utility_thread_resume         Resume a suspended thread         */
 /*    _ux_system_error_handler          System error trap                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
@@ -149,7 +150,7 @@ ULONG                                    endpoint_dir;
                         UX_ENDPOINT_OUT: UX_ENDPOINT_IN;
 #else
 
-        endpoint_dir = (stream -> ux_device_class_audio_stream_thread.tx_thread_entry ==
+        endpoint_dir = (_ux_device_thread_entry(&stream -> ux_device_class_audio_stream_thread) ==
                         _ux_device_class_audio_read_thread_entry) ?
                         UX_ENDPOINT_OUT : UX_ENDPOINT_IN;
 #endif

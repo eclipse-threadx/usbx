@@ -180,26 +180,31 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #if !defined(UX_STANDALONE)
 #define _ux_system_semaphore_create                             _ux_utility_semaphore_create
 #define _ux_system_semaphore_create_norc                        _ux_utility_semaphore_create
-#define _ux_system_semaphore_created(sem)                       ((sem)->tx_semaphore_id != UX_EMPTY)
 #define _ux_system_semaphore_get                                _ux_utility_semaphore_get
 #define _ux_system_semaphore_get_norc                           _ux_utility_semaphore_get
-#define _ux_system_semaphore_waiting(sem)                       ((sem)->tx_semaphore_count != 0)
 #define _ux_system_semaphore_delete                             _ux_utility_semaphore_delete
 #define _ux_system_semaphore_put                                _ux_utility_semaphore_put
 #define _ux_system_thread_create                                _ux_utility_thread_create
 #define _ux_system_thread_create_norc                           _ux_utility_thread_create
-#define _ux_system_thread_created(t)                            ((t)->tx_thread_id != UX_EMPTY)
 #define _ux_system_thread_delete                                _ux_utility_thread_delete
 #define _ux_system_mutex_create                                 _ux_utility_mutex_create
 #define _ux_system_mutex_delete                                 _ux_utility_mutex_delete
 #define _ux_system_mutex_off                                    _ux_utility_mutex_off
 #define _ux_system_mutex_on                                     _ux_utility_mutex_on
 #define _ux_system_event_flags_create                           _ux_utility_event_flags_create
-#define _ux_system_event_flags_created(e)                       ((e)->tx_event_flags_group_id != UX_EMPTY)
 #define _ux_system_event_flags_delete                           _ux_utility_event_flags_delete
 #define _ux_system_event_flags_get                              _ux_utility_event_flags_get
 #define _ux_system_event_flags_set                              _ux_utility_event_flags_set
 #define _ux_system_event_flags_set_rc                           _ux_utility_event_flags_set
+#ifdef TX_API_H
+#define _ux_system_thread_entry(t)                              ((t)->tx_thread_entry)
+#define _ux_system_thread_created(t)                            ((t)->tx_thread_id != UX_EMPTY)
+#define _ux_system_semaphore_created(sem)                       ((sem)->tx_semaphore_id != UX_EMPTY)
+#define _ux_system_semaphore_waiting(sem)                       ((sem)->tx_semaphore_count != 0)
+#define _ux_system_event_flags_created(e)                       ((e)->tx_event_flags_group_id != UX_EMPTY)
+#define _ux_system_mutex_created(m)                             ((m)->tx_mutex_id != UX_EMPTY)
+#define _ux_system_mutex_suspended_count(m)                     ((m)->tx_mutex_suspended_count)
+#endif /* TX_API_H */
 #else
 #define _ux_system_semaphore_create(sem,name,cnt)               (UX_SUCCESS)
 #define _ux_system_semaphore_create_norc(sem,name,cnt)          do{}while(0)
@@ -223,18 +228,16 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_system_event_flags_get(g,req,gopt,actual,wopt)      (*actual = 0)
 #define _ux_system_event_flags_set(g,flags,option)              do{(void)flags;}while(0)
 #define _ux_system_event_flags_set_rc(g,flags,option)           (UX_SUCCESS)
+#define _ux_system_mutex_created(m)                             (UX_FALSE)
 #endif
 
 #if !defined(UX_DEVICE_STANDALONE)
 #define _ux_device_thread_create                                _ux_utility_thread_create
 #define _ux_device_thread_delete                                _ux_utility_thread_delete
-#define _ux_device_thread_entry(t)                              ((t)->tx_thread_entry)
 #define _ux_device_thread_suspend                               _ux_utility_thread_suspend
 #define _ux_device_thread_resume                                _ux_utility_thread_resume
 #define _ux_device_thread_relinquish                            _ux_utility_thread_relinquish
 #define _ux_device_semaphore_create                             _ux_utility_semaphore_create
-#define _ux_device_semaphore_created(sem)                       ((sem)->tx_semaphore_id != 0)
-#define _ux_device_semaphore_waiting(sem)                       ((sem)->tx_semaphore_count != 0)
 #define _ux_device_semaphore_delete                             _ux_utility_semaphore_delete
 #define _ux_device_semaphore_get                                _ux_utility_semaphore_get
 #define _ux_device_semaphore_put                                _ux_utility_semaphore_put
@@ -246,6 +249,15 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_device_event_flags_delete                           _ux_utility_event_flags_delete
 #define _ux_device_event_flags_get                              _ux_utility_event_flags_get
 #define _ux_device_event_flags_set                              _ux_utility_event_flags_set
+#ifdef TX_API_H
+#define _ux_device_thread_entry(t)                              ((t)->tx_thread_entry)
+#define _ux_device_thread_created(t)                            ((t)->tx_thread_id != UX_EMPTY)
+#define _ux_device_semaphore_created(sem)                       ((sem)->tx_semaphore_id != UX_EMPTY)
+#define _ux_device_semaphore_waiting(sem)                       ((sem)->tx_semaphore_count != 0)
+#define _ux_device_event_flags_created(e)                       ((e)->tx_event_flags_group_id != UX_EMPTY)
+#define _ux_device_mutex_created(m)                             ((m)->tx_mutex_id != UX_EMPTY)
+#define _ux_device_mutex_suspended_count(m)                     ((m)->tx_mutex_suspended_count)
+#endif /* TX_API_H */
 #else
 #define _ux_device_thread_create(t,name,entry,entry_param,stack,stack_size,priority,preempt_threshold,time_slice,auto_start) (UX_SUCCESS)
 #define _ux_device_thread_delete(t)                             do{}while(0)
@@ -267,20 +279,18 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_device_event_flags_delete(g)                        do{}while(0)
 #define _ux_device_event_flags_get(g,req,gopt,actual,wopt)      do{}while(0)
 #define _ux_device_event_flags_set(g,flags,option)              do{}while(0)
+#define _ux_device_event_flags_created(e)                       (UX_FALSE)
+#define _ux_device_mutex_created(m)                             (UX_FALSE)
 #endif
 
 
 #if !defined(UX_HOST_STANDALONE)
 #define _ux_host_thread_create                                  _ux_utility_thread_create
-#define _ux_host_thread_created(thr)                            ((thr)->tx_thread_id != 0)
 #define _ux_host_thread_delete                                  _ux_utility_thread_delete
-#define _ux_host_thread_entry(thr)                              ((thr)->tx_thread_entry)
 #define _ux_host_thread_resume                                  _ux_utility_thread_resume
 #define _ux_host_thread_sleep                                   _ux_utility_thread_sleep
 #define _ux_host_thread_schedule_other                          _ux_utility_thread_schedule_other
 #define _ux_host_semaphore_create                               _ux_utility_semaphore_create
-#define _ux_host_semaphore_created(sem)                         ((sem)->tx_semaphore_id != 0)
-#define _ux_host_semaphore_waiting(sem)                         ((sem)->tx_semaphore_count != 0)
 #define _ux_host_semaphore_delete                               _ux_utility_semaphore_delete
 #define _ux_host_semaphore_get                                  _ux_utility_semaphore_get
 #define _ux_host_semaphore_get_norc                             _ux_utility_semaphore_get
@@ -296,6 +306,15 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_host_event_flags_set                                _ux_utility_event_flags_set
 #define _ux_host_timer_create                                   _ux_utility_timer_create
 #define _ux_host_timer_delete                                   _ux_utility_timer_delete
+#ifdef TX_API_H
+#define _ux_host_thread_entry(t)                                ((t)->tx_thread_entry)
+#define _ux_host_thread_created(t)                              ((t)->tx_thread_id != UX_EMPTY)
+#define _ux_host_semaphore_created(sem)                         ((sem)->tx_semaphore_id != UX_EMPTY)
+#define _ux_host_semaphore_waiting(sem)                         ((sem)->tx_semaphore_count != 0)
+#define _ux_host_event_flags_created(e)                         ((e)->tx_event_flags_group_id != UX_EMPTY)
+#define _ux_host_mutex_created(m)                               ((m)->tx_mutex_id != UX_EMPTY)
+#define _ux_host_mutex_suspended_count(m)                       ((m)->tx_mutex_suspended_count)
+#endif /* TX_API_H */
 #else
 #define _ux_host_thread_create(t,name,entry,entry_param,stack,stack_size,priority,preempt_threshold,time_slice,auto_start) (UX_SUCCESS)
 #define _ux_host_thread_created(t)                              (UX_FALSE)
@@ -322,6 +341,8 @@ extern  ALIGN_TYPE  _ux_utility_time_elapsed(ALIGN_TYPE, ALIGN_TYPE);
 #define _ux_host_event_flags_set(g,flags,option)                do{}while(0)
 #define _ux_host_timer_create(t,name,func,arg,tick0,tick1,flag) (UX_SUCCESS)
 #define _ux_host_timer_delete(t)                                do{}while(0)
+#define _ux_host_event_flags_created(e)                         (UX_FALSE)
+#define _ux_host_mutex_created(m)                               (UX_FALSE)
 #endif
 
 

@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -243,7 +243,7 @@ ULONG                                   descriptor_length;
     /* The last resource, thread is not created or created error, no need to free.  */
     if (dfu -> ux_slave_class_dfu_thread_stack)
         _ux_utility_memory_free(dfu -> ux_slave_class_dfu_thread_stack);
-    if (dfu -> ux_slave_class_dfu_event_flags_group.tx_event_flags_group_id != 0)
+    if (_ux_device_event_flags_created(&dfu -> ux_slave_class_dfu_event_flags_group))
         _ux_utility_event_flags_delete(&dfu -> ux_slave_class_dfu_event_flags_group);
 #endif
 
