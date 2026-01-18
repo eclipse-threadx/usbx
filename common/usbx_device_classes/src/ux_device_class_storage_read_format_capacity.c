@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -34,47 +34,46 @@
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_read_format_capacity       PORTABLE C      */ 
-/*                                                           6.3.0        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_read_format_capacity       PORTABLE C      */
+/*                                                           6.4.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a READ_FORMAT_CAPACITY command.              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a READ_FORMAT_CAPACITY command.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    lun                                   Logical unit number           */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_utility_long_put_big_endian       Put 32-bit big endian         */
-/*    _ux_utility_memory_copy               Copy memory                   */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized command logic,    */
@@ -88,11 +87,14 @@
 /*                                            checked compiling options   */
 /*                                            by runtime UX_ASSERT,       */
 /*                                            resulting in version 6.3.0  */
+/*  01-20-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support load eject media    */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_read_format_capacity(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
-                                            UX_SLAVE_ENDPOINT *endpoint_in,
-                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb)
+                                                    UX_SLAVE_ENDPOINT *endpoint_in,
+                                                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb)
 {
 
 UINT                    status;
@@ -107,6 +109,20 @@ UCHAR                   *read_format_capacity_buffer;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_READ_FORMAT_CAPACITY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
+
+    if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_medium_loaded_status == 0)
+    {
+        /* Media not loaded. Set NOT READY sense code.  */
+        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+            UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(UX_SLAVE_CLASS_STORAGE_SENSE_KEY_NOT_READY,
+                                                 UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_PRESENT, 0x00);
+
+        /* Return CSW with failure.  */
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
+
+        /* Return completion status.  */
+        return(UX_SUCCESS);
+    }
 
     /* Obtain the pointer to the transfer request.  */
     transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
@@ -129,7 +145,7 @@ UCHAR                   *read_format_capacity_buffer;
                                     storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_block_length);
 
     /* Insert the response code : always 2.  */
-    read_format_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_FORMAT_CAPACITY_RESPONSE_DESC_CODE] =  2;    
+    read_format_capacity_buffer[UX_SLAVE_CLASS_STORAGE_READ_FORMAT_CAPACITY_RESPONSE_DESC_CODE] =  2;
 
 #if defined(UX_DEVICE_STANDALONE)
 
@@ -148,9 +164,9 @@ UCHAR                   *read_format_capacity_buffer;
 #else
 
     /* Send a data payload with the read_capacity response buffer.  */
-    _ux_device_stack_transfer_request(transfer_request, 
-                                  UX_SLAVE_CLASS_STORAGE_READ_FORMAT_CAPACITY_RESPONSE_LENGTH,
-                                  UX_SLAVE_CLASS_STORAGE_READ_FORMAT_CAPACITY_RESPONSE_LENGTH);
+    _ux_device_stack_transfer_request(transfer_request,
+                                      UX_SLAVE_CLASS_STORAGE_READ_FORMAT_CAPACITY_RESPONSE_LENGTH,
+                                      UX_SLAVE_CLASS_STORAGE_READ_FORMAT_CAPACITY_RESPONSE_LENGTH);
 #endif
 
     /* Now we set the CSW with success.  */
@@ -160,4 +176,3 @@ UCHAR                   *read_format_capacity_buffer;
     /* Return completion status.  */
     return(status);
 }
-

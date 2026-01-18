@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -29,40 +29,40 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_activate                   PORTABLE C      */ 
-/*                                                           6.3.0        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_activate                   PORTABLE C      */
+/*                                                           6.4.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function activates the USB storage device.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to storage command    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_thread_resume              Resume thread                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function activates the USB storage device.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to storage command    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_thread_resume              Resume thread                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -77,15 +77,19 @@
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            resulting in version 6.3.0  */
+/*  01-20-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support load eject media    */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_activate(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
+
 UINT                                    status = UX_SUCCESS;
 UX_SLAVE_INTERFACE                      *interface_ptr;
 UX_SLAVE_CLASS                          *class_ptr;
 UX_SLAVE_CLASS_STORAGE                  *storage;
+ULONG                                   lun_index;
 #if defined(UX_DEVICE_STANDALONE)
 UX_SLAVE_ENDPOINT                       *endpoint;
 #endif
@@ -99,17 +103,17 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
     /* Get the interface that owns this instance.  */
     interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
-    
+
     /* Store the class instance into the interface.  */
     interface_ptr -> ux_slave_interface_class_instance =  (VOID *)storage;
-         
+
     /* Now the opposite, store the interface in the class instance.  */
     storage -> ux_slave_class_storage_interface =  interface_ptr;
 
 #if !defined(UX_DEVICE_STANDALONE)
 
     /* Resume thread.  */
-    _ux_device_thread_resume(&class_ptr -> ux_slave_class_thread); 
+    _ux_device_thread_resume(&class_ptr -> ux_slave_class_thread);
 
 #else
 
@@ -130,7 +134,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
         /* We found the IN endpoint first.  */
         storage -> ux_device_class_storage_ep_in = endpoint;
-            
+
         /* So the next endpoint has to be the OUT endpoint.  */
         storage -> ux_device_class_storage_ep_out = endpoint -> ux_slave_endpoint_next_endpoint;
     }
@@ -162,13 +166,20 @@ UX_SLAVE_ENDPOINT                       *endpoint;
     status = UX_SUCCESS;
 #endif
 
+    /* Default when activating storage device: media removal is allowed (not prevented) and loaded.  */
+    for (lun_index = 0; lun_index < storage -> ux_slave_class_storage_number_lun; lun_index++)
+    {
+        storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_prevent_medium_removal = 0;
+        storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_medium_loaded_status = 1;
+    }
+
     /* If there is a activate function call it.  */
     if (storage -> ux_slave_class_storage_instance_activate != UX_NULL)
-    {        
+    {
         /* Invoke the application.  */
         storage -> ux_slave_class_storage_instance_activate(storage);
     }
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_ACTIVATE, storage, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 

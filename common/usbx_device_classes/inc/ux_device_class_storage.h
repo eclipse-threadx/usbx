@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -25,7 +25,7 @@
 /*  COMPONENT DEFINITION                                   RELEASE        */
 /*                                                                        */
 /*    ux_device_class_storage.h                           PORTABLE C      */
-/*                                                           6.3.0        */
+/*                                                           6.4.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -61,21 +61,24 @@
 /*                                            endpoint buffer in classes, */
 /*                                            added error checks support, */
 /*                                            resulting in version 6.3.0  */
+/*  01-20-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support load eject media    */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_STORAGE_H
 #define UX_DEVICE_CLASS_STORAGE_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -107,12 +110,15 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_PROTOCOL_BO                          0x50
 
 /* Define Storage Class USB MEDIA types.  */
-#define UX_SLAVE_CLASS_STORAGE_MEDIA_FAT_DISK                       0
-#define UX_SLAVE_CLASS_STORAGE_MEDIA_CDROM                          5
-#define UX_SLAVE_CLASS_STORAGE_MEDIA_OPTICAL_DISK                   7
+#define UX_SLAVE_CLASS_STORAGE_MEDIA_FAT_DISK                       0x00
+#define UX_SLAVE_CLASS_STORAGE_MEDIA_CDROM                          0x05
+#define UX_SLAVE_CLASS_STORAGE_MEDIA_OPTICAL_DISK                   0x07
 #define UX_SLAVE_CLASS_STORAGE_MEDIA_IOMEGA_CLICK                   0x55
 
+/* Define Storage Class USB medium removable type.  */
 
+#define UX_SLAVE_CLASS_STORAGE_MEDIA_IS_NOT_REMOVABLE              0x00
+#define UX_SLAVE_CLASS_STORAGE_MEDIA_IS_REMOVABLE                  (1u<<8)
 
 /* Define Storage Class SCSI command constants.  */
 
@@ -308,23 +314,27 @@ extern   "C" {
 
 /* Define Storage Class SCSI sense key definition constants.  */
 
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_NO_SENSE                   0x0
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_RECOVERED_ERROR            0x1
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_NOT_READY                  0x2
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_MEDIUM_ERROR               0x3
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_HARDWARE_ERROR             0x4
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ILLEGAL_REQUEST            0x5
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_UNIT_ATTENTION             0x6
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_DATA_PROTECT               0x7
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_BLANK_CHECK                0x8
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ABORTED_COMMAND            0x0b
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_VOLUME_OVERFLOW            0x0d
-#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_MISCOMPARE                 0x0e
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_NO_SENSE                   0x00
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_RECOVERED_ERROR            0x01
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_NOT_READY                  0x02
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_MEDIUM_ERROR               0x03
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_HARDWARE_ERROR             0x04
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ILLEGAL_REQUEST            0x05
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_UNIT_ATTENTION             0x06
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_DATA_PROTECT               0x07
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_BLANK_CHECK                0x08
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_ABORTED_COMMAND            0x0B
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_VOLUME_OVERFLOW            0x0D
+#define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_MISCOMPARE                 0x0E
 
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_READY                 0x04
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_WRITE_PROTECTED           0x27
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_READY_TO_READY        0x28
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_PRESENT               0x3A
 
 /* Define Storage Class SCSI sense key definition constants.  */
 
-#define UX_SLAVE_CLASS_STORAGE_REQUEST_CODE_MEDIA_PROTECTED         0x27
+#define UX_SLAVE_CLASS_STORAGE_REQUEST_CODE_MEDIA_PROTECTED             0x27
 
 /* Define Storage Class SCSI GET CONFIGURATION command constants.  */
 
@@ -335,13 +345,13 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_GET_CONFIGURATION_COMMAND_LENGTH_SBC     9
 
 /* Define Storage Class SCSI ASC return codes.  */
-#define UX_SLAVE_CLASS_STORAGE_ASC_KEY_INVALID_COMMAND              0x20
+#define UX_SLAVE_CLASS_STORAGE_ASC_KEY_INVALID_COMMAND                  0x20
 
 /* Define Storage Class CSW status.  */
 
-#define UX_SLAVE_CLASS_STORAGE_CSW_PASSED                           0
-#define UX_SLAVE_CLASS_STORAGE_CSW_FAILED                           1
-#define UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR                      2
+#define UX_SLAVE_CLASS_STORAGE_CSW_PASSED                               0x00
+#define UX_SLAVE_CLASS_STORAGE_CSW_FAILED                               0x01
+#define UX_SLAVE_CLASS_STORAGE_CSW_PHASE_ERROR                          0x02
 
 /* Define generic SCSI values.  */
 
@@ -351,15 +361,32 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_INQUIRY_PERIPHERAL_TYPE                  0x00
 #define UX_SLAVE_CLASS_STORAGE_RESET                                    0xff
 #define UX_SLAVE_CLASS_STORAGE_GET_MAX_LUN                              0xfe
-#define UX_SLAVE_CLASS_STORAGE_MAX_LUN                                  0
-#define UX_SLAVE_CLASS_STORAGE_RESPONSE_LENGTH                          64
+#define UX_SLAVE_CLASS_STORAGE_MAX_LUN                                  0x00
+#define UX_SLAVE_CLASS_STORAGE_RESPONSE_LENGTH                          0x40
 
 /* Define Storage Class SCSI read disk information command constants.  */
 
-#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_OPERATION          0
-#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_STATUS             2
-#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_ALLOCATION_LENGTH  7
-#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_LENGTH             10
+#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_OPERATION          0x00
+#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_STATUS             0x02
+#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_ALLOCATION_LENGTH  0x07
+#define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_LENGTH             0x0A
+
+/* Define Storage Class (SBC-4) POWER CONDITION constants.  */
+
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_START_VALID              0x00
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_ACTIVE                   0x01
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_IDLE                     0x02
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_STANDBY                  0x03
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_LU_CONTROL               0x07
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_FORCE_IDLE_0             0x0A
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_FORCE_STANDBY_0          0x0B
+
+/* Define Storage Class (SBC-4) PREVENT constants.  */
+
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_REMOVAL_IS_ALLOWED                0x00
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_REMOVAL_SHALL_BE_PREVENTED        0x01
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_PREVENT_OBSOLETE_2                0x02
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_PREVENT_OBSOLETE_3                0x03
 
 /* Define Storage Class Feature Descriptor generic format.  */
 
@@ -504,12 +531,17 @@ typedef struct UX_SLAVE_CLASS_STORAGE_LUN_STRUCT
     ULONG           ux_slave_class_storage_request_sense_status;
     ULONG           ux_slave_class_storage_disk_status;
     ULONG           ux_slave_class_storage_last_session_state;
+    ULONG           ux_slave_class_storage_prevent_medium_removal;
+    ULONG           ux_slave_class_storage_medium_loaded_status;
 
     UINT            (*ux_slave_class_storage_media_read)(VOID *storage, ULONG lun, UCHAR *data_pointer, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_write)(VOID *storage, ULONG lun, UCHAR *data_pointer, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_flush)(VOID *storage, ULONG lun, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_status)(VOID *storage, ULONG lun, ULONG media_id, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_notification)(VOID *storage, ULONG lun, ULONG media_id, ULONG notification_class, UCHAR **media_notification, ULONG *media_notification_length);
+
+    /* Optional callback invoked when load/eject media is requested.  */
+    UINT            (*ux_slave_class_storage_media_start_stop)(VOID *storage, ULONG lun, ULONG power_condition, ULONG start, ULONG load_eject);
 } UX_SLAVE_CLASS_STORAGE_LUN;
 
 /* Sense status value (key at bit0-7, code at bit8-15 and qualifier at bit16-23).  */
@@ -605,64 +637,76 @@ UINT    _ux_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_storage_uninitialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_storage_activate(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_storage_control_request(UX_SLAVE_CLASS_COMMAND *command);
-UINT    _ux_device_class_storage_csw_send(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in, UCHAR csw_status);
+UINT    _ux_device_class_storage_csw_send(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                          UX_SLAVE_ENDPOINT *endpoint_in, UCHAR csw_status);
 UINT    _ux_device_class_storage_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_storage_entry(UX_SLAVE_CLASS_COMMAND *command);
-UINT    _ux_device_class_storage_format(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_mode_select(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_prevent_allow_media_removal(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
-                    UX_SLAVE_ENDPOINT *endpoint_in, UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb);
-UINT    _ux_device_class_storage_read(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command);
-UINT    _ux_device_class_storage_read_capacity(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_read_format_capacity(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_read_toc(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb);
-UINT    _ux_device_class_storage_request_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_start_stop(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_test_ready(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-VOID    _ux_device_class_storage_thread(ULONG storage_instance);
-UINT    _ux_device_class_storage_verify(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_write(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command);
-UINT    _ux_device_class_storage_synchronize_cache(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command);
-UINT    _ux_device_class_storage_read_disk_information(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+UINT    _ux_device_class_storage_format(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                        UX_SLAVE_ENDPOINT *endpoint_in,
+                                        UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                         UX_SLAVE_ENDPOINT *endpoint_in,
+                                         UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_mode_select(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                             UX_SLAVE_ENDPOINT *endpoint_in,
+                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
                                             UX_SLAVE_ENDPOINT *endpoint_in,
                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_prevent_allow_media_removal(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                                             UX_SLAVE_ENDPOINT *endpoint_in,
+                                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_read(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                      UX_SLAVE_ENDPOINT *endpoint_in,
+                                      UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command);
+UINT    _ux_device_class_storage_read_capacity(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                               UX_SLAVE_ENDPOINT *endpoint_in,
+                                               UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_read_format_capacity(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                                      UX_SLAVE_ENDPOINT *endpoint_in,
+                                                      UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_read_toc(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                          UX_SLAVE_ENDPOINT *endpoint_in,
+                                          UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb);
+UINT    _ux_device_class_storage_request_sense(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                               UX_SLAVE_ENDPOINT *endpoint_in,
+                                               UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_start_stop(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                            UX_SLAVE_ENDPOINT *endpoint_in,
+                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_test_ready(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                            UX_SLAVE_ENDPOINT *endpoint_in,
+                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+VOID    _ux_device_class_storage_thread(ULONG storage_instance);
+UINT    _ux_device_class_storage_verify(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                        UX_SLAVE_ENDPOINT *endpoint_in,
+                                        UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_write(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                       UX_SLAVE_ENDPOINT *endpoint_in,
+                                       UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command);
+UINT    _ux_device_class_storage_synchronize_cache(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                                   UX_SLAVE_ENDPOINT *endpoint_in,
+                                                   UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command);
+UINT    _ux_device_class_storage_read_disk_information(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                                        UX_SLAVE_ENDPOINT *endpoint_in,
+                                                        UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
 
 UINT    _ux_device_class_storage_get_configuration(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
-                                            UX_SLAVE_ENDPOINT *endpoint_in,
-                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+                                                   UX_SLAVE_ENDPOINT *endpoint_in,
+                                                   UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
 UINT    _ux_device_class_storage_get_status_notification(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                                         UX_SLAVE_ENDPOINT *endpoint_in,
+                                                         UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+UINT    _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
                                             UX_SLAVE_ENDPOINT *endpoint_in,
                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
-UINT    _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage,
-                                            ULONG               lun,
-                                            UX_SLAVE_ENDPOINT   *endpoint_in,
-                                            UX_SLAVE_ENDPOINT   *endpoint_out,
-                                            UCHAR               *cbwcb);
 
-UINT    _ux_device_class_storage_get_performance(UX_SLAVE_CLASS_STORAGE *storage,
-                                            ULONG               lun,
-                                            UX_SLAVE_ENDPOINT   *endpoint_in,
-                                            UX_SLAVE_ENDPOINT   *endpoint_out,
-                                            UCHAR               *cbwcb);
+UINT    _ux_device_class_storage_get_performance(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                                 UX_SLAVE_ENDPOINT *endpoint_in,
+                                                 UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
 UINT    _ux_device_class_storage_read_dvd_structure(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
-                                            UX_SLAVE_ENDPOINT *endpoint_in,
-                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
+                                                    UX_SLAVE_ENDPOINT *endpoint_in,
+                                                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb);
 
 UINT    _ux_device_class_storage_tasks_run(VOID *instance);
 
@@ -674,10 +718,10 @@ UINT    _uxe_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command);
 
 #define ux_device_class_storage_entry        _ux_device_class_storage_entry
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif

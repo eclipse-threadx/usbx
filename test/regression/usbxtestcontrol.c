@@ -285,6 +285,7 @@ void    usbx_ux_device_class_storage_mode_select_test_application_define(void *)
 void    usbx_ux_device_class_storage_mode_sense_test_application_define(void *);
 void    usbx_ux_device_class_storage_request_sense_test_application_define(void *);
 void    usbx_ux_device_class_storage_start_stop_test_application_define(void *);
+void    usbx_ux_device_class_storage_media_start_stop_test_application_define(void *);
 void    usbx_ux_device_class_storage_prevent_allow_media_removal_test_application_define(void *);
 void    usbx_ux_device_class_storage_verify_test_application_define(void *);
 void    usbx_ux_device_class_storage_uninitialize_test_application_define(void *);
@@ -521,6 +522,7 @@ TEST_ENTRY  test_control_tests[] =
     usbx_ux_device_class_storage_mode_sense_test_application_define,
     usbx_ux_device_class_storage_request_sense_test_application_define,
     usbx_ux_device_class_storage_start_stop_test_application_define,
+    usbx_ux_device_class_storage_media_start_stop_test_application_define,
     usbx_ux_device_class_storage_prevent_allow_media_removal_test_application_define,
     usbx_ux_device_class_storage_verify_test_application_define,
     usbx_ux_device_class_storage_uninitialize_test_application_define,
