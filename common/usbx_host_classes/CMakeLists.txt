@@ -93,6 +93,8 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_idle_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_idle_set.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_idle_set_run.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_protocol_set.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_protocol_get.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_instance_clean.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_interrupt_endpoint_search.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_host_class_hid_item_data_get.c

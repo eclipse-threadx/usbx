@@ -205,15 +205,28 @@ UX_SLAVE_CLASS_HID          *hid;
 
         case UX_DEVICE_CLASS_HID_COMMAND_GET_PROTOCOL:
 
-            /* Send the protocol.  */
+            /* Send the protocol to host. */
             *transfer_request -> ux_slave_transfer_request_data_pointer = (UCHAR)hid -> ux_device_class_hid_protocol;
             _ux_device_stack_transfer_request(transfer_request, 1, request_length);
             break;
 
         case UX_DEVICE_CLASS_HID_COMMAND_SET_PROTOCOL:
 
+            /* Check protocol must be 0 (Boot) or 1 (Report).  */
+            if ((request_value != UX_DEVICE_CLASS_HID_PROTOCOL_BOOT) &&
+                (request_value != UX_DEVICE_CLASS_HID_PROTOCOL_REPORT))
+            {
+                /* Invalid value: not handled. */
+                return(UX_ERROR);
+            }
+
             /* Accept the protocol.  */
             hid -> ux_device_class_hid_protocol = request_value;
+
+            /* If there is a callback defined by the application, send the protocol to it.  */
+            if (hid -> ux_device_class_hid_set_protocol_callback != UX_NULL)
+                hid -> ux_device_class_hid_set_protocol_callback(hid, request_value);
+
             break;
 
         default:
@@ -225,4 +238,3 @@ UX_SLAVE_CLASS_HID          *hid;
     /* It's handled.  */
     return(UX_SUCCESS);
 }
-
