@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -196,6 +197,7 @@ UCHAR                                   *buffer;
         /* Store the callback function.  */
         hid -> ux_device_class_hid_callback                   = hid_parameter -> ux_device_class_hid_parameter_callback;
         hid -> ux_device_class_hid_get_callback               = hid_parameter -> ux_device_class_hid_parameter_get_callback;
+        hid -> ux_device_class_hid_set_protocol_callback      = hid_parameter -> ux_device_class_hid_parameter_set_protocol_callback;
 
 #if defined(UX_DEVICE_CLASS_HID_FLEXIBLE_EVENTS_QUEUE)
 

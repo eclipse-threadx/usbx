@@ -249,6 +249,7 @@ typedef struct UX_SLAVE_CLASS_HID_STRUCT
     UINT                            ux_device_class_hid_state;
     UINT                            (*ux_device_class_hid_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid, UX_SLAVE_CLASS_HID_EVENT *);
     UINT                            (*ux_device_class_hid_get_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid, UX_SLAVE_CLASS_HID_EVENT *);
+    VOID                            (*ux_device_class_hid_set_protocol_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid, ULONG protocol);
     VOID                            (*ux_slave_class_hid_instance_activate)(VOID *);
     VOID                            (*ux_slave_class_hid_instance_deactivate)(VOID *);
     UCHAR                           *ux_device_class_hid_report_address;
@@ -365,6 +366,10 @@ typedef struct UX_SLAVE_CLASS_HID_PARAMETER_STRUCT
     ULONG                   ux_device_class_hid_parameter_report_length;
     UINT                    (*ux_device_class_hid_parameter_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid, UX_SLAVE_CLASS_HID_EVENT *);
     UINT                    (*ux_device_class_hid_parameter_get_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid, UX_SLAVE_CLASS_HID_EVENT *);
+
+    /* Optional callback invoked when protocol changes (boot/report).  */
+    VOID                    (*ux_device_class_hid_parameter_set_protocol_callback)(struct UX_SLAVE_CLASS_HID_STRUCT *hid, ULONG protocol);
+
 #if defined(UX_DEVICE_CLASS_HID_FLEXIBLE_EVENTS_QUEUE)
     ULONG                   ux_device_class_hid_parameter_event_max_number;
     ULONG                   ux_device_class_hid_parameter_event_max_length;
