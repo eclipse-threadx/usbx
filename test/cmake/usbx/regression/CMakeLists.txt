@@ -347,6 +347,7 @@ set(ux_class_storage_test_cases
     ${SOURCE_DIR}/usbx_ux_device_class_storage_read_test.c
     ${SOURCE_DIR}/usbx_ux_device_class_storage_request_sense_test.c
     ${SOURCE_DIR}/usbx_ux_device_class_storage_start_stop_test.c
+    ${SOURCE_DIR}/usbx_ux_device_class_storage_media_start_stop_test.c
     ${SOURCE_DIR}/usbx_ux_device_class_storage_synchronize_cache_test.c
     ${SOURCE_DIR}/usbx_ux_device_class_storage_test_ready_test.c
     ${SOURCE_DIR}/usbx_ux_device_class_storage_thread_test.c

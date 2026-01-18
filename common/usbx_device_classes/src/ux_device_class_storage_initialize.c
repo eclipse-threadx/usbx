@@ -184,6 +184,7 @@ ULONG                                   lun_index;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_write          = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_write;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_status         = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_status;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_notification   = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_notification;
+            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_start_stop     = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_start_stop;
         }
 
         /* If it's OK, complete it.  */
