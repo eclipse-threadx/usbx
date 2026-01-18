@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -29,47 +29,47 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_test_ready                 PORTABLE C      */ 
-/*                                                           6.1.10       */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_test_ready                 PORTABLE C      */
+/*                                                           6.4.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function tests if the SCSI slave device is ready.              */ 
-/*    The status function of the storage devices is called. If there is   */ 
-/*    an error, the request sense parameters are set for the host to      */ 
-/*    investigate.                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function tests if the SCSI slave device is ready.              */
+/*    The status function of the storage devices is called. If there is   */
+/*    an error, the request sense parameters are set for the host to      */
+/*    investigate.                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    lun                                   Logical unit number           */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_class_storage_media_status) Get media status              */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_class_storage_media_status) Get media status              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized command logic,    */
@@ -80,16 +80,19 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  01-20-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support load eject media    */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_test_ready(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
-                                          UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb)
+UINT  _ux_device_class_storage_test_ready(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                          UX_SLAVE_ENDPOINT *endpoint_in,
+                                          UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb)
 {
 
 UINT        status;
 ULONG        media_status;
 
-    UX_PARAMETER_NOT_USED(lun);
     UX_PARAMETER_NOT_USED(endpoint_in);
     UX_PARAMETER_NOT_USED(endpoint_out);
     UX_PARAMETER_NOT_USED(cbwcb);
@@ -97,8 +100,22 @@ ULONG        media_status;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_TEST_READY, storage, lun, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
+    if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_medium_loaded_status == 0)
+    {
+        /* Media not loaded. Set NOT READY sense code.  */
+        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+            UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(UX_SLAVE_CLASS_STORAGE_SENSE_KEY_NOT_READY,
+                                                 UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_PRESENT, 0x00);
+
+        /* Return CSW with failure.  */
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
+
+        /* Return completion status.  */
+        return(UX_SUCCESS);
+    }
+
     /* Obtain the status of the device.  */
-    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage, lun, 
+    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage, lun,
                                 storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id, &media_status);
 
     /* Set the sense/code/qualifier codes for the REQUEST_SENSE command.  */
@@ -122,4 +139,3 @@ ULONG        media_status;
     /* Return completion status.  */
     return(status);
 }
-

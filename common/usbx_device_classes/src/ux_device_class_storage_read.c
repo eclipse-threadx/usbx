@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -29,50 +29,50 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_read                       PORTABLE C      */ 
-/*                                                           6.1.10       */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_read                       PORTABLE C      */
+/*                                                           6.4.6       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a READ command in 32 or 16 bits.             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a READ command in 32 or 16 bits.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    lun                                   Logical unit number           */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*    scsi_command                          SCSI command                  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_class_storage_media_read)   Read from media               */ 
-/*    (ux_slave_class_storage_media_status) Get media status              */ 
-/*    _ux_device_stack_endpoint_stall       Stall endpoint                */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
-/*    _ux_utility_long_get_big_endian       Get 32-bit big endian         */ 
-/*    _ux_utility_short_get_big_endian      Get 16-bit big endian         */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*    scsi_command                          SCSI command                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_class_storage_media_read)   Read from media               */
+/*    (ux_slave_class_storage_media_status) Get media status              */
+/*    _ux_device_stack_endpoint_stall       Stall endpoint                */
+/*    _ux_device_stack_transfer_request     Transfer request              */
+/*    _ux_utility_long_get_big_endian       Get 32-bit big endian         */
+/*    _ux_utility_short_get_big_endian      Get 16-bit big endian         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            optimized command logic,    */
@@ -83,28 +83,45 @@
 /*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            added standalone support,   */
 /*                                            resulting in version 6.1.10 */
+/*  01-20-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support load eject media    */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_read(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
-                                            UX_SLAVE_ENDPOINT *endpoint_in,
-                                            UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb, UCHAR scsi_command)
+UINT  _ux_device_class_storage_read(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
+                                    UX_SLAVE_ENDPOINT *endpoint_in,
+                                    UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command)
 {
 
 UINT                    status;
 ULONG                   lba;
 UX_SLAVE_TRANSFER       *transfer_request;
-ULONG                   total_number_blocks; 
+ULONG                   total_number_blocks;
 ULONG                   media_status;
 ULONG                   total_length;
 
 #if !defined(UX_DEVICE_STANDALONE)
-ULONG                   number_blocks; 
+ULONG                   number_blocks;
 ULONG                   transfer_length;
 ULONG                   done_length;
 #endif
 
 
     UX_PARAMETER_NOT_USED(endpoint_out);
+
+    if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_medium_loaded_status == 0)
+    {
+        /* Media not loaded. Set NOT READY sense code.  */
+        storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status =
+            UX_DEVICE_CLASS_STORAGE_SENSE_STATUS(UX_SLAVE_CLASS_STORAGE_SENSE_KEY_NOT_READY,
+                                                 UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_PRESENT, 0x00);
+
+        /* Return CSW with failure.  */
+        storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_FAILED;
+
+        /* Return completion status.  */
+        return(UX_SUCCESS);
+    }
 
     /* Get the LBA from the CBWCB.  */
     lba =  _ux_utility_long_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_READ_LBA);
@@ -116,7 +133,7 @@ ULONG                   done_length;
         /* Get the number of blocks from the CBWCB in 16 bits.  */
         total_number_blocks =  _ux_utility_short_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_READ_TRANSFER_LENGTH_16);
 
-    else        
+    else
 
         /* Get the number of blocks from the CBWCB in 32 bits.  */
         total_number_blocks =  _ux_utility_long_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_READ_TRANSFER_LENGTH_32);
@@ -133,7 +150,7 @@ ULONG                   done_length;
 #if defined(UX_DEVICE_STANDALONE)
 
     /* Obtain the status of the device.  */
-    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage, lun, 
+    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage, lun,
                                 storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id, &media_status);
 
     /* Update the request sense.  */
@@ -196,23 +213,23 @@ ULONG                   done_length;
     {
 
         /* Obtain the status of the device.  */
-        status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage, lun, 
+        status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage, lun,
                                     storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id, &media_status);
-    
+
         /* Update the request sense.  */
         storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status = media_status;
-    
+
         /* If there is a problem, return a failed command.  */
         if (status != UX_SUCCESS)
         {
-    
+
             /* We have a problem, media status error. Return a bad completion and wait for the
                REQUEST_SENSE command.  */
             _ux_device_stack_endpoint_stall(endpoint_in);
 
             /* Update residue.  */
             storage -> ux_slave_class_storage_csw_residue = storage -> ux_slave_class_storage_host_length - done_length;
-    
+
             /* Return an error.  */
             return(UX_ERROR);
         }
@@ -222,7 +239,7 @@ ULONG                   done_length;
 
             /* Compute the transfer length based on the maximum allowed.  */
             transfer_length =  UX_SLAVE_CLASS_STORAGE_BUFFER_SIZE;
-            
+
         else
 
             /* Compute the transfer length based on what is left to transfer.  */
@@ -232,27 +249,27 @@ ULONG                   done_length;
         number_blocks = transfer_length / storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_block_length;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_READ, storage, lun, transfer_request -> ux_slave_transfer_request_data_pointer, 
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_READ, storage, lun, transfer_request -> ux_slave_transfer_request_data_pointer,
                                 number_blocks, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
         /* Execute the read command from the local media.  */
-        status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_read(storage, lun, 
-                                                    transfer_request -> ux_slave_transfer_request_data_pointer, number_blocks, lba, &media_status); 
+        status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_read(storage, lun,
+                                                    transfer_request -> ux_slave_transfer_request_data_pointer, number_blocks, lba, &media_status);
 
         /* If there is a problem, return a failed command.  */
         if (status != UX_SUCCESS)
         {
-    
+
             /* We have a problem, request error. Return a bad completion and wait for the
                REQUEST_SENSE command.  */
             _ux_device_stack_endpoint_stall(endpoint_in);
-    
+
             /* Update residue.  */
             storage -> ux_slave_class_storage_csw_residue = storage -> ux_slave_class_storage_host_length - done_length;
 
             /* And update the REQUEST_SENSE codes.  */
             storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_request_sense_status = media_status;
-    
+
             /* Return an error.  */
             return(UX_ERROR);
         }
@@ -267,7 +284,7 @@ ULONG                   done_length;
             /* We have a problem, request error. Return a bad completion and wait for the
                REQUEST_SENSE command.  */
             _ux_device_stack_endpoint_stall(endpoint_in);
-    
+
             /* Update residue.  */
             storage -> ux_slave_class_storage_csw_residue = storage -> ux_slave_class_storage_host_length - done_length;
 
@@ -282,11 +299,11 @@ ULONG                   done_length;
 
         /* Update the LBA address.  */
         lba += number_blocks;
-        
+
         /* Update the length to remain.  */
-        total_length -= transfer_length;        
+        total_length -= transfer_length;
         done_length += transfer_length;
-        
+
         /* Update the number of blocks to read.  */
         total_number_blocks -= number_blocks;
     }

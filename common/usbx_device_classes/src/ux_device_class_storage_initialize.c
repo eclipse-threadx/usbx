@@ -40,7 +40,7 @@ UCHAR _ux_system_slave_class_storage_product_serial[] =                     "123
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _ux_device_class_storage_initialize                 PORTABLE C      */
-/*                                                           6.3.0        */
+/*                                                           6.4.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
@@ -85,6 +85,9 @@ UCHAR _ux_system_slave_class_storage_product_serial[] =                     "123
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            resulting in version 6.3.0  */
+/*  01-20-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support load eject media    */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -184,6 +187,7 @@ ULONG                                   lun_index;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_write          = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_write;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_status         = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_status;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_notification   = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_notification;
+            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_start_stop     = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_start_stop;
         }
 
         /* If it's OK, complete it.  */
