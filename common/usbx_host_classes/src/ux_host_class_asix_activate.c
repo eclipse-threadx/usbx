@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Asix Class                                                          */
 /**                                                                       */
@@ -29,53 +29,53 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_activate                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_asix_activate                        PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates the asix instance, configure the device.      */ 
-/*    WARNING !!!! The NX_PHYSICAL_HEADER should be set to 20 in nx_api.h */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                                Asix class command pointer   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_configure            Configure asix class       */ 
-/*    _ux_host_class_asix_endpoints_get        Get endpoints of asix      */ 
+/*                                                                        */
+/*    This function creates the asix instance, configure the device.      */
+/*    WARNING !!!! The NX_PHYSICAL_HEADER should be set to 20 in nx_api.h */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                                Asix class command pointer   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_asix_configure            Configure asix class       */
+/*    _ux_host_class_asix_endpoints_get        Get endpoints of asix      */
 /*    _ux_host_class_asix_setup                Set up asix                */
-/*    _ux_host_stack_class_instance_create     Create class instance      */ 
-/*    _ux_host_stack_class_instance_destroy    Destroy the class instance */ 
+/*    _ux_host_stack_class_instance_create     Create class instance      */
+/*    _ux_host_stack_class_instance_destroy    Destroy the class instance */
 /*    _ux_host_stack_transfer_request          Transfer request           */
-/*    _ux_utility_memory_allocate              Allocate memory block      */ 
-/*    _ux_utility_memory_free                  Free memory block          */ 
+/*    _ux_utility_memory_allocate              Allocate memory block      */
+/*    _ux_utility_memory_free                  Free memory block          */
 /*    _ux_host_semaphore_create                Create semaphore           */
 /*    _ux_host_semaphore_delete                Delete semaphore           */
 /*    _ux_utility_thread_create                Create thread              */
 /*    _ux_utility_thread_delete                Delete thread              */
 /*    nx_packet_pool_create                    Create NetX packet pool    */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_entry                Entry of asix class        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_asix_entry                Entry of asix class        */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -113,7 +113,7 @@ ULONG                               physical_address_msw;
 ULONG                               physical_address_lsw;
 
 
-    /* We need to make sure that the value of the NX_PHYSICAL_HEADER is at least 20.  
+    /* We need to make sure that the value of the NX_PHYSICAL_HEADER is at least 20.
        This should be changed in the nx_user.h file */
 
 
@@ -132,16 +132,16 @@ ULONG                               physical_address_lsw;
     asix -> ux_host_class_asix_device =  device;
 
     /* Store the instance in the device container, this is for the USBX stack
-       when it needs to invoke the class for deactivation.  */        
+       when it needs to invoke the class for deactivation.  */
     device -> ux_device_class_instance =  (VOID *) asix;
 
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(asix -> ux_host_class_asix_class, (VOID *) asix);
 
     /* Configure the asix class.  */
-    status =  _ux_host_class_asix_configure(asix);     
+    status =  _ux_host_class_asix_configure(asix);
 
-    /* Get the asix endpoint(s). We need to search for Bulk Out and Bulk In endpoints 
+    /* Get the asix endpoint(s). We need to search for Bulk Out and Bulk In endpoints
        and the interrupt endpoint.  */
     if (status == UX_SUCCESS)
         status =  _ux_host_class_asix_endpoints_get(asix);
@@ -165,7 +165,7 @@ ULONG                               physical_address_lsw;
     /* Allocate a Thread stack.  */
     if (status == UX_SUCCESS)
     {
-        asix -> ux_host_class_asix_thread_stack =  
+        asix -> ux_host_class_asix_thread_stack =
                     _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
 
         /* Check the completion status.  */
@@ -178,13 +178,13 @@ ULONG                               physical_address_lsw;
     {
         status =  _ux_utility_thread_create(&asix -> ux_host_class_asix_thread,
                                 "ux_asix_thread", _ux_host_class_asix_thread,
-                                (ULONG) asix, 
+                                (ULONG) asix,
                                 asix -> ux_host_class_asix_thread_stack,
-                                UX_THREAD_STACK_SIZE, 
+                                UX_THREAD_STACK_SIZE,
                                 UX_THREAD_PRIORITY_CLASS,
                                 UX_THREAD_PRIORITY_CLASS,
-                                TX_NO_TIME_SLICE, UX_AUTO_START);
-                    
+                                UX_NO_TIME_SLICE, UX_AUTO_START);
+
         /* Check the completion status.  */
         if (status != UX_SUCCESS)
             status = UX_THREAD_ERROR;
@@ -202,7 +202,7 @@ ULONG                               physical_address_lsw;
 
         /* The ethernet link is down by default.  */
         asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_DOWN;
-        
+
         /* Start the interrupt pipe now.  */
         transfer_request =  &asix -> ux_host_class_asix_interrupt_endpoint -> ux_endpoint_transfer_request;
         status =  _ux_host_stack_transfer_request(transfer_request);
@@ -222,12 +222,12 @@ ULONG                               physical_address_lsw;
 
         /* Setup the physical address of this IP instance.  */
         physical_address_msw =  (ULONG)((asix -> ux_host_class_asix_node_id[0] << 8) | (asix -> ux_host_class_asix_node_id[1]));
-        physical_address_lsw =  (ULONG)((asix -> ux_host_class_asix_node_id[2] << 24) | (asix -> ux_host_class_asix_node_id[3] << 16) | 
+        physical_address_lsw =  (ULONG)((asix -> ux_host_class_asix_node_id[2] << 24) | (asix -> ux_host_class_asix_node_id[3] << 16) |
                                                         (asix -> ux_host_class_asix_node_id[4] << 8) | (asix -> ux_host_class_asix_node_id[5]));
-        
+
         /* Register this interface to the NetX USB interface broker.  */
-        status = _ux_network_driver_activate((VOID *) asix, _ux_host_class_asix_write, 
-                                    &asix -> ux_host_class_asix_network_handle, 
+        status = _ux_network_driver_activate((VOID *) asix, _ux_host_class_asix_write,
+                                    &asix -> ux_host_class_asix_network_handle,
                                     physical_address_msw,
                                     physical_address_lsw);
     }
@@ -238,12 +238,12 @@ ULONG                               physical_address_lsw;
 
         /* Mark the asix instance as live now.  */
         asix -> ux_host_class_asix_state =  UX_HOST_CLASS_INSTANCE_LIVE;
-        
+
         /* If all is fine and the device is mounted, we need to inform the application
         if a function has been programmed in the system structure. */
         if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
         {
-            
+
             /* Call system change function.  */
             _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, asix -> ux_host_class_asix_class, (VOID *) asix);
         }
@@ -255,7 +255,7 @@ ULONG                               physical_address_lsw;
         UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, asix, 0, 0, 0)
 
         /* Return completion status.  */
-        return(UX_SUCCESS);    
+        return(UX_SUCCESS);
     }
 
     /* There was a problem, so free the resources.  */
@@ -265,7 +265,7 @@ ULONG                               physical_address_lsw;
         _ux_utility_memory_free(asix -> ux_host_class_asix_receive_buffer);
 
     /* Free asix -> ux_host_class_asix_thread.  */
-    if (asix -> ux_host_class_asix_thread.tx_thread_id)
+    if (_ux_host_thread_created(&asix -> ux_host_class_asix_thread))
         _ux_utility_thread_delete(&asix -> ux_host_class_asix_thread);
 
     /* Free asix -> ux_host_class_asix_thread_stack.  */
@@ -273,11 +273,11 @@ ULONG                               physical_address_lsw;
         _ux_utility_memory_free(asix -> ux_host_class_asix_thread_stack);
 
     /* Free asix -> ux_host_class_asix_interrupt_notification_semaphore.  */
-    if (asix -> ux_host_class_asix_interrupt_notification_semaphore.tx_semaphore_id != 0)
+    if (_ux_host_semaphore_created(&asix -> ux_host_class_asix_interrupt_notification_semaphore))
         _ux_host_semaphore_delete(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
 
     /* Free asix -> ux_host_class_asix_semaphore.  */
-    if (asix -> ux_host_class_asix_semaphore.tx_semaphore_id != 0)
+    if (_ux_host_semaphore_created(&asix -> ux_host_class_asix_semaphore))
         _ux_host_semaphore_delete(&asix -> ux_host_class_asix_semaphore);
 
     /* Destroy class instance.  */
@@ -293,4 +293,3 @@ ULONG                               physical_address_lsw;
     return(status);
 #endif
 }
-
