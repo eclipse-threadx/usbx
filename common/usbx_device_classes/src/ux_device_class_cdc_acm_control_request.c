@@ -1,19 +1,20 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
 /**                                                                       */
-/**   Device CDC Class                                                    */
+/** USBX Component                                                        */
+/**                                                                       */
+/**   Device CDC ACM Class                                                */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -28,41 +29,41 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_acm_control_request            PORTABLE C      */ 
-/*                                                           6.1.12       */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_acm_control_request            PORTABLE C      */
+/*                                                           6.4.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function manages the based sent by the host on the control     */ 
-/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_acm                               Pointer to cdc_acm class      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function manages the based sent by the host on the control     */
+/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_acm                               Pointer to cdc_acm class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    CDC Class                                                           */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -70,6 +71,9 @@
 /*                                            fixed parameter/variable    */
 /*                                            names conflict C++ keyword, */
 /*                                            resulting in version 6.1.12 */
+/*  01-28-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support send break request  */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_acm_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -105,7 +109,7 @@ ULONG                                   transmit_length;
     request_length =   _ux_utility_short_get(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_LENGTH);
 
     transmit_length = request_length ;
-    
+
     /* Here we proceed only the standard request we know of at the device level.  */
     switch (request)
     {
@@ -118,16 +122,16 @@ ULONG                                   transmit_length;
 
             /* Get the line state parameters from the host.  DTR signal. */
             if (value & UX_SLAVE_CLASS_CDC_ACM_LINE_STATE_DTR)
-                cdc_acm -> ux_slave_class_cdc_acm_data_dtr_state = UX_TRUE;               
+                cdc_acm -> ux_slave_class_cdc_acm_data_dtr_state = UX_TRUE;
 
             /* Get the line state parameters from the host.  RTS signal. */
             if (value & UX_SLAVE_CLASS_CDC_ACM_LINE_STATE_RTS)
-                cdc_acm -> ux_slave_class_cdc_acm_data_rts_state = UX_TRUE;               
-                
+                cdc_acm -> ux_slave_class_cdc_acm_data_rts_state = UX_TRUE;
+
             /* If there is a parameter change function call it.  */
             if (cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change != UX_NULL)
-            {        
-        
+            {
+
                 /* Invoke the application.  */
                 cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change(cdc_acm);
             }
@@ -137,11 +141,11 @@ ULONG                                   transmit_length;
         case UX_SLAVE_CLASS_CDC_ACM_GET_LINE_CODING:
 
             /* Setup the length appropriately.  */
-            if (request_length >  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_RESPONSE_SIZE) 
+            if (request_length >  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_RESPONSE_SIZE)
                 transmit_length = UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_RESPONSE_SIZE;
-    
+
             /* Send the line coding default parameters back to the host.  */
-            _ux_utility_long_put(transfer_request -> ux_slave_transfer_request_data_pointer + UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_BAUDRATE_STRUCT, 
+            _ux_utility_long_put(transfer_request -> ux_slave_transfer_request_data_pointer + UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_BAUDRATE_STRUCT,
                                     cdc_acm -> ux_slave_class_cdc_acm_baudrate);
             *(transfer_request -> ux_slave_transfer_request_data_pointer + UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_STOP_BIT_STRUCT) = cdc_acm -> ux_slave_class_cdc_acm_stop_bit;
             *(transfer_request -> ux_slave_transfer_request_data_pointer + UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_PARITY_STRUCT)   = cdc_acm -> ux_slave_class_cdc_acm_parity;
@@ -149,11 +153,11 @@ ULONG                                   transmit_length;
 
             /* Set the phase of the transfer to data out.  */
             transfer_request -> ux_slave_transfer_request_phase =  UX_TRANSFER_PHASE_DATA_OUT;
-            
+
             /* Perform the data transfer.  */
             _ux_device_stack_transfer_request(transfer_request, transmit_length, request_length);
-            break; 
-            
+            break;
+
         case UX_SLAVE_CLASS_CDC_ACM_SET_LINE_CODING:
 
             /* Get the line coding parameters from the host.  */
@@ -164,13 +168,27 @@ ULONG                                   transmit_length;
 
             /* If there is a parameter change function call it.  */
             if (cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change != UX_NULL)
-            {        
-        
+            {
+
                 /* Invoke the application.  */
                 cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change(cdc_acm);
             }
 
             break ;
+
+        case UX_SLAVE_CLASS_CDC_ACM_SEND_BREAK:
+
+            /* SEND_BREAK has no data stage, wValue contains break duration in ms.
+               0x0000 means stop break.
+               0x0001-0xFFFE means break signal duration in ms.
+               0xFFFF means indefinite break.  */
+            cdc_acm -> ux_slave_class_cdc_acm_break_duration = (USHORT) value;
+
+            /* If there is a parameter change function call it.  */
+            if (cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change != UX_NULL)
+                cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change(cdc_acm);
+
+            break;
 
         default:
 
@@ -181,4 +199,3 @@ ULONG                                   transmit_length;
     /* It's handled.  */
     return(UX_SUCCESS);
 }
-

@@ -1,18 +1,20 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**************************************************************************/
 /**                                                                       */
-/**   Device CDC Class                                                    */
+/** USBX Component                                                        */
+/**                                                                       */
+/**   Device CDC ACM Class                                                */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -31,43 +33,43 @@
 #error UX_THREAD_STACK_SIZE too large
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_acm_initialize                 PORTABLE C      */ 
-/*                                                           6.3.0        */
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_acm_initialize                 PORTABLE C      */
+/*                                                           6.4.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the USB CDC device.                       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to cdc_acm command    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_allocate           Allocate memory               */ 
-/*    _ux_utility_memory_free               Free memory                   */ 
-/*    _ux_utility_mutex_create              Create mutex                  */ 
-/*    _ux_device_mutex_delete               Delete mutex                  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Source Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the USB CDC device.                       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to cdc acm command    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_allocate           Allocate memory               */
+/*    _ux_utility_memory_free               Free memory                   */
+/*    _ux_utility_mutex_create              Create mutex                  */
+/*    _ux_device_mutex_delete               Delete mutex                  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Source Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            resulting in version 6.1    */
@@ -91,11 +93,14 @@
 /*                                            added a new mode to manage  */
 /*                                            endpoint buffer in classes, */
 /*                                            resulting in version 6.3.0  */
+/*  01-28-2026     Mohamed AYED             Modified comment(s),          */
+/*                                            support send break request  */
+/*                                            resulting in version 6.4.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
+
 UX_SLAVE_CLASS_CDC_ACM                  *cdc_acm;
 UX_SLAVE_CLASS_CDC_ACM_PARAMETER        *cdc_acm_parameter;
 UX_SLAVE_CLASS                          *class_ptr;
@@ -132,10 +137,10 @@ UINT                                    status;
                                     UX_DEVICE_CLASS_CDC_ACM_ENDPOINT_BUFFER_SIZE);
     if (cdc_acm -> ux_device_class_cdc_acm_endpoint_buffer == UX_NULL)
     {
-        
+
         /* Free the resources.  */
         _ux_utility_memory_free(cdc_acm);
-        
+
         /* Return fatal error.  */
         return(UX_MEMORY_INSUFFICIENT);
     }
@@ -155,10 +160,10 @@ UINT                                    status;
         _ux_utility_memory_free(cdc_acm -> ux_device_class_cdc_acm_endpoint_buffer);
 #endif
         _ux_utility_memory_free(cdc_acm);
-        
+
         /* Return fatal error.  */
         return(UX_MUTEX_ERROR);
-    }        
+    }
 
     /* Out Mutex. */
     status =  _ux_utility_mutex_create(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex, "ux_slave_class_cdc_acm_out_mutex");
@@ -175,10 +180,10 @@ UINT                                    status;
         _ux_utility_memory_free(cdc_acm -> ux_device_class_cdc_acm_endpoint_buffer);
 #endif
         _ux_utility_memory_free(cdc_acm);
-        
+
         /* Return fatal error.  */
         return(UX_MUTEX_ERROR);
-    }        
+    }
 
 #endif
 
@@ -187,6 +192,9 @@ UINT                                    status;
     cdc_acm -> ux_slave_class_cdc_acm_stop_bit  =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_STOP_BIT;
     cdc_acm -> ux_slave_class_cdc_acm_parity    =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_PARITY;
     cdc_acm -> ux_slave_class_cdc_acm_data_bit  =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_DATA_BIT;
+
+    /* Initialize break duration.  */
+    cdc_acm -> ux_slave_class_cdc_acm_break_duration = 0;
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 
@@ -198,7 +206,7 @@ UINT                                    status;
 
     /* We need to prepare the 2 threads for sending and receiving.  */
     /* Allocate some memory for the bulk out and in thread stack. */
-    cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack =  
+    cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack =
             _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE * 2);
 
     /* Check for successful allocation.  */
@@ -236,7 +244,7 @@ UINT                                    status;
             does not start until we have a instance of the class. */
         status =  _ux_utility_thread_create(
                     &cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread,
-                    "ux_slave_class_cdc_acm_bulkin_thread", 
+                    "ux_slave_class_cdc_acm_bulkin_thread",
                     _ux_device_class_cdc_acm_bulkin_thread,
                     (ULONG) (ALIGN_TYPE) cdc_acm,
                     (VOID *) cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread_stack,
@@ -264,7 +272,7 @@ UINT                                    status;
             does not start until we have a instance of the class. */
         status =  _ux_utility_thread_create(
                     &cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread,
-                    "ux_slave_class_cdc_acm_bulkout_thread", 
+                    "ux_slave_class_cdc_acm_bulkout_thread",
                     _ux_device_class_cdc_acm_bulkout_thread,
                     (ULONG) (ALIGN_TYPE) cdc_acm,
                     (VOID *) cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack,
@@ -309,4 +317,3 @@ UINT                                    status;
     /* Return completion status.  */
     return(UX_SUCCESS);
 }
-
