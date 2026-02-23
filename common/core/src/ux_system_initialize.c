@@ -261,6 +261,14 @@ ULONG               pool_size;
     /* Other fields are kept zero.  */
 #endif
 
+#if !defined(UX_STANDALONE)
+
+    /* Create the Mutex object used by USBX to control critical sections.  */
+    status =  _ux_system_mutex_create(&_ux_system -> ux_system_mutex, "ux_system_mutex");
+    if(status != UX_SUCCESS)
+        return(UX_MUTEX_ERROR);
+#endif
+
 #ifdef UX_ENABLE_DEBUG_LOG
 
     /* Obtain memory for storing the debug log.  */
@@ -275,14 +283,6 @@ ULONG               pool_size;
     /* Keep the size in system structure variable.  */
     _ux_system -> ux_system_debug_log_size = UX_DEBUG_LOG_SIZE;
 
-#endif
-
-#if !defined(UX_STANDALONE)
-
-    /* Create the Mutex object used by USBX to control critical sections.  */
-    status =  _ux_system_mutex_create(&_ux_system -> ux_system_mutex, "ux_system_mutex");
-    if(status != UX_SUCCESS)
-        return(UX_MUTEX_ERROR);
 #endif
 
     return(UX_SUCCESS);
