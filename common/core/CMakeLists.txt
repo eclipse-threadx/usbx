@@ -10,6 +10,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_function.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_initialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_initialize_complete.c
+	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_uninitialize.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_state_change.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_transfer_abort.c
 	${CMAKE_CURRENT_LIST_DIR}/src/ux_dcd_sim_slave_transfer_request.c
