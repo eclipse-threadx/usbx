@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -67,15 +67,15 @@
 #ifndef UX_DEVICE_CLASS_STORAGE_H
 #define UX_DEVICE_CLASS_STORAGE_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -112,7 +112,10 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_MEDIA_OPTICAL_DISK                   7
 #define UX_SLAVE_CLASS_STORAGE_MEDIA_IOMEGA_CLICK                   0x55
 
+/* Define Storage Class USB medium removable type.  */
 
+#define UX_SLAVE_CLASS_STORAGE_MEDIA_IS_NOT_REMOVABLE              0x00
+#define UX_SLAVE_CLASS_STORAGE_MEDIA_IS_REMOVABLE                  (1u<<8)
 
 /* Define Storage Class SCSI command constants.  */
 
@@ -321,6 +324,10 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_VOLUME_OVERFLOW            0x0d
 #define UX_SLAVE_CLASS_STORAGE_SENSE_KEY_MISCOMPARE                 0x0e
 
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_READY                 0x04
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_WRITE_PROTECTED           0x27
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_READY_TO_READY        0x28
+#define UX_SLAVE_CLASS_STORAGE_SENSE_CODE_NOT_PRESENT               0x3A
 
 /* Define Storage Class SCSI sense key definition constants.  */
 
@@ -360,6 +367,23 @@ extern   "C" {
 #define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_STATUS             2
 #define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_ALLOCATION_LENGTH  7
 #define UX_SLAVE_CLASS_STORAGE_READ_DISK_INFORMATION_LENGTH             10
+
+/* Define Storage Class (SBC-4) POWER CONDITION constants.  */
+
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_START_VALID              0x00
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_ACTIVE                   0x01
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_IDLE                     0x02
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_STANDBY                  0x03
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_LU_CONTROL               0x07
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_FORCE_IDLE_0             0x0A
+#define UX_SLAVE_CLASS_STORAGE_POWER_CONDITION_FORCE_STANDBY_0          0x0B
+
+/* Define Storage Class (SBC-4) PREVENT constants.  */
+
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_REMOVAL_IS_ALLOWED                0x00
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_REMOVAL_SHALL_BE_PREVENTED        0x01
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_PREVENT_OBSOLETE_2                0x02
+#define UX_SLAVE_CLASS_STORAGE_MEDIUM_PREVENT_OBSOLETE_3                0x03
 
 /* Define Storage Class Feature Descriptor generic format.  */
 
@@ -504,12 +528,17 @@ typedef struct UX_SLAVE_CLASS_STORAGE_LUN_STRUCT
     ULONG           ux_slave_class_storage_request_sense_status;
     ULONG           ux_slave_class_storage_disk_status;
     ULONG           ux_slave_class_storage_last_session_state;
+    ULONG           ux_slave_class_storage_prevent_medium_removal;
+    ULONG           ux_slave_class_storage_medium_loaded_status;
 
     UINT            (*ux_slave_class_storage_media_read)(VOID *storage, ULONG lun, UCHAR *data_pointer, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_write)(VOID *storage, ULONG lun, UCHAR *data_pointer, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_flush)(VOID *storage, ULONG lun, ULONG number_blocks, ULONG lba, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_status)(VOID *storage, ULONG lun, ULONG media_id, ULONG *media_status);
     UINT            (*ux_slave_class_storage_media_notification)(VOID *storage, ULONG lun, ULONG media_id, ULONG notification_class, UCHAR **media_notification, ULONG *media_notification_length);
+
+    /* Optional callback invoked when load/eject media is requested.  */
+    UINT            (*ux_slave_class_storage_media_start_stop)(VOID *storage, ULONG lun, ULONG power_condition, ULONG start, ULONG load_eject);
 } UX_SLAVE_CLASS_STORAGE_LUN;
 
 /* Sense status value (key at bit0-7, code at bit8-15 and qualifier at bit16-23).  */
@@ -674,10 +703,10 @@ UINT    _uxe_device_class_storage_initialize(UX_SLAVE_CLASS_COMMAND *command);
 
 #define ux_device_class_storage_entry        _ux_device_class_storage_entry
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif
