@@ -1,18 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Keyboard Client                                                 */
 /**                                                                       */
@@ -92,52 +92,52 @@ UX_HOST_CLASS_HID_KEYBOARD_LAYOUT ux_host_class_hid_keyboard_layout =
     UX_HOST_CLASS_HID_KEYBOARD_KEYS_KEYPAD_UPPER_RANGE_DEFAULT,
 };
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_keyboard_activate                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_keyboard_activate                PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs the enumeration of a HID Keyboard Client.    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function performs the enumeration of a HID Keyboard Client.    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    command                               Pointer to command            */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_class_hid_periodic_report_start                            */
-/*                                          Start periodic report         */ 
+/*                                          Start periodic report         */
 /*    _ux_host_class_hid_report_callback_register                         */
-/*                                          Register callback             */ 
+/*                                          Register callback             */
 /*    _ux_host_class_hid_report_id_get      Get the report ID             */
 /*    _ux_host_class_hid_idle_set           Set the idle rate             */
 /*    _ux_host_class_hid_report_set         Do SET_REPORT                 */
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Free memory block             */
 /*    _ux_host_semaphore_create             Create semaphore              */
 /*    _ux_host_semaphore_delete             Delete semaphore              */
 /*    _ux_utility_thread_create             Create thread                 */
 /*    _ux_utility_thread_delete             Delete thread                 */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            used UX prefix to refer to  */
@@ -177,7 +177,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
     /* Get some memory for both the HID class instance and copy of this client
        and for the callback.  */
     client_keyboard =  (UX_HOST_CLASS_HID_CLIENT_KEYBOARD *)
-                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
+                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY,
                                     sizeof(UX_HOST_CLASS_HID_CLIENT_KEYBOARD));
     if (client_keyboard == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
@@ -319,7 +319,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         to the callback because it involves using the commands on the Control Pipe which cannot
         be done during callbacks.  First allocate some stack memory.  */
         keyboard_instance -> ux_host_class_hid_keyboard_thread_stack =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
-                                
+
         /* Check if stack memory was allocated.  */
         if (keyboard_instance -> ux_host_class_hid_keyboard_thread_stack == UX_NULL)
             status = (UX_MEMORY_INSUFFICIENT);
@@ -328,7 +328,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
     /* If we are OK, go on.  */
     if (status == UX_SUCCESS)
 
-        /* Then create the actual thread.  */                   
+        /* Then create the actual thread.  */
         status =  _ux_utility_thread_create(&keyboard_instance -> ux_host_class_hid_keyboard_thread, "ux_host_stack_keyboard_thread",_ux_host_class_hid_keyboard_thread,
                 (ULONG) (ALIGN_TYPE) keyboard_instance, keyboard_instance -> ux_host_class_hid_keyboard_thread_stack,
                 UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_KEYBOARD,
@@ -376,19 +376,19 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         /* The report ID should exist.  If there is an error, we do not proceed.  */
         if (status == UX_SUCCESS)
         {
-        
+
             /* Memorize the report pointer.  */
             client_report.ux_host_class_hid_client_report =  report_id.ux_host_class_hid_report_get_report;
-            
+
             /* The report set is raw since the LEDs mask is already in the right format.  */
             client_report.ux_host_class_hid_client_report_flags = UX_HOST_CLASS_HID_REPORT_RAW;
-        
+
             /* The length of this report is 1 byte.  */
             client_report.ux_host_class_hid_client_report_length = 1;
-        
+
             /* The output report buffer is the LED mask field.  */
             client_report.ux_host_class_hid_client_report_buffer = &keyboard_instance -> ux_host_class_hid_keyboard_led_mask;
-        
+
             /* The HID class will perform the SET_REPORT command.  Do not check for error here, this is
                handled by the function itself.  */
             status = _ux_host_class_hid_report_set(hid, &client_report);
@@ -425,7 +425,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
                if a function has been programmed in the system structure.  */
             if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
             {
-                
+
                 /* Call system change function.  */
                 _ux_system_host ->  ux_system_host_change_function(UX_HID_CLIENT_INSERTION, hid -> ux_host_class_hid_class, (VOID *) hid_client);
             }
@@ -434,7 +434,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_HID_KEYBOARD_ACTIVATE, hid, keyboard_instance, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
             /* Return completion status.  */
-            return(status);    
+            return(status);
         }
 
         /* There is error, delete thread.  */
@@ -455,7 +455,7 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         _ux_utility_memory_free(keyboard_instance -> ux_host_class_hid_keyboard_thread_stack);
 
     /* Delete semaphore.  */
-    if (keyboard_instance -> ux_host_class_hid_keyboard_semaphore.tx_semaphore_id != UX_EMPTY)
+    if (_ux_host_semaphore_created(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore))
         _ux_host_semaphore_delete(&keyboard_instance -> ux_host_class_hid_keyboard_semaphore);
 
 #endif

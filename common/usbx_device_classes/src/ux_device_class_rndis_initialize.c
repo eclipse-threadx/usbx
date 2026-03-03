@@ -1,16 +1,16 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device RNDIS Class                                                  */
 /**                                                                       */
@@ -72,35 +72,35 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
     0,
 };
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_rndis_initialize                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_rndis_initialize                   PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the USB RNDIS device.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to rndis command      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_allocate           Allocate memory               */ 
+/*                                                                        */
+/*    This function initializes the USB RNDIS device.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to rndis command      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_copy               Copy memory                   */
 /*    _ux_utility_memory_free               Free memory                   */
-/*    _ux_utility_event_flags_create        Create Flag group             */ 
-/*    _ux_utility_event_flags_delete        Delete Flag group             */ 
+/*    _ux_utility_event_flags_create        Create Flag group             */
+/*    _ux_utility_event_flags_delete        Delete Flag group             */
 /*    _ux_utility_mutex_create              Create mutex                  */
 /*    _ux_device_mutex_delete               Delete mutex                  */
 /*    _ux_device_semaphore_create           Create semaphore              */
@@ -109,15 +109,15 @@ ULONG ux_device_class_rndis_oid_supported_list[UX_DEVICE_CLASS_RNDIS_OID_SUPPORT
 /*    _ux_device_thread_delete              Delete thread                 */
 /*    nx_packet_pool_create                 Create NetX packet pool       */
 /*    nx_packet_pool_delete                 Delete NetX packet pool       */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Source Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Source Code                                                    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
 /*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
 /*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
 /*                                            verified memset and memcpy  */
@@ -185,16 +185,16 @@ UINT                                        status = UX_SUCCESS;
     /* Store the start and stop signals if needed by the application.  */
     rndis -> ux_slave_class_rndis_parameter.ux_slave_class_rndis_instance_activate = rndis_parameter -> ux_slave_class_rndis_instance_activate;
     rndis -> ux_slave_class_rndis_parameter.ux_slave_class_rndis_instance_deactivate = rndis_parameter -> ux_slave_class_rndis_instance_deactivate;
-    
+
     /* Save the Netx IP passed by the application.  */
-    rndis -> ux_slave_class_rndis_nx_ip = rndis_parameter -> ux_slave_class_rndis_parameter_nx_ip; 
-    
+    rndis -> ux_slave_class_rndis_nx_ip = rndis_parameter -> ux_slave_class_rndis_parameter_nx_ip;
+
     /* Save the Netx IP address passed by the application.  */
-    rndis -> ux_slave_class_rndis_nx_ip_address = rndis_parameter -> ux_slave_class_rndis_parameter_nx_ip_address; 
-    
+    rndis -> ux_slave_class_rndis_nx_ip_address = rndis_parameter -> ux_slave_class_rndis_parameter_nx_ip_address;
+
     /* Save the Netx IP address network mask passed by the application.  */
-    rndis -> ux_slave_class_rndis_nx_ip_network_mask = rndis_parameter -> ux_slave_class_rndis_parameter_nx_ip_network_mask; 
-    
+    rndis -> ux_slave_class_rndis_nx_ip_network_mask = rndis_parameter -> ux_slave_class_rndis_parameter_nx_ip_network_mask;
+
     /* Copy the local node ID.  */
     _ux_utility_memory_copy(rndis -> ux_slave_class_rndis_local_node_id, rndis_parameter -> ux_slave_class_rndis_parameter_local_node_id,
                             UX_DEVICE_CLASS_RNDIS_NODE_ID_LENGTH); /* Use case of memcpy is verified. */
@@ -230,9 +230,9 @@ UINT                                        status = UX_SUCCESS;
     /* Allocate some memory for the interrupt thread stack. */
     if (status == UX_SUCCESS)
     {
-        rndis -> ux_slave_class_rndis_interrupt_thread_stack =  
+        rndis -> ux_slave_class_rndis_interrupt_thread_stack =
                 _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
-        
+
         /* Check for successful allocation.  */
         if (rndis -> ux_slave_class_rndis_interrupt_thread_stack  == UX_NULL)
 
@@ -245,12 +245,12 @@ UINT                                        status = UX_SUCCESS;
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_interrupt_thread , "ux_slave_class_rndis_interrupt_thread", 
+        status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_interrupt_thread , "ux_slave_class_rndis_interrupt_thread",
                     _ux_device_class_rndis_interrupt_thread,
                     (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) rndis -> ux_slave_class_rndis_interrupt_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
-                    
+
         /* Check the creation of this thread.  */
         if (status != UX_SUCCESS)
             status = UX_THREAD_ERROR;
@@ -261,9 +261,9 @@ UINT                                        status = UX_SUCCESS;
     /* Allocate some memory for the bulk out thread stack. */
     if (status == UX_SUCCESS)
     {
-        rndis -> ux_slave_class_rndis_bulkout_thread_stack =  
+        rndis -> ux_slave_class_rndis_bulkout_thread_stack =
                 _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
-        
+
         /* Check for successful allocation.  */
         if (rndis -> ux_slave_class_rndis_bulkout_thread_stack  == UX_NULL)
             status = UX_MEMORY_INSUFFICIENT;
@@ -274,12 +274,12 @@ UINT                                        status = UX_SUCCESS;
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_bulkout_thread , "ux_slave_class_rndis_bulkout_thread", 
+        status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_bulkout_thread , "ux_slave_class_rndis_bulkout_thread",
                     _ux_device_class_rndis_bulkout_thread,
                     (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) rndis -> ux_slave_class_rndis_bulkout_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
                     UX_THREAD_PRIORITY_CLASS, UX_NO_TIME_SLICE, UX_DONT_START);
-                    
+
         /* Check the creation of this thread.  */
         if (status != UX_SUCCESS)
             status = UX_THREAD_ERROR;
@@ -290,9 +290,9 @@ UINT                                        status = UX_SUCCESS;
     /* Allocate some memory for the bulk in thread stack. */
     if (status == UX_SUCCESS)
     {
-        rndis -> ux_slave_class_rndis_bulkin_thread_stack =  
+        rndis -> ux_slave_class_rndis_bulkin_thread_stack =
                 _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_THREAD_STACK_SIZE);
-        
+
         /* Check for successful allocation.  */
         if (rndis -> ux_slave_class_rndis_bulkin_thread_stack  == UX_NULL)
             status = UX_MEMORY_INSUFFICIENT;
@@ -303,7 +303,7 @@ UINT                                        status = UX_SUCCESS;
        does not start until we have a instance of the class. */
     if (status == UX_SUCCESS)
     {
-        status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_bulkin_thread , "ux_slave_class_rndis_bulkin_thread", 
+        status =  _ux_device_thread_create(&rndis -> ux_slave_class_rndis_bulkin_thread , "ux_slave_class_rndis_bulkin_thread",
                     _ux_device_class_rndis_bulkin_thread,
                     (ULONG) (ALIGN_TYPE) class_ptr, (VOID *) rndis -> ux_slave_class_rndis_bulkin_thread_stack ,
                     UX_THREAD_STACK_SIZE, UX_THREAD_PRIORITY_CLASS,
@@ -342,15 +342,15 @@ UINT                                        status = UX_SUCCESS;
     /* Failed! Free up resources. */
 
     /* Delete semaphore for protecting the driver entry.  */
-    if (rndis -> ux_slave_class_rndis_semaphore.tx_semaphore_id != 0)
+    if (_ux_device_semaphore_created(&rndis -> ux_slave_class_rndis_semaphore))
         _ux_device_semaphore_delete(&rndis -> ux_slave_class_rndis_semaphore);
 
     /* Delete rndis -> ux_slave_class_rndis_event_flags_group.  */
-    if (rndis -> ux_slave_class_rndis_event_flags_group.tx_event_flags_group_id != 0)
+    if (_ux_device_event_flags_created(&rndis -> ux_slave_class_rndis_event_flags_group))
         _ux_utility_event_flags_delete(&rndis -> ux_slave_class_rndis_event_flags_group);
 
     /* Delete rndis -> ux_slave_class_rndis_bulkin_thread.  */
-    if (rndis -> ux_slave_class_rndis_bulkin_thread.tx_thread_id != 0)
+    if (_ux_device_thread_created(&rndis -> ux_slave_class_rndis_bulkin_thread))
         _ux_device_thread_delete(&rndis -> ux_slave_class_rndis_bulkin_thread);
 
     /* Free rndis -> ux_slave_class_rndis_bulkin_thread_stack.  */
@@ -358,23 +358,23 @@ UINT                                        status = UX_SUCCESS;
         _ux_utility_memory_free(rndis -> ux_slave_class_rndis_bulkin_thread_stack);
 
     /* Delete rndis -> ux_slave_class_rndis_bulkout_thread.  */
-    if (rndis -> ux_slave_class_rndis_bulkout_thread.tx_thread_id != 0)
+    if (_ux_device_thread_created(&rndis -> ux_slave_class_rndis_bulkout_thread))
         _ux_device_thread_delete(&rndis -> ux_slave_class_rndis_bulkout_thread);
 
     /* Free rndis -> ux_slave_class_rndis_bulkout_thread_stack.  */
     if (rndis -> ux_slave_class_rndis_bulkout_thread_stack)
         _ux_utility_memory_free(rndis -> ux_slave_class_rndis_bulkout_thread_stack);
-    
+
     /* Delete rndis -> ux_slave_class_rndis_interrupt_thread.  */
-    if (rndis -> ux_slave_class_rndis_interrupt_thread.tx_thread_id != 0)
+    if (_ux_device_thread_created(&rndis -> ux_slave_class_rndis_interrupt_thread))
         _ux_device_thread_delete(&rndis -> ux_slave_class_rndis_interrupt_thread);
-    
+
     /* Free rndis -> ux_slave_class_rndis_interrupt_thread_stack.  */
     if (rndis -> ux_slave_class_rndis_interrupt_thread_stack)
         _ux_utility_memory_free(rndis -> ux_slave_class_rndis_interrupt_thread_stack);
 
     /* Delete rndis -> ux_slave_class_rndis_mutex.  */
-    if (rndis -> ux_slave_class_rndis_mutex.tx_mutex_id != 0)
+    if (_ux_device_mutex_created(&rndis -> ux_slave_class_rndis_mutex))
         _ux_device_mutex_delete(&rndis -> ux_slave_class_rndis_mutex);
 
 #if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
