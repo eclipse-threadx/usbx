@@ -1,4 +1,4 @@
-/* This tests the case where the hub reports a port RESET change. The specific 
+/* This tests the case where the hub reports a port RESET change. The specific
    test case is in ux_host_class_hub_port_change_process.c. */
 
 #include "usbx_ux_test_hub.h"
@@ -24,7 +24,7 @@ static void post_init_host()
 {
 #if UX_MAX_DEVICES > 1
     /* Send port change enable to host. */
-    set_and_send_port_event(0, 
+    set_and_send_port_event(0,
                             UX_HOST_CLASS_HUB_PORT_CHANGE_RESET);
 
     /* Wait for enum thread to complete. */

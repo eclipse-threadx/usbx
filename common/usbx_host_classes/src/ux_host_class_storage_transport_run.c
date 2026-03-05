@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -90,19 +91,6 @@ static inline VOID _ux_host_class_storage_transport_ep_reset(UX_HOST_CLASS_STORA
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Storage Class                                                       */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved internal logic,    */
-/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_transport_run(UX_HOST_CLASS_STORAGE *storage)
@@ -480,7 +468,7 @@ ULONG               requested_length;
     if (storage -> ux_host_class_storage_trans_stage == UX_HOST_CLASS_STORAGE_STAGE_DATA)
     {
         /* Update data count.  */
-        storage -> ux_host_class_storage_data_phase_length += 
+        storage -> ux_host_class_storage_data_phase_length +=
                                 trans -> ux_transfer_request_requested_length;
 
         /* Check if all data is done.  */
@@ -533,7 +521,7 @@ UCHAR                   csw_status;
         storage -> ux_host_class_storage_trans_data =
                                 storage -> ux_host_class_storage_trans_data_bak;
 
-        /* Get sense code from response buffer.  */ 
+        /* Get sense code from response buffer.  */
         sense_code = UX_HOST_CLASS_STORAGE_SENSE_STATUS(
                 (ULONG) *(resp + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_SENSE_KEY),
                 (ULONG) *(resp + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_CODE),

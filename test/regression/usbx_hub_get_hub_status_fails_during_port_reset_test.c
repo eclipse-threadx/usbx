@@ -1,4 +1,4 @@
-/* This tests the case where the get hub status commmand fails when a port is being reset. 
+/* This tests the case where the get hub status commmand fails when a port is being reset.
    The specific test case is in ux_host_class_hub_port_reset.c. */
 
 #include "usbx_ux_test_hub.h"
@@ -38,7 +38,7 @@ static void post_init_host()
     get_port_status_fail_action.status = UX_ERROR;
 
     /* The host actually gets the port status three times - first is initial
-       port status check, second is during port reset (the one we want to fail), third is necessary since 
+       port status check, second is during port reset (the one we want to fail), third is necessary since
        we retry enumeration. */
     UX_TEST_ACTION get_port_status_match_action = {0};
     get_port_status_match_action.usbx_function = UX_TEST_OVERRIDE_UX_HCD_SIM_HOST_ENTRY;

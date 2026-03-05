@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,53 +30,42 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_transfer_request_completed       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_transfer_request_completed       PORTABLE C      */
 /*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is called by the completion thread when a transfer    */ 
-/*    request has been completed either because the transfer is           */ 
-/*    successful or there was an error.                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_host_class_hid_report_callback_function)                        */ 
-/*                                          Callback function for report  */ 
-/*    _ux_host_class_hid_report_decompress  Decompress HID report         */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            supported report IDs,       */
-/*                                            resulting in version 6.2.1  */
+/*                                                                        */
+/*    This function is called by the completion thread when a transfer    */
+/*    request has been completed either because the transfer is           */
+/*    successful or there was an error.                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_host_class_hid_report_callback_function)                        */
+/*                                          Callback function for report  */
+/*    _ux_host_class_hid_report_decompress  Decompress HID report         */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_transfer_request_completed(UX_TRANSFER *transfer_request)
@@ -97,28 +87,28 @@ ULONG                               field_report_count;
 
     /* Get the class instance for this transfer request.  */
     hid =  (UX_HOST_CLASS_HID *) transfer_request -> ux_transfer_request_class_instance;
-    
+
     /* Check the state of the transfer.  If there is an error, we do not proceed with this report.  */
     if (transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS)
     {
 
         /* We have an error. We do not rehook another transfer if the device instance is shutting down or
            if the transfer was aborted by the class.  */
-        if ((hid -> ux_host_class_hid_state ==  UX_HOST_CLASS_INSTANCE_SHUTDOWN) || 
+        if ((hid -> ux_host_class_hid_state ==  UX_HOST_CLASS_INSTANCE_SHUTDOWN) ||
             (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_ABORT))
 
             /* We do not proceed.  */
             return;
 
         else
-        {            
+        {
 
             /* Reactivate the HID interrupt pipe.  */
             _ux_host_stack_transfer_request(transfer_request);
-        
+
             /* We do not proceed.  */
-            return;        
-        }            
+            return;
+        }
     }
 
     /* Get the client instance attached to the HID.  */
@@ -178,10 +168,10 @@ ULONG                               field_report_count;
 
             /* Build the callback structure status.  */
             callback.ux_host_class_hid_report_callback_status =  status;
-    
+
             /* Set the flags to indicate the type of report.  */
             callback.ux_host_class_hid_report_callback_flags =  hid_report -> ux_host_class_hid_report_callback_flags;
-            
+
             /* Call the report owner.  */
             hid_report -> ux_host_class_hid_report_callback_function(&callback);
         }
@@ -260,16 +250,16 @@ ULONG                               field_report_count;
 
                     /* Add the length actually valid in the caller's buffer.  */
                     callback.ux_host_class_hid_report_callback_actual_length =  client_report.ux_host_class_hid_client_report_actual_length;
-        
+
                     /* Add the caller's buffer address.  */
                     callback.ux_host_class_hid_report_callback_buffer =  client_report.ux_host_class_hid_client_report_buffer;
-            
+
                     /* Build the callback structure status.  */
                     callback.ux_host_class_hid_report_callback_status =  status;
-        
+
                     /* Set the flags to indicate the type of report.  */
                     callback.ux_host_class_hid_report_callback_flags =  hid_report -> ux_host_class_hid_report_callback_flags;
-                
+
                     /* Call the report owner.  */
                     hid_report -> ux_host_class_hid_report_callback_function(&callback);
                 }
@@ -278,7 +268,7 @@ ULONG                               field_report_count;
                 _ux_utility_memory_free(client_buffer);
             }
         }
-    }    
+    }
 
     /* Check latest status.  */
     if (status != UX_SUCCESS)

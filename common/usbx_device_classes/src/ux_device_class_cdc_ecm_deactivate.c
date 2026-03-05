@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device CDC_ECM Class                                                */
 /**                                                                       */
@@ -28,63 +29,45 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_ecm_deactivate                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_ecm_deactivate                 PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function deactivate an instance of the cdc_ecm class.          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to a class command    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function deactivate an instance of the cdc_ecm class.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to a class command    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_device_stack_transfer_all_request_abort                         */
 /*                                          Abort all transfers           */
 /*    _ux_device_event_flags_set            Set event flags               */
 /*    _ux_network_driver_deactivate         Deactivate NetX USB interface */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    CDC_ECM Class                                                       */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_deactivate(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
+
 UX_SLAVE_CLASS_CDC_ECM      *cdc_ecm;
-UX_SLAVE_INTERFACE          *interface_ptr;            
+UX_SLAVE_INTERFACE          *interface_ptr;
 UX_SLAVE_CLASS              *class_ptr;
 
     /* Get the class container.  */
@@ -98,7 +81,7 @@ UX_SLAVE_CLASS              *class_ptr;
        interface in the class container, we used the class_command pointer to retrieve the
        correct interface which issued the deactivation. */
     interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
-    
+
     /* Check if this is the Control or Data interface.  We only need to dismount the link and abort the
        transfer once for the 2 classes.  */
     if (interface_ptr -> ux_slave_interface_descriptor.bInterfaceClass == UX_DEVICE_CLASS_CDC_ECM_CLASS_COMMUNICATION_CONTROL)
@@ -110,7 +93,7 @@ UX_SLAVE_CLASS              *class_ptr;
 
             /* Then we've found the bulk endpoints and started the threads.  */
 
-            /* Abort transfers. Note that since the bulk out thread is most likely waiting for 
+            /* Abort transfers. Note that since the bulk out thread is most likely waiting for
                a transfer from the host, this will allow it to resume and suspend itself.  */
             _ux_device_stack_transfer_all_request_abort(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint, UX_TRANSFER_BUS_RESET);
             _ux_device_stack_transfer_all_request_abort(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint, UX_TRANSFER_BUS_RESET);
@@ -126,7 +109,7 @@ UX_SLAVE_CLASS              *class_ptr;
                 _ux_device_stack_transfer_all_request_abort(cdc_ecm -> ux_slave_class_cdc_ecm_interrupt_endpoint, UX_TRANSFER_BUS_RESET);
 
             /* Wake up the bulk in thread so it will release the NetX resources used and suspend.  */
-            _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);                
+            _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);
 
             /* If there is a deactivate function call it.  */
             if (cdc_ecm -> ux_slave_class_cdc_ecm_parameter.ux_slave_class_cdc_ecm_instance_deactivate != UX_NULL)

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -29,63 +30,44 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_deactivate                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_deactivate                       PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called when this instance of the HUB has been      */
-/*    removed from the bus either directly or indirectly. The interrupt   */ 
-/*    pipe will be destroyed and the instance removed.                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to class command      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
-/*    _ux_host_stack_device_remove          Remove device                 */ 
+/*    removed from the bus either directly or indirectly. The interrupt   */
+/*    pipe will be destroyed and the instance removed.                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to class command      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_destroy Destroy class instance        */
+/*    _ux_host_stack_device_remove          Remove device                 */
 /*    _ux_host_stack_endpoint_transfer_abort                              */
-/*                                          Abort transfer                */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_host_semaphore_put                Release semaphore             */ 
+/*                                          Abort transfer                */
+/*    _ux_utility_memory_free               Release memory block          */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*    _ux_host_semaphore_put                Release semaphore             */
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved deactivate flow,   */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -105,7 +87,7 @@ UINT                    port_index;
 
     /* The HUB is being shut down.  */
     hub -> ux_host_class_hub_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
-    
+
     /* We need to abort transactions on the interrupt pipe.  */
 #if defined(UX_HOST_STANDALONE)
     if (hub -> ux_host_class_hub_interrupt_endpoint)
@@ -134,7 +116,7 @@ UINT                    port_index;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
 
     /* Then de allocate the memory.  */
 #if defined(UX_HOST_STANDALONE)
@@ -156,7 +138,7 @@ UINT                    port_index;
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
     {
-        
+
         /* Inform the application the device is removed.  */
         _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, hub -> ux_host_class_hub_class, (VOID *) hub);
     }
@@ -169,7 +151,7 @@ UINT                    port_index;
 
 #if defined(UX_HOST_STANDALONE)
 
-    /* Unlink from device class instance.  */        
+    /* Unlink from device class instance.  */
     hub -> ux_host_class_hub_device -> ux_device_class_instance =  (VOID *) hub;
 #endif
 
@@ -177,5 +159,5 @@ UINT                    port_index;
     _ux_utility_memory_free(hub);
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }

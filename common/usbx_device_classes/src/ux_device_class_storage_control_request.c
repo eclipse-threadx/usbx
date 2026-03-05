@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -29,56 +30,37 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_control_request            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_control_request            PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function manages the based sent by the host on the control     */ 
-/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
+/*                                                                        */
+/*    This function manages the based sent by the host on the control     */
+/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_device_stack_transfer_abort       Abort Transfer                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Storage Class                                                */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            resulting in version 6.1    */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed USB CV test issues,   */
-/*                                            resulting in version 6.1.3  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -103,7 +85,7 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
 
     /* Get the pointer to the transfer request associated with the control endpoint.  */
     transfer_request =  &device -> ux_slave_device_control_endpoint.ux_slave_endpoint_transfer_request;
-    
+
     /* Extract the request type from the SETUP packet..   */
     request =  *(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_REQUEST);
     request_value = _ux_utility_short_get(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_VALUE);
@@ -115,7 +97,7 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
 
     /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;
-    
+
     /* Get the storage instance from this class container.  */
     storage =  (UX_SLAVE_CLASS_STORAGE *) class_ptr -> ux_slave_class_instance;
 
@@ -139,14 +121,14 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
 
         /* Locate the endpoints.  */
         endpoint_in =  interface_ptr -> ux_slave_interface_first_endpoint;
-        
+
         /* Check the endpoint direction, if IN we have the correct endpoint.  */
         if ((endpoint_in -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_IN)
         {
 
             /* Wrong direction, we found the OUT endpoint first.  */
             endpoint_out =  endpoint_in;
-                
+
             /* So the next endpoint has to be the IN endpoint.  */
             endpoint_in =  endpoint_out -> ux_slave_endpoint_next_endpoint;
         }

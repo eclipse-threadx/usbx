@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,59 +30,45 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_report_get                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_report_get                       PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function gets a report (input/output/feature) from the device. */
-/*    The report can be either decompressed by the stack or raw.          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*    client_report                         Pointer to client report      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_report_decompress  Decompress HID report         */ 
-/*    _ux_host_stack_class_instance_verify  Verify the instance is valid  */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_copy               Copy memory block             */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*    _ux_host_semaphore_put                Release protection semaphore  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases, accepted both INPUT  */
-/*                                            and FEATURE reports,        */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*    The report can be either decompressed by the stack or raw.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*    client_report                         Pointer to client report      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_report_decompress  Decompress HID report         */
+/*    _ux_host_stack_class_instance_verify  Verify the instance is valid  */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_copy               Copy memory block             */
+/*    _ux_utility_memory_free               Release memory block          */
+/*    _ux_host_semaphore_get                Get protection semaphore      */
+/*    _ux_host_semaphore_put                Release protection semaphore  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report)
@@ -100,7 +87,7 @@ UINT                            status;
 
     /* Ensure the instance is valid.  */
     if (_ux_host_stack_class_instance_verify(_ux_system_host_class_hid_name, (VOID *) hid) != UX_SUCCESS)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -124,7 +111,7 @@ UINT                            status;
 
         /* Unprotect thread reentry to this instance.  */
         _ux_host_class_hid_unlock(hid);
-        
+
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_HID_REPORT_ERROR, hid, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
@@ -138,7 +125,7 @@ UINT                            status;
 
         /* Unprotect thread reentry to this instance.  */
         _ux_host_class_hid_unlock(hid);
-        
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_HID_REPORT_ERROR);
 
@@ -148,7 +135,7 @@ UINT                            status;
         /* Return error code.  */
         return(UX_HOST_CLASS_HID_REPORT_ERROR);
     }
-        
+
     /* Get some memory for reading the report.  */
     report_buffer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, hid_report -> ux_host_class_hid_report_byte_length);
     if (report_buffer == UX_NULL)
@@ -158,14 +145,14 @@ UINT                            status;
         _ux_host_class_hid_unlock(hid);
 
         /* Return error code.  */
-        return(UX_MEMORY_INSUFFICIENT); 
-    }        
+        return(UX_MEMORY_INSUFFICIENT);
+    }
 
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &hid -> ux_host_class_hid_device -> ux_device_control_endpoint;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
-    /* Protect the control endpoint semaphore here.  It will be unprotected in the 
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
 #if defined(UX_HOST_STANDALONE)
     UX_DISABLE
@@ -221,22 +208,22 @@ UINT                            status;
             /* Ensure the user has given us enough memory for the raw buffer.  */
             if (client_report -> ux_host_class_hid_client_report_length >= transfer_request -> ux_transfer_request_actual_length)
             {
-                
+
                 /* We have enough memory to store the raw buffer.  */
                 _ux_utility_memory_copy(client_report -> ux_host_class_hid_client_report_buffer, report_buffer, transfer_request -> ux_transfer_request_actual_length); /* Use case of memcpy is verified. */
-                
+
                 /* Set status to success.  */
                 status =  UX_SUCCESS;
             }
             else
             {
-                
+
                 /* Error trap. */
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_BUFFER_OVERFLOW);
 
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_BUFFER_OVERFLOW, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
-        
+
                 /* Set overflow status.  */
                 status =  UX_BUFFER_OVERFLOW;
             }
@@ -250,7 +237,7 @@ UINT                            status;
     }
     else
     {
-        
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_HID_REPORT_ERROR);
 
@@ -263,7 +250,7 @@ UINT                            status;
 
     /* Free all resources.  */
     _ux_utility_memory_free(report_buffer);
-    
+
     /* Unprotect thread reentry to this instance.  */
     _ux_host_class_hid_unlock(hid);
 
@@ -301,12 +288,6 @@ UINT                            status;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_hid_report_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report)

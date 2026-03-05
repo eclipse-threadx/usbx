@@ -258,7 +258,7 @@ ULONG                                           action_taken;
 
     /* Perform hooked callbacks.  */
     ux_test_do_hooks_after(UX_TEST_OVERRIDE_UX_HCD_SIM_HOST_ENTRY, &params);
-    
+
     /* Return completion status.  */
     return(status);
 }

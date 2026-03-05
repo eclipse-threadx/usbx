@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,65 +30,57 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_entry                                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_entry                                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function dispatches the HCD function internally to the OHCI   */
-/*     controller driver routines.                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    HCD                                   Pointer to HCD                */ 
-/*    function                              Function for driver to perform*/ 
-/*    parameter                             Pointer to parameter(s)       */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_asynchronous_endpoint_create  Create async endpoint    */ 
-/*    _ux_hcd_ohci_asynchronous_endpoint_destroy Destroy async endpoint   */ 
-/*    _ux_hcd_ohci_controller_disable            Disable controller       */ 
-/*    _ux_hcd_ohci_done_queue_process            Process done queue       */ 
-/*    _ux_hcd_ohci_endpoint_reset                Reset endpoint           */ 
-/*    _ux_hcd_ohci_frame_number_get              Get frame number         */ 
-/*    _ux_hcd_ohci_frame_number_set              Set frame number         */ 
-/*    _ux_hcd_ohci_interrupt_endpoint_create     Create interrupt endpoint*/ 
-/*    _ux_hcd_ohci_isochronous_endpoint_create   Create isoch endpoint    */ 
-/*    _ux_hcd_ohci_periodic_endpoint_destroy     Destroy periodic endpoint*/ 
-/*    _ux_hcd_ohci_port_enable                   Enable port              */ 
-/*    _ux_hcd_ohci_port_disable                  Disable port             */ 
-/*    _ux_hcd_ohci_port_reset                    Reset port               */ 
-/*    _ux_hcd_ohci_port_resume                   Resume port              */ 
-/*    _ux_hcd_ohci_port_status_get               Get port status          */ 
-/*    _ux_hcd_ohci_port_suspend                  Suspend port             */ 
-/*    _ux_hcd_ohci_power_down_port               Power down port          */ 
-/*    _ux_hcd_ohci_power_on_port                 Power on port            */ 
-/*    _ux_hcd_ohci_request_transfer              Request transfer         */ 
-/*    _ux_hcd_ohci_transfer_abort                Abort transfer           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Host Stack                                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*     controller driver routines.                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    HCD                                   Pointer to HCD                */
+/*    function                              Function for driver to perform*/
+/*    parameter                             Pointer to parameter(s)       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ohci_asynchronous_endpoint_create  Create async endpoint    */
+/*    _ux_hcd_ohci_asynchronous_endpoint_destroy Destroy async endpoint   */
+/*    _ux_hcd_ohci_controller_disable            Disable controller       */
+/*    _ux_hcd_ohci_done_queue_process            Process done queue       */
+/*    _ux_hcd_ohci_endpoint_reset                Reset endpoint           */
+/*    _ux_hcd_ohci_frame_number_get              Get frame number         */
+/*    _ux_hcd_ohci_frame_number_set              Set frame number         */
+/*    _ux_hcd_ohci_interrupt_endpoint_create     Create interrupt endpoint*/
+/*    _ux_hcd_ohci_isochronous_endpoint_create   Create isoch endpoint    */
+/*    _ux_hcd_ohci_periodic_endpoint_destroy     Destroy periodic endpoint*/
+/*    _ux_hcd_ohci_port_enable                   Enable port              */
+/*    _ux_hcd_ohci_port_disable                  Disable port             */
+/*    _ux_hcd_ohci_port_reset                    Reset port               */
+/*    _ux_hcd_ohci_port_resume                   Resume port              */
+/*    _ux_hcd_ohci_port_status_get               Get port status          */
+/*    _ux_hcd_ohci_port_suspend                  Suspend port             */
+/*    _ux_hcd_ohci_power_down_port               Power down port          */
+/*    _ux_hcd_ohci_power_on_port                 Power on port            */
+/*    _ux_hcd_ohci_request_transfer              Request transfer         */
+/*    _ux_hcd_ohci_transfer_abort                Abort transfer           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Host Stack                                                          */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_entry(UX_HCD *hcd, UINT function, VOID *parameter)
@@ -95,7 +88,7 @@ UINT  _ux_hcd_ohci_entry(UX_HCD *hcd, UINT function, VOID *parameter)
 
 UINT            status;
 UX_HCD_OHCI     *hcd_ohci;
-    
+
 
     /* Check the status of the controller.  */
     if (hcd -> ux_hcd_status == UX_UNUSED)
@@ -109,7 +102,7 @@ UX_HCD_OHCI     *hcd_ohci;
 
         return(UX_CONTROLLER_UNKNOWN);
     }
-            
+
     /* Get the pointer to the OHCI HCD.  */
     hcd_ohci =  (UX_HCD_OHCI *) hcd -> ux_hcd_controller_hardware;
 
@@ -207,15 +200,15 @@ UX_HCD_OHCI     *hcd_ohci;
             status =  _ux_hcd_ohci_asynchronous_endpoint_create(hcd_ohci, (UX_ENDPOINT*) parameter);
             break;
 
-        
+
         case UX_INTERRUPT_ENDPOINT:
-        
+
             status =  _ux_hcd_ohci_interrupt_endpoint_create(hcd_ohci, (UX_ENDPOINT*) parameter);
             break;
 
 
         case UX_ISOCHRONOUS_ENDPOINT:
-        
+
             status =  _ux_hcd_ohci_isochronous_endpoint_create(hcd_ohci, (UX_ENDPOINT*) parameter);
             break;
 
@@ -224,7 +217,7 @@ UX_HCD_OHCI     *hcd_ohci;
 
 
     case UX_HCD_DESTROY_ENDPOINT:
-    
+
         switch ((((UX_ENDPOINT*) parameter) -> ux_endpoint_descriptor.bmAttributes) & UX_MASK_ENDPOINT_TYPE)
         {
 
@@ -236,7 +229,7 @@ UX_HCD_OHCI     *hcd_ohci;
 
         case UX_INTERRUPT_ENDPOINT:
         case UX_ISOCHRONOUS_ENDPOINT:
-        
+
             status =  _ux_hcd_ohci_periodic_endpoint_destroy(hcd_ohci, (UX_ENDPOINT*) parameter);
             break;
 
@@ -245,13 +238,13 @@ UX_HCD_OHCI     *hcd_ohci;
 
 
     case UX_HCD_RESET_ENDPOINT:
-        
+
         status =  _ux_hcd_ohci_endpoint_reset(hcd_ohci, (UX_ENDPOINT*) parameter);
         break;
 
 
     case UX_HCD_PROCESS_DONE_QUEUE:
-        
+
         _ux_hcd_ohci_done_queue_process(hcd_ohci);
         status =  UX_SUCCESS;
         break;
@@ -267,8 +260,8 @@ UX_HCD_OHCI     *hcd_ohci;
 
         /* Set status to not supported.  */
         status =  UX_FUNCTION_NOT_SUPPORTED;
-    }        
-    
+    }
+
     /* Return completion status.  */
     return(status);
 }

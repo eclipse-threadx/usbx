@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Slave Simulator Controller Driver                                   */
 /**                                                                       */
@@ -49,26 +50,15 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Slave Simulator Controller Driver                                   */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            supported bi-dir-endpoints, */
-/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_endpoint_create(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_ENDPOINT *endpoint)
@@ -78,7 +68,7 @@ UX_DCD_SIM_SLAVE_ED     *ed;
 ULONG                   sim_slave_endpoint_index;
 
 
-    /* The simulator slave controller has 16 endpoints maximum. Endpoint 0 is always control. 
+    /* The simulator slave controller has 16 endpoints maximum. Endpoint 0 is always control.
        The other endpoints are generic. We can use the endpoint number as an index.  */
     sim_slave_endpoint_index =  endpoint ->ux_slave_endpoint_descriptor.bEndpointAddress & ~(ULONG)UX_ENDPOINT_DIRECTION;
 
@@ -96,7 +86,7 @@ ULONG                   sim_slave_endpoint_index;
     /* Check the endpoint status, if it is free, reserve it. If not reject this endpoint.  */
     if ((ed -> ux_sim_slave_ed_status & UX_DCD_SIM_SLAVE_ED_STATUS_USED) == 0)
     {
-        
+
         /* We can use this endpoint.  */
         ed -> ux_sim_slave_ed_status |=  UX_DCD_SIM_SLAVE_ED_STATUS_USED;
 
@@ -114,7 +104,7 @@ ULONG                   sim_slave_endpoint_index;
             ed -> ux_sim_slave_ed_status |= UX_DCD_SIM_SLAVE_ED_STATUS_TRANSFER;
 
         /* Enable this endpoint.  */
-        return(UX_SUCCESS);         
+        return(UX_SUCCESS);
     }
 
     /* Notify application.  */

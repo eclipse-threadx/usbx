@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device CDC_ECM Class                                                */
 /**                                                                       */
@@ -29,56 +30,39 @@
 
 
 #if !defined(UX_DEVICE_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_ecm_interrupt_thread           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_ecm_interrupt_thread           PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the thread of the cdc_ecm interrupt endpoint       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_ecm_class                         Address of cdc_ecm class      */ 
-/*                                          container                     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Request transfer              */ 
+/*                                                                        */
+/*    This function is the thread of the cdc_ecm interrupt endpoint       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_ecm_class                         Address of cdc_ecm class      */
+/*                                          container                     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Request transfer              */
 /*    _ux_utility_event_flags_get           Get event flags               */
 /*    _ux_utility_short_put                 Put 16-bit value to buffer    */
 /*    _ux_device_thread_suspend             Suspend thread                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_interrupt_thread(ULONG cdc_ecm_class)
@@ -94,13 +78,13 @@ UCHAR                           *notification_buffer;
 
     /* Cast properly the cdc_ecm instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, cdc_ecm_class)
-    
+
     /* Get the cdc_ecm instance from this class container.  */
     cdc_ecm =  (UX_SLAVE_CLASS_CDC_ECM *) class_ptr -> ux_slave_class_instance;
-    
+
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
-    
+
     /* This thread runs forever but can be suspended or resumed.  */
     while(1)
     {
@@ -110,13 +94,13 @@ UCHAR                           *notification_buffer;
 
         /* As long as the device is in the CONFIGURED state.  */
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
-        { 
+        {
 
 
             /* Wait until we have a event sent by the application. We do not treat yet the case where a timeout based
                on the interrupt pipe frequency or a change in the idle state forces us to send an empty report.  */
-            _ux_utility_event_flags_get(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, 
-                                        UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, 
+            _ux_utility_event_flags_get(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group,
+                                        UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT,
                                         UX_OR_CLEAR, &actual_flags, UX_WAIT_FOREVER);
 
             /* Build the Network Notification response.  */
@@ -127,7 +111,7 @@ UCHAR                           *notification_buffer;
 
             /* Set the request itself.  */
             *(notification_buffer + UX_SETUP_REQUEST) = 0;
-            
+
             /* Set the value. It is the network link.  */
             _ux_utility_short_put(notification_buffer + UX_SETUP_VALUE, (USHORT)(cdc_ecm -> ux_slave_class_cdc_ecm_link_state));
 

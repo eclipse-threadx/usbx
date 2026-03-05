@@ -245,11 +245,11 @@ UX_HOST_CLASS_CDC_ACM               *cdc_acm;
         case UX_HOST_CLASS_CDC_CONTROL_CLASS:
             cdc_acm_host_control = cdc_acm;
             break;
-        
+
         case UX_HOST_CLASS_CDC_DATA_CLASS:
             cdc_acm_host_data = cdc_acm;
             break;
-        
+
         default:
             break;
         }

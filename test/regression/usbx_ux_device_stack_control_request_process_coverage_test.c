@@ -48,7 +48,7 @@ UCHAR                   request = 0;
     slave_class1.ux_slave_class_entry_function = _test_class_entry;
     slave_interface.ux_slave_interface_descriptor.bInterfaceClass = 0x7;
     _ux_device_stack_control_request_process(&transfer_request);
-    
+
     printf("SUCCESS!\n");
     test_control_return(0);
 

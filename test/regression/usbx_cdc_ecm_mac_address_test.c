@@ -21,11 +21,11 @@ static unsigned char mac_address_test_string_framework[] = {
     /* MAC Address string descriptor : Index 4 - "001E5841B878" */
         0x09, 0x04, 0x04, 0x0C,
         'A', 'A', /* Test capital upper and lower element. */
-        '0', '1', 
-        '2', '3', 
-        '4', 'b', 
-        'c', 'D', 
-        'e', 'f', 
+        '0', '1',
+        '2', '3',
+        '4', 'b',
+        'c', 'D',
+        'e', 'f',
 
 };
 

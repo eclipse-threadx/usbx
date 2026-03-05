@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,52 +30,40 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_descriptor_parse                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_descriptor_parse                 PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function obtains the HID descriptor and parses it.             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_report_descriptor_get                            */ 
-/*                                          Get HID report descriptor     */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used shared device config   */
-/*                                            descriptor for enum scan,   */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*    This function obtains the HID descriptor and parses it.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_report_descriptor_get                            */
+/*                                          Get HID report descriptor     */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_descriptor_parse(UX_HOST_CLASS_HID *hid)
@@ -91,7 +80,7 @@ UX_INTERFACE_DESCRIPTOR         interface_descriptor;
 UINT                            status;
 ULONG                           total_configuration_length;
 UINT                            descriptor_length;
-UINT                            descriptor_type;                
+UINT                            descriptor_type;
 ULONG                           current_interface;
 
     /* Get device, current configuration.  */
@@ -113,7 +102,7 @@ ULONG                           current_interface;
         control_endpoint =  &device -> ux_device_control_endpoint;
         transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
-        /* Need to allocate memory for the descriptor. Since we do not know the size of the 
+        /* Need to allocate memory for the descriptor. Since we do not know the size of the
         descriptor, we first read the first bytes.  */
         descriptor =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, total_configuration_length);
         if (descriptor == UX_NULL)
@@ -137,7 +126,7 @@ ULONG                           current_interface;
         if (transfer_request -> ux_transfer_request_actual_length != total_configuration_length)
             status = UX_DESCRIPTOR_CORRUPTED;
     }
-    
+
     /* Reset the current interface to keep compiler warnings happy. */
     current_interface = 0;
 
@@ -145,15 +134,15 @@ ULONG                           current_interface;
     if (status == UX_SUCCESS)
     {
 
-        /* The HID descriptor is embedded within the configuration descriptor. We parse the 
+        /* The HID descriptor is embedded within the configuration descriptor. We parse the
             entire descriptor to locate the HID portion.  */
         while (total_configuration_length)
         {
-    
+
             /* Gather the length and type of the descriptor.   */
             descriptor_length =  *descriptor;
             descriptor_type =    *(descriptor + 1);
-    
+
             /* Make sure this descriptor has at least the minimum length.  */
             if (descriptor_length < 3)
             {
@@ -183,7 +172,7 @@ ULONG                           current_interface;
                 /* Memorize the interface we are scanning.  */
                 current_interface = interface_descriptor.bInterfaceNumber;
             }
-    
+
             /* Check the type for an interface descriptor.  */
             /* Check if the descriptor belongs to interface attached to this instance.  */
             if (descriptor_type == UX_HOST_CLASS_HID_DESCRIPTOR)
@@ -208,7 +197,7 @@ ULONG                           current_interface;
                     return(status);
                 }
             }
-    
+
             /* Verify if the descriptor is still valid.  */
             if (descriptor_length > total_configuration_length)
             {
@@ -225,10 +214,10 @@ ULONG                           current_interface;
                 /* Return an error.  */
                 return(UX_DESCRIPTOR_CORRUPTED);
             }
-    
+
             /* Jump to the next descriptor if we have not reached the end.  */
             descriptor +=  descriptor_length;
-    
+
             /* And adjust the length left to parse in the descriptor.  */
             total_configuration_length -=  descriptor_length;
         }

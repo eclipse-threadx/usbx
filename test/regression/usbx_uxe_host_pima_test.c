@@ -127,7 +127,7 @@ ULONG                                           object_handles_array[32];
     UX_TEST_CHECK_CODE(UX_MEMORY_INSUFFICIENT ,status);
 
     /* Unit test for function ux_host_class_pima_object_info_get() */
-    status = ux_host_class_pima_object_info_get(NX_NULL, &pima_session, 0, &object); 
+    status = ux_host_class_pima_object_info_get(NX_NULL, &pima_session, 0, &object);
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER ,status);
 
     status = ux_host_class_pima_object_info_get(dummy_pima, NX_NULL, 0, &object);
@@ -292,7 +292,7 @@ ULONG                                           object_handles_array[32];
     /* Unit test for function ux_host_class_pima_num_objects_get() */
     status = ux_host_class_pima_num_objects_get(NX_NULL, &pima_session, 0, 0);
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER ,status);
-    
+
     status = ux_host_class_pima_num_objects_get(dummy_pima, NX_NULL, 0, 0);
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER ,status);
 

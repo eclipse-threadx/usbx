@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,47 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_next_td_clean                          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_next_td_clean                          PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function cleans all the tds attached to a ED. The end of the  */ 
-/*     TD chain is pointed by the tail TD.                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    td                                    Pointer to OHCI TD            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_physical_address          Get physical address          */ 
-/*    _ux_utility_virtual_address           Get virtual address           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    OHCI Controller Driver                                              */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed physical and virtual  */
-/*                                            address conversion,         */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*     This function cleans all the tds attached to a ED. The end of the  */
+/*     TD chain is pointed by the tail TD.                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    td                                    Pointer to OHCI TD            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_physical_address          Get physical address          */
+/*    _ux_utility_virtual_address           Get virtual address           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    OHCI Controller Driver                                              */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_next_td_clean(UX_OHCI_TD *td)
@@ -110,7 +101,7 @@ ULONG           value_carry;
         head_td =  _ux_utility_virtual_address(ed -> ux_ohci_ed_head_td);
     }
 
-    /* Restore the value carry for next transfers.  */       
+    /* Restore the value carry for next transfers.  */
     value_td =   (ULONG) ed -> ux_ohci_ed_head_td;
     value_td |=  value_carry;
     ed -> ux_ohci_ed_head_td =  (UX_OHCI_TD *) value_td;

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,62 +29,44 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_configuration_set                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_configuration_set                    PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a setting of a device configuration.         */ 
+/*                                                                        */
+/*    This function performs a setting of a device configuration.         */
 /*                                                                        */
 /*    In RTOS mode, this function is blocking.                            */
-/*    If the host is OTG capable and the device has an OTG descriptor     */ 
-/*    that supports HNP we perform a SET_FEATURE with b_hnp_support.      */ 
-/*                                                                        */ 
+/*    If the host is OTG capable and the device has an OTG descriptor     */
+/*    that supports HNP we perform a SET_FEATURE with b_hnp_support.      */
+/*                                                                        */
 /*    In standalone mode, when device enumeration is in progress, this    */
 /*    function is non-blocking, it prepares transfer for enum step of     */
 /*    SET_CONFIGURE request. Otherwise it blocks until transfer request   */
 /*    done.                                                               */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    configuration                         Pointer to configuration      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used pointer for current    */
-/*                                            selected configuration,     */
-/*                                            resulting in version 6.1.4  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            set device power source,    */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    configuration                         Pointer to configuration      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_configuration_set(UX_CONFIGURATION *configuration)
@@ -98,7 +81,7 @@ UX_HCD          *hcd;
 #endif
 
 
-    /* A configuration is selected. Retrieve the pointer to the control endpoint 
+    /* A configuration is selected. Retrieve the pointer to the control endpoint
        and its transfer request.  */
     device =            configuration -> ux_configuration_device;
     control_endpoint =  &device -> ux_device_control_endpoint;
@@ -116,11 +99,11 @@ UX_HCD          *hcd;
 
             /* With the device we have the pointer to the HCD.  */
             hcd = UX_DEVICE_HCD_GET(device);
-    
+
             /* Check the HCD to ensure we have an OTG host controller.  */
             if (hcd -> ux_hcd_otg_capabilities & UX_HCD_OTG_CAPABLE)
             {
-    
+
                 /* The Host controller is OTG aware.  Perform a SET_FEATURE with b_hnp_support.  */
                 transfer_request -> ux_transfer_request_data_pointer =      UX_NULL;
                 transfer_request -> ux_transfer_request_requested_length =  0;
@@ -128,10 +111,10 @@ UX_HCD          *hcd;
                 transfer_request -> ux_transfer_request_type =              UX_REQUEST_OUT| UX_REQUEST_TYPE_STANDARD | UX_REQUEST_TARGET_DEVICE;
                 transfer_request -> ux_transfer_request_value =             UX_OTG_FEATURE_A_HNP_SUPPORT;
                 transfer_request -> ux_transfer_request_index =             0;
-            
+
                 /* Send request to HCD layer.  */
                 status =  _ux_host_stack_transfer_request(transfer_request);
-            
+
                 /* If the device fails this command we turn off its OTG capabilities.  */
                 if (status != UX_SUCCESS)
 
@@ -175,7 +158,7 @@ UX_HCD          *hcd;
 
         /* Change the device state to configured.  */
         device -> ux_device_state =  UX_DEVICE_CONFIGURED;
-    
+
         /* Store the new configuration value in the device container.  */
         device -> ux_device_current_configuration =  configuration;
 

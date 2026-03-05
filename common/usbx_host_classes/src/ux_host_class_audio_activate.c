@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -68,30 +69,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Audio Class                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            added interrupt support,    */
-/*                                            protect reentry with mutex, */
-/*                                            added feedback support,     */
-/*                                            refined error handling,     */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved AC AS management,  */
-/*                                            improved error handling,    */
-/*                                            improved descriptors check, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_activate(UX_HOST_CLASS_COMMAND *command)
@@ -364,7 +341,7 @@ UINT                    status;
         {
 
             /* Check interface number to see if it's right AC.  */
-            if ((ac -> ux_host_class_audio_interface -> ux_interface_configuration == 
+            if ((ac -> ux_host_class_audio_interface -> ux_interface_configuration ==
                     interface_ptr -> ux_interface_configuration) &&
                 (ac -> ux_host_class_audio_interface -> ux_interface_descriptor.bInterfaceNumber ==
                     audio -> ux_host_class_audio_control_interface_number) &&

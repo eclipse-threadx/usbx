@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device CDC_ECM Class                                                */
 /**                                                                       */
@@ -27,48 +28,36 @@
 #include "ux_device_class_cdc_ecm.h"
 #include "ux_device_stack.h"
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_ecm_control_request            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_ecm_control_request            PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function manages the based sent by the host on the control     */ 
-/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_ecm                           Pointer to cdc_ecm class          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_short_get                 Get 16-bit value              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function manages the based sent by the host on the control     */
+/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_ecm                           Pointer to cdc_ecm class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_short_get                 Get 16-bit value              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    CDC_ECM Class                                                       */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -93,17 +82,17 @@ UX_SLAVE_CLASS_CDC_ECM  *cdc_ecm;
 
     /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;
-    
+
     /* Get the cdc_ecm instance from this class container.  */
     cdc_ecm =  (UX_SLAVE_CLASS_CDC_ECM *) class_ptr -> ux_slave_class_instance;
-    
+
     /* Here we proceed only the standard request we know of at the device level.  */
     switch (request)
     {
 
         case UX_DEVICE_CLASS_CDC_ECM_SET_ETHERNET_MULTICAST_FILTER                :
 
-            /* Save the multicast filter.  */                
+            /* Save the multicast filter.  */
             cdc_ecm -> ux_slave_class_cdc_ecm_ethernet_multicast_filter =  request_value;
             break ;
 
@@ -118,7 +107,7 @@ UX_SLAVE_CLASS_CDC_ECM  *cdc_ecm;
             /* Save the packet filter.  */
             cdc_ecm -> ux_slave_class_cdc_ecm_ethernet_packet_filter =  request_value;
             break ;
-            
+
         case UX_DEVICE_CLASS_CDC_ECM_GET_ETHERNET_POWER_MANAGEMENT_FILTER        :
         default:
 

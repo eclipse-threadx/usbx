@@ -34,16 +34,16 @@ UX_SLAVE_CLASS_DPUMP            *dpump_device;
 
 
 #define DEVICE_FRAMEWORK_LENGTH_FULL_SPEED 50
-UCHAR device_framework_full_speed[] = { 
+UCHAR device_framework_full_speed[] = {
 
     /* Device descriptor */
         0x12, 0x01, 0x10, 0x01, 0x00, 0x00, 0x00, 0x08,
         0xec, 0x08, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x01,                                      
+        0x00, 0x01,
 
     /* Configuration descriptor */
         0x09, 0x02, 0x20, 0x00, 0x01, 0x01, 0x00, 0xc0,
-        0x32, 
+        0x32,
 
     /* Interface descriptor */
         0x09, 0x04, 0x00, 0x00, 0x02, 0x99, 0x99, 0x99,
@@ -53,17 +53,17 @@ UCHAR device_framework_full_speed[] = {
         0x07, 0x05, 0x01, 0x02, 0x40, 0x00, 0x00,
 
     /* Endpoint descriptor (Bulk In) */
-        0x07, 0x05, 0x82, 0x02, 0x40, 0x00, 0x00 
+        0x07, 0x05, 0x82, 0x02, 0x40, 0x00, 0x00
     };
-    
-    
+
+
 #define DEVICE_FRAMEWORK_LENGTH_HIGH_SPEED 60
-UCHAR device_framework_high_speed[] = { 
+UCHAR device_framework_high_speed[] = {
 
     /* Device descriptor */
         0x12, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x40,
         0x0a, 0x07, 0x25, 0x40, 0x01, 0x00, 0x01, 0x02,
-        0x03, 0x01,                                      
+        0x03, 0x01,
 
     /* Device qualifier descriptor */
         0x0a, 0x06, 0x00, 0x02, 0x00, 0x00, 0x00, 0x40,
@@ -71,7 +71,7 @@ UCHAR device_framework_high_speed[] = {
 
     /* Configuration descriptor */
         0x09, 0x02, 0x20, 0x00, 0x01, 0x01, 0x00, 0xc0,
-        0x32, 
+        0x32,
 
     /* Interface descriptor */
         0x09, 0x04, 0x00, 0x00, 0x02, 0x99, 0x99, 0x99,
@@ -81,30 +81,30 @@ UCHAR device_framework_high_speed[] = {
         0x07, 0x05, 0x01, 0x02, 0x00, 0x02, 0x00,
 
     /* Endpoint descriptor (Bulk In) */
-        0x07, 0x05, 0x82, 0x02, 0x00, 0x02, 0x00 
+        0x07, 0x05, 0x82, 0x02, 0x00, 0x02, 0x00
     };
-    
+
     /* String Device Framework :
      Byte 0 and 1 : Word containing the language ID : 0x0904 for US
      Byte 2       : Byte containing the index of the descriptor
      Byte 3       : Byte containing the length of the descriptor string
     */
-   
+
 #define STRING_FRAMEWORK_LENGTH 38
-UCHAR string_framework[] = { 
+UCHAR string_framework[] = {
 
     /* Manufacturer string descriptor : Index 1 */
-        0x09, 0x04, 0x01, 0x0c, 
-        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c, 
+        0x09, 0x04, 0x01, 0x0c,
+        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c,
         0x6f, 0x67, 0x69, 0x63,
 
     /* Product string descriptor : Index 2 */
-        0x09, 0x04, 0x02, 0x0c, 
-        0x44, 0x61, 0x74, 0x61, 0x50, 0x75, 0x6d, 0x70, 
-        0x44, 0x65, 0x6d, 0x6f,  
+        0x09, 0x04, 0x02, 0x0c,
+        0x44, 0x61, 0x74, 0x61, 0x50, 0x75, 0x6d, 0x70,
+        0x44, 0x65, 0x6d, 0x6f,
 
     /* Serial Number string descriptor : Index 3 */
-        0x09, 0x04, 0x03, 0x04, 
+        0x09, 0x04, 0x03, 0x04,
         0x30, 0x30, 0x30, 0x31
     };
 
@@ -114,7 +114,7 @@ UCHAR string_framework[] = {
        be appended to the language_id_framework array and the length
        adjusted accordingly. */
 #define LANGUAGE_ID_FRAMEWORK_LENGTH 2
-UCHAR language_id_framework[] = { 
+UCHAR language_id_framework[] = {
 
     /* English. */
         0x09, 0x04
@@ -123,14 +123,14 @@ UCHAR language_id_framework[] = {
 
 /* Define prototypes for external Host Controller's (HCDs), classes and clients.  */
 
-VOID                tx_demo_instance_activate(VOID  *dpump_instance);             
+VOID                tx_demo_instance_activate(VOID  *dpump_instance);
 VOID                tx_demo_instance_deactivate(VOID *dpump_instance);
 
 UINT                _ux_host_class_dpump_entry(UX_HOST_CLASS_COMMAND *command);
 UINT                ux_hcd_sim_initialize(UX_HCD *hcd);
-UINT                _ux_host_class_dpump_write(UX_HOST_CLASS_DPUMP *dpump, UCHAR * data_pointer, 
+UINT                _ux_host_class_dpump_write(UX_HOST_CLASS_DPUMP *dpump, UCHAR * data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
-UINT                _ux_host_class_dpump_read (UX_HOST_CLASS_DPUMP *dpump, UCHAR *data_pointer, 
+UINT                _ux_host_class_dpump_read (UX_HOST_CLASS_DPUMP *dpump, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
 
 TX_THREAD           tx_demo_thread_host_simulation;
@@ -168,7 +168,7 @@ UX_SLAVE_CLASS_DPUMP_PARAMETER  parameter;
     /* Initialize the free memory pointer.  */
     stack_pointer = (CHAR *) ux_demo_memory_buffer;
     memory_pointer = stack_pointer + (UX_DEMO_STACK_SIZE * 2);
-    
+
     /* Initialize USBX Memory.  */
     status =  ux_system_initialize(memory_pointer, UX_DEMO_MEMORY_SIZE, UX_NULL, 0);
 
@@ -212,7 +212,7 @@ UX_SLAVE_CLASS_DPUMP_PARAMETER  parameter;
     parameter.ux_slave_class_dpump_instance_deactivate =  tx_demo_instance_deactivate;
 
     /* Initialize the device dpump class. The class is connected with interface 0 */
-     status =  _ux_device_stack_class_register(_ux_system_slave_class_dpump_name, _ux_device_class_dpump_entry, 
+     status =  _ux_device_stack_class_register(_ux_system_slave_class_dpump_name, _ux_device_class_dpump_entry,
                                                1, 0, &parameter);
 
     /* Check for error.  */
@@ -225,21 +225,21 @@ UX_SLAVE_CLASS_DPUMP_PARAMETER  parameter;
     /* Check for error.  */
     if (status != UX_SUCCESS)
         error_handler();
-    
+
     /* Create the main host simulation thread.  */
-    status =  tx_thread_create(&tx_demo_thread_host_simulation, "tx demo host simulation", tx_demo_thread_host_simulation_entry, 0,  
-            stack_pointer, UX_DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&tx_demo_thread_host_simulation, "tx demo host simulation", tx_demo_thread_host_simulation_entry, 0,
+            stack_pointer, UX_DEMO_STACK_SIZE,
             20, 20, 1, TX_AUTO_START);
 
     /* Check for error.  */
     if (status != TX_SUCCESS)
         error_handler();
-            
+
     /* Create the main demo thread.  */
-    status =  tx_thread_create(&tx_demo_thread_device_simulation, "tx demo slave simulation", tx_demo_thread_device_simulation_entry, 0,  
-            stack_pointer + UX_DEMO_STACK_SIZE, UX_DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&tx_demo_thread_device_simulation, "tx demo slave simulation", tx_demo_thread_device_simulation_entry, 0,
+            stack_pointer + UX_DEMO_STACK_SIZE, UX_DEMO_STACK_SIZE,
             20, 20, 1, TX_AUTO_START);
-      
+
     /* Check for error.  */
     if (status != TX_SUCCESS)
         error_handler();
@@ -279,9 +279,9 @@ UX_HOST_CLASS   *class;
         tx_thread_relinquish();
     }
 
-    /* At this point, the data pump class has been found.  Now use the 
-       data pump to send and receive data between the host and device.  */    
-    
+    /* At this point, the data pump class has been found.  Now use the
+       data pump to send and receive data between the host and device.  */
+
     /* We start with a 'A' in buffer.  */
     current_char = 'A';
 
@@ -296,11 +296,11 @@ UX_HOST_CLASS   *class;
 
         /* Increment the character in buffer.  */
         current_char++;
-        
+
         /* Check for upper alphabet limit.  */
-        if (current_char > 'Z') 
+        if (current_char > 'Z')
             current_char =  'A';
-        
+
         /* Write to the host Data Pump Bulk out endpoint.  */
         status =  _ux_host_class_dpump_write (dpump, host_out_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length);
 
@@ -311,17 +311,17 @@ UX_HOST_CLASS   *class;
         /* Verify that the status and the amount of data is correct.  */
         if ((status != UX_SUCCESS) || actual_length != UX_HOST_CLASS_DPUMP_PACKET_SIZE)
             return;
-        
+
         /* Read to the Data Pump Bulk out endpoint.  */
         status =  _ux_host_class_dpump_read (dpump, host_in_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length);
 
         /* Verify that the status and the amount of data is correct.  */
         if ((status != UX_SUCCESS) || actual_length != UX_HOST_CLASS_DPUMP_PACKET_SIZE)
             error_handler();
-            
+
         /* Relinquish to other thread.  */
         tx_thread_relinquish();
-    }        
+    }
 }
 
 
@@ -345,14 +345,14 @@ ULONG   actual_length;
             thread_1_counter++;
 
             /* Read from the device data pump.  */
-            status =  _ux_device_class_dpump_read(dpump_device, device_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length); 
+            status =  _ux_device_class_dpump_read(dpump_device, device_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length);
 
             /* Verify that the status and the amount of data is correct.  */
             if ((status != UX_SUCCESS) || actual_length != UX_HOST_CLASS_DPUMP_PACKET_SIZE)
                 error_handler();
 
             /* Now write to the device data pump.  */
-            status =  _ux_device_class_dpump_write(dpump_device, device_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length); 
+            status =  _ux_device_class_dpump_write(dpump_device, device_buffer, UX_HOST_CLASS_DPUMP_PACKET_SIZE, &actual_length);
 
             /* Verify that the status and the amount of data is correct.  */
             if ((status != UX_SUCCESS) || actual_length != UX_HOST_CLASS_DPUMP_PACKET_SIZE)
@@ -362,14 +362,14 @@ ULONG   actual_length;
         /* Relinquish to other thread.  */
         tx_thread_relinquish();
     }
-}            
+}
 
-VOID  tx_demo_instance_activate(VOID *dpump_instance) 
+VOID  tx_demo_instance_activate(VOID *dpump_instance)
 {
 
     /* Save the DPUMP instance.  */
     dpump_device = (UX_SLAVE_CLASS_DPUMP *) dpump_instance;
-}           
+}
 
 VOID  tx_demo_instance_deactivate(VOID *dpump_instance)
 {
@@ -389,8 +389,8 @@ VOID  error_handler(void)
 
     while(1)
     {
-    
-        /* Error - just spin here!  Look at call tree in debugger 
+
+        /* Error - just spin here!  Look at call tree in debugger
            to see where the error occurred.  */
     }
 }

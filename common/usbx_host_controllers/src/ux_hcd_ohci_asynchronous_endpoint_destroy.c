@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,53 +30,40 @@
 #include "ux_hcd_ohci.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_asynchronous_endpoint_destroy          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_asynchronous_endpoint_destroy          PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function will destroy an asynchronous endpoint. The control   */ 
-/*     and bulk endpoints fall into this category.                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ohci                              Pointer to OHCI HCD           */ 
-/*    endpoint                              Pointer to endpoint           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_register_read            Read OHCI register            */ 
-/*    _ux_hcd_ohci_register_write           Write OHCI register           */ 
-/*    _ux_utility_virtual_address           Get virtual address           */ 
-/*    _ux_utility_delay_ms                  Delay ms                      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    OHCI Controller Driver                                              */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed physical and virtual  */
-/*                                            address conversion,         */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed an addressing issue,  */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*     This function will destroy an asynchronous endpoint. The control   */
+/*     and bulk endpoints fall into this category.                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ohci                              Pointer to OHCI HCD           */
+/*    endpoint                              Pointer to endpoint           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ohci_register_read            Read OHCI register            */
+/*    _ux_hcd_ohci_register_write           Write OHCI register           */
+/*    _ux_utility_virtual_address           Get virtual address           */
+/*    _ux_utility_delay_ms                  Delay ms                      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    OHCI Controller Driver                                              */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_asynchronous_endpoint_destroy(UX_HCD_OHCI *hcd_ohci, UX_ENDPOINT *endpoint)
@@ -88,7 +76,7 @@ UX_OHCI_TD      *tail_td;
 UX_OHCI_TD      *head_td;
 ULONG           value_td;
 ULONG           ohci_register;
-    
+
 
     /* From the endpoint container fetch the OHCI ED descriptor.  */
     ed =  (UX_OHCI_ED*) endpoint -> ux_endpoint_ed;
@@ -96,7 +84,7 @@ ULONG           ohci_register;
     /* Check if this physical endpoint has been initialized properly!  */
     if (ed == UX_NULL)
     {
-    
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HCD, UX_ENDPOINT_HANDLE_UNKNOWN);
 
@@ -108,7 +96,7 @@ ULONG           ohci_register;
 
     /* The endpoint may be active. If so, set the skip bit.  */
     ed -> ux_ohci_ed_dw0 |=  UX_OHCI_ED_SKIP;
-    
+
     /* Wait for the controller to finish the current frame processing.  */
     _ux_utility_delay_ms(1);
 
@@ -135,7 +123,7 @@ ULONG           ohci_register;
                 ohci_register &=  ~OHCI_HC_CR_CLE;
                 _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL, ohci_register);
             }
-            
+
             /* Store the new endpoint in the Control list.  */
             _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL_HEAD_ED, (ULONG) next_ed);
             break;
@@ -151,7 +139,7 @@ ULONG           ohci_register;
                 ohci_register &=  ~OHCI_HC_CR_BLE;
                 _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL, ohci_register);
             }
-            
+
             /* Store the new endpoint in the Bulk list */
             _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_BULK_HEAD_ED, (ULONG) next_ed);
             break;
@@ -201,6 +189,6 @@ ULONG           ohci_register;
     ed -> ux_ohci_ed_status =  UX_UNUSED;
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,59 +30,45 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_interrupt_handler                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_interrupt_handler                      PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function is the interrupt handler for the OHCI interrupts.    */
-/*     Normally an interrupt occurs from the controller when there is     */ 
-/*     either a EOF signal and there has been transfers within the frame  */ 
+/*     Normally an interrupt occurs from the controller when there is     */
+/*     either a EOF signal and there has been transfers within the frame  */
 /*     or when there is a change on one of the downstream ports.          */
 /*                                                                        */
-/*     All we need to do in the ISR is scan the controllers to find out   */ 
-/*     which one has issued a IRQ. If there is work to do for this        */ 
-/*     controller we need to wake up the corresponding thread to take     */ 
-/*     care of the job.                                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_register_read            Read OHCI register            */ 
-/*    _ux_hcd_ohci_register_write           Write OHCI register           */ 
-/*    _ux_host_semaphore_put                Put semaphore                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX Interrupt Handler                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Yajun Xia                Modified comment(s),          */
-/*                                            fixed OHCI PRSC issue,      */
-/*                                            resulting in version 6.1.12 */
+/*     All we need to do in the ISR is scan the controllers to find out   */
+/*     which one has issued a IRQ. If there is work to do for this        */
+/*     controller we need to wake up the corresponding thread to take     */
+/*     care of the job.                                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ohci_register_read            Read OHCI register            */
+/*    _ux_hcd_ohci_register_write           Write OHCI register           */
+/*    _ux_host_semaphore_put                Put semaphore                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX Interrupt Handler                                           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ohci_interrupt_handler(VOID)
@@ -96,7 +83,7 @@ ULONG           root_hub_thread_wakeup = 0;
 ULONG           port_index;
 
 
-    /* We need to parse the controller driver table to find all controllers that 
+    /* We need to parse the controller driver table to find all controllers that
        registered as OHCI.  */
     for (hcd_index = 0; hcd_index < _ux_system_host -> ux_system_host_registered_hcd; hcd_index++)
     {
@@ -120,10 +107,10 @@ ULONG           port_index;
                 if (ohci_register & OHCI_HC_INT_WDH)
                 {
 
-                    /* We have some transferred EDs in the done queue. The controller thread needs 
+                    /* We have some transferred EDs in the done queue. The controller thread needs
                        to wake up and process them.  */
                     hcd_ohci -> ux_hcd_ohci_done_head =  hcd_ohci -> ux_hcd_ohci_hcca -> ux_hcd_ohci_hcca_done_head;
-                    hcd_ohci -> ux_hcd_ohci_hcca -> ux_hcd_ohci_hcca_done_head =  UX_NULL;                    
+                    hcd_ohci -> ux_hcd_ohci_hcca -> ux_hcd_ohci_hcca_done_head =  UX_NULL;
                     hcd -> ux_hcd_thread_signal++;
                     _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_hcd_semaphore);
 
@@ -133,11 +120,11 @@ ULONG           port_index;
                        before we acknowledge the IRQ register.  */
                     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_INTERRUPT_DISABLE, OHCI_HC_INT_WDH);
                 }
-                    
+
                 if (ohci_register & OHCI_HC_INT_UE)
                 {
 
-                    /* The controller has issued a Unrecoverable Error signal. The controller will 
+                    /* The controller has issued a Unrecoverable Error signal. The controller will
                        be reset now, and we wake up the HCD thread.  */
                     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_COMMAND_STATUS, OHCI_HC_CS_HCR);
                     hcd -> ux_hcd_thread_signal++;
@@ -155,17 +142,17 @@ ULONG           port_index;
 
                         /* Read the port status.  */
                         ohci_register_port_status =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index);
-                
+
                         /* Check for Connect Status Change signal.  */
                         if (ohci_register_port_status &  OHCI_HC_PS_CSC)
-                        {                        
+                        {
                             /* Something happened on this port. Signal it to the root hub thread.  */
                             hcd -> ux_hcd_root_hub_signal[port_index]++;
-                            
+
                             /* Memorize wake up signal.  */
                             root_hub_thread_wakeup ++;
                         }
-                        
+
                         if (ohci_register_port_status &  OHCI_HC_PS_PRSC)
                         {
                             _ux_host_event_flags_set(&hcd_ohci -> ux_hcd_ohci_event_flags_group, UX_OHCI_PRSC_EVENT, UX_OR);

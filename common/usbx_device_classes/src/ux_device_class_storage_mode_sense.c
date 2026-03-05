@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -30,16 +31,16 @@
 
 #ifdef UX_SLAVE_CLASS_STORAGE_INCLUDE_MMC
 #define USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CDROM_LENGTH (0x42 + 2)
-UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CDROM_LENGTH] = { 
+UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_MODE_SENSE_PAGE_CDROM_LENGTH] = {
 
     0x2A, 0x42, 0x3F, 0x37, 0xF1, 0x77, 0x29, 0x23,
-    0x10, 0x89, 0x01, 0x00, 0x02, 0x00, 0x05, 0x84, 
+    0x10, 0x89, 0x01, 0x00, 0x02, 0x00, 0x05, 0x84,
     0x00, 0x10, 0x10, 0x89, 0x00, 0x00, 0x00, 0x01,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00
 
 };
@@ -60,71 +61,50 @@ UCHAR usbx_device_class_storage_mode_sense_page_cdrom[USBX_DEVICE_CLASS_STORAGE_
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_mode_sense                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_mode_sense                 PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a MODE_SENSE SCSI command. It supports       */ 
-/*    the standard page for the CD-ROM.                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a MODE_SENSE SCSI command. It supports       */
+/*    the standard page for the CD-ROM.                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
+/*    _ux_device_class_storage_csw_send     Send CSW                      */
 /*    _ux_utility_short_get_big_endian      Get 16-bit big endian         */
 /*    _ux_utility_short_put_big_endian      Put 16-bit big endian         */
 /*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_utility_memory_copy               Copy memory                   */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Storage Class                                                */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked compiling options   */
-/*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage, 
-                      ULONG               lun, 
+UINT  _ux_device_class_storage_mode_sense(UX_SLAVE_CLASS_STORAGE *storage,
+                      ULONG               lun,
                       UX_SLAVE_ENDPOINT   *endpoint_in,
-                      UX_SLAVE_ENDPOINT   *endpoint_out, 
+                      UX_SLAVE_ENDPOINT   *endpoint_out,
                       UCHAR               *cbwcb)
 {
 
@@ -154,7 +134,7 @@ ULONG                   page_length;
 
     /* Get the command format : we have 1a and 5a.  */
     mode_sense_command =  (ULONG) *(cbwcb + UX_SLAVE_CLASS_STORAGE_MODE_SENSE_OPERATION);
-    
+
     /* Extract the notification from the cbwcb.  */
     page_code =  (ULONG) *(cbwcb + UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PC_PAGE_CODE);
 
@@ -186,14 +166,14 @@ ULONG                   page_length;
 
     /* Establish READ ONLY flag.  */
     if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_read_only_flag == UX_TRUE)
-    
+
         /* This device is Read Only.  */
         read_only_flag = UX_SLAVE_CLASS_STORAGE_MODE_SENSE_PARAMETER_FLAG_WP;
-    
+
     else
-    
+
         /* This device can be written to.  */
-        read_only_flag = 0;        
+        read_only_flag = 0;
 
     /* Build response based on expected page codes.  */
 
@@ -277,7 +257,7 @@ ULONG                   page_length;
 #else
 
     /* Send a payload with the response buffer.  */
-    _ux_device_stack_transfer_request(transfer_request, mode_sense_reply_length, mode_sense_reply_length); 
+    _ux_device_stack_transfer_request(transfer_request, mode_sense_reply_length, mode_sense_reply_length);
 #endif
 
     /* Now we set the CSW with success.  */
@@ -287,4 +267,4 @@ ULONG                   page_length;
     /* Return completion status.  */
     return(status);
 }
-    
+

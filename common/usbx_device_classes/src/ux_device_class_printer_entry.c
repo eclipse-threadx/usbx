@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -65,18 +66,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Device Stack                                                        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  03-08-2023     Yajun Xia                Modified comment(s),          */
-/*                                            added error checks support, */
-/*                                            resulting in version 6.2.1  */
-/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
-/*                                            fix typo,                   */
-/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_printer_entry(UX_SLAVE_CLASS_COMMAND *command)

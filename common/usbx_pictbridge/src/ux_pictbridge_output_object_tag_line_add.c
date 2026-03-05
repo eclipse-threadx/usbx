@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -28,22 +29,22 @@
 #include "ux_pictbridge.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_tag_line_add                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_object_tag_line_add                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function adds a tag line into the target xml object            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function adds a tag line into the target xml object            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    pima_object_buffer                    Pointer to object buffer      */
 /*    object_length                         Length of the object          */
 /*    tag_element                           Tag to insert                 */
@@ -54,37 +55,27 @@
 /*    pima_object_buffer_updated            Updated Address of the object */
 /*    object_length_updated                 Updated length                */
 /*                                                                        */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpshost_object_get                                   */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_dpshost_object_get                                   */
 /*                                                                        */
 /**************************************************************************/
-UINT _ux_pictbridge_object_tag_line_add(UCHAR *pima_object_buffer, 
-                                                 ULONG object_length, 
+UINT _ux_pictbridge_object_tag_line_add(UCHAR *pima_object_buffer,
+                                                 ULONG object_length,
                                                  UCHAR *tag_element_string,
                                                  ULONG tag_flag,
                                                  UCHAR *tag_variable,
                                                  ULONG  tag_variable_value,
                                                  VOID  *tag_element,
-                                                 UCHAR **pima_object_buffer_updated, 
+                                                 UCHAR **pima_object_buffer_updated,
                                                  ULONG *object_length_updated)
 {
 
@@ -115,13 +106,13 @@ UINT                                status;
 
         /* Insert a "<".  */
         *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_START_BRACKET;
-    
+
         /* Create the element string.  */
        _ux_utility_memory_copy(pima_object_buffer, tag_element_string, element_length); /* Use case of memcpy is verified. */
 
         /* Update the object pointer position.  */
         pima_object_buffer += element_length;
-    
+
         /* Do we have a variable to insert after the opening tag ?  */
         if (tag_variable != UX_NULL)
         {
@@ -157,13 +148,13 @@ UINT                                status;
 
             /* Insert a " ".  */
             *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_SPACE;
-    
+
             /* Create the variable string.  */
             _ux_utility_memory_copy(pima_object_buffer, tag_variable, element_length); /* Use case of memcpy is verified. */
 
             /* Update the object pointer position.  */
             pima_object_buffer += element_length;
-            
+
             /* Insert a "=".  */
             *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_EQUAL;
 
@@ -176,10 +167,10 @@ UINT                                status;
 
                 /* Bad element.  */
                 return(status);
-            
+
             /* Update the object pointer position.  */
             pima_object_buffer += 8;
-            
+
             /* Insert a quote.  */
             *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_QUOTE;
         }
@@ -215,7 +206,7 @@ UINT                                status;
        can be a single value or an array of values.  */
     if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_VARIABLE)
     {
-        
+
         /* We have a single variable.  Check its nature.  Is it hexa ? */
         if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_VARIABLE_HEXA)
         {
@@ -232,7 +223,7 @@ UINT                                status;
                 return(status);
             element_length = 8;
         }
-                        
+
         /* Is it decimal ?  */
         if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_VARIABLE_DECIMAL)
         {
@@ -305,14 +296,14 @@ UINT                                status;
 
         /* Update the object pointer position.  */
         pima_object_buffer += element_length;
-    
+
         object_length += element_length;
     }
 
     /* Is there an array to insert ? */
     if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_VARIABLE_ARRAY)
     {
-    
+
         /* We have an array to insert.  First reset the value index.  */
         value_index =  0;
 
@@ -330,7 +321,7 @@ UINT                                status;
                 /* Do bounds-checking.  */
                 if (object_length > UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER)
                     return(UX_MEMORY_INSUFFICIENT);
-        
+
                 /* Insert a space.  */
                 *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_SPACE;
             }
@@ -351,7 +342,7 @@ UINT                                status;
                     return(status);
                 element_length = 8;
             }
-                        
+
             /* Is it decimal ?  */
             if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_VARIABLE_ARRAY_DECIMAL)
             {
@@ -359,7 +350,7 @@ UINT                                status;
                 /* Going to insert at maximum 8 chars. Do bounds-checking.  */
                 if (object_length + 8 > UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER)
                     return(UX_MEMORY_INSUFFICIENT);
-    
+
                 /* We have a array of decimal value to insert.  */
                 status = _ux_pictbridge_hexa_to_decimal_string( *((ULONG *)tag_element + value_index), pima_object_buffer, UX_PICTBRIDGE_LEADING_ZERO_OFF, 8);
                 if (status != UX_SUCCESS)
@@ -368,7 +359,7 @@ UINT                                status;
                     return(status);
                 _ux_utility_string_length_check(pima_object_buffer, &element_length, 8);
             }
-    
+
             /* Is it in the form 00.00 ?  */
             if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_VARIABLE_ARRAY_MAJOR_MINOR)
             {
@@ -376,7 +367,7 @@ UINT                                status;
                 /* Going to insert at maximum 5 chars. Do bounds-checking.  */
                 if (object_length + 5 > UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER)
                     return(UX_MEMORY_INSUFFICIENT);
-    
+
                 /* We have a array of major minor value to insert.  */
                 status = _ux_pictbridge_hexa_to_major_minor( *((ULONG *) tag_element + value_index), pima_object_buffer);
                 if (status != UX_SUCCESS)
@@ -404,15 +395,15 @@ UINT                                status;
                 /* We have a string to insert.  */
                 _ux_utility_memory_copy(pima_object_buffer, (UCHAR *) (*((ALIGN_TYPE *)tag_element)), element_length); /* Use case of memcpy is verified. */
             }
-    
+
             /* Update the object pointer position.  */
             pima_object_buffer += element_length;
-    
+
             /* And update the cumulated length of the object.  */
             object_length += element_length;
 
             /* Next index value.  */
-            value_index++;  
+            value_index++;
         }
     }
 
@@ -451,7 +442,7 @@ UINT                                status;
 
         /* Insert a "/".  */
         *pima_object_buffer++ = UX_PICTBRIDGE_TAG_CHAR_SLASH;
-    
+
         /* Create the element string.  */
        _ux_utility_memory_copy(pima_object_buffer, tag_element_string, element_length); /* Use case of memcpy is verified. */
 
@@ -482,10 +473,10 @@ UINT                                status;
 
     /* Update the caller's object position.  */
     *pima_object_buffer_updated = pima_object_buffer;
-    
+
     /* Update the caller's object length .  */
     *object_length_updated = object_length;
-    
+
     /* Return completion status.  */
-    return(UX_SUCCESS);    
+    return(UX_SUCCESS);
 }

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Data Pump Class                                              */
 /**                                                                       */
@@ -20,54 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_device_class_dpump.h                             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_device_class_dpump.h                             PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX device dpump class.                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
+/*    USBX device dpump class.                                            */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_DPUMP_H
 #define UX_DEVICE_CLASS_DPUMP_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Bulk out endpoint / read buffer size, must be larger than max packet size in framework, and aligned in 4-bytes.  */
@@ -139,16 +121,16 @@ UINT    _ux_device_class_dpump_initialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_dpump_activate(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_dpump_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT    _ux_device_class_dpump_entry(UX_SLAVE_CLASS_COMMAND *command);
-UINT    _ux_device_class_dpump_read(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
+UINT    _ux_device_class_dpump_read(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
-UINT    _ux_device_class_dpump_read_run(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
+UINT    _ux_device_class_dpump_read_run(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
-UINT    _ux_device_class_dpump_write(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
+UINT    _ux_device_class_dpump_write(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
-UINT    _ux_device_class_dpump_write_run(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer, 
+UINT    _ux_device_class_dpump_write_run(UX_SLAVE_CLASS_DPUMP *dpump, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
 UINT    _ux_device_class_dpump_change(UX_SLAVE_CLASS_COMMAND *command);
-                                
+
 /* Define Device DPUMP Class API prototypes.  */
 
 #define ux_device_class_dpump_entry                               _ux_device_class_dpump_entry
@@ -157,10 +139,10 @@ UINT    _ux_device_class_dpump_change(UX_SLAVE_CLASS_COMMAND *command);
 #define ux_device_class_dpump_write                               _ux_device_class_dpump_write
 #define ux_device_class_dpump_write_run                           _ux_device_class_dpump_write_run
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
+}
 #endif
 
 #endif

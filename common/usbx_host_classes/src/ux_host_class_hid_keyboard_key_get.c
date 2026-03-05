@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Remote Control Class                                            */
 /**                                                                       */
@@ -30,49 +31,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_keyboard_key_get                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_keyboard_key_get                 PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function reads the key and keyboard state from the             */ 
-/*    round-robin buffer.                                                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    keyboard_instance                     Pointer to remote control     */ 
-/*    keyboard key                          Pointer to keyboard key       */ 
-/*    keyboard state                        Pointer to keyboard state     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_verify  Verify instance               */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    User application                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function reads the key and keyboard state from the             */
+/*    round-robin buffer.                                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    keyboard_instance                     Pointer to remote control     */
+/*    keyboard key                          Pointer to keyboard key       */
+/*    keyboard state                        Pointer to keyboard state     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_verify  Verify instance               */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    User application                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance, 
+UINT  _ux_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
                                             ULONG *keyboard_key, ULONG *keyboard_state)
 {
 
@@ -84,10 +77,10 @@ UX_HOST_CLASS_HID   *hid;
 
     /* Get the HID class associated with the HID client. */
     hid = keyboard_instance -> ux_host_class_hid_keyboard_hid;
-    
+
     /* Ensure the instance is valid.  */
     if (_ux_host_stack_class_instance_verify(_ux_system_host_class_hid_name, (VOID *) hid) != UX_SUCCESS)
-    {        
+    {
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_INSTANCE_UNKNOWN, hid, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -119,7 +112,7 @@ UX_HOST_CLASS_HID   *hid;
     keyboard_instance -> ux_host_class_hid_keyboard_usage_array_tail =  array_tail;
 
     /* The status will tell the application there is something valid in the key/state.  */
-    return(UX_SUCCESS);    
+    return(UX_SUCCESS);
 }
 
 /**************************************************************************/
@@ -138,9 +131,9 @@ UX_HOST_CLASS_HID   *hid;
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    keyboard_instance                     Pointer to remote control     */ 
-/*    keyboard key                          Pointer to keyboard key       */ 
-/*    keyboard state                        Pointer to keyboard state     */ 
+/*    keyboard_instance                     Pointer to remote control     */
+/*    keyboard key                          Pointer to keyboard key       */
+/*    keyboard state                        Pointer to keyboard state     */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -154,14 +147,8 @@ UX_HOST_CLASS_HID   *hid;
 /*                                                                        */
 /*    Application                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
-/*                                                                        */
 /**************************************************************************/
-UINT  _uxe_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance, 
+UINT  _uxe_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
                                             ULONG *keyboard_key, ULONG *keyboard_state)
 {
 
