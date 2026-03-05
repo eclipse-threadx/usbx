@@ -9,12 +9,13 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   Device CDC Class                                                    */
+/**   Device CDC ACM Class                                                */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -161,6 +162,20 @@ ULONG                                   transmit_length;
 
             break ;
 
+        case UX_SLAVE_CLASS_CDC_ACM_SEND_BREAK:
+
+            /* SEND_BREAK has no data stage, wValue contains break duration in ms.
+               0x0000 means stop break.
+               0x0001-0xFFFE means break signal duration in ms.
+               0xFFFF means indefinite break.  */
+            cdc_acm -> ux_slave_class_cdc_acm_break_duration = (ULONG) value;
+
+            /* If there is a parameter change function call it.  */
+            if (cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change != UX_NULL)
+                cdc_acm -> ux_slave_class_cdc_acm_parameter.ux_slave_class_cdc_acm_parameter_change(cdc_acm);
+
+            break;
+
         default:
 
             /* Unknown function. It's not handled.  */
@@ -170,4 +185,3 @@ ULONG                                   transmit_length;
     /* It's handled.  */
     return(UX_SUCCESS);
 }
-

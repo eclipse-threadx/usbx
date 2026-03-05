@@ -9,12 +9,13 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   Device CDC Class                                                    */
+/**   Device CDC ACM Class                                                */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -118,6 +119,8 @@ UX_SLAVE_ENDPOINT           *endpoint_out;
        next connection.  */
     cdc_acm -> ux_slave_class_cdc_acm_data_dtr_state =  0;
     cdc_acm -> ux_slave_class_cdc_acm_data_rts_state =  0;
+
+    cdc_acm -> ux_slave_class_cdc_acm_break_duration = 0;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ACM_DEACTIVATE, cdc_acm, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)

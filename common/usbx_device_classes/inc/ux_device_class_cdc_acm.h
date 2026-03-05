@@ -9,16 +9,19 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   CDC Class                                                           */
+/**   Device CDC ACM Class                                                */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
+
+/**************************************************************************/
 /**************************************************************************/
 /*                                                                        */
 /*  COMPONENT DEFINITION                                   RELEASE        */
@@ -221,6 +224,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
     UCHAR                               ux_slave_class_cdc_acm_data_bit;
     UCHAR                               ux_slave_class_cdc_acm_data_dtr_state;
     UCHAR                               ux_slave_class_cdc_acm_data_rts_state;
+    ULONG                               ux_slave_class_cdc_acm_break_duration;
     UCHAR                               reserved[3];
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE

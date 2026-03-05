@@ -9,11 +9,13 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
+/**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   Device CDC Class                                                    */
+/**   Device CDC ACM Class                                                */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -48,7 +50,7 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    command                               Pointer to cdc_acm command    */
+/*    command                               Pointer to cdc acm command    */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -160,6 +162,9 @@ UINT                                    status;
     cdc_acm -> ux_slave_class_cdc_acm_stop_bit  =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_STOP_BIT;
     cdc_acm -> ux_slave_class_cdc_acm_parity    =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_PARITY;
     cdc_acm -> ux_slave_class_cdc_acm_data_bit  =  UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_DATA_BIT;
+
+    /* Initialize break duration.  */
+    cdc_acm -> ux_slave_class_cdc_acm_break_duration = 0;
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
 
