@@ -111,7 +111,7 @@ UINT                    status;
         {
             /* Get one item from the report and analyze it.  */
             /* Make sure this descriptor has at least the minimum length.  */
-            analysis_failure = _ux_host_class_hid_report_item_analyse(descriptor, &item);
+            analysis_failure = _ux_host_class_hid_report_item_analyse(descriptor, length, &item);
             if (analysis_failure)
             {
               /* Error trap. */
