@@ -47,6 +47,7 @@
 /*  INPUT                                                                 */
 /*                                                                        */
 /*    descriptor                            Pointer to descriptor         */
+/*    length                                Length of descriptor          */
 /*    item                                  Pointer to item               */
 /*                                                                        */
 /*  OUTPUT                                                                */
@@ -62,11 +63,17 @@
 /*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_hid_report_item_analyse(UCHAR *descriptor, UX_HOST_CLASS_HID_ITEM *item)
+UINT  _ux_host_class_hid_report_item_analyse(UCHAR *descriptor, ULONG length, UX_HOST_CLASS_HID_ITEM *item)
 {
 
 UCHAR       item_byte;
 UINT        result = UX_SUCCESS;
+
+    /* Make sure descriptor has minimal length.*/
+    if (length == 0)
+    {
+        return(UX_DESCRIPTOR_CORRUPTED);
+    }
 
     /* Get the first byte from the descriptor.  */
     item_byte =  *descriptor;
@@ -83,7 +90,7 @@ UINT        result = UX_SUCCESS;
         item -> ux_host_class_hid_item_report_type =  (item_byte >> 2) & 3;
 
         /* Make sure descriptor has minimal length.*/
-        if (sizeof(descriptor) >= 3)
+        if (length >= 3)
         {
             /* Get its length (byte 1).  */
             item -> ux_host_class_hid_item_report_length =  (USHORT) *(descriptor + 1);
@@ -120,11 +127,14 @@ UINT        result = UX_SUCCESS;
         /* Set the type.  */
         item -> ux_host_class_hid_item_report_type =  (item_byte >> 2) & 3;
 
-        /* Set the tag.  */
-        item -> ux_host_class_hid_item_report_tag =  item_byte >> 4;
+        /* Then the tag.  */
+        item -> ux_host_class_hid_item_report_tag =  (item_byte >> 4) & 0xf;
+
+        /* Mark its format. For short items, this is always 1. */
+        item -> ux_host_class_hid_item_report_format = 1;
+
     }
 
-    /* Return successful completion.  */
+    /* Return result.  */
     return(result);
 }
-

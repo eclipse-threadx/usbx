@@ -247,8 +247,7 @@ VOID    outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] =
-                                    "Copyright (c) 2024 Microsoft Corporation. * USBX ARM9/GNU Version 6.4.1 *";
- * Copyright (c) 2026-present Eclipse ThreadX contributors
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * USBX ARM9/GNU Version 6.5.0.202601 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

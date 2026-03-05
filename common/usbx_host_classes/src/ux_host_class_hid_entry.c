@@ -358,7 +358,7 @@ UINT                    status = UX_SUCCESS;
     {
 
         /* Get one item from the report and analyze it.  */
-        _ux_host_class_hid_report_item_analyse(descriptor, &item);
+        _ux_host_class_hid_report_item_analyse(descriptor, length, &item);
 
         /* Point the descriptor right after the item identifier.  */
         descriptor +=  item.ux_host_class_hid_item_report_format;

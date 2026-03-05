@@ -1069,7 +1069,7 @@ UINT    _ux_host_class_hid_report_decompress(UX_HOST_CLASS_HID *hid, UX_HOST_CLA
 UINT    _ux_host_class_hid_report_descriptor_get(UX_HOST_CLASS_HID *hid, ULONG length);
 UINT    _ux_host_class_hid_report_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
 UINT    _ux_host_class_hid_report_id_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_REPORT_GET_ID *report_id);
-UINT    _ux_host_class_hid_report_item_analyse(UCHAR *descriptor, UX_HOST_CLASS_HID_ITEM *item);
+UINT    _ux_host_class_hid_report_item_analyse(UCHAR *descriptor, ULONG length, UX_HOST_CLASS_HID_ITEM *item);
 UINT    _ux_host_class_hid_report_set(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
 UINT    _ux_host_class_hid_resources_free(UX_HOST_CLASS_HID *hid);
 VOID    _ux_host_class_hid_transfer_request_completed(UX_TRANSFER *transfer_request);
