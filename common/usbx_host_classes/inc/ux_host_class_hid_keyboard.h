@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Keyboard Client                                                 */
 /**                                                                       */
@@ -20,60 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_hid_keyboard.h                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_hid_keyboard.h                        PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX HID keyboard client.                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed clients management,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved HID OUTPUT report  */
-/*                                            handling in standalone mode,*/
-/*                                            resulting in version 6.2.0  */
+/*    USBX HID keyboard client.                                           */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_HID_KEYBOARD_H
 #define UX_HOST_CLASS_HID_KEYBOARD_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -140,7 +116,7 @@ extern   "C" {
 
 /* Define HID keyboard generic equivalences.  */
 
-#define UX_HID_KEYBOARD_NO_KEY                              0   
+#define UX_HID_KEYBOARD_NO_KEY                              0
 #define UX_HID_KEYBOARD_PHANTOM_STATE                       0x01
 #define UX_HID_KEYBOARD_KEY_LETTER_A                        0x04
 #define UX_HID_KEYBOARD_KEY_LETTER_Z                        0x1D
@@ -215,11 +191,11 @@ typedef struct UX_HOST_CLASS_HID_KEYBOARD_LAYOUT_STRUCT
 typedef struct UX_HOST_CLASS_HID_KEYBOARD_STRUCT
 {
 
-    ULONG           ux_host_class_hid_keyboard_state;    
+    ULONG           ux_host_class_hid_keyboard_state;
     UCHAR           *ux_host_class_hid_keyboard_key_state;
     ULONG           ux_host_class_hid_keyboard_key_count;
     UX_HOST_CLASS_HID   *ux_host_class_hid_keyboard_hid;
-    USHORT          ux_host_class_hid_keyboard_id;    
+    USHORT          ux_host_class_hid_keyboard_id;
 #if !defined(UX_HOST_STANDALONE)
     VOID            *ux_host_class_hid_keyboard_thread_stack;
     UX_THREAD       ux_host_class_hid_keyboard_thread;
@@ -255,7 +231,7 @@ UINT    _ux_host_class_hid_keyboard_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *c
 UINT    _ux_host_class_hid_keyboard_deactivate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command);
 UINT    _ux_host_class_hid_keyboard_entry(UX_HOST_CLASS_HID_CLIENT_COMMAND *command);
 VOID    _ux_host_class_hid_keyboard_thread(ULONG thread_entry);
-UINT    _ux_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance, 
+UINT    _ux_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
                                             ULONG *keyboard_key, ULONG *keyboard_state);
 UINT    _ux_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
                                         ULONG ioctl_function, VOID *parameter);
@@ -263,7 +239,7 @@ UINT    _ux_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_i
 VOID    _ux_host_class_hid_keyboard_tasks_run(UX_HOST_CLASS_HID_CLIENT *client);
 
 
-UINT    _uxe_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance, 
+UINT    _uxe_host_class_hid_keyboard_key_get(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
                                             ULONG *keyboard_key, ULONG *keyboard_state);
 UINT    _uxe_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_instance,
                                         ULONG ioctl_function, VOID *parameter);
@@ -285,10 +261,10 @@ UINT    _uxe_host_class_hid_keyboard_ioctl(UX_HOST_CLASS_HID_KEYBOARD *keyboard_
 
 #endif
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
+}
 #endif
 
 #endif

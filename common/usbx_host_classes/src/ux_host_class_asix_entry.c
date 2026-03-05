@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Asix Class                                                          */
 /**                                                                       */
@@ -34,54 +35,39 @@ static inline UINT _ux_host_class_asix_try_all_vid_pids(UX_HOST_CLASS_COMMAND *c
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_entry                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_asix_entry                           PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the entry point of the asix class. It will be      */ 
-/*    called by the USBX stack enumeration module when there is a new     */ 
-/*    asix ethernet device on the bus or when the it is removed.          */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is the entry point of the asix class. It will be      */
+/*    called by the USBX stack enumeration module when there is a new     */
+/*    asix ethernet device on the bus or when the it is removed.          */
+/*                                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    command                                       Asix class command    */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_activate                  Activate asix class   */ 
-/*    _ux_host_class_asix_deactivate                Deactivate asix class */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Asix Class                                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warning,      */
-/*                                            refined VID/PID check flow, */
-/*                                            resulting in version 6.2.0  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_asix_activate                  Activate asix class   */
+/*    _ux_host_class_asix_deactivate                Deactivate asix class */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Asix Class                                                          */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_entry(UX_HOST_CLASS_COMMAND *command)
@@ -103,15 +89,15 @@ UINT    status;
 
         /* The query command is used to let the stack enumeration process know if we want to own
            this device or not.  */
-        if(command -> ux_host_class_command_usage == UX_HOST_CLASS_COMMAND_USAGE_PIDVID) 
+        if(command -> ux_host_class_command_usage == UX_HOST_CLASS_COMMAND_USAGE_PIDVID)
         {
             if (_ux_host_class_asix_try_all_vid_pids(command) == UX_SUCCESS)
                 return(UX_SUCCESS);
         }
-        
+
         /* No match.  */
-        return(UX_NO_CLASS_MATCH);                        
-                
+        return(UX_NO_CLASS_MATCH);
+
     case UX_HOST_CLASS_COMMAND_ACTIVATE:
 
         /* The activate command is used when the device inserted has found a parent and
@@ -121,13 +107,13 @@ UINT    status;
 
     case UX_HOST_CLASS_COMMAND_DEACTIVATE:
 
-        /* The deactivate command is used when the device has been extracted either      
+        /* The deactivate command is used when the device has been extracted either
            directly or when its parents has been extracted.  */
         status =  _ux_host_class_asix_deactivate(command);
         return(status);
 
-    default: 
-            
+    default:
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_FUNCTION_NOT_SUPPORTED);
 
@@ -135,7 +121,7 @@ UINT    status;
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_FUNCTION_NOT_SUPPORTED);
-    }   
+    }
 #endif
 }
 #if !defined(UX_HOST_STANDALONE)

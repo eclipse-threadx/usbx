@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,52 +30,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_transfer_abort                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_transfer_abort                         PORTABLE C      */
 /*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function will abort transactions attached to a transfer       */ 
-/*     request.                                                           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ohci                              Pointer to OHCI controller    */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_delay_ms                  Delay                         */ 
-/*    _ux_utility_physical_address          Get physical address          */ 
-/*    _ux_utility_virtual_address           Get virtual address           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    OHCI Controller Driver                                              */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed physical and virtual  */
-/*                                            address conversion,         */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.1.2  */
+/*                                                                        */
+/*     This function will abort transactions attached to a transfer       */
+/*     request.                                                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ohci                              Pointer to OHCI controller    */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_delay_ms                  Delay                         */
+/*    _ux_utility_physical_address          Get physical address          */
+/*    _ux_utility_virtual_address           Get virtual address           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    OHCI Controller Driver                                              */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_transfer_abort(UX_HCD_OHCI *hcd_ohci, UX_TRANSFER *transfer_request)
@@ -92,10 +80,10 @@ ULONG           value_carry;
 
     /* Get the pointer to the endpoint associated with the transfer request.  */
     endpoint =  (UX_ENDPOINT *) transfer_request -> ux_transfer_request_endpoint;
-    
+
     /* From the endpoint container, get the address of the physical endpoint.  */
     ed =  (UX_OHCI_ED *) endpoint -> ux_endpoint_ed;
-    
+
     /* Check if this physical endpoint has been initialized properly!  */
     if (ed == UX_NULL)
     {
@@ -111,7 +99,7 @@ ULONG           value_carry;
 
     /* The endpoint may be active. If so, set the skip bit.  */
     ed -> ux_ohci_ed_dw0 |=  UX_OHCI_ED_SKIP;
-    
+
     /* Wait for the controller to finish the current frame processing.  */
     _ux_utility_delay_ms(1);
 
@@ -140,7 +128,7 @@ ULONG           value_carry;
         head_td =  _ux_utility_virtual_address(ed -> ux_ohci_ed_head_td);
     }
 
-    /* Restore the value carry for next transfers.  */       
+    /* Restore the value carry for next transfers.  */
     value_td =   (ULONG) ed -> ux_ohci_ed_head_td;
     value_td |=  value_carry;
     ed -> ux_ohci_ed_head_td =  (UX_OHCI_TD *) value_td;
@@ -149,6 +137,6 @@ ULONG           value_carry;
     ed -> ux_ohci_ed_dw0 &=  ~UX_OHCI_ED_SKIP;
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
 

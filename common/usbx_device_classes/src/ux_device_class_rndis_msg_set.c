@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device RNDIS Class                                                  */
 /**                                                                       */
@@ -27,45 +28,37 @@
 #include "ux_device_class_rndis.h"
 #include "ux_device_stack.h"
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_rndis_msg_set                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_rndis_msg_set                      PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function analyzes and replies to the MSG SET                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    rndis                           Pointer to rndis class              */ 
-/*    transfer_request                Pointer to the transfer request     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function analyzes and replies to the MSG SET                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    rndis                           Pointer to rndis class              */
+/*    transfer_request                Pointer to the transfer request     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_long_get            Get 32-bit value                    */
 /*    _ux_utility_long_put            Put 32-bit value                    */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    RNDIS Class                                                         */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_rndis_msg_set(UX_SLAVE_CLASS_RNDIS *rndis, UX_SLAVE_TRANSFER *transfer_request)
@@ -78,10 +71,10 @@ ULONG            status;
 
     /* Get the pointer to the RNDIS message.  */
     rndis_msg = transfer_request -> ux_slave_transfer_request_data_pointer;
-    
+
     /* Get the request ID and keep it for the response.  */
     rndis -> ux_slave_class_rndis_request_id =  _ux_utility_long_get(rndis_msg + UX_DEVICE_CLASS_RNDIS_MSG_SET_REQUEST_ID);
-    
+
     /* Get the OID.  */
     rndis_oid = _ux_utility_long_get(rndis_msg + UX_DEVICE_CLASS_RNDIS_MSG_SET_OID);
 
@@ -90,10 +83,10 @@ ULONG            status;
 
     /* Now prepare the response.  */
     rndis_response = rndis -> ux_slave_class_rndis_response;
-    
+
     /* First store the command. */
     _ux_utility_long_put(rndis_response + UX_DEVICE_CLASS_RNDIS_CMPLT_SET_MESSAGE_TYPE, UX_DEVICE_CLASS_RNDIS_CMPLT_SET);
-    
+
     /* Store the request ID.  */
     _ux_utility_long_put(rndis_response + UX_DEVICE_CLASS_RNDIS_CMPLT_SET_REQUEST_ID, rndis -> ux_slave_class_rndis_request_id);
 
@@ -103,7 +96,7 @@ ULONG            status;
     /* What OID are we dealing here ? No need to treat OIDs but not sure so leave the code as is for now. */
     switch (rndis_oid)
     {
- 
+
          case UX_DEVICE_CLASS_RNDIS_OID_GEN_SUPPORTED_LIST        :
         case UX_DEVICE_CLASS_RNDIS_OID_GEN_MAXIMUM_FRAME_SIZE    :
         case UX_DEVICE_CLASS_RNDIS_OID_GEN_MEDIA_SUPPORTED         :
@@ -122,15 +115,15 @@ ULONG            status;
         break;
 
     }
-        
+
     /* Set the status field.  */
     _ux_utility_long_put(rndis_response + UX_DEVICE_CLASS_RNDIS_CMPLT_SET_STATUS, status);
-    
+
     /* Set the response length.  */
     rndis -> ux_slave_class_rndis_response_length =   UX_DEVICE_CLASS_RNDIS_CMPLT_SET_RESPONSE_LENGTH;
     _ux_utility_long_put(rndis_response + UX_DEVICE_CLASS_RNDIS_CMPLT_SET_MESSAGE_LENGTH, UX_DEVICE_CLASS_RNDIS_CMPLT_SET_RESPONSE_LENGTH);
 
     /* We are done. Return UX_SUCCESS.  */
-    return(status);        
+    return(status);
 }
 

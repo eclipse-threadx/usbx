@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -20,57 +21,39 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_pictbridge.h                                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_pictbridge.h                                     PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX Pictbridge application                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added magic number defines, */
-/*                                            resulting in version 6.1.12 */
+/*    USBX Pictbridge application                                         */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_PICTBRIDGE_H
 #define UX_PICTBRIDGE_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 struct UX_PICTBRIDGE_STRUCT;
 
-/* Define the behaviour of this Pictbridge device : DPSHOST or DPSCLIENT.  
+/* Define the behaviour of this Pictbridge device : DPSHOST or DPSCLIENT.
    This should be done in the project management tool. */
 #ifndef UX_PICTBRIDGE_DPSHOST_NO
 #define UX_PICTBRIDGE_DPSHOST
@@ -92,7 +75,7 @@ struct UX_PICTBRIDGE_STRUCT;
 /* Define PICTBRIDGE main equivalences.  */
 
 #define UX_PICTBRIDGE_MAX_FILE_NAME_SIZE                    63
-#define UX_PICTBRIDGE_MAX_TAG_SIZE                          64 
+#define UX_PICTBRIDGE_MAX_TAG_SIZE                          64
 #define UX_PICTBRIDGE_MAX_ELEMENT_SIZE                      128
 #define UX_PICTBRIDGE_MAX_TAG_DEPTH                         16
 #define UX_PICTBRIDGE_MAX_VARIABLE_SIZE                     128
@@ -402,32 +385,32 @@ struct UX_PICTBRIDGE_STRUCT;
 #define UX_PICTBRIDGE_FILE_TYPES_EXIF_JPEG                  0x53010000
 #define UX_PICTBRIDGE_FILE_TYPES_OTHER_EXIF                 0x53020000
 #define UX_PICTBRIDGE_FILE_TYPES_JPEG                       0x53030000
-#define UX_PICTBRIDGE_FILE_TYPES_TIFF_EP                    0x53040000    
-#define UX_PICTBRIDGE_FILE_TYPES_FLASHPIX                   0x53050000    
-#define UX_PICTBRIDGE_FILE_TYPES_BMP                        0x53060000    
-#define UX_PICTBRIDGE_FILE_TYPES_CIFF                       0x53070000    
-#define UX_PICTBRIDGE_FILE_TYPES_GIF                        0x53080000    
-#define UX_PICTBRIDGE_FILE_TYPES_JFIF                       0x53090000    
-#define UX_PICTBRIDGE_FILE_TYPES_PCD                        0x530A0000    
-#define UX_PICTBRIDGE_FILE_TYPES_PICT                       0x530B0000    
-#define UX_PICTBRIDGE_FILE_TYPES_PNG                        0x530C0000    
-#define UX_PICTBRIDGE_FILE_TYPES_TIFF                       0x530D0000    
-#define UX_PICTBRIDGE_FILE_TYPES_TIFF_IT                    0x530E0000    
-#define UX_PICTBRIDGE_FILE_TYPES_JP2                        0x530F0000    
-#define UX_PICTBRIDGE_FILE_TYPES_JPX                        0x53110000    
-#define UX_PICTBRIDGE_FILE_TYPES_UNDEFINED                  0x53120000    
-#define UX_PICTBRIDGE_FILE_TYPES_ASSOCIATION                0x53130000    
-#define UX_PICTBRIDGE_FILE_TYPES_SCRIPT                     0x53140000    
-#define UX_PICTBRIDGE_FILE_TYPES_EXECUTABLE                 0x53150000    
-#define UX_PICTBRIDGE_FILE_TYPES_TEXT                       0x53160000    
-#define UX_PICTBRIDGE_FILE_TYPES_HTML                       0x53170000    
-#define UX_PICTBRIDGE_FILE_TYPES_DPOF                       0x53180000    
-#define UX_PICTBRIDGE_FILE_TYPES_AIFF                       0x53190000    
-#define UX_PICTBRIDGE_FILE_TYPES_WAV                        0x531A0000    
-#define UX_PICTBRIDGE_FILE_TYPES_MP3                        0x531B0000    
-#define UX_PICTBRIDGE_FILE_TYPES_AVI                        0x531C0000    
-#define UX_PICTBRIDGE_FILE_TYPES_MPEG                       0x531D0000    
-#define UX_PICTBRIDGE_FILE_TYPES_ASF                        0x531E0000    
+#define UX_PICTBRIDGE_FILE_TYPES_TIFF_EP                    0x53040000
+#define UX_PICTBRIDGE_FILE_TYPES_FLASHPIX                   0x53050000
+#define UX_PICTBRIDGE_FILE_TYPES_BMP                        0x53060000
+#define UX_PICTBRIDGE_FILE_TYPES_CIFF                       0x53070000
+#define UX_PICTBRIDGE_FILE_TYPES_GIF                        0x53080000
+#define UX_PICTBRIDGE_FILE_TYPES_JFIF                       0x53090000
+#define UX_PICTBRIDGE_FILE_TYPES_PCD                        0x530A0000
+#define UX_PICTBRIDGE_FILE_TYPES_PICT                       0x530B0000
+#define UX_PICTBRIDGE_FILE_TYPES_PNG                        0x530C0000
+#define UX_PICTBRIDGE_FILE_TYPES_TIFF                       0x530D0000
+#define UX_PICTBRIDGE_FILE_TYPES_TIFF_IT                    0x530E0000
+#define UX_PICTBRIDGE_FILE_TYPES_JP2                        0x530F0000
+#define UX_PICTBRIDGE_FILE_TYPES_JPX                        0x53110000
+#define UX_PICTBRIDGE_FILE_TYPES_UNDEFINED                  0x53120000
+#define UX_PICTBRIDGE_FILE_TYPES_ASSOCIATION                0x53130000
+#define UX_PICTBRIDGE_FILE_TYPES_SCRIPT                     0x53140000
+#define UX_PICTBRIDGE_FILE_TYPES_EXECUTABLE                 0x53150000
+#define UX_PICTBRIDGE_FILE_TYPES_TEXT                       0x53160000
+#define UX_PICTBRIDGE_FILE_TYPES_HTML                       0x53170000
+#define UX_PICTBRIDGE_FILE_TYPES_DPOF                       0x53180000
+#define UX_PICTBRIDGE_FILE_TYPES_AIFF                       0x53190000
+#define UX_PICTBRIDGE_FILE_TYPES_WAV                        0x531A0000
+#define UX_PICTBRIDGE_FILE_TYPES_MP3                        0x531B0000
+#define UX_PICTBRIDGE_FILE_TYPES_AVI                        0x531C0000
+#define UX_PICTBRIDGE_FILE_TYPES_MPEG                       0x531D0000
+#define UX_PICTBRIDGE_FILE_TYPES_ASF                        0x531E0000
 
 /* Define Pictbridge action result codes.  */
 
@@ -632,7 +615,7 @@ typedef struct UX_PICTBRIDGE_EVENT_STRUCT
     ULONG                                                   ux_pictbridge_event_parameter_1;
     ULONG                                                   ux_pictbridge_event_parameter_2;
     ULONG                                                   ux_pictbridge_event_parameter_3;
-    
+
 } UX_PICTBRIDGE_EVENT;
 
 /* Define Pictbridge structure.  */
@@ -698,49 +681,49 @@ UINT  _ux_pictbridge_xml_function_input_getcapability_capability_layouts(UX_PICT
 UINT  _ux_pictbridge_xml_function_input_getcapability_capability_papertypes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
 UINT  _ux_pictbridge_xml_function_input_startjob(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
 UINT  _ux_pictbridge_xml_function_input_startjob_printinfo(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_quality(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);         
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_papersize(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);   
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_papertype(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);   
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_filetype(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);        
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_dateprint(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);   
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_filenameprint(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter); 
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_imageoptimize(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter); 
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_layout(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_fixedsize(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);   
-UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_cropping(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);        
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_croppingarea(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);    
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_fileid(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_filename(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);        
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_date(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);            
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_copies(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_prtpid(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_filepath(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);        
-UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_copyid(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_dpsprintservicestatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_jobendreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_errorstatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_errorreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_capabilitychanged(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_disconnectenable(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_newjobok(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_quality(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_papersize(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_papertype(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_filetype(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_dateprint(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_filenameprint(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_imageoptimize(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_layout(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_fixedsize(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_jobconfig_cropping(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_croppingarea(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_fileid(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_filename(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_date(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_copies(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_prtpid(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_filepath(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_startjob_printinfo_copyid(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_dpsprintservicestatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_jobendreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_errorstatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_errorreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_capabilitychanged(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_disconnectenable(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_input_notifydevicestatus_newjobok(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
 UINT  _ux_pictbridge_xml_function_output_result(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_qualities(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);        
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_papersizes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);       
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_filetypes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);        
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_dateprints(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);       
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_filenameprints(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);       
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_imageoptimizes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);       
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_fixedsizes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);       
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_croppings(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);        
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_papertypes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);       
-UINT  _ux_pictbridge_xml_function_output_getcapability_capability_layouts(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);      
-UINT  _ux_pictbridge_xml_function_output_getdevicestatus_dpsprintservicestatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);                        
-UINT  _ux_pictbridge_xml_function_output_getdevicestatus_jobendreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);                             
-UINT  _ux_pictbridge_xml_function_output_getdevicestatus_errorstatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);                              
-UINT  _ux_pictbridge_xml_function_output_getdevicestatus_errorreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);                              
-UINT  _ux_pictbridge_xml_function_output_getdevicestatus_disconnectenable(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);                         
-UINT  _ux_pictbridge_xml_function_output_getdevicestatus_capabilitychanged(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);                            
-UINT  _ux_pictbridge_xml_function_output_getdevicestatus_newjobok(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);                                 
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_qualities(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_papersizes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_filetypes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_dateprints(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_filenameprints(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_imageoptimizes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_fixedsizes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_croppings(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_papertypes(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getcapability_capability_layouts(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getdevicestatus_dpsprintservicestatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getdevicestatus_jobendreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getdevicestatus_errorstatus(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getdevicestatus_errorreason(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getdevicestatus_disconnectenable(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getdevicestatus_capabilitychanged(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
+UINT  _ux_pictbridge_xml_function_output_getdevicestatus_newjobok(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, UCHAR *input_string, UCHAR *xml_parameter);
 
 /* Remapping of pictbridge functions that point to a NULL function..  */
 
@@ -819,62 +802,62 @@ UINT  _ux_pictbridge_dpsclient_object_data_send(UX_SLAVE_CLASS_PIMA *pima, ULONG
                                                 UCHAR *object_buffer, ULONG object_offset,
                                                 ULONG object_length);
 UINT  _ux_pictbridge_dpsclient_object_number_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_format_code, ULONG object_association, ULONG *number_objects);
-UINT  _ux_pictbridge_dpsclient_object_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle, 
+UINT  _ux_pictbridge_dpsclient_object_info_get(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle,
                                                 UX_SLAVE_CLASS_PIMA_OBJECT **object);
-UINT  _ux_pictbridge_dpsclient_object_info_send(UX_SLAVE_CLASS_PIMA *pima, UX_SLAVE_CLASS_PIMA_OBJECT *object, 
+UINT  _ux_pictbridge_dpsclient_object_info_send(UX_SLAVE_CLASS_PIMA *pima, UX_SLAVE_CLASS_PIMA_OBJECT *object,
                                                 ULONG storage_id, ULONG parent_object_handle, ULONG *object_handle);
 UINT  _ux_pictbridge_dpsclient_object_delete(UX_SLAVE_CLASS_PIMA *pima, ULONG object_handle);
-UINT  _ux_pictbridge_dpsclient_object_handles_get(UX_SLAVE_CLASS_PIMA *pima, 
-                                                    ULONG object_handles_format_code, 
-                                                    ULONG object_handles_association, 
+UINT  _ux_pictbridge_dpsclient_object_handles_get(UX_SLAVE_CLASS_PIMA *pima,
+                                                    ULONG object_handles_format_code,
+                                                    ULONG object_handles_association,
                                                     ULONG *object_handles_array,
                                                     ULONG object_handles_max_number);
-UINT  _ux_pictbridge_dpsclient_input_object_prepare(UX_PICTBRIDGE *pictbridge, 
-                                                    ULONG input_function, 
+UINT  _ux_pictbridge_dpsclient_input_object_prepare(UX_PICTBRIDGE *pictbridge,
+                                                    ULONG input_function,
                                                     ULONG input_subfunction,
                                                     ULONG input_parameter);
-UINT _ux_pictbridge_dpsclient_input_object_configure_print_service(UX_PICTBRIDGE *pictbridge, 
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+UINT _ux_pictbridge_dpsclient_input_object_configure_print_service(UX_PICTBRIDGE *pictbridge,
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
-UINT _ux_pictbridge_dpsclient_input_object_get_capability(UX_PICTBRIDGE *pictbridge, 
+UINT _ux_pictbridge_dpsclient_input_object_get_capability(UX_PICTBRIDGE *pictbridge,
                                                             ULONG input_subcode,
                                                             ULONG input_parameter,
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
-UINT _ux_pictbridge_dpsclient_input_object_startjob(UX_PICTBRIDGE *pictbridge, 
+UINT _ux_pictbridge_dpsclient_input_object_startjob(UX_PICTBRIDGE *pictbridge,
                                                             ULONG input_subcode,
                                                             ULONG input_parameter,
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
-UINT _ux_pictbridge_dpsclient_input_object_abortjob(UX_PICTBRIDGE *pictbridge, 
+UINT _ux_pictbridge_dpsclient_input_object_abortjob(UX_PICTBRIDGE *pictbridge,
                                                             ULONG input_subcode,
                                                             ULONG input_parameter,
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
-UINT _ux_pictbridge_dpsclient_input_object_continuejob(UX_PICTBRIDGE *pictbridge, 
+UINT _ux_pictbridge_dpsclient_input_object_continuejob(UX_PICTBRIDGE *pictbridge,
                                                             ULONG input_subcode,
                                                             ULONG input_parameter,
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
 UINT _ux_pictbridge_dpsclient_start(UX_PICTBRIDGE *pictbridge);
 UINT _ux_pictbridge_dpsclient_api_configure_print_service(UX_PICTBRIDGE *pictbridge);
-UINT _ux_pictbridge_dpsclient_api_capability(UX_PICTBRIDGE *pictbridge, ULONG capability_code, 
+UINT _ux_pictbridge_dpsclient_api_capability(UX_PICTBRIDGE *pictbridge, ULONG capability_code,
                                              ULONG capability_parameter);
 UINT _ux_pictbridge_dpsclient_api_device_status(UX_PICTBRIDGE *pictbridge);
 UINT _ux_pictbridge_dpsclient_api_start_job(UX_PICTBRIDGE *pictbridge);
 UINT _ux_pictbridge_dpsclient_api_abort_job(UX_PICTBRIDGE *pictbridge);
 UINT _ux_pictbridge_dpsclient_api_continue_job(UX_PICTBRIDGE *pictbridge);
-UINT _ux_pictbridge_dpsclient_register_event_callback_function(UX_PICTBRIDGE *pictbridge, 
+UINT _ux_pictbridge_dpsclient_register_event_callback_function(UX_PICTBRIDGE *pictbridge,
                                                                UINT (*event_callback_function)(struct UX_PICTBRIDGE_STRUCT *pictbridge, UINT event_flag));
 
 
@@ -913,34 +896,34 @@ UINT  _ux_pictbridge_dpshost_object_get(UX_PICTBRIDGE *pictbridge, ULONG object_
 UINT  _ux_pictbridge_dpshost_response_get(UX_PICTBRIDGE *pictbridge);
 UINT  _ux_pictbridge_dpshost_input_object_send(UX_PICTBRIDGE *pictbridge, ULONG input_function);
 UINT  _ux_pictbridge_dpshost_output_object_create(UX_PICTBRIDGE *pictbridge);
-UINT  _ux_pictbridge_dpshost_output_object_configure_print_service(UX_PICTBRIDGE *pictbridge, 
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+UINT  _ux_pictbridge_dpshost_output_object_configure_print_service(UX_PICTBRIDGE *pictbridge,
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
 
-UINT  _ux_pictbridge_dpshost_input_object_notify_job_status(UX_PICTBRIDGE *pictbridge, 
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+UINT  _ux_pictbridge_dpshost_input_object_notify_job_status(UX_PICTBRIDGE *pictbridge,
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
 
-UINT  _ux_pictbridge_dpshost_input_object_notify_device_status(UX_PICTBRIDGE *pictbridge, 
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+UINT  _ux_pictbridge_dpshost_input_object_notify_device_status(UX_PICTBRIDGE *pictbridge,
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
 
-UINT  _ux_pictbridge_dpshost_output_object_get_capability(UX_PICTBRIDGE *pictbridge, 
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+UINT  _ux_pictbridge_dpshost_output_object_get_capability(UX_PICTBRIDGE *pictbridge,
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
 
-UINT  _ux_pictbridge_dpshost_output_object_get_device_status(UX_PICTBRIDGE *pictbridge, 
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+UINT  _ux_pictbridge_dpshost_output_object_get_device_status(UX_PICTBRIDGE *pictbridge,
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated);
 
 /* Define Pictbridge Client API prototypes.  */
@@ -957,7 +940,7 @@ UINT  _ux_pictbridge_array_element_to_array_hexa(UCHAR *element, ULONG *hexa_arr
 UINT  _ux_pictbridge_element_to_decimal(UCHAR *element, ULONG *decimal_value);
 UINT  _ux_pictbridge_element_to_hexa(UCHAR *element, ULONG *hexa_value);
 UINT  _ux_pictbridge_hexa_to_element(ULONG hexa_value, UCHAR *element);
-UINT  _ux_pictbridge_tag_name_get(UCHAR *input_buffer, ULONG input_length, 
+UINT  _ux_pictbridge_tag_name_get(UCHAR *input_buffer, ULONG input_length,
                                   UCHAR *tag_name,
                                   UCHAR *variable_name,
                                   UCHAR *variable_string,
@@ -968,20 +951,20 @@ UINT  _ux_pictbridge_tag_name_scan(UX_PICTBRIDGE_XML_ITEM *tag_item,
                                   UCHAR *tag_name,
                                   UX_PICTBRIDGE_XML_ITEM **tag_entry);
 UINT  _ux_pictbridge_hexa_to_major_minor(ULONG hexa_value, UCHAR *output_buffer);
-UINT  _ux_pictbridge_hexa_to_decimal_string(ULONG hexa_value, UCHAR *decimal_string, 
+UINT  _ux_pictbridge_hexa_to_decimal_string(ULONG hexa_value, UCHAR *decimal_string,
                                             ULONG leading_zero_flag, ULONG max_digit_string_size);
-UINT  _ux_pictbridge_object_tag_line_add(UCHAR *pima_object_buffer, 
-                                                 ULONG object_length, 
+UINT  _ux_pictbridge_object_tag_line_add(UCHAR *pima_object_buffer,
+                                                 ULONG object_length,
                                                  UCHAR *tag_element_string,
                                                  ULONG tag_flag,
                                                  UCHAR *tag_variable,
                                                  ULONG  tag_variable_value,
                                                  VOID  *tag_element,
-                                                 UCHAR **pima_object_buffer_updated, 
+                                                 UCHAR **pima_object_buffer_updated,
                                                  ULONG *object_length_updated);
 
 UINT  _ux_pictbridge_input_object_create(UX_PICTBRIDGE *pictbridge, ULONG input_function);
-                                                 
+
 
 
 /* Define external strings and xml tag lines.  */
@@ -993,44 +976,44 @@ extern UCHAR _ux_pictbridge_hrequest_name[];
 extern UCHAR _ux_pictbridge_hrsponse_name[];
 extern UCHAR _ux_pictbridge_drequest_name[];
 extern UCHAR _ux_pictbridge_drsponse_name[];
-extern UCHAR _ux_pictbridge_xml_tag_line_xmlversion[];                
-extern UCHAR _ux_pictbridge_xml_tag_line_dpsxmlns[];                  
-extern UCHAR _ux_pictbridge_xml_tag_line_dps[];                   
-extern UCHAR _ux_pictbridge_xml_tag_line_output[];                    
-extern UCHAR _ux_pictbridge_xml_tag_line_input[];                     
-extern UCHAR _ux_pictbridge_xml_tag_line_result[];                    
-extern UCHAR _ux_pictbridge_xml_tag_line_configureprintservice[];     
-extern UCHAR _ux_pictbridge_xml_tag_line_printserviceavailable[];     
-extern UCHAR _ux_pictbridge_xml_tag_line_dpsversions[];               
-extern UCHAR _ux_pictbridge_xml_tag_line_vendorname[];                
-extern UCHAR _ux_pictbridge_xml_tag_line_vendorspecificversion[];     
-extern UCHAR _ux_pictbridge_xml_tag_line_productname[];               
-extern UCHAR _ux_pictbridge_xml_tag_line_serialno[];                  
-extern UCHAR _ux_pictbridge_xml_tag_line_capability[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_getcapability[];       
-extern UCHAR _ux_pictbridge_xml_tag_line_qualities[];           
-extern UCHAR _ux_pictbridge_xml_tag_line_papersizes[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_papertypes[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_filetypes[];           
-extern UCHAR _ux_pictbridge_xml_tag_line_dateprints[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_filenameprints[];      
-extern UCHAR _ux_pictbridge_xml_tag_line_imageoptimizes[];      
-extern UCHAR _ux_pictbridge_xml_tag_line_layouts[];             
-extern UCHAR _ux_pictbridge_xml_tag_line_fixedsizes[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_croppings[];           
-extern UCHAR _ux_pictbridge_xml_tag_line_charrepertoires[];     
+extern UCHAR _ux_pictbridge_xml_tag_line_xmlversion[];
+extern UCHAR _ux_pictbridge_xml_tag_line_dpsxmlns[];
+extern UCHAR _ux_pictbridge_xml_tag_line_dps[];
+extern UCHAR _ux_pictbridge_xml_tag_line_output[];
+extern UCHAR _ux_pictbridge_xml_tag_line_input[];
+extern UCHAR _ux_pictbridge_xml_tag_line_result[];
+extern UCHAR _ux_pictbridge_xml_tag_line_configureprintservice[];
+extern UCHAR _ux_pictbridge_xml_tag_line_printserviceavailable[];
+extern UCHAR _ux_pictbridge_xml_tag_line_dpsversions[];
+extern UCHAR _ux_pictbridge_xml_tag_line_vendorname[];
+extern UCHAR _ux_pictbridge_xml_tag_line_vendorspecificversion[];
+extern UCHAR _ux_pictbridge_xml_tag_line_productname[];
+extern UCHAR _ux_pictbridge_xml_tag_line_serialno[];
+extern UCHAR _ux_pictbridge_xml_tag_line_capability[];
+extern UCHAR _ux_pictbridge_xml_tag_line_getcapability[];
+extern UCHAR _ux_pictbridge_xml_tag_line_qualities[];
+extern UCHAR _ux_pictbridge_xml_tag_line_papersizes[];
+extern UCHAR _ux_pictbridge_xml_tag_line_papertypes[];
+extern UCHAR _ux_pictbridge_xml_tag_line_filetypes[];
+extern UCHAR _ux_pictbridge_xml_tag_line_dateprints[];
+extern UCHAR _ux_pictbridge_xml_tag_line_filenameprints[];
+extern UCHAR _ux_pictbridge_xml_tag_line_imageoptimizes[];
+extern UCHAR _ux_pictbridge_xml_tag_line_layouts[];
+extern UCHAR _ux_pictbridge_xml_tag_line_fixedsizes[];
+extern UCHAR _ux_pictbridge_xml_tag_line_croppings[];
+extern UCHAR _ux_pictbridge_xml_tag_line_charrepertoires[];
 extern UCHAR _ux_pictbridge_xml_variable_papersize[];
 extern UCHAR _ux_pictbridge_xml_variable_version[];
 extern UCHAR _ux_pictbridge_xml_variable_xmlns[];
 extern UCHAR _ux_pictbridge_xml_string_xmlns[];
-extern UCHAR _ux_pictbridge_xml_tag_line_getdevicestatus[]; 
-extern UCHAR _ux_pictbridge_xml_tag_line_dpsprintservicestatus[]; 
-extern UCHAR _ux_pictbridge_xml_tag_line_jobendreason[]; 
-extern UCHAR _ux_pictbridge_xml_tag_line_errorstatus[]; 
-extern UCHAR _ux_pictbridge_xml_tag_line_errorreason[]; 
-extern UCHAR _ux_pictbridge_xml_tag_line_disconnectenable[]; 
-extern UCHAR _ux_pictbridge_xml_tag_line_capabilitychanged[]; 
-extern UCHAR _ux_pictbridge_xml_tag_line_newjobok[]; 
+extern UCHAR _ux_pictbridge_xml_tag_line_getdevicestatus[];
+extern UCHAR _ux_pictbridge_xml_tag_line_dpsprintservicestatus[];
+extern UCHAR _ux_pictbridge_xml_tag_line_jobendreason[];
+extern UCHAR _ux_pictbridge_xml_tag_line_errorstatus[];
+extern UCHAR _ux_pictbridge_xml_tag_line_errorreason[];
+extern UCHAR _ux_pictbridge_xml_tag_line_disconnectenable[];
+extern UCHAR _ux_pictbridge_xml_tag_line_capabilitychanged[];
+extern UCHAR _ux_pictbridge_xml_tag_line_newjobok[];
 extern UCHAR _ux_pictbridge_xml_tag_line_notifydevicestatus[];
 extern UCHAR _ux_pictbridge_xml_tag_line_notifyjobstatus[];
 extern UCHAR _ux_pictbridge_xml_tag_line_progress[];
@@ -1040,27 +1023,27 @@ extern UCHAR _ux_pictbridge_xml_tag_line_abortjob[];
 extern UCHAR _ux_pictbridge_xml_tag_line_abortstyle[];
 extern UCHAR _ux_pictbridge_xml_tag_line_continuejob[];
 
-extern UCHAR _ux_pictbridge_xml_tag_line_quality[];           
-extern UCHAR _ux_pictbridge_xml_tag_line_papersize[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_papertype[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_filetype[];           
-extern UCHAR _ux_pictbridge_xml_tag_line_dateprint[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_filenameprint[];      
-extern UCHAR _ux_pictbridge_xml_tag_line_imageoptimize[];      
-extern UCHAR _ux_pictbridge_xml_tag_line_layout[];             
-extern UCHAR _ux_pictbridge_xml_tag_line_fixedsize[];          
-extern UCHAR _ux_pictbridge_xml_tag_line_cropping[];           
+extern UCHAR _ux_pictbridge_xml_tag_line_quality[];
+extern UCHAR _ux_pictbridge_xml_tag_line_papersize[];
+extern UCHAR _ux_pictbridge_xml_tag_line_papertype[];
+extern UCHAR _ux_pictbridge_xml_tag_line_filetype[];
+extern UCHAR _ux_pictbridge_xml_tag_line_dateprint[];
+extern UCHAR _ux_pictbridge_xml_tag_line_filenameprint[];
+extern UCHAR _ux_pictbridge_xml_tag_line_imageoptimize[];
+extern UCHAR _ux_pictbridge_xml_tag_line_layout[];
+extern UCHAR _ux_pictbridge_xml_tag_line_fixedsize[];
+extern UCHAR _ux_pictbridge_xml_tag_line_cropping[];
 extern UCHAR _ux_pictbridge_xml_tag_line_jobconfig[];
 extern UCHAR _ux_pictbridge_xml_tag_line_printinfo[];
 extern UCHAR _ux_pictbridge_xml_tag_line_fileid[];
 extern UCHAR _ux_pictbridge_xml_tag_line_filename[];
 extern UCHAR _ux_pictbridge_xml_tag_line_date[];
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif
 

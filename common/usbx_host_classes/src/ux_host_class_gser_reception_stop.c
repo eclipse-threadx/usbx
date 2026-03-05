@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Generic Serial Host module class                                    */
 /**                                                                       */
@@ -29,52 +30,44 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_gser_reception_stop                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_gser_reception_stop                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function starts a reception with the generic modem. This way   */ 
-/*    allows for non blocking calls based on a packet orientated round    */ 
+/*                                                                        */
+/*    This function starts a reception with the generic modem. This way   */
+/*    allows for non blocking calls based on a packet orientated round    */
 /*    robbin buffer. When a packet is fully or partially received, an     */
 /*    application callback function is invoked and a new transfer request */
 /*    is rescheduled.                                                     */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    gser                               Pointer to gser class            */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    gser                               Pointer to gser class            */
 /*    gser_reception                     Pointer to reception struct      */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_endpoint_transfer_abort                              */
-/*                                       Abort transfer request           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                       Abort transfer request           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser, 
+UINT  _ux_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser,
                                     UX_HOST_CLASS_GSER_RECEPTION *gser_reception)
 {
 
@@ -85,7 +78,7 @@ ULONG           interface_index;
 
     /* Ensure the instance is valid.  */
     if (gser -> ux_host_class_gser_state !=  UX_HOST_CLASS_INSTANCE_LIVE)
-    {       
+    {
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_INSTANCE_UNKNOWN, gser, 0, 0, UX_TRACE_ERRORS, 0, 0)
@@ -96,7 +89,7 @@ ULONG           interface_index;
     /* Check if we do have transfers for this application. If none, nothing to do. */
     if (gser_reception -> ux_host_class_gser_reception_state ==  UX_HOST_CLASS_GSER_RECEPTION_STATE_STOPPED)
         return(UX_SUCCESS);
-        
+
     /* Get the interface index.  */
     interface_index = gser_reception -> ux_host_class_gser_reception_interface_index;
 
@@ -142,14 +135,8 @@ ULONG           interface_index;
 /*                                                                        */
 /*    Application                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
-/*                                                                        */
 /**************************************************************************/
-UINT  _uxe_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser, 
+UINT  _uxe_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser,
                                     UX_HOST_CLASS_GSER_RECEPTION *gser_reception)
 {
 

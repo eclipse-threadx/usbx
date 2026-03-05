@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device RNDIS Class                                                  */
 /**                                                                       */
@@ -28,53 +29,39 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_rndis_write                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_rndis_write                        PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function writes a packet into a queue for later thread         */ 
-/*    processing.                                                         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    rndis                                   Address of rndis class      */ 
-/*                                                instance                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function writes a packet into a queue for later thread         */
+/*    processing.                                                         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    rndis                                   Address of rndis class      */
+/*                                                instance                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*   _ux_device_mutex_on                     Take mutex                  */
 /*   _ux_device_mutex_off                    Free mutex                  */
 /*   _ux_device_event_flags_set              Set event flags             */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_write(VOID *rndis_class, NX_PACKET *packet)
@@ -94,17 +81,17 @@ UX_SLAVE_CLASS_RNDIS     *rndis;
 
     /* Protect this thread.  */
     _ux_device_mutex_on(&rndis -> ux_slave_class_rndis_mutex);
-            
+
     /* Check the queue. See if there is something that is being sent. */
     if (rndis -> ux_slave_class_rndis_xmit_queue == UX_NULL)
-        
+
         /* Memorize this packet at the beginning of the queue.  */
         rndis -> ux_slave_class_rndis_xmit_queue = packet;
-        
+
     else
-    
+
     {
-    
+
         /* We get here when there is something in the queue.  */
         current_packet =  rndis -> ux_slave_class_rndis_xmit_queue;
 
@@ -116,7 +103,7 @@ UX_SLAVE_CLASS_RNDIS     *rndis;
         {
             /* Remember the current packet.  */
             current_packet = next_packet;
-            
+
             /* See what the next packet in the chain is.  */
             next_packet = current_packet -> nx_packet_queue_next;
         }
@@ -128,14 +115,14 @@ UX_SLAVE_CLASS_RNDIS     *rndis;
 
     /* Free Mutex resource.  */
     _ux_device_mutex_off(&rndis -> ux_slave_class_rndis_mutex);
-    
+
     /* The packet to be sent is the last in the chain.  */
     packet -> nx_packet_queue_next = NX_NULL;
 
     /* Set an event to wake up the bulkin thread.  */
-    _ux_device_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_BULKIN_EVENT, UX_OR);                
+    _ux_device_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_BULKIN_EVENT, UX_OR);
 
     /* We are done here.  */
-    return(UX_SUCCESS);            
+    return(UX_SUCCESS);
 #endif
 }

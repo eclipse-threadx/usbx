@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Sierra Wireless AR module class                                */
 /**                                                                       */
@@ -20,50 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_swar.h                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_swar.h                                PORTABLE C      */
 /*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX Sierra Wireless AR Class.                                      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
+/*    USBX Sierra Wireless AR Class.                                      */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_SWAR_H
 #define UX_HOST_CLASS_SWAR_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -78,7 +64,7 @@ extern   "C" {
 #define UX_HOST_CLASS_SWAR_CLASS_TRANSFER_TIMEOUT               300000
 #ifndef UX_HOST_CLASS_SWAR_VENDOR_ID
 #define UX_HOST_CLASS_SWAR_VENDOR_ID                            0X1199
-#define UX_HOST_CLASS_SWAR_PRODUCT_ID                           0X68A3 
+#define UX_HOST_CLASS_SWAR_PRODUCT_ID                           0X68A3
 #endif
 
 /* Define Sierra Wireless AR Class packet equivalences.  */
@@ -103,7 +89,7 @@ extern   "C" {
 typedef struct UX_HOST_CLASS_SWAR_STRUCT
 {
 
-    struct UX_HOST_CLASS_SWAR_STRUCT  
+    struct UX_HOST_CLASS_SWAR_STRUCT
                     *ux_host_class_swar_next_instance;
     UX_HOST_CLASS   *ux_host_class_swar_class;
     UX_DEVICE       *ux_host_class_swar_device;
@@ -113,7 +99,7 @@ typedef struct UX_HOST_CLASS_SWAR_STRUCT
     UINT            ux_host_class_swar_state;
     UX_SEMAPHORE    ux_host_class_swar_semaphore;
 
-    struct UX_HOST_CLASS_SWAR_RECEPTION_STRUCT  
+    struct UX_HOST_CLASS_SWAR_RECEPTION_STRUCT
                     *ux_host_class_swar_reception;
     ULONG           ux_host_class_swar_notification_count;
 } UX_HOST_CLASS_SWAR;
@@ -129,9 +115,9 @@ typedef struct UX_HOST_CLASS_SWAR_RECEPTION_STRUCT
     ULONG           ux_host_class_swar_reception_data_buffer_size;
     UCHAR           *ux_host_class_swar_reception_data_head;
     UCHAR           *ux_host_class_swar_reception_data_tail;
-    VOID            (*ux_host_class_swar_reception_callback)(struct UX_HOST_CLASS_SWAR_STRUCT *swar, 
+    VOID            (*ux_host_class_swar_reception_callback)(struct UX_HOST_CLASS_SWAR_STRUCT *swar,
                                                                 UINT  status,
-                                                                UCHAR *reception_buffer, 
+                                                                UCHAR *reception_buffer,
                                                                 ULONG reception_size);
 
 } UX_HOST_CLASS_SWAR_RECEPTION;
@@ -143,28 +129,28 @@ UINT    _ux_host_class_swar_configure(UX_HOST_CLASS_SWAR *swar);
 UINT    _ux_host_class_swar_deactivate(UX_HOST_CLASS_COMMAND *command);
 UINT    _ux_host_class_swar_endpoints_get(UX_HOST_CLASS_SWAR *swar);
 UINT    _ux_host_class_swar_entry(UX_HOST_CLASS_COMMAND *command);
-UINT    _ux_host_class_swar_read (UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer, 
+UINT    _ux_host_class_swar_read (UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
-UINT    _ux_host_class_swar_write(UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer, 
+UINT    _ux_host_class_swar_write(UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
 UINT    _ux_host_class_swar_ioctl(UX_HOST_CLASS_SWAR *swar, ULONG ioctl_function,
                                     VOID *parameter);
 VOID    _ux_host_class_swar_reception_callback (UX_TRANSFER *transfer_request);
-UINT    _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar, 
+UINT    _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
-UINT    _ux_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar, 
+UINT    _ux_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar,
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
 
 
-UINT    _uxe_host_class_swar_read (UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer, 
+UINT    _uxe_host_class_swar_read (UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
-UINT    _uxe_host_class_swar_write(UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer, 
+UINT    _uxe_host_class_swar_write(UX_HOST_CLASS_SWAR *swar, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
 UINT    _uxe_host_class_swar_ioctl(UX_HOST_CLASS_SWAR *swar, ULONG ioctl_function,
                                     VOID *parameter);
-UINT    _uxe_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar, 
+UINT    _uxe_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
-UINT    _uxe_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar, 
+UINT    _uxe_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar,
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception);
 
 /* Define SWAR Class API prototypes.  */
@@ -190,10 +176,10 @@ UINT    _uxe_host_class_swar_reception_start (UX_HOST_CLASS_SWAR *swar,
 
 #endif
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif

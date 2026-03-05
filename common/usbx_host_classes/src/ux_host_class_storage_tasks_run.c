@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -88,19 +89,6 @@ static inline UINT _ux_host_class_storage_transport_sense_check(UX_HOST_CLASS_ST
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Host Stack                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved internal logic,    */
-/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_tasks_run(UX_HOST_CLASS *storage_class)

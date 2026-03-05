@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -32,28 +33,6 @@
 /*                                                                        */
 /*    This file defines the equivalences for the USBX Device Class        */
 /*    Printer component.                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Yajun xia                Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023     Yajun xia                Modified comment(s),          */
-/*                                            added error checks support, */
-/*                                            resulting in version 6.2.1  */
-/*  10-31-2023     Yajun Xia, CQ Xiao       Modified comment(s),          */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            fixed error checking issue, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

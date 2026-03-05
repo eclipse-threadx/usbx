@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device CDC_ECM Class                                                */
 /**                                                                       */
@@ -29,67 +30,41 @@
 
 
 #if !defined(UX_DEVICE_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_ecm_bulkin_thread              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_ecm_bulkin_thread              PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the thread of the cdc_ecm bulkin endpoint. The bulk*/ 
-/*    IN endpoint is used when the device wants to write data to be sent  */ 
-/*    to the host.                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_ecm_class                             Address of cdc_ecm class  */ 
-/*                                                container               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Request transfer              */ 
+/*                                                                        */
+/*    This function is the thread of the cdc_ecm bulkin endpoint. The bulk*/
+/*    IN endpoint is used when the device wants to write data to be sent  */
+/*    to the host.                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_ecm_class                             Address of cdc_ecm class  */
+/*                                                container               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Request transfer              */
 /*    _ux_utility_event_flags_get           Get event flags               */
 /*    _ux_device_mutex_on                   Take mutex                    */
 /*    _ux_device_mutex_off                  Free mutex                    */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases, used UX prefix to    */
-/*                                            refer to TX symbols instead */
-/*                                            of using them directly,     */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used NX API to copy data,   */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_cdc_ecm_bulkin_thread(ULONG cdc_ecm_class)
@@ -110,13 +85,13 @@ NX_PACKET                       *packet;
 
     /* Cast properly the cdc_ecm instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, cdc_ecm_class)
-    
+
     /* Get the cdc_ecm instance from this class container.  */
     cdc_ecm =  (UX_SLAVE_CLASS_CDC_ECM *) class_ptr -> ux_slave_class_instance;
-    
+
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
-    
+
     /* This thread runs forever but can be suspended or resumed.  */
     while (1)
     {
@@ -124,11 +99,11 @@ NX_PACKET                       *packet;
         /* For as long we are configured.  */
         while (1)
         {
-            
+
             /* Wait until either a new packet has been added to the xmit queue,
                or until there has been a change in the device state (i.e. disconnection).  */
             _ux_utility_event_flags_get(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, (UX_DEVICE_CLASS_CDC_ECM_NEW_BULKIN_EVENT |
-                                                                                               UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT), 
+                                                                                               UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT),
                                                                                               UX_OR_CLEAR, &actual_flags, UX_WAIT_FOREVER);
 
             /* Check the completion code and the actual flags returned.  */
@@ -137,7 +112,7 @@ NX_PACKET                       *packet;
 
                 /* Get the transfer request for the bulk IN pipe.  */
                 transfer_request =  &cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint -> ux_slave_endpoint_transfer_request;
-    
+
                 /* Parse all packets.  */
                 while (cdc_ecm -> ux_slave_class_cdc_ecm_xmit_queue != UX_NULL)
                 {
@@ -150,10 +125,10 @@ NX_PACKET                       *packet;
 
                     /* Set the next packet (or a NULL value) as the head of the xmit queue. */
                     cdc_ecm -> ux_slave_class_cdc_ecm_xmit_queue =  current_packet -> nx_packet_queue_next;
-                
+
                     /* Free Mutex resource.  */
                     _ux_device_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
-                    
+
                     /* If the link is down no need to rearm a packet. */
                     if (cdc_ecm -> ux_slave_class_cdc_ecm_link_state == UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_UP)
                     {
@@ -176,7 +151,7 @@ NX_PACKET                       *packet;
                             {
 
                                 /* Allocate a new packet for chain data collection.  */
-                                status = nx_packet_allocate(cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool, &packet, 
+                                status = nx_packet_allocate(cdc_ecm -> ux_slave_class_cdc_ecm_packet_pool, &packet,
                                             NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_DEVICE_CLASS_CDC_ECM_PACKET_POOL_WAIT));
                                 if (status == UX_SUCCESS)
                                 {
@@ -213,7 +188,7 @@ NX_PACKET                       *packet;
 
                             /* Calculate the transfer length.  */
                             transfer_length =  current_packet -> nx_packet_length;
-                            
+
                             /* If trace is enabled, insert this event into the trace buffer.  */
                             UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ECM_PACKET_TRANSMIT, cdc_ecm, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
@@ -248,7 +223,7 @@ NX_PACKET                       *packet;
 
                                 /* Calculate the transfer length.  */
                                 transfer_length =  current_packet -> nx_packet_length;
-                                
+
                                 /* If trace is enabled, insert this event into the trace buffer.  */
                                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_CDC_ECM_PACKET_TRANSMIT, cdc_ecm, 0, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
@@ -281,11 +256,11 @@ NX_PACKET                       *packet;
                     }
 
                     /* Free the packet that was just sent.  First do some housekeeping.  */
-                    current_packet -> nx_packet_prepend_ptr =  current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE; 
+                    current_packet -> nx_packet_prepend_ptr =  current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE;
                     current_packet -> nx_packet_length =  current_packet -> nx_packet_length - UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE;
-                
+
                     /* And ask Netx to release it.  */
-                    nx_packet_transmit_release(current_packet); 
+                    nx_packet_transmit_release(current_packet);
                 }
             }
             else
@@ -295,7 +270,7 @@ NX_PACKET                       *packet;
                 _ux_device_mutex_on(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
                 /* Since we got the mutex, we know no one is trying to modify the queue; we also know
-                   no one can start modifying the queue since the link state is down, so we can just 
+                   no one can start modifying the queue since the link state is down, so we can just
                    release the mutex.  */
                 _ux_device_mutex_off(&cdc_ecm -> ux_slave_class_cdc_ecm_mutex);
 
@@ -305,16 +280,16 @@ NX_PACKET                       *packet;
 
                     /* Get the current packet in the list.  */
                     current_packet =  cdc_ecm -> ux_slave_class_cdc_ecm_xmit_queue;
-                    
+
                     /* Set the next packet (or a NULL value) as the head of the xmit queue. */
                     cdc_ecm -> ux_slave_class_cdc_ecm_xmit_queue =  current_packet -> nx_packet_queue_next;
 
                     /* Free the packet.  */
-                    current_packet -> nx_packet_prepend_ptr =  current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE; 
+                    current_packet -> nx_packet_prepend_ptr =  current_packet -> nx_packet_prepend_ptr + UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE;
                     current_packet -> nx_packet_length =  current_packet -> nx_packet_length - UX_DEVICE_CLASS_CDC_ECM_ETHERNET_SIZE;
 
                     /* And ask Netx to release it.  */
-                    nx_packet_transmit_release(current_packet); 
+                    nx_packet_transmit_release(current_packet);
                 }
 
                 /* Was the change in the device state caused by a disconnection?  */

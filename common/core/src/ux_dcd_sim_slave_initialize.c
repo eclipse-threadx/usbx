@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Slave Simulator Controller Driver                                   */
 /**                                                                       */
@@ -45,31 +46,19 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    None                                                                */ 
+/*    None                                                                */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_allocate           Allocate memory               */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_allocate           Allocate memory               */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Slave Simulator Controller Driver                                   */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added link with HCD,        */
-/*                                            set device to full speed,   */
-/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_initialize(VOID)
@@ -79,13 +68,13 @@ UX_SLAVE_DCD            *dcd;
 UX_DCD_SIM_SLAVE        *dcd_sim_slave;
 UX_HCD                  *hcd;
 
-                                                                            
+
     /* Get the pointer to the DCD.  */
     dcd = &_ux_system_slave -> ux_system_slave_dcd;
 
     /* The controller initialized here is of Slave simulation type.  */
     dcd -> ux_slave_dcd_controller_type =  UX_DCD_SIM_SLAVE_SLAVE_CONTROLLER;
-    
+
     /* Allocate memory for this Slave simulation DCD instance.  */
     dcd_sim_slave =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_DCD_SIM_SLAVE));
 

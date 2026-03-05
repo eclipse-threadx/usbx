@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,48 +30,40 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_request_isochronous_transfer           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_request_isochronous_transfer           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function performs an isochronous transfer request. This       */ 
+/*                                                                        */
+/*     This function performs an isochronous transfer request. This       */
 /*     function does not support multiple packets per TD as there can be  */
-/*     issues with packets crossing 4K pages.                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ohci                              Pointer to OHCI controller    */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_isochronous_td_obtain    Get isochronous TD            */ 
-/*    _ux_utility_physical_address          Get physical address          */ 
-/*    _ux_utility_virtual_address           Get virtual address           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    OHCI Controller Driver                                              */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*     issues with packets crossing 4K pages.                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ohci                              Pointer to OHCI controller    */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ohci_isochronous_td_obtain    Get isochronous TD            */
+/*    _ux_utility_physical_address          Get physical address          */
+/*    _ux_utility_virtual_address           Get virtual address           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    OHCI Controller Driver                                              */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_request_isochronous_transfer(UX_HCD_OHCI *hcd_ohci, UX_TRANSFER *transfer_request)
@@ -87,7 +80,7 @@ ULONG               transfer_request_payload_length;
 ULONG               isoch_packet_payload_length;
 UCHAR *             data_pointer;
 ULONG               current_frame_number;
-    
+
 
     /* Get the pointer to the Endpoint.  */
     endpoint =  (UX_ENDPOINT *) transfer_request -> ux_transfer_request_endpoint;
@@ -97,7 +90,7 @@ ULONG               current_frame_number;
 
     /* Reset the MPS value of the ED.  */
     ed -> ux_ohci_ed_dw0 &=  UX_OHCI_ED_MPS;
-    
+
     /* If the transfer request specifies a max packet length other than the endpoint
        size, we force the transfer request value into the endpoint.  */
     if (transfer_request -> ux_transfer_request_packet_length == 0)
@@ -115,7 +108,7 @@ ULONG               current_frame_number;
     /* Reset the first obtained data TD in case there is a TD shortage while building the list of TDs.  */
     start_data_td =  UX_NULL;
 
-    /* Calculate the frame number to be used to send this payload. If there are no current transfers, 
+    /* Calculate the frame number to be used to send this payload. If there are no current transfers,
        we take the current frame number and add a safety value (2-5) to it. If here is pending transactions,
        we use the frame number stored in the transfer request.  */
     if (ed -> ux_ohci_ed_tail_td == ed -> ux_ohci_ed_head_td)
@@ -130,13 +123,13 @@ ULONG               current_frame_number;
     /* Load the start buffer address and URB length to split the URB in multiple TD transfer.  */
     transfer_request_payload_length =  transfer_request -> ux_transfer_request_requested_length;
     data_pointer =  transfer_request -> ux_transfer_request_data_pointer;
-    
+
     while (transfer_request_payload_length != 0)
     {
 
         /* Set the default CC value. Default is 1 packet per TD frame.  */
         data_td -> ux_ohci_iso_td_dw0 =  UX_OHCI_TD_DEFAULT_DW0;
-        
+
         /* Set the direction. In Iso, this is done at the ED level.  */
         if ((transfer_request -> ux_transfer_request_type & UX_REQUEST_DIRECTION) == UX_REQUEST_IN)
 
@@ -153,7 +146,7 @@ ULONG               current_frame_number;
 
         /* Set the condition code for the current packet.  */
         data_td -> ux_ohci_iso_td_offset_psw[0] |=  (USHORT) UX_OHCI_ISO_TD_PSW_CC;
-        
+
         /* Program the end address of the buffer.  */
         data_td -> ux_ohci_iso_td_be =  ((UCHAR *) _ux_utility_physical_address(data_pointer)) + isoch_packet_payload_length - 1;
 
@@ -201,12 +194,12 @@ ULONG               current_frame_number;
             if (start_data_td == UX_NULL)
                 start_data_td =  data_td;
 
-            /* Attach this new TD to the previous one.  */                                
+            /* Attach this new TD to the previous one.  */
             previous_td -> ux_ohci_iso_td_next_td =  _ux_utility_physical_address(data_td);
             previous_td =  data_td;
         }
     }
-        
+
     /* Memorize the next frame number for this ED.  */
     ed -> ux_ohci_ed_frame =  current_frame_number;
 
@@ -242,6 +235,6 @@ ULONG               current_frame_number;
     ed -> ux_ohci_ed_tail_td =  _ux_utility_physical_address(tail_td);
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);           
+    return(UX_SUCCESS);
 }
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,65 +29,49 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_transfer_request                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request                     PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a USB transaction. On entry the transfer     */ 
-/*    request gives the endpoint pipe selected for this transaction and   */ 
-/*    the parameters associated with the transfer (data payload, length   */ 
+/*                                                                        */
+/*    This function performs a USB transaction. On entry the transfer     */
+/*    request gives the endpoint pipe selected for this transaction and   */
+/*    the parameters associated with the transfer (data payload, length   */
 /*    of transaction)                                                     */
 /*                                                                        */
-/*    For Control pipe, the transaction is blocking and will only return  */ 
-/*    when the 3 phases of the control transfer have been completed or if */ 
-/*    there is a previous error. For other pipes, the USB stack will      */ 
-/*    schedule the transaction on the USB but will not wait for its       */ 
-/*    completion. Each request for non blocking pipes has to specify a    */ 
+/*    For Control pipe, the transaction is blocking and will only return  */
+/*    when the 3 phases of the control transfer have been completed or if */
+/*    there is a previous error. For other pipes, the USB stack will      */
+/*    schedule the transaction on the USB but will not wait for its       */
+/*    completion. Each request for non blocking pipes has to specify a    */
 /*    completion routine.                                                 */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    transfer_request                      Transfer request structure    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                     If UX_SUCCESS, transfer was   */ 
-/*                                            successfully started        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    HCD Entry Function                                                  */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    transfer_request                      Transfer request structure    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                     If UX_SUCCESS, transfer was   */
+/*                                            successfully started        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    HCD Entry Function                                                  */
 /*    _ux_utility_semaphore_put             Put semaphore                 */
 /*    _ux_utility_semaphore_get             Get semaphore                 */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions, used UX prefix */
-/*                                            to refer to TX symbols      */
-/*                                            instead of using them       */
-/*                                            directly,                   */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_transfer_request(UX_TRANSFER *transfer_request)
@@ -124,11 +109,11 @@ UINT        status;
 #else
 UX_INTERRUPT_SAVE_AREA
 
-UX_ENDPOINT     *endpoint;  
-UX_DEVICE       *device;    
+UX_ENDPOINT     *endpoint;
+UX_DEVICE       *device;
 UX_HCD          *hcd;
 UINT            status;
-    
+
 
     /* Get the endpoint container from the transfer_request */
     endpoint =  transfer_request -> ux_transfer_request_endpoint;
@@ -136,7 +121,7 @@ UINT            status;
     /* Get the device container from the endpoint.  */
     device =  endpoint -> ux_endpoint_device;
 
-    /* Ensure we are not preempted by the enum thread while we check the device 
+    /* Ensure we are not preempted by the enum thread while we check the device
        state and set the transfer status.  */
     UX_DISABLE
 
@@ -180,7 +165,7 @@ UINT            status;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_TRANSFER_REQUEST, device, endpoint, transfer_request, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
-    
+
     /* With the device we have the pointer to the HCD.  */
     hcd = UX_DEVICE_HCD_GET(device);
 
@@ -189,21 +174,21 @@ UINT            status;
     {
 
         /* Check if the class has already protected it.  */
-        if (_ux_host_semaphore_waiting(&device -> ux_device_protection_semaphore))        
+        if (_ux_host_semaphore_waiting(&device -> ux_device_protection_semaphore))
         {
 
             /* We are using endpoint 0. Protect with semaphore.  */
             status =  _ux_host_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
-    
+
             /* Check for status.  */
             if (status != UX_SUCCESS)
-            
+
                 /* Something went wrong. */
                 return(status);
-        }        
-    }             
-    
-    /* Send the command to the controller.  */    
+        }
+    }
+
+    /* Send the command to the controller.  */
     status =  hcd -> ux_hcd_entry_function(hcd, UX_HCD_TRANSFER_REQUEST, transfer_request);
 
     /* If this is endpoint 0, we unprotect the endpoint. */
@@ -247,12 +232,6 @@ UINT            status;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_transfer_request(UX_TRANSFER *transfer_request)

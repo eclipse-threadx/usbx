@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Printer Class                                                       */
 /**                                                                       */
@@ -44,54 +45,38 @@ extern VOID _ux_host_class_printer_name_parse(UX_HOST_CLASS_PRINTER *printer,
 static inline UINT _ux_host_class_printer_activate_wait(UX_HOST_CLASS_COMMAND *command);
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_entry                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_printer_entry                        PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the entry point of the printer class. It will be   */ 
-/*    called by the USBX stack enumeration module when there is a new     */ 
-/*    printer on the bus or when the USB printer is removed.              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Printer class command         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_printer_activate       Activate printer class        */ 
-/*    _ux_host_class_printer_deactivate     Deactivate printer class      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Printer Class                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            removed compile warning,    */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*    This function is the entry point of the printer class. It will be   */
+/*    called by the USBX stack enumeration module when there is a new     */
+/*    printer on the bus or when the USB printer is removed.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Printer class command         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_printer_activate       Activate printer class        */
+/*    _ux_host_class_printer_deactivate     Deactivate printer class      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Printer Class                                                       */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_printer_entry(UX_HOST_CLASS_COMMAND *command)
@@ -111,10 +96,10 @@ UINT    status;
            this device or not.  */
         if((command -> ux_host_class_command_usage == UX_HOST_CLASS_COMMAND_USAGE_CSP) &&
                              (command -> ux_host_class_command_class == UX_HOST_CLASS_PRINTER_CLASS))
-            return(UX_SUCCESS);                        
-        else            
-            return(UX_NO_CLASS_MATCH);                        
-                
+            return(UX_SUCCESS);
+        else
+            return(UX_NO_CLASS_MATCH);
+
     case UX_HOST_CLASS_COMMAND_ACTIVATE:
 
         /* The activate command is used when the device inserted has found a parent and
@@ -130,18 +115,18 @@ UINT    status;
 
     case UX_HOST_CLASS_COMMAND_DEACTIVATE:
 
-        /* The deactivate command is used when the device has been extracted either      
+        /* The deactivate command is used when the device has been extracted either
            directly or when its parents has been extracted.  */
         status =  _ux_host_class_printer_deactivate(command);
         return(status);
 
-    default: 
-            
+    default:
+
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_FUNCTION_NOT_SUPPORTED);
-    }   
+    }
 }
 
 #if defined(UX_HOST_STANDALONE)

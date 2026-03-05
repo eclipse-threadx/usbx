@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,47 +29,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_call                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_class_call                           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function will call all the registered classes to the USBX      */
 /*    stack. Each class will have the possibility to own the device or    */
-/*    one of the interfaces of a device.                                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    class_command                         Class command structure       */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Number of owners                                                    */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_host_class_entry_function)        Class entry function          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
+/*    one of the interfaces of a device.                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class_command                         Class command structure       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Number of owners                                                    */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_host_class_entry_function)        Class entry function          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UX_HOST_CLASS  *_ux_host_stack_class_call(UX_HOST_CLASS_COMMAND *class_command)
@@ -101,9 +92,9 @@ ULONG           class_index;
             {
 
                 /* Yes, return this class pointer.  */
-                return(class_inst); 
+                return(class_inst);
             }
-        }    
+        }
 #if UX_MAX_CLASS_DRIVER > 1
         /* Move to the next registered class. */
         class_inst ++;

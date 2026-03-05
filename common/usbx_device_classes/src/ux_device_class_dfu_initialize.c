@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -61,31 +62,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Source Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed max transfer size,    */
-/*                                            added max size limit check, */
-/*                                            resulting in version 6.1.6  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -243,7 +219,7 @@ ULONG                                   descriptor_length;
     /* The last resource, thread is not created or created error, no need to free.  */
     if (dfu -> ux_slave_class_dfu_thread_stack)
         _ux_utility_memory_free(dfu -> ux_slave_class_dfu_thread_stack);
-    if (dfu -> ux_slave_class_dfu_event_flags_group.tx_event_flags_group_id != 0)
+    if (_ux_device_event_flags_created(&dfu -> ux_slave_class_dfu_event_flags_group))
         _ux_utility_event_flags_delete(&dfu -> ux_slave_class_dfu_event_flags_group);
 #endif
 
@@ -285,12 +261,6 @@ ULONG                                   descriptor_length;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Source Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_dfu_initialize(UX_SLAVE_CLASS_COMMAND *command)

@@ -694,7 +694,7 @@ static UINT    demo_thread_media_read(VOID *storage, ULONG lun, UCHAR * data_poi
 
     if (lun > 1)
         return UX_ERROR;
-    
+
     ram_disk_read_sent = UX_TRUE;
 
     if (ram_disk_read_status != UX_SUCCESS)

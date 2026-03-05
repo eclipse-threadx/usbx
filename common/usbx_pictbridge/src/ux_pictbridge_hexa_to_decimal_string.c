@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -28,19 +29,19 @@
 #include "ux_pictbridge.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_hexa_to_decimal_string               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_hexa_to_decimal_string               PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function translates an hexa value into a decimal string.       */ 
+/*                                                                        */
+/*    This function translates an hexa value into a decimal string.       */
 /*                                                                        */
 /*    Note:                                                               */
 /*    Number of max_digit_string_size must be large enough to fit digits  */
@@ -49,41 +50,27 @@
 /*    than max_digit_string_size to accept converted characters.          */
 /*    When leading zeros are off, the converted string ends before        */
 /*    reaching buffer end and zeros are padded.                           */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hexa_value                             Value to be translated       */ 
-/*    decimal_string                         Where to store the element   */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hexa_value                             Value to be translated       */
+/*    decimal_string                         Where to store the element   */
 /*    leading_zero_flag                      If leading zeroes are OK     */
 /*    max_digit_string_size                  Max number of digits (<=8)   */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_parse                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Yajun Xia                Modified comment(s),          */
-/*                                            fixed maximum decimal       */
-/*                                            calculation issue,          */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_object_parse                                         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_pictbridge_hexa_to_decimal_string(ULONG hexa_value, UCHAR *decimal_string, 
+UINT  _ux_pictbridge_hexa_to_decimal_string(ULONG hexa_value, UCHAR *decimal_string,
                                             ULONG leading_zero_flag, ULONG max_digit_string_size)
 {
 
@@ -130,9 +117,9 @@ ULONG                   decimal_max[8] = {9, 99, 999, 9999, 99999, 999999, 99999
     /* Set the leading zero flag.  */
     if (leading_zero_flag == UX_PICTBRIDGE_LEADING_ZERO_ON)
         leading_flag = UX_FALSE;
-    else        
+    else
         leading_flag = UX_TRUE;
-    
+
     /* Reset the decimal_string buffer.  */
     _ux_utility_memory_set(decimal_string, 0, max_digit_string_size); /* Use case of memset is verified. */
 
@@ -142,23 +129,23 @@ ULONG                   decimal_max[8] = {9, 99, 999, 9999, 99999, 999999, 99999
         /* Divide the hexa value by the shift and decode the leading digital.  */
         decimal_value = hexa_value / decimal_string_shift;
 
-        /* If the result is non zero, we can insert that decimal in the string.  
+        /* If the result is non zero, we can insert that decimal in the string.
            There is a special case if the value is the last decimal or if the leading flag is off. */
         if (decimal_value != 0 || decimal_string_shift == 1 || leading_flag == UX_FALSE)
         {
             /* Insert the value.  */
             *decimal_string++ = (UCHAR)(decimal_value + '0');
-            
+
             /* Reset the leading flag.  */
             leading_flag = UX_FALSE;
         }
 
         /* Reduce the shift value to the next decimal.  */
-        decimal_string_shift = decimal_string_shift / 10;  
-        
-    }       
+        decimal_string_shift = decimal_string_shift / 10;
+
+    }
 
     /* Operation was successful.  */
-    return(UX_SUCCESS);    
+    return(UX_SUCCESS);
 }
 

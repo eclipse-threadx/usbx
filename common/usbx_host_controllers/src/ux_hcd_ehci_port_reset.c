@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -82,50 +83,38 @@
 
 #endif /* ifndef UX_HCD_EHCI_EXT_USBPHY_HIGHSPEED_MODE_SET */
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_port_reset                             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_port_reset                             PORTABLE C      */
 /*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function will reset a specific port attached to the root HUB.  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*    port_index                            Port index to reset           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_register_read            Read EHCI register            */ 
-/*    _ux_hcd_ehci_register_write           Write EHCI register           */ 
-/*    _ux_utility_delay_ms                  Delay                         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function will reset a specific port attached to the root HUB.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*    port_index                            Port index to reset           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ehci_register_read            Read EHCI register            */
+/*    _ux_hcd_ehci_register_write           Write EHCI register           */
+/*    _ux_utility_delay_ms                  Delay                         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed NXP register base,    */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_port_reset(UX_HCD_EHCI *hcd_ehci, ULONG port_index)
@@ -147,15 +136,15 @@ INT         i;
 
         return(UX_PORT_INDEX_UNKNOWN);
     }
-    
-    /* Ensure that the downstream port has a device attached. It is unnatural to perform 
+
+    /* Ensure that the downstream port has a device attached. It is unnatural to perform
        a port reset if there is no device.  */
     ehci_register_port_status =  _ux_hcd_ehci_register_read(hcd_ehci, EHCI_HCOR_PORT_SC + port_index);
-                                    
+
     /* Check Device Connection Status.  */
     if ((ehci_register_port_status & EHCI_HC_PS_CCS) == 0)
     {
-    
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HCD, UX_NO_DEVICE_CONNECTED);
 
@@ -164,8 +153,8 @@ INT         i;
 
         return(UX_NO_DEVICE_CONNECTED);
     }
-    
-    /* Check for the speed of the device. If low speed, we need to send the connection signal 
+
+    /* Check for the speed of the device. If low speed, we need to send the connection signal
        to the companion chip.  Unless we are on a controller with a built-in TT. */
     if ((ehci_register_port_status & EHCI_HC_PS_SPEED_MASK) != EHCI_HC_PS_SPEED_LOW || (hcd_ehci -> ux_hcd_ehci_embedded_tt == UX_TRUE))
     {
@@ -176,7 +165,7 @@ INT         i;
             /* Before reset, phy does not know the speed.  */
             UX_HCD_EHCI_EXT_USBPHY_HIGHSPEED_MODE_SET(hcd_ehci, UX_FALSE);
 
-            /* The device may be high speed or full speed, we try to reset the port for some time 
+            /* The device may be high speed or full speed, we try to reset the port for some time
             and see if the port is enabled by the host controller.  */
             _ux_hcd_ehci_register_write(hcd_ehci, EHCI_HCOR_PORT_SC + port_index, (ehci_register_port_status | EHCI_HC_PS_PR));
 
@@ -191,7 +180,7 @@ INT         i;
                 ehci_register_port_status &= ~EHCI_HC_PS_PR;
                 _ux_hcd_ehci_register_write(hcd_ehci, EHCI_HCOR_PORT_SC + port_index, ehci_register_port_status);
 
-                /* According to the USB 2.0 spec, the controller may take 2ms to reset the port bit from 1 to 0 after 
+                /* According to the USB 2.0 spec, the controller may take 2ms to reset the port bit from 1 to 0 after
                 we write a 0. Wait until the port reset bit has been turned off completely.  */
                 _ux_utility_delay_ms(EHCI_HC_RH_RESET_SETTLE_DELAY);
             }
@@ -202,7 +191,7 @@ INT         i;
                 (ehci_register_port_status & EHCI_HC_PS_EMBEDDED_TT_SPEED_MASK) == EHCI_HC_PS_EMBEDDED_TT_SPEED_HIGH)
                 break;
 
-            /* Seems we need to set the Port to a Suspend state before forcing the reset. Otherwise some devices fail the 
+            /* Seems we need to set the Port to a Suspend state before forcing the reset. Otherwise some devices fail the
                HS detection handshake.  */
             if (i == 0)
             {
@@ -225,21 +214,21 @@ INT         i;
         }
     }
 
-    /* We come here when the device is either low speed or full speed. In this case, we release 
+    /* We come here when the device is either low speed or full speed. In this case, we release
        the ownership of the port to the companion chip.  */
     _ux_hcd_ehci_register_write(hcd_ehci, EHCI_HCOR_PORT_SC + port_index, (ehci_register_port_status | EHCI_HC_PS_PO));
-                        
+
     /* Delay.  */
     _ux_utility_delay_ms(EHCI_HC_RH_RESET_DELAY);
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_PORT_RESET_FAILED, port_index, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HCD, UX_PORT_RESET_FAILED);
 
-    /* When the root HUB sees an error message, it will give up on this device and the companion chip root HUB 
+    /* When the root HUB sees an error message, it will give up on this device and the companion chip root HUB
        will pick up the insertion signal again and reawake the root HUB driver.  */
-    return(UX_PORT_RESET_FAILED);       
+    return(UX_PORT_RESET_FAILED);
 }
 

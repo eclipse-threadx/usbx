@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -29,56 +30,42 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_get_status_notification    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_get_status_notification    PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a GET_STATUS_NOTIFICATION command.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a GET_STATUS_NOTIFICATION command.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_storage_csw_send     Send CSW                      */
+/*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_device_stack_endpoint_stall       Stall endpoint                */
 /*    _ux_utility_short_put_big_endian      Put 16-bit big endian         */
-/*    _ux_utility_memory_copy               Copy memory                   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*    _ux_utility_memory_copy               Copy memory                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_get_status_notification(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
@@ -120,12 +107,12 @@ ULONG                   notification_class;
 
     /* Extract the notification from the cbwcb.  */
     notification_class = (ULONG) *(cbwcb + UX_SLAVE_CLASS_STORAGE_EVENT_NOTIFICATION_CLASS_REQUEST);
-    
+
     /* Obtain the notification of the device.  */
-    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_notification(storage, lun, 
+    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_notification(storage, lun,
                                 storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id,
-                                notification_class, 
-                                &media_notification, 
+                                notification_class,
+                                &media_notification,
                                 &media_notification_length);
 
     /* Check the notification length.  */
@@ -145,33 +132,33 @@ ULONG                   notification_class;
     /* Check the status for error.  */
     if (status != UX_SUCCESS)
     {
-        
+
 #if !defined(UX_DEVICE_STANDALONE)
 
         /* We need to STALL the IN endpoint.  The endpoint will be reset by the host.  */
         _ux_device_stack_endpoint_stall(endpoint_in);
 #endif
-    }    
+    }
     else
     {
 
         /* Obtain the pointer to the transfer request.  */
         transfer_request =  &endpoint_in -> ux_slave_endpoint_transfer_request;
-        
+
         /* Put the length of the notification length in the buffer.  */
         _ux_utility_short_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer, (USHORT)media_notification_length);
 
         /* Copy the CSW into the transfer request memory.  */
-        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + sizeof (USHORT), 
-                                            media_notification, 
+        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer + sizeof (USHORT),
+                                            media_notification,
                                             media_notification_length); /* Use case of memcpy is verified. */
-        
+
         /* Update the notification length. */
         media_notification_length += (ULONG)sizeof (USHORT);
 
 #if !defined(UX_DEVICE_STANDALONE)
         /* Send a data payload with the notification buffer.  */
-        _ux_device_stack_transfer_request(transfer_request, 
+        _ux_device_stack_transfer_request(transfer_request,
                                   media_notification_length,
                                   media_notification_length);
 #else
@@ -190,7 +177,7 @@ ULONG                   notification_class;
         storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
         status = UX_SUCCESS;
     }
-        
+
     /* Return completion status.  */
     return(status);
 }

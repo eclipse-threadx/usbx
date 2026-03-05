@@ -121,6 +121,6 @@ UX_HOST_CLASS       *host_class;
         printf("Error on line %d, error code: %d\n", __LINE__, status);
         test_control_return(1);
     }
-    
+
     return(UX_SUCCESS);
 }

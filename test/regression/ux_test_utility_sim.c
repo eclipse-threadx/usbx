@@ -242,7 +242,7 @@ UX_TEST_ACTION                                  action;
     /* Setup the basic semaphore fields.  */
     semaphore_ptr -> tx_semaphore_name =             name_ptr;
     semaphore_ptr -> tx_semaphore_count =            initial_count;
-    
+
     /* Disable interrupts to place the semaphore on the created list.  */
     TX_DISABLE
 
@@ -272,9 +272,9 @@ UX_TEST_ACTION                                  action;
 
         /* Setup this semaphore's next and previous created links.  */
         semaphore_ptr -> tx_semaphore_created_previous =  previous_semaphore;
-        semaphore_ptr -> tx_semaphore_created_next =      next_semaphore;    
+        semaphore_ptr -> tx_semaphore_created_next =      next_semaphore;
     }
-    
+
     /* Increment the created count.  */
     _tx_semaphore_created_count++;
 
@@ -372,8 +372,8 @@ UINT  _tx_semaphore_get(TX_SEMAPHORE *semaphore_ptr, ULONG wait_option)
 {
 
 TX_INTERRUPT_SAVE_AREA
-            
-TX_THREAD       *thread_ptr;            
+
+TX_THREAD       *thread_ptr;
 TX_THREAD       *next_thread;
 TX_THREAD       *previous_thread;
 UINT            status;
@@ -446,7 +446,7 @@ UX_TEST_ACTION                              action;
         /* Increment the number of suspensions on this semaphore.  */
         semaphore_ptr -> tx_semaphore_performance_suspension_count++;
 #endif
-            
+
         /* Pickup thread pointer.  */
         TX_THREAD_GET_CURRENT(thread_ptr)
 
@@ -598,7 +598,7 @@ UX_TEST_ACTION                          action;
     /* Setup the basic mutex fields.  */
     mutex_ptr -> tx_mutex_name =             name_ptr;
     mutex_ptr -> tx_mutex_inherit =          inherit;
-    
+
     /* Disable interrupts to place the mutex on the created list.  */
     TX_DISABLE
 
@@ -631,12 +631,12 @@ UX_TEST_ACTION                          action;
 
         /* Setup this mutex's next and previous created links.  */
         mutex_ptr -> tx_mutex_created_previous =  previous_mutex;
-        mutex_ptr -> tx_mutex_created_next =      next_mutex;    
+        mutex_ptr -> tx_mutex_created_next =      next_mutex;
     }
 
     /* Increment the ownership count.  */
     _tx_mutex_created_count++;
-    
+
     /* Optional mutex create extended processing.  */
     TX_MUTEX_CREATE_EXTENSION(mutex_ptr)
 
@@ -772,7 +772,7 @@ ULONG                   updated_stack_start;
 
 #ifdef TX_ENABLE_STACK_CHECKING
 
-    /* Ensure that there are two ULONG of 0xEF patterns at the top and 
+    /* Ensure that there are two ULONG of 0xEF patterns at the top and
        bottom of the thread's stack. This will be used to check for stack
        overflow conditions during run-time.  */
     stack_size =  ((stack_size/(sizeof(ULONG))) * (sizeof(ULONG))) - (sizeof(ULONG));
@@ -784,7 +784,7 @@ ULONG                   updated_stack_start;
     /* Determine if the starting stack address is different.  */
     if (new_stack_start != updated_stack_start)
     {
-    
+
         /* Yes, subtract another ULONG from the size to avoid going past the stack area.  */
         stack_size =  stack_size - (sizeof(ULONG));
     }
@@ -832,7 +832,7 @@ ULONG                   updated_stack_start;
            disable all preemption.  */
         thread_ptr -> tx_thread_preempt_threshold =       ((UINT) 0);
         thread_ptr -> tx_thread_user_preempt_threshold =  ((UINT) 0);
-    } 
+    }
     else
     {
 
@@ -849,9 +849,9 @@ ULONG                   updated_stack_start;
     TX_THREAD_CREATE_TIMEOUT_SETUP(thread_ptr)
 
     /* Perform any additional thread setup activities for tool or user purpose.  */
-    TX_THREAD_CREATE_INTERNAL_EXTENSION(thread_ptr) 
+    TX_THREAD_CREATE_INTERNAL_EXTENSION(thread_ptr)
 
-    /* Call the target specific stack frame building routine to build the 
+    /* Call the target specific stack frame building routine to build the
        thread's initial stack and to setup the actual stack pointer in the
        control block.  */
     _tx_thread_stack_build(thread_ptr, _tx_thread_shell_entry);
@@ -891,9 +891,9 @@ ULONG                   updated_stack_start;
 
         /* Setup this thread's created links.  */
         thread_ptr -> tx_thread_created_previous =  previous_thread;
-        thread_ptr -> tx_thread_created_next =      next_thread;    
+        thread_ptr -> tx_thread_created_next =      next_thread;
     }
-    
+
     /* Increment the thread created count.  */
     _tx_thread_created_count++;
 
@@ -927,26 +927,26 @@ ULONG                   updated_stack_start;
             /* Yes, this create call was made from initialization.  */
 
             /* Pickup the current thread execute pointer, which corresponds to the
-               highest priority thread ready to execute.  Interrupt lockout is 
-               not required, since interrupts are assumed to be disabled during 
+               highest priority thread ready to execute.  Interrupt lockout is
+               not required, since interrupts are assumed to be disabled during
                initialization.  */
             saved_thread_ptr =  _tx_thread_execute_ptr;
 
             /* Determine if there is thread ready for execution.  */
             if (saved_thread_ptr != TX_NULL)
             {
-                
+
                 /* Yes, a thread is ready for execution when initialization completes.  */
 
                 /* Save the current preemption-threshold.  */
                 saved_threshold =  saved_thread_ptr -> tx_thread_preempt_threshold;
 
-                /* For initialization, temporarily set the preemption-threshold to the 
-                   priority level to make sure the highest-priority thread runs once 
+                /* For initialization, temporarily set the preemption-threshold to the
+                   priority level to make sure the highest-priority thread runs once
                    initialization is complete.  */
                 saved_thread_ptr -> tx_thread_preempt_threshold =  saved_thread_ptr -> tx_thread_priority;
             }
-        } 
+        }
         else
         {
 
@@ -972,10 +972,10 @@ ULONG                   updated_stack_start;
         /* Perform any additional activities for tool or user purpose.  */
         TX_THREAD_CREATE_EXTENSION(thread_ptr)
 
-        /* Call the resume thread function to make this thread ready.  */ 
+        /* Call the resume thread function to make this thread ready.  */
         _tx_thread_system_resume(thread_ptr);
 #endif
- 
+
         /* Determine if the thread's preemption-threshold needs to be restored.  */
         if (saved_thread_ptr != TX_NULL)
         {
@@ -983,7 +983,7 @@ ULONG                   updated_stack_start;
             /* Yes, restore the previous highest-priority thread's preemption-threshold. This
                can only happen if this routine is called from initialization.  */
             saved_thread_ptr -> tx_thread_preempt_threshold =  saved_threshold;
-        } 
+        }
     }
     else
     {
@@ -1026,7 +1026,7 @@ UINT  _tx_mutex_get(TX_MUTEX *mutex_ptr, ULONG wait_option)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;            
+TX_THREAD       *thread_ptr;
 TX_MUTEX        *next_mutex;
 TX_MUTEX        *previous_mutex;
 TX_THREAD       *mutex_owner;
@@ -1081,7 +1081,7 @@ UX_TEST_ACTION                          action;
             /* Determine if priority inheritance is required.  */
             if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
             {
-         
+
                 /* Remember the current priority of thread.  */
                 mutex_ptr -> tx_mutex_original_priority =   thread_ptr -> tx_thread_priority;
 
@@ -1133,7 +1133,7 @@ UX_TEST_ACTION                          action;
     else if (mutex_ptr -> tx_mutex_owner == thread_ptr)
     {
 
-        /* The owning thread is requesting the mutex again, just 
+        /* The owning thread is requesting the mutex again, just
            increment the ownership count.  */
         mutex_ptr -> tx_mutex_ownership_count++;
 
@@ -1214,7 +1214,7 @@ UX_TEST_ACTION                          action;
                 previous_thread -> tx_thread_suspended_next =   thread_ptr;
                 next_thread -> tx_thread_suspended_previous =   thread_ptr;
             }
-            
+
             /* Increment the suspension count.  */
             mutex_ptr -> tx_mutex_suspended_count++;
 
@@ -1223,7 +1223,7 @@ UX_TEST_ACTION                          action;
 
 #ifdef TX_NOT_INTERRUPTABLE
 
-            /* Determine if we need to raise the priority of the thread 
+            /* Determine if we need to raise the priority of the thread
                owning the mutex.  */
             if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
             {
@@ -1274,7 +1274,7 @@ UX_TEST_ACTION                          action;
             /* Restore interrupts.  */
             TX_RESTORE
 
-            /* Determine if we need to raise the priority of the thread 
+            /* Determine if we need to raise the priority of the thread
                owning the mutex.  */
             if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
             {
@@ -1316,7 +1316,7 @@ UX_TEST_ACTION                          action;
         {
 
             /* Restore interrupts.  */
-            TX_RESTORE 
+            TX_RESTORE
 
             /* Immediate return, return error completion.  */
             status =  TX_NOT_AVAILABLE;
@@ -1448,16 +1448,16 @@ UX_TEST_ACTION                          action;
 
 #ifdef TX_DISABLE_PREEMPTION_THRESHOLD
 
-    /* Only allow 0 (disable all preemption) and returning preemption-threshold to the 
+    /* Only allow 0 (disable all preemption) and returning preemption-threshold to the
        current thread priority if preemption-threshold is disabled. All other threshold
        values are converted to 0.  */
     if (thread_ptr -> tx_thread_user_priority != new_threshold)
     {
-    
+
         /* Is the new threshold zero?  */
         if (new_threshold != ((UINT) 0))
         {
-        
+
             /* Convert the new threshold to disable all preemption, since preemption-threshold is
                not supported.  */
             new_threshold =  ((UINT) 0);
@@ -1477,7 +1477,7 @@ UX_TEST_ACTION                          action;
     /* Determine if the new threshold is greater than the current user priority.  */
     if (new_threshold > thread_ptr -> tx_thread_user_priority)
     {
-            
+
         /* Return error.  */
         status =  TX_THRESH_ERROR;
     }
@@ -1529,13 +1529,13 @@ UX_TEST_ACTION                          action;
         /* Determine if the new threshold represents a higher priority than the priority inheritance threshold.  */
         if (new_threshold < thread_ptr -> tx_thread_inherit_priority)
         {
-    
+
             /* Update the actual preemption-threshold with the new threshold.  */
             thread_ptr -> tx_thread_preempt_threshold =  new_threshold;
         }
         else
         {
-    
+
             /* Update the actual preemption-threshold with the priority inheritance.  */
             thread_ptr -> tx_thread_preempt_threshold =  thread_ptr -> tx_thread_inherit_priority;
         }
@@ -1549,7 +1549,7 @@ UX_TEST_ACTION                          action;
             {
 
                 /* If the current execute pointer is the same at this thread, preemption needs to take place.  */
-                if (_tx_thread_execute_ptr == thread_ptr) 
+                if (_tx_thread_execute_ptr == thread_ptr)
                 {
 
                     /* Preemption needs to take place.  */
@@ -1595,18 +1595,18 @@ UX_TEST_ACTION                          action;
                     /* Is the execute pointer different?  */
                     if (_tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] != _tx_thread_execute_ptr)
                     {
-                     
+
                         /* Move to next entry.  */
                         _tx_thread_performance__execute_log_index++;
-            
+
                         /* Check for wrap condition.  */
                         if (_tx_thread_performance__execute_log_index >= TX_THREAD_EXECUTE_LOG_SIZE)
                         {
-          
-                            /* Set the index to the beginning.  */                  
+
+                            /* Set the index to the beginning.  */
                             _tx_thread_performance__execute_log_index =  ((UINT) 0);
                         }
-            
+
                         /* Log the new execute pointer.  */
                         _tx_thread_performance_execute_log[_tx_thread_performance__execute_log_index] =  _tx_thread_execute_ptr;
                     }
@@ -1620,7 +1620,7 @@ UX_TEST_ACTION                          action;
 
                     /* Check for preemption.  */
                     _tx_thread_system_preempt_check();
-                    
+
                     /* Disable interrupts.  */
                     TX_DISABLE
                 }
@@ -1632,7 +1632,7 @@ UX_TEST_ACTION                          action;
     TX_RESTORE
 
     ux_test_do_action_after(&action, &params);
-    
+
     /* Return completion status.  */
     return(status);
 }
@@ -1763,11 +1763,11 @@ UINT  _tx_mutex_put(TX_MUTEX *mutex_ptr)
 
 TX_INTERRUPT_SAVE_AREA
 
-TX_THREAD       *thread_ptr;            
-TX_THREAD       *old_owner;             
-UINT            old_priority;            
+TX_THREAD       *thread_ptr;
+TX_THREAD       *old_owner;
+UINT            old_priority;
 UINT            status;
-TX_MUTEX        *next_mutex;            
+TX_MUTEX        *next_mutex;
 TX_MUTEX        *previous_mutex;
 UINT            owned_count;
 UINT            suspended_count;
@@ -1814,8 +1814,8 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
         /* Check to see if the mutex is owned by the calling thread.  */
         if (mutex_ptr -> tx_mutex_owner != current_thread)
         {
-        
-            /* Determine if the preempt disable flag is set, indicating that 
+
+            /* Determine if the preempt disable flag is set, indicating that
                the caller is not the application but from ThreadX. In such
                cases, the thread mutex owner does not need to match.  */
             if (_tx_thread_preempt_disable == ((UINT) 0))
@@ -1830,11 +1830,11 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                 status =  TX_NOT_OWNED;
             }
         }
-        
+
         /* Determine if we should continue.  */
         if (status == TX_NOT_DONE)
         {
-    
+
             /* Decrement the mutex ownership count.  */
             mutex_ptr -> tx_mutex_ownership_count--;
 
@@ -1849,7 +1849,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                 status =  TX_SUCCESS;
             }
             else
-            {        
+            {
 
                 /* Check for a NULL thread pointer, which can only happen during initialization.   */
                 if (thread_ptr == TX_NULL)
@@ -1865,9 +1865,9 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                 {
 
                     /* The mutex is now available.   */
-            
+
                     /* Remove this mutex from the owned mutex list.  */
-                    
+
                     /* Decrement the ownership count.  */
                     thread_ptr -> tx_thread_owned_mutex_count--;
 
@@ -1894,21 +1894,21 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                         {
 
                             /* Yes, move the head pointer to the next link. */
-                            thread_ptr -> tx_thread_owned_mutex_list =  next_mutex; 
+                            thread_ptr -> tx_thread_owned_mutex_list =  next_mutex;
                         }
                     }
 
-                    /* Determine if the simple, non-suspension, non-priority inheritance case is present.  */ 
+                    /* Determine if the simple, non-suspension, non-priority inheritance case is present.  */
                     if (mutex_ptr -> tx_mutex_suspension_list == TX_NULL)
                     {
-                    
+
                         /* Is this a priority inheritance mutex?  */
                         if (mutex_ptr -> tx_mutex_inherit == TX_FALSE)
                         {
 
                             /* Yes, we are done - set the mutex owner to NULL.   */
                             mutex_ptr -> tx_mutex_owner =  TX_NULL;
-                            
+
                             /* Restore interrupts.  */
                             TX_RESTORE
 
@@ -1916,11 +1916,11 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                             status =  TX_SUCCESS;
                         }
                     }
-                     
+
                     /* Determine if the processing is complete.  */
                     if (status == TX_NOT_DONE)
                     {
-   
+
                         /* Initialize original owner and thread priority.  */
                         old_owner =      TX_NULL;
                         old_priority =   thread_ptr -> tx_thread_user_priority;
@@ -1938,7 +1938,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                             TX_RESTORE
 #endif
 
-                            /* Search the owned mutexes for this thread to determine the highest priority for this 
+                            /* Search the owned mutexes for this thread to determine the highest priority for this
                                former mutex owner to return to.  */
                             next_mutex =  thread_ptr -> tx_thread_owned_mutex_list;
                             while (next_mutex != TX_NULL)
@@ -1947,8 +1947,8 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                                 /* Does this mutex support priority inheritance?  */
                                 if (next_mutex -> tx_mutex_inherit == TX_TRUE)
                                 {
-                            
-                                    /* Determine if highest priority field of the mutex is higher than the priority to 
+
+                                    /* Determine if highest priority field of the mutex is higher than the priority to
                                        restore.  */
                                     if (next_mutex -> tx_mutex_highest_priority_waiting < old_priority)
                                     {
@@ -1964,7 +1964,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                                 /* Are we at the end of the list?  */
                                 if (next_mutex == thread_ptr -> tx_thread_owned_mutex_list)
                                 {
-                            
+
                                     /* Yes, set the next mutex to NULL.  */
                                     next_mutex =  TX_NULL;
                                 }
@@ -2001,7 +2001,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                                 TX_RESTORE
 #endif
 
-                                /* Call the mutex prioritize processing to ensure the 
+                                /* Call the mutex prioritize processing to ensure the
                                    highest priority thread is resumed.  */
 #ifdef TX_MISRA_ENABLE
                                 do
@@ -2028,7 +2028,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
 
                         /* Now determine if there are any threads still waiting on the mutex.  */
                         if (mutex_ptr -> tx_mutex_suspension_list == TX_NULL)
-                        {           
+                        {
 
                             /* No, there are no longer any threads waiting on the mutex.  */
 
@@ -2036,24 +2036,24 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
 
                             /* Temporarily disable preemption.  */
                             _tx_thread_preempt_disable++;
- 
+
                             /* Restore interrupts.  */
                             TX_RESTORE
 #endif
 
-                            /* Mutex is not owned, but it is possible that a thread that 
+                            /* Mutex is not owned, but it is possible that a thread that
                                caused a priority inheritance to occur is no longer waiting
                                on the mutex.  */
-                            if (mutex_ptr -> tx_mutex_inherit == TX_TRUE) 
+                            if (mutex_ptr -> tx_mutex_inherit == TX_TRUE)
                             {
 
                                 /* Setup the highest priority waiting thread.  */
                                 mutex_ptr -> tx_mutex_highest_priority_waiting =  (UINT) TX_MAX_PRIORITIES;
-  
+
                                 /* Determine if we need to restore priority.  */
                                 if ((mutex_ptr -> tx_mutex_owner) -> tx_thread_priority != old_priority)
                                 {
-                      
+
                                     /* Yes, restore the priority of thread.  */
                                     _tx_mutex_priority_change(mutex_ptr -> tx_mutex_owner, old_priority);
                                 }
@@ -2098,14 +2098,14 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
 
                                 /* Remember the old mutex owner.  */
                                 old_owner =  mutex_ptr -> tx_mutex_owner;
-        
+
                                 /* Setup owner thread priority information.  */
                                 mutex_ptr -> tx_mutex_original_priority =   thread_ptr -> tx_thread_priority;
 
                                 /* Setup the highest priority waiting thread.  */
                                 mutex_ptr -> tx_mutex_highest_priority_waiting =  (UINT) TX_MAX_PRIORITIES;
                             }
- 
+
                             /* Determine how many mutexes are owned by this thread.  */
                             owned_count =  thread_ptr -> tx_thread_owned_mutex_count;
 
@@ -2147,7 +2147,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
 
                             /* Decrement the suspension count.  */
                             mutex_ptr -> tx_mutex_suspended_count--;
-                
+
                             /* Pickup the suspended count.  */
                             suspended_count =  mutex_ptr -> tx_mutex_suspended_count;
 
@@ -2156,7 +2156,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                             {
 
                                 /* Yes, the only suspended thread.  */
-    
+
                                 /* Update the head pointer.  */
                                 mutex_ptr -> tx_mutex_suspension_list =  TX_NULL;
                             }
@@ -2173,15 +2173,15 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                                 previous_thread =                              thread_ptr -> tx_thread_suspended_previous;
                                 next_thread -> tx_thread_suspended_previous =  previous_thread;
                                 previous_thread -> tx_thread_suspended_next =  next_thread;
-                            } 
- 
+                            }
+
                             /* Prepare for resumption of the first thread.  */
 
                             /* Clear cleanup routine to avoid timeout.  */
                             thread_ptr -> tx_thread_suspend_cleanup =  TX_NULL;
 
                             /* Put return status into the thread control block.  */
-                            thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;        
+                            thread_ptr -> tx_thread_suspend_status =  TX_SUCCESS;
 
 #ifdef TX_NOT_INTERRUPTABLE
 
@@ -2210,7 +2210,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                                         _tx_mutex_prioritize(mutex_ptr);
 #endif
                                     }
-    
+
                                     /* Now, pickup the list head and set the priority.  */
 
                                     /* Determine if there still are threads suspended for this mutex.  */
@@ -2227,11 +2227,11 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                                    inheritance.  */
                                 if (old_owner != TX_NULL)
                                 {
-                    
+
                                     /* Determine if we need to restore priority.  */
                                     if (old_owner -> tx_thread_priority != old_priority)
                                     {
-    
+
                                         /* Restore priority of thread.  */
                                         _tx_mutex_priority_change(old_owner, old_priority);
                                     }
@@ -2256,7 +2256,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                             {
 
                                 /* Yes, priority inheritance is requested.  */
-        
+
                                 /* Determine if there are any more threads still suspended on the mutex.  */
                                 if (mutex_ptr -> tx_mutex_suspended_count != TX_NO_SUSPENSIONS)
                                 {
@@ -2271,7 +2271,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
 #else
                                     _tx_mutex_prioritize(mutex_ptr);
 #endif
-                            
+
                                     /* Now, pickup the list head and set the priority.  */
 
                                     /* Disable interrupts.  */
@@ -2294,11 +2294,11 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                                    inheritance.  */
                                 if (old_owner != TX_NULL)
                                 {
-                    
+
                                     /* Is the priority different?  */
                                     if (old_owner -> tx_thread_priority != old_priority)
                                     {
-        
+
                                         /* Restore the priority of thread.  */
                                         _tx_mutex_priority_change(old_owner, old_priority);
                                     }
@@ -2308,7 +2308,7 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
                             /* Resume thread.  */
                             _tx_thread_system_resume(thread_ptr);
 #endif
-                     
+
                             /* Return a successful status.  */
                             status =  TX_SUCCESS;
                         }
@@ -2322,9 +2322,9 @@ UX_TEST_OVERRIDE_TX_MUTEX_PUT_PARAMS action_params = {mutex_ptr};
 
         /* Restore interrupts.  */
         TX_RESTORE
-    
+
         /* Caller does not own the mutex.  */
-        status =  TX_NOT_OWNED;  
+        status =  TX_NOT_OWNED;
     }
 
     /* Perform hooked callbacks.  */
@@ -2792,7 +2792,7 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
 
     /* Setup the basic event flags group fields.  */
     group_ptr -> tx_event_flags_group_name =             name_ptr;
-    
+
     /* Disable interrupts to put the event flags group on the created list.  */
     TX_DISABLE
 
@@ -2822,12 +2822,12 @@ TX_EVENT_FLAGS_GROUP    *previous_group;
 
         /* Setup this group's created links.  */
         group_ptr -> tx_event_flags_group_created_previous =  previous_group;
-        group_ptr -> tx_event_flags_group_created_next =      next_group;    
+        group_ptr -> tx_event_flags_group_created_next =      next_group;
     }
 
     /* Increment the number of created event flag groups.  */
     _tx_event_flags_created_count++;
-    
+
     /* Optional event flag group create extended processing.  */
     TX_EVENT_FLAGS_GROUP_CREATE_EXTENSION(group_ptr)
 
@@ -2865,7 +2865,7 @@ static ULONG _ux_test_sim_inp_seq_value(VOID)
     {
         return 0;
     }
-    
+
 }
 static VOID _ux_test_sim_inp_seq_inc(VOID)
 {

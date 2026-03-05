@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device RNDIS Class                                                  */
 /**                                                                       */
@@ -29,69 +30,43 @@
 
 
 #if !defined(UX_DEVICE_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_rndis_bulkout_thread               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_rndis_bulkout_thread               PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the thread of the rndis bulk out endpoint. It      */ 
-/*    is waiting for the host to send data on the bulk out endpoint to    */ 
-/*    the device.                                                         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    rndis_class                             Address of rndis class      */ 
-/*                                                container               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Request transfer              */ 
+/*                                                                        */
+/*    This function is the thread of the rndis bulk out endpoint. It      */
+/*    is waiting for the host to send data on the bulk out endpoint to    */
+/*    the device.                                                         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    rndis_class                             Address of rndis class      */
+/*                                                container               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Request transfer              */
 /*    _ux_network_driver_packet_received    Process received packet       */
 /*    _ux_utility_long_get                  Get 32-bit value              */
 /*    _ux_device_thread_suspend             Suspend thread                */
 /*    nx_packet_allocate                    Allocate NetX packet          */
 /*    nx_packet_release                     Release NetX packet           */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            prefixed UX to MS_TO_TICK,  */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used NX API to copy data,   */
-/*                                            used linked NX IP pool,     */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_rndis_bulkout_thread(ULONG rndis_class)
@@ -108,13 +83,13 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
 
     /* Cast properly the rndis instance.  */
     UX_THREAD_EXTENSION_PTR_GET(class_ptr, UX_SLAVE_CLASS, rndis_class)
-    
+
     /* Get the rndis instance from this class container.  */
     rndis =  (UX_SLAVE_CLASS_RNDIS *) class_ptr -> ux_slave_class_instance;
-    
+
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
-    
+
     /* This thread runs forever but can be suspended or resumed.  */
     while(1)
     {
@@ -124,7 +99,7 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
 
         /* As long as the device is in the CONFIGURED state.  */
         while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED)
-        { 
+        {
 
             /* Check if packet pool is ready.  */
             if (rndis -> ux_slave_class_rndis_packet_pool == UX_NULL)
@@ -150,7 +125,7 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
             }
 
             /* We can accept new reception. Get a NX Packet.  */
-            status =  nx_packet_allocate(rndis -> ux_slave_class_rndis_packet_pool, &packet, 
+            status =  nx_packet_allocate(rndis -> ux_slave_class_rndis_packet_pool, &packet,
                                          NX_RECEIVE_PACKET, UX_MS_TO_TICK(UX_DEVICE_CLASS_RNDIS_PACKET_POOL_WAIT));
 
             if (status == NX_SUCCESS)
@@ -159,10 +134,10 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
                 /* And length.  */
                 transfer_request -> ux_slave_transfer_request_requested_length =  UX_DEVICE_CLASS_RNDIS_BULKOUT_BUFFER_SIZE;
                 transfer_request -> ux_slave_transfer_request_actual_length =     0;
-            
+
                 /* Memorize this packet at the beginning of the queue.  */
                 rndis -> ux_slave_class_rndis_receive_queue = packet;
-            
+
                 /* Reset the queue pointer of this packet.  */
                 packet -> nx_packet_queue_next = UX_NULL;
 
@@ -221,7 +196,7 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
 
                         /* Ensure the length reported in the RNDIS header is not larger than it actually is.
                             The reason we can't check to see if the length reported in the header and the
-                            actual length are exactly equal is because there might other data after the payload 
+                            actual length are exactly equal is because there might other data after the payload
                             (padding, or even a message). */
                         if (packet_payload <= transfer_request -> ux_slave_transfer_request_actual_length - UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH)
                         {
@@ -297,7 +272,7 @@ USB_NETWORK_DEVICE_TYPE         *ux_nx_device;
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_MEMORY_INSUFFICIENT);
             }
         }
-             
+
         /* We need to suspend ourselves. We will be resumed by the device enumeration module.  */
         _ux_device_thread_suspend(&rndis -> ux_slave_class_rndis_bulkout_thread);
     }

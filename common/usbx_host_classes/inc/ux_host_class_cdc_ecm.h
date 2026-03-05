@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   CDC ECM Class                                                       */
 /**                                                                       */
@@ -20,63 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_cdc_ecm.h                             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_cdc_ecm.h                             PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX CDC_ECM class.                                                 */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Xiuwen Cai               Modified comment(s), added    */
-/*                                            compile option for using    */
-/*                                            packet pool from NetX,      */
-/*                                            resulting in version 6.1.4  */
-/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            supported NX packet chain,  */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized USB descriptors,  */
-/*                                            resulting in version 6.3.0  */
+/*    USBX CDC_ECM class.                                                 */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_CDC_ECM_H
 #define UX_HOST_CLASS_CDC_ECM_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 #if !defined(UX_HOST_STANDALONE)
 #include "nx_api.h"
@@ -89,7 +62,7 @@ extern   "C" {
 #endif
 
 
-/* Define CDC_ECM Class constants.  Insert here the PID/VID of vendors and products using the CDC ECM chipset. 
+/* Define CDC_ECM Class constants.  Insert here the PID/VID of vendors and products using the CDC ECM chipset.
    It is a better mechanism to put this value in the ux_user.h file. */
 #ifndef UX_HOST_CLASS_CDC_ECM_VENDOR_ID
 #define UX_HOST_CLASS_CDC_ECM_VENDOR_ID                        0x0770
@@ -106,8 +79,8 @@ extern   "C" {
 #define UX_HOST_CLASS_CDC_ECM_MAC_ADDRESS_STRING_LENGTH        32
 #define UX_HOST_CLASS_CDC_ECM_MAC_ADDRESS_ASCII_LENGTH         8
 
-#define UX_HOST_CLASS_CDC_ECM_SPEED_SELECTED_100MPBS           0x100 
-#define UX_HOST_CLASS_CDC_ECM_SPEED_SELECTED_10MPBS            0x10 
+#define UX_HOST_CLASS_CDC_ECM_SPEED_SELECTED_100MPBS           0x100
+#define UX_HOST_CLASS_CDC_ECM_SPEED_SELECTED_10MPBS            0x10
 #define UX_HOST_CLASS_CDC_ECM_LINK_STATE_DOWN                  0
 #define UX_HOST_CLASS_CDC_ECM_LINK_STATE_UP                    1
 #define UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_UP            2
@@ -118,10 +91,10 @@ extern   "C" {
 #define UX_HOST_CLASS_CDC_ECM_ETHERNET_IP                      0x0800
 #define UX_HOST_CLASS_CDC_ECM_ETHERNET_ARP                     0x0806
 #define UX_HOST_CLASS_CDC_ECM_ETHERNET_RARP                    0x8035
-#define UX_HOST_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE             1536    
+#define UX_HOST_CLASS_CDC_ECM_ETHERNET_PACKET_SIZE             1536
 #define UX_HOST_CLASS_CDC_ECM_NX_ALIGN_PADDING                 2
 #ifndef UX_HOST_CLASS_CDC_ECM_NX_PKPOOL_ENTRIES
-#define UX_HOST_CLASS_CDC_ECM_NX_PKPOOL_ENTRIES                16  
+#define UX_HOST_CLASS_CDC_ECM_NX_PKPOOL_ENTRIES                16
 #endif
 
 #define UX_HOST_CLASS_CDC_ECM_NX_PACKET_SIZE                   sizeof(NX_PACKET)
@@ -156,7 +129,7 @@ extern   "C" {
 #endif
 
 #define UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE                    14
-                                                                
+
 #define UX_HOST_CLASS_CDC_ECM_DEVICE_INIT_DELAY                (1 * UX_PERIODIC_RATE)
 #define UX_HOST_CLASS_CDC_ECM_CLASS_TRANSFER_TIMEOUT           300000
 #define UX_HOST_CLASS_CDC_ECM_SETUP_BUFFER_SIZE                16
@@ -220,7 +193,7 @@ extern   "C" {
 /* Define  CDC_ECM Class packet equivalences.  */
 
 #define UX_HOST_CLASS_CDC_ECM_PACKET_SIZE                      128
-#define UX_HOST_CLASS_CDC_ECM_NODE_ID_LENGTH                   6  
+#define UX_HOST_CLASS_CDC_ECM_NODE_ID_LENGTH                   6
 
 /* Define supported notification types.  */
 
@@ -260,7 +233,7 @@ extern   "C" {
 
 typedef struct UX_HOST_CLASS_CDC_ECM_STRUCT
 {
-    struct UX_HOST_CLASS_CDC_ECM_STRUCT  
+    struct UX_HOST_CLASS_CDC_ECM_STRUCT
                     *ux_host_class_cdc_ecm_next_instance;
     UX_HOST_CLASS   *ux_host_class_cdc_ecm_class;
     UX_DEVICE       *ux_host_class_cdc_ecm_device;
@@ -299,10 +272,10 @@ typedef struct UX_HOST_CLASS_CDC_ECM_STRUCT
 #endif
 
     UCHAR           ux_host_class_cdc_ecm_node_id[UX_HOST_CLASS_CDC_ECM_NODE_ID_LENGTH];
-    VOID            (*ux_host_class_cdc_ecm_device_status_change_callback)(struct UX_HOST_CLASS_CDC_ECM_STRUCT *cdc_ecm, 
+    VOID            (*ux_host_class_cdc_ecm_device_status_change_callback)(struct UX_HOST_CLASS_CDC_ECM_STRUCT *cdc_ecm,
                                                                 ULONG  device_state);
     VOID            *ux_host_class_cdc_ecm_network_handle;
-    
+
 } UX_HOST_CLASS_CDC_ECM;
 
 
@@ -336,16 +309,16 @@ VOID  _ux_host_class_cdc_ecm_thread(ULONG parameter);
 VOID  _ux_host_class_cdc_ecm_transmission_callback(UX_TRANSFER *transfer_request);
 VOID  _ux_host_class_cdc_ecm_transmit_queue_clean(UX_HOST_CLASS_CDC_ECM *cdc_ecm_control);
 UINT  _ux_host_class_cdc_ecm_mac_address_get(UX_HOST_CLASS_CDC_ECM *cdc_ecm);
-                                    
+
 /* Define CDC ECM Class API prototypes.  */
 
 #define ux_host_class_cdc_ecm_entry        _ux_host_class_cdc_ecm_entry
 #define ux_host_class_cdc_ecm_write        _ux_host_class_cdc_ecm_write
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif

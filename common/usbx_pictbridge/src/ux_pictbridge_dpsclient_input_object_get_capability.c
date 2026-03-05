@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -29,58 +30,50 @@
 #include "ux_device_class_pima.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpsclient_input_get_capability                       */ 
-/*                                                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_dpsclient_input_get_capability                       */
+/*                                                        PORTABLE C      */
 /*                                                           6.1          */
-/*                                                                        */ 
+/*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates the tag lines of the capability               */ 
-/*    request.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pictbridge                            Pictbridge instance           */ 
+/*                                                                        */
+/*    This function creates the tag lines of the capability               */
+/*    request.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pictbridge                            Pictbridge instance           */
 /*    pima_object_buffer                    Pointer to object buffer      */
 /*    object_length                         Length of the object          */
 /*    pima_object_buffer_updated            Updated Address of the object */
 /*    object_length_updated                 Updated length                */
 /*                                                                        */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpsclient_input_object_prepare                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_dpsclient_input_object_prepare                       */
 /*                                                                        */
 /**************************************************************************/
-UINT _ux_pictbridge_dpsclient_input_object_get_capability(UX_PICTBRIDGE *pictbridge, 
+UINT _ux_pictbridge_dpsclient_input_object_get_capability(UX_PICTBRIDGE *pictbridge,
                                                             ULONG input_subcode,
                                                             ULONG input_parameter,
-                                                            UCHAR *pima_object_buffer, 
-                                                            ULONG object_length, 
-                                                            UCHAR **pima_object_buffer_updated, 
+                                                            UCHAR *pima_object_buffer,
+                                                            ULONG object_length,
+                                                            UCHAR **pima_object_buffer_updated,
                                                             ULONG *object_length_updated)
 {
 
@@ -88,14 +81,14 @@ UINT                status;
 
 
     /* Add the line <getcapability>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_getcapability, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_getcapability,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_LF,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
         return(status);
 
     /* Add the line <capability>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_capability, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_capability,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_LF,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
@@ -105,7 +98,7 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_QUALITIES)
     {
         /* Add the line <qualities/> */
-        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_qualities, 
+        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_qualities,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
@@ -116,7 +109,7 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_PAPER_SIZES)
     {
         /* Add the line <paperSizes/> */
-        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_papersizes, 
+        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_papersizes,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
@@ -131,10 +124,10 @@ UINT                status;
         if (input_parameter != 0)
         {
             /* Add the line <paperTypes paperSize = "xxxxxxxx"/> */
-            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_papertypes, 
+            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_papertypes,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END | UX_PICTBRIDGE_TAG_FLAG_VARIABLE_HEXA,
                                                 _ux_pictbridge_xml_variable_papersize,
-                                                input_parameter, 
+                                                input_parameter,
                                                 UX_NULL, &pima_object_buffer, &object_length);
             if (status != UX_SUCCESS)
                 return(status);
@@ -142,20 +135,20 @@ UINT                status;
         else
         {
             /* Add the line <paperTypes/> */
-            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_papertypes, 
+            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_papertypes,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
-                                                UX_NULL, 0, 
+                                                UX_NULL, 0,
                                                 (VOID *) &pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_papertypes, &pima_object_buffer, &object_length);
             if (status != UX_SUCCESS)
                 return(status);
         }
     }
-            
+
     /* Parse the tag code that was memorized during the input.  */
     if (input_subcode & UX_PICTBRIDGE_API_FILE_TYPES)
     {
         /* Add the line <fileTypes/> */
-        _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_filetypes, 
+        _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_filetypes,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
                                                 UX_NULL, 0, UX_NULL , &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
@@ -166,7 +159,7 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_DATE_PRINTS)
     {
         /* Add the line <datePrints/> */
-        _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_dateprints, 
+        _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_dateprints,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
                                                 UX_NULL, 0, UX_NULL , &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
@@ -177,7 +170,7 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_FILE_NAME_PRINTS)
     {
         /* Add the line <namePrints/> */
-        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_filenameprints, 
+        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_filenameprints,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
@@ -188,7 +181,7 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_IMAGE_OPTIMIZES)
     {
         /* Add the line <imageOptimizes/> */
-        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_imageoptimizes, 
+        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_imageoptimizes,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
@@ -203,10 +196,10 @@ UINT                status;
         if (input_parameter != 0)
         {
             /* Add the line <layouts paperSize = "xxxxxxxx"/> */
-            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_layouts, 
+            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_layouts,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END | UX_PICTBRIDGE_TAG_FLAG_VARIABLE_HEXA,
                                                 _ux_pictbridge_xml_variable_papersize,
-                                                input_parameter,  
+                                                input_parameter,
                                                 UX_NULL, &pima_object_buffer, &object_length);
             if (status != UX_SUCCESS)
                 return(status);
@@ -214,9 +207,9 @@ UINT                status;
         else
         {
             /* Add the line <layouts/> */
-            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_layouts, 
+            status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_layouts,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
-                                                UX_NULL, 0, 
+                                                UX_NULL, 0,
                                                 UX_NULL, &pima_object_buffer, &object_length);
             if (status != UX_SUCCESS)
                 return(status);
@@ -227,9 +220,9 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_FIXED_SIZES)
     {
         /* Add the line <fixedSizes/> */
-        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_fixedsizes, 
+        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_fixedsizes,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
-                                                UX_NULL, 0, 
+                                                UX_NULL, 0,
                                                 UX_NULL, &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
             return(status);
@@ -239,7 +232,7 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_CROPPINGS)
     {
         /* Add the line <croppings/> */
-        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_croppings, 
+        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_croppings,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
@@ -250,23 +243,23 @@ UINT                status;
     if (input_subcode & UX_PICTBRIDGE_API_CHAR_REPERTOIRES)
     {
         /* Add the line <charRepertoires/> */
-        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_charrepertoires, 
+        status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_charrepertoires,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_SLASH_AT_END,
-                                                UX_NULL, 0, 
+                                                UX_NULL, 0,
                                                 UX_NULL, &pima_object_buffer, &object_length);
         if (status != UX_SUCCESS)
             return(status);
     }
 
     /* Add the line </capability>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_capability, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_capability,
                                                 UX_PICTBRIDGE_TAG_FLAG_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
         return(status);
 
     /* Add the line </getcapability>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_getcapability, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_getcapability,
                                                 UX_PICTBRIDGE_TAG_FLAG_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
@@ -274,11 +267,11 @@ UINT                status;
 
     /* Update the caller's object position.  */
     *pima_object_buffer_updated = pima_object_buffer;
-    
+
     /* Update the caller's object length .  */
     *object_length_updated = object_length;
-    
+
     /* Return completion status.  */
-    return(UX_SUCCESS);    
+    return(UX_SUCCESS);
 }
 

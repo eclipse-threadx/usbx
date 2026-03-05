@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   CDC ECM Class                                                       */
 /**                                                                       */
@@ -30,68 +31,42 @@
 
 
 #if !defined(UX_HOST_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_ecm_deactivate                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_cdc_ecm_deactivate                   PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called when this instance of the cdc_ecm has been  */
-/*    removed from the bus either directly or indirectly. The bulk in\out */ 
-/*    and interrupt pipes will be destroyed and the instance              */ 
-/*    removed.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                           CDC ECM class command pointer     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
-/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_ecm_entry       Entry of cdc_ecm class           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Xiuwen Cai               Modified comment(s), added    */
-/*                                            compile option for using    */
-/*                                            packet pool from NetX,      */
-/*                                            resulting in version 6.1.4  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            deprecated ECM pool option, */
-/*                                            supported NX packet chain,  */
-/*                                            resulting in version 6.2.0  */
+/*    removed from the bus either directly or indirectly. The bulk in\out */
+/*    and interrupt pipes will be destroyed and the instance              */
+/*    removed.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                           CDC ECM class command pointer     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */
+/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */
+/*    _ux_utility_memory_free               Free memory block             */
+/*    _ux_host_semaphore_get                Get protection semaphore      */
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_cdc_ecm_entry       Entry of cdc_ecm class           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -110,11 +85,11 @@ UX_TRANSFER                 *transfer_request;
 
     /* The cdc_ecm is being shut down.  */
     cdc_ecm -> ux_host_class_cdc_ecm_state =  UX_HOST_CLASS_INSTANCE_SHUTDOWN;
-    
+
     /* If the interrupt endpoint is defined, abort transfers so the link state
        doesn't change.  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint != UX_NULL)
-    {    
+    {
 
         /* Get the transfer request.  */
         transfer_request =  &cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint -> ux_endpoint_transfer_request;
@@ -123,8 +98,8 @@ UX_TRANSFER                 *transfer_request;
         _ux_host_stack_transfer_request_abort(transfer_request);
     }
 
-    /* Check if link was up to see if we should clean the transmit queue. If 
-       the link is pending down, that means the CDC-ECM thread is in the process 
+    /* Check if link was up to see if we should clean the transmit queue. If
+       the link is pending down, that means the CDC-ECM thread is in the process
        of cleaning the transmit queue.  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_link_state == UX_HOST_CLASS_CDC_ECM_LINK_STATE_UP)
 
@@ -134,7 +109,7 @@ UX_TRANSFER                 *transfer_request;
     transfer_request =  &cdc_ecm -> ux_host_class_cdc_ecm_bulk_in_endpoint -> ux_endpoint_transfer_request;
 
     /* Now abort all transfers. It's possible we're executing right before the transfer
-       is armed. If this is the case, then the transfer will not be aborted if we do the abort right now; instead, 
+       is armed. If this is the case, then the transfer will not be aborted if we do the abort right now; instead,
        we should wait until after the transfer is armed. We must look at the CDC-ECM thread's state.  */
 
     /* Disable interrupts while we check the link state and possibly set our state.  */
@@ -175,7 +150,7 @@ UX_TRANSFER                 *transfer_request;
     _ux_host_stack_class_instance_destroy(cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
 
     /* Now wait for all threads to leave the instance before freeing the resources.  */
-    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
 
     /* Free the memory used by the interrupt endpoint.  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_interrupt_endpoint != UX_NULL)
@@ -207,7 +182,7 @@ UX_TRANSFER                 *transfer_request;
     /* Before we free the device resources, we need to inform the application
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
-        
+
         /* Inform the application the device is removed.  */
         _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, cdc_ecm -> ux_host_class_cdc_ecm_class, (VOID *) cdc_ecm);
 

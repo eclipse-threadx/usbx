@@ -219,7 +219,7 @@ struct _test_struct {
             return;
         }
     }
-    
+
     printf("SUCCESS!\n");
     test_control_return(0);
 

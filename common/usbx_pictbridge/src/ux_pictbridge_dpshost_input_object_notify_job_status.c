@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -29,59 +30,48 @@
 #include "ux_host_class_pima.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _ux_pictbridge_dpshost_input_object_notify_job_status               */
-/*                                                        PORTABLE C      */ 
+/*                                                        PORTABLE C      */
 /*                                                           6.1.11       */
-/*                                                                        */ 
+/*                                                                        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates the tag lines of the input object for the     */ 
-/*    notification of the job status.                                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pictbridge                            Pictbridge instance           */ 
+/*                                                                        */
+/*    This function creates the tag lines of the input object for the     */
+/*    notification of the job status.                                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pictbridge                            Pictbridge instance           */
 /*    pima_object_buffer                    Pointer to object buffer      */
 /*    object_length                         Length of the object          */
 /*    pima_object_buffer_updated            Updated Address of the object */
 /*    object_length_updated                 Updated length                */
 /*                                                                        */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                        _device_status                  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Yajun Xia                Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                        _device_status                  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*                                                                        */
 /*                                                                        */
 /**************************************************************************/
-UINT _ux_pictbridge_dpshost_input_object_notify_job_status(UX_PICTBRIDGE *pictbridge, 
-                                                 UCHAR *pima_object_buffer, 
-                                                 ULONG object_length, 
-                                                 UCHAR **pima_object_buffer_updated, 
+UINT _ux_pictbridge_dpshost_input_object_notify_job_status(UX_PICTBRIDGE *pictbridge,
+                                                 UCHAR *pima_object_buffer,
+                                                 ULONG object_length,
+                                                 UCHAR **pima_object_buffer_updated,
                                                  ULONG *object_length_updated)
 {
 UX_PICTBRIDGE_JOBINFO               *jobinfo;
@@ -95,14 +85,14 @@ UINT                                 status = UX_SUCCESS;
     printinfo =  jobinfo -> ux_pictbridge_jobinfo_printinfo_current;
 
     /* Add the line <notifyJobStatus>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_notifyjobstatus, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_notifyjobstatus,
                                                 UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_FORCE_LF,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
         return(status);
 
     /* Add the line <progress>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_progress, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_progress,
                                                     UX_PICTBRIDGE_TAG_FLAG_BEGIN,
                                                     UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
@@ -138,21 +128,21 @@ UINT                                 status = UX_SUCCESS;
     pima_object_buffer += 3;
 
     /* Add the line </progress>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_progress, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_progress,
                                                 UX_PICTBRIDGE_TAG_FLAG_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
         return(status);
 
     /* Add the line <imagesPrinted> xxxxxxxx </imagesPrinted> */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_imagesprinted, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_imagesprinted,
                                             UX_PICTBRIDGE_TAG_FLAG_BEGIN | UX_PICTBRIDGE_TAG_FLAG_END | UX_PICTBRIDGE_TAG_FLAG_VARIABLE_DECIMAL_3DIGITS,
                                             UX_NULL, 0, (VOID *)(ALIGN_TYPE) printinfo -> ux_pictbridge_printinfo_images_printed, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
         return(status);
 
     /* Add the line </notifyJobStatus>  */
-    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_notifyjobstatus, 
+    status = _ux_pictbridge_object_tag_line_add(pima_object_buffer, object_length, _ux_pictbridge_xml_tag_line_notifyjobstatus,
                                                 UX_PICTBRIDGE_TAG_FLAG_END,
                                                 UX_NULL, 0, UX_NULL, &pima_object_buffer, &object_length);
     if (status != UX_SUCCESS)
@@ -160,11 +150,11 @@ UINT                                 status = UX_SUCCESS;
 
     /* Update the caller's object position.  */
     *pima_object_buffer_updated = pima_object_buffer;
-    
+
     /* Update the caller's object length .  */
     *object_length_updated = object_length;
-    
+
     /* Return completion status.  */
-    return(UX_SUCCESS);    
+    return(UX_SUCCESS);
 }
 

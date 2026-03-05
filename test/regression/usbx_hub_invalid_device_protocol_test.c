@@ -1,4 +1,4 @@
-/* This tests the case where the hub reports an invalid device protocol. Specific 
+/* This tests the case where the hub reports an invalid device protocol. Specific
    test case is in ux_host_class_hub_descriptor_get.c. */
 
 #include "usbx_ux_test_hub.h"

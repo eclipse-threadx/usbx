@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device HID Class                                                    */
 /**                                                                       */
@@ -53,30 +54,18 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_copy               Memory copy                   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_copy               Memory copy                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device HID                                                          */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_hid_report_set(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type, 
+UINT  _ux_device_class_hid_report_set(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
                                             ULONG request_index, ULONG host_length)
 {
 
@@ -94,16 +83,16 @@ UCHAR                           *hid_buffer;
 
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
-    
+
     /* Get the control endpoint associated with the device.  */
     endpoint =  &device -> ux_slave_device_control_endpoint;
 
     /* Get the pointer to the transfer request associated with the endpoint.  */
     transfer_request =  &endpoint -> ux_slave_endpoint_transfer_request;
-    
+
     /* Set the event type to OUTPUT.  */
     hid_event.ux_device_class_hid_event_report_type =  descriptor_type;
-    
+
     /* Get HID data address.  */
     hid_buffer = transfer_request -> ux_slave_transfer_request_data_pointer;
 
@@ -115,36 +104,36 @@ UCHAR                           *hid_buffer;
 
         /* Set the length = total length - report ID. */
         hid_event.ux_device_class_hid_event_length = transfer_request -> ux_slave_transfer_request_actual_length -1;
-    
+
         /* Set HID data after report ID.  */
         hid_buffer++;
     }
-        
+
     else
-    {    
+    {
         /* Set the report ID, not used here.  */
         hid_event.ux_device_class_hid_event_report_id = 0;
 
         /* Set the length.  */
         hid_event.ux_device_class_hid_event_length = transfer_request -> ux_slave_transfer_request_actual_length;
     }
-        
+
     /* Copy the buffer received from the host.  Check for overflow. */
     if (hid_event.ux_device_class_hid_event_length > UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH)
-    
+
         /* Overflow detected.  */
-        hid_event.ux_device_class_hid_event_length = UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH;        
-        
+        hid_event.ux_device_class_hid_event_length = UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH;
+
     /* Now we can safely copy the payload.  */
-    _ux_utility_memory_copy(hid_event.ux_device_class_hid_event_buffer, hid_buffer, 
+    _ux_utility_memory_copy(hid_event.ux_device_class_hid_event_buffer, hid_buffer,
                                 hid_event.ux_device_class_hid_event_length); /* Use case of memcpy is verified. */
 
     /* If there is a callback defined by the application, send the hid event to it.  */
     if (hid -> ux_device_class_hid_callback != UX_NULL)
-    
+
         /* Callback exists. */
         hid -> ux_device_class_hid_callback(hid, &hid_event);
-        
+
     /* Return the status to the caller.  */
     return(UX_SUCCESS);
 }

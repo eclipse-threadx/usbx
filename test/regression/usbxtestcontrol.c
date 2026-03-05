@@ -285,6 +285,7 @@ void    usbx_ux_device_class_storage_mode_select_test_application_define(void *)
 void    usbx_ux_device_class_storage_mode_sense_test_application_define(void *);
 void    usbx_ux_device_class_storage_request_sense_test_application_define(void *);
 void    usbx_ux_device_class_storage_start_stop_test_application_define(void *);
+void    usbx_ux_device_class_storage_media_start_stop_test_application_define(void *);
 void    usbx_ux_device_class_storage_prevent_allow_media_removal_test_application_define(void *);
 void    usbx_ux_device_class_storage_verify_test_application_define(void *);
 void    usbx_ux_device_class_storage_uninitialize_test_application_define(void *);
@@ -508,7 +509,7 @@ TEST_ENTRY  test_control_tests[] =
     usbx_host_class_storage_max_lun_get_coverage_test_application_define,
 
     usbx_host_stack_new_endpoint_create_overage_test_application_define,
-    usbx_host_stack_class_unregister_coverage_test_application_define,    
+    usbx_host_stack_class_unregister_coverage_test_application_define,
     usbx_storage_basic_memory_test_application_define,
     usbx_storage_multi_lun_test_application_define,
     usbx_ux_device_class_storage_request_sense_coverage_test_application_define,
@@ -521,6 +522,7 @@ TEST_ENTRY  test_control_tests[] =
     usbx_ux_device_class_storage_mode_sense_test_application_define,
     usbx_ux_device_class_storage_request_sense_test_application_define,
     usbx_ux_device_class_storage_start_stop_test_application_define,
+    usbx_ux_device_class_storage_media_start_stop_test_application_define,
     usbx_ux_device_class_storage_prevent_allow_media_removal_test_application_define,
     usbx_ux_device_class_storage_verify_test_application_define,
     usbx_ux_device_class_storage_uninitialize_test_application_define,
@@ -531,7 +533,7 @@ TEST_ENTRY  test_control_tests[] =
 
     usbx_ux_device_class_storage_write_test_application_define,
     usbx_ux_device_class_storage_thread_test_application_define,
-    usbx_ux_host_class_storage_configure_overage_test_application_define, 
+    usbx_ux_host_class_storage_configure_overage_test_application_define,
     usbx_ux_host_class_storage_request_sense_test_application_define,
     usbx_ux_host_class_storage_media_capacity_get_test_application_define,
     usbx_ux_host_class_storage_max_lun_get_test_application_define,

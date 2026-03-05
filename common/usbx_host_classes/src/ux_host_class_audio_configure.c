@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Audio Class                                                         */
 /**                                                                       */
@@ -29,52 +30,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_audio_configure                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_audio_configure                      PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function calls the USBX stack to do a SET_CONFIGURATION to    */
 /*     the device. Once the device is configured, its interface(s) will   */
-/*     be activated.                                                      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    audio                                 Pointer to audio class        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_configuration_interface_get    Get interface         */ 
-/*    _ux_host_stack_device_configuration_get       Get configuration     */ 
-/*    _ux_host_stack_device_configuration_select    Select configuration  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Audio Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            resulting in version 6.1.11 */
+/*     be activated.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio class        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_configuration_interface_get    Get interface         */
+/*    _ux_host_stack_device_configuration_get       Get configuration     */
+/*    _ux_host_stack_device_configuration_select    Select configuration  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Audio Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_configure(UX_HOST_CLASS_AUDIO *audio)
@@ -105,24 +93,24 @@ UX_DEVICE               *parent_device;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONFIGURATION_HANDLE_UNKNOWN, audio -> ux_host_class_audio_device, 0, 0, UX_TRACE_ERRORS, 0, 0)
-    
+
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
-     
+
     }
 
 #if UX_MAX_DEVICES > 1
-    /* Check the audio power source and check the parent power source for 
+    /* Check the audio power source and check the parent power source for
        incompatible connections.  */
     if (audio -> ux_host_class_audio_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED)
     {
 
         /* Get parent device.  */
         parent_device =  audio -> ux_host_class_audio_device -> ux_device_parent;
-        
-        /* If the device is NULL, the parent is the root audio and we don't have to worry 
+
+        /* If the device is NULL, the parent is the root audio and we don't have to worry
            if the parent is not the root audio, check for its power source.  */
         if ((parent_device != UX_NULL) && (parent_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED))
-        {                        
+        {
 
             /* Error trap. */
             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CONNECTION_INCOMPATIBLE);
@@ -131,11 +119,11 @@ UX_DEVICE               *parent_device;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONNECTION_INCOMPATIBLE, audio, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_CONNECTION_INCOMPATIBLE);
-        }            
+        }
     }
 #endif
 
-    /* We have the valid configuration. Ask the USBX stack to set this configuration */        
+    /* We have the valid configuration. Ask the USBX stack to set this configuration */
     status =  _ux_host_stack_device_configuration_select(configuration);
     if (status != UX_SUCCESS)
     {
@@ -145,7 +133,7 @@ UX_DEVICE               *parent_device;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, status, audio -> ux_host_class_audio_device, 0, 0, UX_TRACE_ERRORS, 0, 0)
-    
+
         return(status);
     }
 
@@ -153,7 +141,7 @@ UX_DEVICE               *parent_device;
     interface_number =  0;
 
     /* We only need to retrieve the audio streaming interface.  */
-    do 
+    do
     {
 
         /* Pickup interface.  */
@@ -166,7 +154,7 @@ UX_DEVICE               *parent_device;
             /* Check the type of interface we have found - is it streaming?  */
             if (interface -> ux_interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_AUDIO_SUBCLASS_STREAMING)
             {
- 
+
                 audio -> ux_host_class_audio_streaming_interface =  interface;
                 audio -> ux_host_class_audio_streaming_interface -> ux_interface_class_instance =  (VOID *)audio;
                 break;
@@ -190,7 +178,7 @@ UX_DEVICE               *parent_device;
     else
     {
 
-        return(UX_SUCCESS);        
+        return(UX_SUCCESS);
     }
 }
 

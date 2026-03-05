@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Storage Class                                                       */
 /**                                                                       */
@@ -30,70 +31,49 @@
 
 UX_COMPILE_TIME_ASSERT(!UX_OVERFLOW_CHECK_MULC_ULONG(sizeof(UX_HOST_CLASS_STORAGE_MEDIA), UX_HOST_CLASS_STORAGE_MAX_MEDIA), UX_HOST_CLASS_STORAGE_MAX_MEDIA_mul_ovf)
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_entry                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_storage_entry                        PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the entry point of the storage class. It will be   */ 
-/*    called by the USBX stack enumeration module when there is a new     */ 
+/*                                                                        */
+/*    This function is the entry point of the storage class. It will be   */
+/*    called by the USBX stack enumeration module when there is a new     */
 /*    USB disk on the bus or when the USB disk is removed.                */
 /*                                                                        */
-/*    Version 2.0 of the storage class only supports USB FAT media and    */ 
-/*    not CD-ROM.                                                         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to class command      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_activate       Activate storage class        */ 
-/*    _ux_host_class_storage_deactivate     Deactivate storage class      */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
+/*    Version 2.0 of the storage class only supports USB FAT media and    */
+/*    not CD-ROM.                                                         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to class command      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_activate       Activate storage class        */
+/*    _ux_host_class_storage_deactivate     Deactivate storage class      */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
 /*    _ux_utility_memory_free               Free memory block             */
 /*    _ux_utility_thread_create             Create storage class thread   */
-/*    _ux_utility_thread_delete             Delete storage class thread   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Host Stack                                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added destroy command,      */
-/*                                            used host class extension   */
-/*                                            pointer for class specific  */
-/*                                            structured data,            */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed class ext access,     */
-/*                                            resulting in version 6.1.2  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*    _ux_utility_thread_delete             Delete storage class thread   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Host Stack                                                          */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_entry(UX_HOST_CLASS_COMMAND *command)
-{     
+{
 
 UINT                        status;
 UX_HOST_CLASS               *class_inst;
@@ -113,10 +93,10 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
            this device or not.  */
         if ((command -> ux_host_class_command_usage == UX_HOST_CLASS_COMMAND_USAGE_CSP) &&
                             (command -> ux_host_class_command_class == UX_HOST_CLASS_STORAGE_CLASS))
-            return(UX_SUCCESS);                        
-        else            
-            return(UX_NO_CLASS_MATCH);                        
-                
+            return(UX_SUCCESS);
+        else
+            return(UX_NO_CLASS_MATCH);
+
     case UX_HOST_CLASS_COMMAND_ACTIVATE:
 
         /* We are assuming the device will mount. If this is the first activation of
@@ -145,9 +125,9 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
             status =  _ux_host_thread_create(&class_ext -> ux_host_class_thread,
                                     "ux_host_storage_thread",
                                     _ux_host_class_storage_thread_entry,
-                                    (ULONG) (ALIGN_TYPE) class_inst, 
+                                    (ULONG) (ALIGN_TYPE) class_inst,
                                     class_ext -> ux_host_class_thread_stack,
-                                    UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE, 
+                                    UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE,
                                     UX_HOST_CLASS_STORAGE_THREAD_PRIORITY_CLASS,
                                     UX_HOST_CLASS_STORAGE_THREAD_PRIORITY_CLASS,
                                     UX_NO_TIME_SLICE, UX_DONT_START);
@@ -205,7 +185,7 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
 
     case UX_HOST_CLASS_COMMAND_DEACTIVATE:
 
-        /* The deactivate command is used when the device has been extracted either      
+        /* The deactivate command is used when the device has been extracted either
            directly or when its parents has been extracted.  */
         status =  _ux_host_class_storage_deactivate(command);
 
@@ -249,7 +229,7 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
         /* Return success.  */
         return(UX_SUCCESS);
 
-    default: 
+    default:
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_FUNCTION_NOT_SUPPORTED);
@@ -259,6 +239,6 @@ UX_HOST_CLASS_STORAGE_EXT   *class_ext;
 
         /* Return an error.  */
         return(UX_FUNCTION_NOT_SUPPORTED);
-    }   
+    }
 }
 

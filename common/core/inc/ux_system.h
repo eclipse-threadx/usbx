@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   System                                                              */
 /**                                                                       */
@@ -20,60 +21,39 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_system.h                                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_system.h                                         PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX main system component.                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added BOS support,          */
-/*                                            resulting in version 6.1.3  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            added device printer name,  */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added device CCID name,     */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added error checks support, */
-/*                                            resulting in version 6.3.0  */
+/*    USBX main system component.                                         */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_SYSTEM_HOST_H
 #define UX_SYSTEM_HOST_H
 
-/* Define System component function prototypes.  Note that since ux_api.h 
-   includes this file, the APIs are only declared if this file is included 
-   by internal code in order to prevent duplicate declarations for 
+/* Define System component function prototypes.  Note that since ux_api.h
+   includes this file, the APIs are only declared if this file is included
+   by internal code in order to prevent duplicate declarations for
    applications.  */
 
 
 #ifdef UX_SOURCE_CODE
-UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
+UINT  _ux_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size,
                             VOID *cache_safe_memory_pool_start, ULONG cache_safe_memory_size);
 UINT  _ux_system_uninitialize(VOID);
 UINT  _ux_system_tasks_run(VOID);
 
-UINT  _uxe_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size, 
+UINT  _uxe_system_initialize(VOID *regular_memory_pool_start, ULONG regular_memory_size,
                             VOID *cache_safe_memory_pool_start, ULONG cache_safe_memory_size);
 #endif
 
@@ -106,50 +86,50 @@ extern UCHAR _ux_system_bos_descriptor_structure[];
 extern UCHAR _ux_system_usb_2_0_extension_descriptor_structure[];
 extern UCHAR _ux_system_container_id_descriptor_structure[];
 
-extern UINT  _ux_system_host_hcd_periodic_tree_entries[32]; 
+extern UINT  _ux_system_host_hcd_periodic_tree_entries[32];
 
-extern UCHAR _ux_system_host_class_hub_name[];  
-extern UCHAR _ux_system_host_class_printer_name[]; 
-extern UCHAR _ux_system_host_class_storage_name[]; 
-extern UCHAR _ux_system_host_class_hid_name[];     
-extern UCHAR _ux_system_host_class_audio_name[];   
-extern UCHAR _ux_system_host_class_cdc_acm_name[];   
-extern UCHAR _ux_system_host_class_cdc_dlc_name[];   
-extern UCHAR _ux_system_host_class_cdc_ecm_name[];   
-extern UCHAR _ux_system_host_class_prolific_name[];   
-extern UCHAR _ux_system_host_class_dpump_name[];  
-extern UCHAR _ux_system_host_class_pima_name[];  
-extern UCHAR _ux_system_host_class_asix_name[];   
-extern UCHAR _ux_system_host_class_swar_name[];   
-extern UCHAR _ux_system_host_class_gser_name[];   
+extern UCHAR _ux_system_host_class_hub_name[];
+extern UCHAR _ux_system_host_class_printer_name[];
+extern UCHAR _ux_system_host_class_storage_name[];
+extern UCHAR _ux_system_host_class_hid_name[];
+extern UCHAR _ux_system_host_class_audio_name[];
+extern UCHAR _ux_system_host_class_cdc_acm_name[];
+extern UCHAR _ux_system_host_class_cdc_dlc_name[];
+extern UCHAR _ux_system_host_class_cdc_ecm_name[];
+extern UCHAR _ux_system_host_class_prolific_name[];
+extern UCHAR _ux_system_host_class_dpump_name[];
+extern UCHAR _ux_system_host_class_pima_name[];
+extern UCHAR _ux_system_host_class_asix_name[];
+extern UCHAR _ux_system_host_class_swar_name[];
+extern UCHAR _ux_system_host_class_gser_name[];
 extern UCHAR _ux_system_host_class_hid_client_remote_control_name[];
-extern UCHAR _ux_system_host_class_hid_client_mouse_name[]; 
-extern UCHAR _ux_system_host_class_hid_client_keyboard_name[]; 
+extern UCHAR _ux_system_host_class_hid_client_mouse_name[];
+extern UCHAR _ux_system_host_class_hid_client_keyboard_name[];
 
-extern UCHAR _ux_system_host_hcd_ohci_name[]; 
-extern UCHAR _ux_system_host_hcd_ehci_name[]; 
-extern UCHAR _ux_system_host_hcd_isp1161_name[]; 
-extern UCHAR _ux_system_host_hcd_isp1362_name[]; 
-extern UCHAR _ux_system_host_hcd_sh2_name[]; 
-extern UCHAR _ux_system_host_hcd_rx_name[]; 
-extern UCHAR _ux_system_host_hcd_pic32_name[]; 
-extern UCHAR _ux_system_host_hcd_stm32_name[]; 
+extern UCHAR _ux_system_host_hcd_ohci_name[];
+extern UCHAR _ux_system_host_hcd_ehci_name[];
+extern UCHAR _ux_system_host_hcd_isp1161_name[];
+extern UCHAR _ux_system_host_hcd_isp1362_name[];
+extern UCHAR _ux_system_host_hcd_sh2_name[];
+extern UCHAR _ux_system_host_hcd_rx_name[];
+extern UCHAR _ux_system_host_hcd_pic32_name[];
+extern UCHAR _ux_system_host_hcd_stm32_name[];
 extern UCHAR _ux_system_host_hcd_musb_name[];
 extern UCHAR _ux_system_host_hcd_atm7_name[];
-extern UCHAR _ux_system_host_hcd_simulator_name[]; 
+extern UCHAR _ux_system_host_hcd_simulator_name[];
 
-extern UCHAR _ux_system_slave_class_storage_name[]; 
-extern UCHAR _ux_system_slave_class_storage_vendor_id[]; 
-extern UCHAR _ux_system_slave_class_storage_product_id[]; 
-extern UCHAR _ux_system_slave_class_storage_product_rev[]; 
-extern UCHAR _ux_system_slave_class_storage_product_serial[]; 
-extern UCHAR _ux_system_slave_class_audio_name[]; 
-extern UCHAR _ux_system_slave_class_cdc_acm_name[]; 
-extern UCHAR _ux_system_slave_class_dpump_name[]; 
-extern UCHAR _ux_system_slave_class_pima_name[]; 
-extern UCHAR _ux_system_slave_class_hid_name[]; 
-extern UCHAR _ux_system_slave_class_rndis_name[]; 
-extern UCHAR _ux_system_slave_class_cdc_ecm_name[]; 
+extern UCHAR _ux_system_slave_class_storage_name[];
+extern UCHAR _ux_system_slave_class_storage_vendor_id[];
+extern UCHAR _ux_system_slave_class_storage_product_id[];
+extern UCHAR _ux_system_slave_class_storage_product_rev[];
+extern UCHAR _ux_system_slave_class_storage_product_serial[];
+extern UCHAR _ux_system_slave_class_audio_name[];
+extern UCHAR _ux_system_slave_class_cdc_acm_name[];
+extern UCHAR _ux_system_slave_class_dpump_name[];
+extern UCHAR _ux_system_slave_class_pima_name[];
+extern UCHAR _ux_system_slave_class_hid_name[];
+extern UCHAR _ux_system_slave_class_rndis_name[];
+extern UCHAR _ux_system_slave_class_cdc_ecm_name[];
 extern UCHAR _ux_system_slave_class_dfu_name[];
 
 extern UCHAR _ux_system_device_class_printer_name[];
