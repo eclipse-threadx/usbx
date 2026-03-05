@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -97,25 +98,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_initialize(UX_HCD *hcd)

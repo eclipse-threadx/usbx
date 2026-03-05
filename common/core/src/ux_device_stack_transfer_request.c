@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Stack                                                        */
 /**                                                                       */
@@ -53,35 +54,21 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_dcd_function)               Slave DCD dispatch function   */ 
-/*    _ux_utility_delay_ms                  Delay ms                      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_dcd_function)               Slave DCD dispatch function   */
+/*    _ux_utility_delay_ms                  Delay ms                      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*    Device Stack                                                        */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_stack_transfer_request(UX_SLAVE_TRANSFER *transfer_request, 
-                                            ULONG slave_length, 
+UINT  _ux_device_stack_transfer_request(UX_SLAVE_TRANSFER *transfer_request,
+                                            ULONG slave_length,
                                             ULONG host_length)
 {
 #if defined(UX_DEVICE_STANDALONE)
@@ -122,7 +109,7 @@ ULONG                   device_state;
             || (device_state == UX_DEVICE_CONFIGURED))
 
         /* Set the transfer to pending.  */
-        transfer_request -> ux_slave_transfer_request_status =  UX_TRANSFER_STATUS_PENDING; 
+        transfer_request -> ux_slave_transfer_request_status =  UX_TRANSFER_STATUS_PENDING;
 
     else
     {
@@ -134,7 +121,7 @@ ULONG                   device_state;
 
     /* Restore interrupts.  */
     UX_RESTORE
-                    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_STACK_TRANSFER_REQUEST, transfer_request, 0, 0, 0, UX_TRACE_DEVICE_STACK_EVENTS, 0, 0)
 
@@ -143,7 +130,7 @@ ULONG                   device_state;
 
     /* Get the endpoint associated with this transaction.  */
     endpoint =  transfer_request -> ux_slave_transfer_request_endpoint;
-    
+
     /* If the endpoint is non Control, check the endpoint direction and set the data phase direction.  */
     if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) != UX_CONTROL_ENDPOINT)
     {
@@ -158,16 +145,16 @@ ULONG                   device_state;
         /* Isolate the direction from the endpoint address.  */
         if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_IN)
             transfer_request -> ux_slave_transfer_request_phase =  UX_TRANSFER_PHASE_DATA_OUT;
-        else    
+        else
             transfer_request -> ux_slave_transfer_request_phase =  UX_TRANSFER_PHASE_DATA_IN;
-    }    
+    }
 
-    /* See if we need to force a zero length packet at the end of the transfer. 
+    /* See if we need to force a zero length packet at the end of the transfer.
        This happens on a DATA IN and when the host requested length is not met
-       and the last packet is on a boundary. If slave_length is zero, then it is 
+       and the last packet is on a boundary. If slave_length is zero, then it is
        a explicit ZLP request, no need to force ZLP.  */
     if ((transfer_request -> ux_slave_transfer_request_phase ==  UX_TRANSFER_PHASE_DATA_OUT) &&
-        (slave_length != 0) && (host_length != slave_length) && 
+        (slave_length != 0) && (host_length != slave_length) &&
         (slave_length % endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize) == 0)
     {
 
@@ -190,7 +177,7 @@ ULONG                   device_state;
     transfer_request -> ux_slave_transfer_request_in_transfer_length =  slave_length;
 
     /* Save the buffer pointer.  */
-    transfer_request -> ux_slave_transfer_request_current_data_pointer =  
+    transfer_request -> ux_slave_transfer_request_current_data_pointer =
                             transfer_request -> ux_slave_transfer_request_data_pointer;
 
     /* Call the DCD driver transfer function.   */

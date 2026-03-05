@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -29,52 +30,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_change_detect                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_change_detect                    PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is called by the enumeration thread when there has    */ 
-/*    been activity on the HUB.                                           */ 
+/*                                                                        */
+/*    This function is called by the enumeration thread when there has    */
+/*    been activity on the HUB.                                           */
 /*                                                                        */
 /*    In standalone mode there is nothing to do here, activities are      */
 /*    processed in hub tasks function.                                    */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_change_process     Process HUB change            */ 
-/*    _ux_host_stack_class_get              Get class                     */ 
-/*    _ux_host_stack_class_instance_get     Get class instance            */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hub_change_process     Process HUB change            */
+/*    _ux_host_stack_class_get              Get class                     */
+/*    _ux_host_stack_class_instance_get     Get class instance            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_change_detect(VOID)
@@ -106,7 +96,7 @@ UINT                    class_index;
         if (status == UX_SUCCESS)
         {
 
-            /* We have found an instance of a HUB, check if it is live and if the HUB has 
+            /* We have found an instance of a HUB, check if it is live and if the HUB has
                detected a change before we proceed.  */
             if (hub -> ux_host_class_hub_change_semaphore != 0)
             {
@@ -121,7 +111,7 @@ UINT                    class_index;
                 hub -> ux_host_class_hub_change_semaphore--;
             }
         }
-    } while (status == UX_SUCCESS);    
+    } while (status == UX_SUCCESS);
 
     /* We have parsed all the HUB instances.  */
     return;

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   CDC_ECM Class                                                       */
 /**                                                                       */
@@ -30,54 +31,37 @@
 
 
 #if !defined(UX_HOST_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_ecm_transmit_queue_clean         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_cdc_ecm_transmit_queue_clean         PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function cleans the transmit queue.                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_ecm                             CDC ECM instance                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    No return value                                                     */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_semaphore_get                Get bulk out semaphore        */ 
-/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
-/*    nx_packet_transmit_release            Release NetX packet           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    CDC ECM thread and deactivation                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*    This function cleans the transmit queue.                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_ecm                             CDC ECM instance                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    No return value                                                     */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_semaphore_get                Get bulk out semaphore        */
+/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */
+/*    nx_packet_transmit_release            Release NetX packet           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    CDC ECM thread and deactivation                                     */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_transmit_queue_clean(UX_HOST_CLASS_CDC_ECM *cdc_ecm)
@@ -131,13 +115,13 @@ NX_PACKET               *next_packet;
     while (current_packet != UX_NULL)
     {
 
-        /* We must get the next packet before releasing the current packet 
-           because nxe_packet_transmit_release sets the pointer we pass 
+        /* We must get the next packet before releasing the current packet
+           because nxe_packet_transmit_release sets the pointer we pass
            to null.  */
         next_packet =  current_packet -> nx_packet_queue_next;
 
         /* Free the packet. First do some housekeeping.  */
-        current_packet -> nx_packet_prepend_ptr =  current_packet -> nx_packet_prepend_ptr + UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE; 
+        current_packet -> nx_packet_prepend_ptr =  current_packet -> nx_packet_prepend_ptr + UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE;
         current_packet -> nx_packet_length =  current_packet -> nx_packet_length - UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE;
 
         /* And ask Netx to release it.  */

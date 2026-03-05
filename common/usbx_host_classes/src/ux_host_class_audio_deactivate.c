@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Audio Class                                                         */
 /**                                                                       */
@@ -29,60 +30,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_audio_deactivate                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_audio_deactivate                     PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called when this instance of the audio has been    */
-/*    removed from the bus either directly or indirectly. The iso pipes   */ 
-/*    will be destroyed and the instanced removed.                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to command            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
-/*    _ux_host_stack_endpoint_transfer_abort Abort outstanding transfer   */ 
+/*    removed from the bus either directly or indirectly. The iso pipes   */
+/*    will be destroyed and the instanced removed.                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to command            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_destroy Destroy class instance        */
+/*    _ux_host_stack_endpoint_transfer_abort Abort outstanding transfer   */
 /*    _ux_host_mutex_on                     Get mutex                     */
 /*    _ux_host_mutex_delete                 Delete mutex                  */
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Audio Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added interrupt support,    */
-/*                                            protect reentry with mutex, */
-/*                                            added feedback support,     */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved AC AS management,  */
-/*                                            resulting in version 6.3.0  */
+/*    _ux_utility_memory_free               Release memory block          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Audio Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -133,7 +115,7 @@ UINT                    i;
 
         /* Protect thread reentry to this instance.  */
         _ux_host_mutex_on(&audio -> ux_host_class_audio_mutex);
-        
+
         /* We need to abort transactions on the iso pipe.  */
         if (audio -> ux_host_class_audio_isochronous_endpoint)
             _ux_host_stack_endpoint_transfer_abort(audio -> ux_host_class_audio_isochronous_endpoint);
@@ -147,7 +129,7 @@ UINT                    i;
 
         /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
         endpoints to exit properly.  */
-        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
 
 #if defined(UX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT)
 
@@ -168,11 +150,11 @@ UINT                    i;
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
     {
-        
+
         /* Inform the application the device is removed.  */
         _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, audio -> ux_host_class_audio_class, (VOID *) audio);
     }
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_AUDIO_DEACTIVATE, audio, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
@@ -181,8 +163,8 @@ UINT                    i;
 
     /* Free the audio instance memory.  */
     _ux_utility_memory_free(audio);
-    
+
     /* Return successful completion.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
 

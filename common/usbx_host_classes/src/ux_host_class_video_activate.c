@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -52,7 +53,7 @@ typedef struct UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_STRUCT
 
 static UINT _ux_host_class_video_descriptors_parser(VOID  *arg,
                               UCHAR *packed_interface_descriptor,
-                              UCHAR *packed_entity_descriptor) 
+                              UCHAR *packed_entity_descriptor)
 {
 
 UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  *parser;
@@ -164,72 +165,47 @@ UCHAR                                   *baInterfaceNr;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_activate                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_video_activate                       PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function activates the video class. It may be called twice by */
-/*     the same device if there is a video control interface to this      */ 
-/*     device.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to command            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_configure        Configure the video class     */ 
-/*    _ux_host_class_video_descriptor_get   Get video descriptor          */ 
+/*     the same device if there is a video control interface to this      */
+/*     device.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to command            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_video_configure        Configure the video class     */
+/*    _ux_host_class_video_descriptor_get   Get video descriptor          */
 /*    _ux_host_class_video_input_terminal_get                             */
 /*                                          Get input terminal            */
 /*    _ux_host_class_video_input_format_get Get input format              */
 /*    _ux_host_class_video_control_list_get Get controls                  */
-/*    _ux_host_stack_class_instance_create  Create class instance         */ 
-/*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
-/*    _ux_utility_memory_allocate           Allocate a memory block       */ 
-/*    _ux_utility_memory_free               Free a memory block           */ 
-/*    _ux_host_semaphore_create             Create protection semaphore   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used entities parsing API,  */
-/*                                            created new semaphore to    */
-/*                                            protect control requests,   */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved VC header check,   */
-/*                                            resulting in version 6.2.0  */
+/*    _ux_host_stack_class_instance_create  Create class instance         */
+/*    _ux_host_stack_class_instance_destroy Destroy class instance        */
+/*    _ux_utility_memory_allocate           Allocate a memory block       */
+/*    _ux_utility_memory_free               Free a memory block           */
+/*    _ux_host_semaphore_create             Create protection semaphore   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Video Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_activate(UX_HOST_CLASS_COMMAND *command)
@@ -250,7 +226,7 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
        we will search the video control interface for the device.  */
     if (interface_ptr -> ux_interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_VIDEO_SUBCLASS_CONTROL)
         return(UX_SUCCESS);
-    
+
     /* Obtain memory for this class instance.  */
     video =  (UX_HOST_CLASS_VIDEO *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_HOST_CLASS_VIDEO));
     if (video == UX_NULL)
@@ -270,9 +246,9 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
 
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(video -> ux_host_class_video_class, (VOID *) video);
-        
+
     /* Configure the video.  */
-    status =  _ux_host_class_video_configure(video);     
+    status =  _ux_host_class_video_configure(video);
 
     /* Get the video descriptor (all the class specific stuff) and memorize them
        as we will need these descriptors to change settings.  */
@@ -321,7 +297,7 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
         if a function has been programmed in the system structure.  */
         if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
         {
-            
+
             /* Call system change function.  */
             _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, video -> ux_host_class_video_class, (VOID *) video);
         }
@@ -355,6 +331,6 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
     _ux_utility_memory_free(video);
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
 }
 

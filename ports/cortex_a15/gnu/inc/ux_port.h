@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -35,20 +36,6 @@
 /*                                                                        */
 /*    This file contains data type definitions that make USBX function    */
 /*    identically on a variety of different processor architectures.      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            moved tx_api.h include and  */
-/*                                            typedefs from ux_api.h,     */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added basic types guards,   */
-/*                                            improved SLONG typedef,     */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -254,6 +241,7 @@ VOID    outpl(ULONG,ULONG);
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] =
                                     "Copyright (c) 2024 Microsoft Corporation. * USBX Cortex-A15/GNU Version 6.4.1 *";
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
 #else
 extern  CHAR                    _ux_version_id[];
 #endif

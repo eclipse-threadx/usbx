@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -29,60 +30,48 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_synchronize_cache          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_synchronize_cache          PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a SYNCHRONIZE_CACHE command in 32 or 16      */ 
-/*    bits.                                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a SYNCHRONIZE_CACHE command in 32 or 16      */
+/*    bits.                                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to the CBWCB          */ 
-/*    scsi_command                          SCSI command                  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_class_storage_media_status) Get media status              */ 
-/*    (ux_slave_class_storage_media_flush)  Flush media                   */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
-/*    _ux_device_stack_endpoint_stall       Stall endpoint                */ 
-/*    _ux_utility_long_get_big_endian       Get 32-bit big endian         */ 
-/*    _ux_utility_short_get_big_endian      Get 16-bit big endian         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*    cbwcb                                 Pointer to the CBWCB          */
+/*    scsi_command                          SCSI command                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_class_storage_media_status) Get media status              */
+/*    (ux_slave_class_storage_media_flush)  Flush media                   */
+/*    _ux_device_class_storage_csw_send     Send CSW                      */
+/*    _ux_device_stack_endpoint_stall       Stall endpoint                */
+/*    _ux_utility_long_get_big_endian       Get 32-bit big endian         */
+/*    _ux_utility_short_get_big_endian      Get 16-bit big endian         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_synchronize_cache(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
+UINT  _ux_device_class_storage_synchronize_cache(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
                                                  UX_SLAVE_ENDPOINT *endpoint_in,
                                                  UX_SLAVE_ENDPOINT *endpoint_out, UCHAR *cbwcb, UCHAR scsi_command)
 {
@@ -121,7 +110,7 @@ UCHAR                   flags;
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_STORAGE_SYNCHRONIZE_CACHE, storage, lun, lba, number_blocks, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
     /* Obtain the status of the device.  */
-    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage, 
+    status =  storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_status(storage,
                             lun, storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_id, &media_status);
 
     /* Update the request sense.  */

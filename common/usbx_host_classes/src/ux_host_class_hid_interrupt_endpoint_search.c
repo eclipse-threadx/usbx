@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**  HID Class                                                            */
 /**                                                                       */
@@ -29,55 +30,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_interrupt_endpoint_search        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_interrupt_endpoint_search        PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function searches for the handle of the only interrupt         */ 
+/*                                                                        */
+/*    This function searches for the handle of the only interrupt         */
 /*    endpoint in the default alternate setting of the HID interface.     */
-/*    The interrupt endpoint should always be there. The actual first     */ 
-/*    transfer on the interrupt endpoint does not start until a HID       */ 
-/*    client has claimed ownership of the HID device.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Xiuwen Cai, CQ Xiao      Modified comment(s),          */
-/*                                            added interrupt OUT support,*/
-/*                                            added timeout initialize,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*    The interrupt endpoint should always be there. The actual first     */
+/*    transfer on the interrupt endpoint does not start until a HID       */
+/*    client has claimed ownership of the HID device.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_interrupt_endpoint_search(UX_HOST_CLASS_HID *hid)
@@ -121,7 +106,7 @@ UX_TRANSFER     *transfer_request;
             transfer_request -> ux_transfer_request_timeout_value = UX_WAIT_FOREVER;
 
             /* Obtain a buffer for this transaction. The buffer will always be reused.  */
-            transfer_request -> ux_transfer_request_data_pointer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, 
+            transfer_request -> ux_transfer_request_data_pointer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY,
                                                                         transfer_request -> ux_transfer_request_requested_length);
 
             /* If the endpoint is available and we have memory, we mark the interrupt endpoint as ready.  */
@@ -130,7 +115,7 @@ UX_TRANSFER     *transfer_request;
                 hid -> ux_host_class_hid_interrupt_endpoint_status =  UX_HOST_CLASS_HID_INTERRUPT_ENDPOINT_READY;
                 status = UX_SUCCESS;
 #if !defined(UX_HOST_CLASS_HID_INTERRUPT_OUT_SUPPORT)
-                
+
                 /* We have found the interrupt IN endpoint, just stop searching.  */
                 break;
 #endif

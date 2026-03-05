@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,49 +30,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_main_item_parse                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_main_item_parse                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function parses a main item from the report descriptor.        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*    item                                  Pointer to item               */ 
-/*    descriptor                            Pointer to descriptor         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_item_data_get      Get data item                 */ 
-/*    _ux_host_class_hid_report_add         Add report                    */ 
-/*    _ux_utility_memory_set                Memory block set              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function parses a main item from the report descriptor.        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*    item                                  Pointer to item               */
+/*    descriptor                            Pointer to descriptor         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_item_data_get      Get data item                 */
+/*    _ux_host_class_hid_report_add         Add report                    */
+/*    _ux_utility_memory_set                Memory block set              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_main_item_parse(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_ITEM *item, UCHAR *descriptor)
@@ -91,7 +82,7 @@ ULONG                           collection_type;
 
     case UX_HOST_CLASS_HID_MAIN_TAG_COLLECTION:
 
-        /* We have a new collection to open. If the collection type is application, 
+        /* We have a new collection to open. If the collection type is application,
            we have to differentiate the first collection.  */
         collection_type =  _ux_host_class_hid_item_data_get(descriptor, item);
 
@@ -104,7 +95,7 @@ ULONG                           collection_type;
             {
 
                 /* It is the first application. Since the main usage and page have not yet
-                   been defined, we use the global page and the current local usage.  */          
+                   been defined, we use the global page and the current local usage.  */
                 hid_parser -> ux_host_class_hid_parser_main_page =   hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_usage_page;
                 hid_parser -> ux_host_class_hid_parser_main_usage =  hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_usages[0];
             }
@@ -114,7 +105,7 @@ ULONG                           collection_type;
 
             /* Add one collection to this report */
             hid_parser -> ux_host_class_hid_parser_number_collection++;
-            
+
             /* Set the status to success.  */
             status =  UX_SUCCESS;
         }
@@ -123,7 +114,7 @@ ULONG                           collection_type;
 
             if (hid_parser -> ux_host_class_hid_parser_number_collection >= UX_HOST_CLASS_HID_MAX_COLLECTION)
             {
-            
+
                 /* Error trap. */
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_HID_COLLECTION_OVERFLOW);
 
@@ -144,14 +135,14 @@ ULONG                           collection_type;
                 status =  UX_SUCCESS;
             }
         }
-        break;      
+        break;
 
     case UX_HOST_CLASS_HID_MAIN_TAG_END_COLLECTION:
 
-        /* We need to pop back the last collection.  */               
+        /* We need to pop back the last collection.  */
         if (hid_parser -> ux_host_class_hid_parser_number_collection == 0)
         {
-            
+
             /* Error trap. */
             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_HID_COLLECTION_OVERFLOW);
 
@@ -160,7 +151,7 @@ ULONG                           collection_type;
 
             return(UX_HOST_CLASS_HID_COLLECTION_OVERFLOW);
         }
-        
+
         else
 
             hid_parser -> ux_host_class_hid_parser_number_collection--;
@@ -175,8 +166,8 @@ ULONG                           collection_type;
         /* We need to add a report.  */
         status =  _ux_host_class_hid_report_add(hid, descriptor, item);
         break;
-    }  
-                                                 
+    }
+
     /* We have a new main item, so the local instances have to be cleaned.  */
     _ux_utility_memory_set(&hid_parser -> ux_host_class_hid_parser_local, 0, sizeof(UX_HOST_CLASS_HID_LOCAL_ITEM)); /* Use case of memset is verified. */
 

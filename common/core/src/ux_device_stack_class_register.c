@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Stack                                                        */
 /**                                                                       */
@@ -56,28 +57,17 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_string_length_check       Check C string and return     */
 /*                                          its length if null-terminated */
-/*    _ux_utility_memory_copy               Memory copy                   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions, verified       */
-/*                                            memset and memcpy cases,    */
-/*                                            resulting in version 6.1    */
+/*    _ux_utility_memory_copy               Memory copy                   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_class_register(UCHAR *class_name,
@@ -123,19 +113,19 @@ ULONG                       class_index;
             /* We have found a free container for the class. Copy the name (with null-terminator).  */
             _ux_utility_memory_copy(class_inst -> ux_slave_class_name, class_name, class_name_length + 1); /* Use case of memcpy is verified. */
 #endif
-            
+
             /* Memorize the entry function of this class.  */
             class_inst -> ux_slave_class_entry_function =  class_entry_function;
 
             /* Memorize the pointer to the application parameter.  */
             class_inst -> ux_slave_class_interface_parameter =  parameter;
-            
+
             /* Memorize the configuration number on which this instance will be called.  */
             class_inst -> ux_slave_class_configuration_number =  configuration_number;
-            
+
             /* Memorize the interface number on which this instance will be called.  */
             class_inst -> ux_slave_class_interface_number =  interface_number;
-            
+
             /* Build all the fields of the Class Command to initialize the class.  */
             command.ux_slave_class_command_request    =  UX_SLAVE_CLASS_COMMAND_INITIALIZE;
             command.ux_slave_class_command_parameter  =  parameter;
@@ -143,11 +133,11 @@ ULONG                       class_index;
 
             /* Call the class initialization routine.  */
             status = class_entry_function(&command);
-            
+
             /* Check the status.  */
             if (status != UX_SUCCESS)
                 return(status);
-            
+
             /* Make this class used now.  */
             class_inst -> ux_slave_class_status = UX_USED;
 
@@ -158,7 +148,7 @@ ULONG                       class_index;
 #if UX_MAX_SLAVE_CLASS_DRIVER > 1
         /* Move to the next class.  */
         class_inst ++;
-    }    
+    }
 #endif
 
     /* No more entries in the class table.  */
@@ -200,12 +190,6 @@ ULONG                       class_index;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_stack_class_register(UCHAR *class_name,

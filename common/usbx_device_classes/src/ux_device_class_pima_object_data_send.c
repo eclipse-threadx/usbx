@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Pima Class                                                   */
 /**                                                                       */
@@ -29,48 +30,36 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_pima_object_data_send              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_pima_object_data_send              PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function accepts an object data from the host.                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                  Pointer to pima class         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
+/*                                                                        */
+/*    This function accepts an object data from the host.                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                  Pointer to pima class         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_device_stack_endpoint_stall       Stall endpoint                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            updated status handling,    */
-/*                                            improved cancel flow,       */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_pima_object_data_send(UX_SLAVE_CLASS_PIMA *pima)
@@ -94,33 +83,33 @@ ULONG                       total_length;
 
     /* Obtain the object info from the application.  */
     status = pima -> ux_device_class_pima_object_info_get(pima, object_handle, &object);
-    
+
     /* Check for error.  */
     if (status == UX_SUCCESS)
-    {    
+    {
 
         /* Data phase (Bulk OUT).  */
         pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_DATA_OUT;
 
         /* Set the object length.  */
-        object_length =  object -> ux_device_class_pima_object_compressed_size;   
-        
+        object_length =  object -> ux_device_class_pima_object_compressed_size;
+
         /* Set the total length to be received.  */
         total_length = object_length + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE;
-        
+
         /* Reset the offset. */
-        object_offset =  0;        
+        object_offset =  0;
 
         /* Obtain the pointer to the transfer request of the bulk out endpoint.  */
         transfer_request =  &pima -> ux_device_class_pima_bulk_out_endpoint -> ux_slave_endpoint_transfer_request;
-        
+
         /* Obtain memory for this object info. Use the transfer request pre-allocated memory.  */
         object_data =  transfer_request -> ux_slave_transfer_request_data_pointer;
 
         /* Assume the host will send all the data.  */
         while (total_length != 0)
         {
-        
+
             /* Get a data payload.  */
             status =  _ux_device_stack_transfer_request(transfer_request, UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH, UX_DEVICE_CLASS_PIMA_TRANSFER_BUFFER_LENGTH);
 
@@ -134,15 +123,15 @@ ULONG                       total_length;
             /* Check for the status. We may have had a request to cancel the transaction from the host.  */
             if (status != UX_SUCCESS)
             {
-    
+
                 /* Check the completion code for transfer abort from the host.  */
                 if (transfer_request -> ux_slave_transfer_request_status ==  UX_TRANSFER_STATUS_ABORT)
                 {
-                    
+
                     /* Do not proceed.  */
                     return(UX_ERROR);
-    
-                }                    
+
+                }
 
             else
                 {
@@ -151,12 +140,12 @@ ULONG                       total_length;
                     break;
 
                 }
-            
+
             }
-                    
+
             /* Obtain the length of the transaction.  */
             transfer_length =  transfer_request -> ux_slave_transfer_request_actual_length;
-            
+
             /* If this is the first packet, we have to take into account the
                header.  */
             if (object_offset == 0)
@@ -172,33 +161,33 @@ ULONG                       total_length;
                 }
 
                 /* Send the object data to the application.  */
-                status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_ACTIVE, 
-                                                                        object_data + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE, 
+                status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_ACTIVE,
+                                                                        object_data + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE,
                                                                         object_offset,
                                                                         (transfer_length - UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE));
-                                                                        
+
                 /* Check status, if we have a problem, we abort.  */
                 if (status != UX_SUCCESS)
                 {
-    
+
                     /* We need to inform the host of an error.  */
                     status =  UX_ERROR;
                     break;
                 }
                 else
-                {    
+                {
 
                     /* Adjust the remaining length of the object.  */
                     total_length -= transfer_length;
 
                     /* Adjust the length to be sent.  */
                     object_offset += (transfer_length - UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE);
-                    
-                }                        
-                                                                                        
+
+                }
+
             }
             else
-            {        
+            {
 
                 /* Do some sanity check.  */
                 if (object_length < transfer_length)
@@ -211,29 +200,29 @@ ULONG                       total_length;
                 }
 
                 /* This is not the first packet, send the object data to the application.  */
-                status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_ACTIVE, 
-                                                                        object_data, 
+                status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_ACTIVE,
+                                                                        object_data,
                                                                         object_offset,
                                                                         transfer_length);
-                                                                        
+
                 /* Check status, if we have a problem, we abort.  */
                 if (status != UX_SUCCESS)
                 {
-    
+
                     /* We need to inform the host of an error.  */
                     status =  UX_ERROR;
                     break;
                 }
                 else
-                {    
+                {
 
                     /* Adjust the remaining length of the total object.  */
                     total_length -= transfer_length;
 
                     /* Adjust the length to be sent.  */
                     object_offset += transfer_length;
-                    
-                }                        
+
+                }
 
             }
 
@@ -245,31 +234,31 @@ ULONG                       total_length;
             }
         }
     }
-    
+
     /* Check for status.  */
     if (status == UX_SUCCESS)
     {
-    
+
         /* Now we return a response with success.  */
         _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 0, 0, 0, 0);
 
         /* Make the object transfer completed.  */
-        status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_COMPLETED, 
+        status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_COMPLETED,
                                                                                 UX_NULL, 0, 0);
-    }    
+    }
     else
     {
-        
-        /* We need to stall the bulk out pipe.  This is the method used by Pima devices to 
+
+        /* We need to stall the bulk out pipe.  This is the method used by Pima devices to
            cancel a transaction.  */
         _ux_device_stack_endpoint_stall(pima -> ux_device_class_pima_bulk_in_endpoint);
 
         /* Make the object transfer non completed.  */
-        status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_COMPLETED_ERROR, 
+        status = pima -> ux_device_class_pima_object_data_send(pima, object_handle, UX_DEVICE_CLASS_PIMA_OBJECT_TRANSFER_PHASE_COMPLETED_ERROR,
                                                                                 UX_NULL, 0, 0);
 
     }
-    
+
     /* Return completion status.  */
     return(status);
 }

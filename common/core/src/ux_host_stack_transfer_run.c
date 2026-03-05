@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -79,12 +80,6 @@ static inline void _ux_host_stack_transfer_retire(UX_TRANSFER *transfer);
 /*                                                                        */
 /*    Application                                                         */
 /*    USBX Components                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_transfer_run(UX_TRANSFER *transfer_request)
@@ -196,10 +191,10 @@ UINT            status;
 
                 /* All transfers pending need to abort. There may have been a partial transfer.  */
                 _ux_host_stack_transfer_request_abort(transfer_request);
-                
+
                 /* Set the completion code.  */
                 transfer_request -> ux_transfer_request_completion_code = UX_TRANSFER_TIMEOUT;
-        
+
                 /* There was an error: simplify to idle.  */
                 UX_DISABLE
                 UX_TRANSFER_STATE_IDLE(transfer_request);
@@ -323,12 +318,6 @@ UX_TRANSFER         *previous;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_transfer_run(UX_TRANSFER *transfer_request)

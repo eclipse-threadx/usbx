@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -29,52 +30,40 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_activate                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_activate                        PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates the ACM instance, configure the device ...    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                                Pima class command pointer   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_configure           Configure pima class        */ 
-/*    _ux_host_class_pima_endpoints_get       Get endpoints of pima       */ 
-/*    _ux_host_stack_class_instance_create    Create class instance       */ 
-/*    _ux_host_stack_class_instance_destroy   Destroy the class instance  */ 
-/*    _ux_utility_memory_allocate             Allocate memory block       */ 
-/*    _ux_utility_memory_free                 Free memory block           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_entry               Entry of pima class         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*    This function creates the ACM instance, configure the device ...    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                                Pima class command pointer   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_pima_configure           Configure pima class        */
+/*    _ux_host_class_pima_endpoints_get       Get endpoints of pima       */
+/*    _ux_host_stack_class_instance_create    Create class instance       */
+/*    _ux_host_stack_class_instance_destroy   Destroy the class instance  */
+/*    _ux_utility_memory_allocate             Allocate memory block       */
+/*    _ux_utility_memory_free                 Free memory block           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_pima_entry               Entry of pima class         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_activate(UX_HOST_CLASS_COMMAND *command)
@@ -147,7 +136,7 @@ UINT                                 status;
         if a function has been programmed in the system structure.  */
         if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
         {
-            
+
             /* Call system change function.  */
             _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, pima -> ux_host_class_pima_class, (VOID *) pima);
         }
@@ -176,6 +165,6 @@ UINT                                 status;
     _ux_utility_memory_free(pima);
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
 }
 

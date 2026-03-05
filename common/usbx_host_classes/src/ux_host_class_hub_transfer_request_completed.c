@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -29,25 +30,25 @@
 #include "ux_host_class_hub.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_transfer_request_completed       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_transfer_request_completed       PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is called by the completion thread when a transfer    */ 
-/*    request has been completed either because the transfer is           */ 
+/*                                                                        */
+/*    This function is called by the completion thread when a transfer    */
+/*    request has been completed either because the transfer is           */
 /*    successful or there was an error.                                   */
 /*                                                                        */
 /*    Because the HUB influences the topology of the USB, the insertion   */
-/*    or extraction of devices cannot be done during the transfer request */ 
-/*    thread. We post a signal to the topology thread to wake up and      */ 
+/*    or extraction of devices cannot be done during the transfer request */
+/*    thread. We post a signal to the topology thread to wake up and      */
 /*    treat these changes on the HUB status.                              */
 /*                                                                        */
 /*    In RTOS mode, the interrupt pipe is not reactivated here. We will   */
@@ -56,36 +57,22 @@
 /*                                                                        */
 /*    In standalone mode, the interrupt pipe is reactivated here. The     */
 /*    bitmap in buffer is examined in hub tasks function.                 */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_semaphore_put                Put the signaling semaphore   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_semaphore_put                Put the signaling semaphore   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_transfer_request_completed(UX_TRANSFER *transfer_request)
@@ -104,7 +91,7 @@ UX_HOST_CLASS_HUB        *hub;
 
         /* We have an error. We do not rehook another transfer if the device instance is shutting down or
            if the transfer was aborted by the class.  */
-        if ((hub -> ux_host_class_hub_state ==  UX_HOST_CLASS_INSTANCE_SHUTDOWN) || 
+        if ((hub -> ux_host_class_hub_state ==  UX_HOST_CLASS_INSTANCE_SHUTDOWN) ||
             (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_ABORT) ||
             (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_NO_ANSWER))
 
@@ -112,14 +99,14 @@ UX_HOST_CLASS_HUB        *hub;
             return;
         else
 
-        {            
+        {
 
             /* Reactivate the HUB interrupt pipe.  */
             _ux_host_stack_transfer_request(transfer_request);
-        
+
             /* We do not proceed.  */
-            return;        
-        }            
+            return;
+        }
     }
 
 #if defined(UX_HOST_STANDALONE)
@@ -130,7 +117,7 @@ UX_HOST_CLASS_HUB        *hub;
 
     /* We need to memorize which HUB instance has received a change signal.  */
     hub -> ux_host_class_hub_change_semaphore++;
-    
+
     /* Now we can set the semaphore, the enum thread will wake up and will
        call the HUB instance which has a status change.  */
     _ux_host_semaphore_put(&_ux_system_host -> ux_system_host_enum_semaphore);

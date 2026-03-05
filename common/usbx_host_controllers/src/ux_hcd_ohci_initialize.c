@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,64 +30,45 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_initialize                             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_initialize                             PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function initializes the OHCI controller. It sets the dma     */ 
-/*     areas, programs all the OHCI registers, setup the ED and TD        */ 
-/*     containers, sets the control, and builds the periodic lists.       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    HCD                                   Pointer to HCD                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_periodic_tree_create     Create OHCI periodic tree     */ 
-/*    _ux_hcd_ohci_power_root_hubs          Power root HUBs               */ 
-/*    _ux_hcd_ohci_register_read            Read OHCI register            */ 
-/*    _ux_hcd_ohci_register_write           Write OHCI register           */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_host_mutex_on                     Get mutex protection          */ 
-/*    _ux_host_mutex_off                    Release mutex protection      */ 
-/*    _ux_utility_physical_address          Get physical address          */ 
-/*    _ux_utility_set_interrupt_handler     Setup interrupt handler       */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Host Stack                                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Xiuwen Cai               Modified comment(s),          */
-/*                                            fixed HcPeriodicStart value,*/
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Yajun Xia                Modified comment(s),          */
-/*                                            fixed OHCI PRSC issue,      */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*     This function initializes the OHCI controller. It sets the dma     */
+/*     areas, programs all the OHCI registers, setup the ED and TD        */
+/*     containers, sets the control, and builds the periodic lists.       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    HCD                                   Pointer to HCD                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ohci_periodic_tree_create     Create OHCI periodic tree     */
+/*    _ux_hcd_ohci_power_root_hubs          Power root HUBs               */
+/*    _ux_hcd_ohci_register_read            Read OHCI register            */
+/*    _ux_hcd_ohci_register_write           Write OHCI register           */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_host_mutex_on                     Get mutex protection          */
+/*    _ux_host_mutex_off                    Release mutex protection      */
+/*    _ux_utility_physical_address          Get physical address          */
+/*    _ux_utility_set_interrupt_handler     Setup interrupt handler       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Host Stack                                                          */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_initialize(UX_HCD *hcd)
@@ -102,7 +84,7 @@ UINT            status;
     hcd -> ux_hcd_controller_type =  UX_OHCI_CONTROLLER;
 
 #if UX_MAX_DEVICES > 1
-    /* Initialize the max bandwidth for periodic endpoints. On OHCI, the spec says no 
+    /* Initialize the max bandwidth for periodic endpoints. On OHCI, the spec says no
        more than 90% to be allocated for periodic.  */
     hcd -> ux_hcd_available_bandwidth =  UX_OHCI_AVAILABLE_BANDWIDTH;
 #endif
@@ -155,7 +137,7 @@ UINT            status;
 
 #if UX_MAX_DEVICES > 1
 
-    /* Read the OHCI controller version, it is either USB 1.0 or 1.1. This is important for 
+    /* Read the OHCI controller version, it is either USB 1.0 or 1.1. This is important for
        filtering INT out endpoints on a 1.0 OHCI.  */
     hcd -> ux_hcd_version =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_REVISION);
 #endif
@@ -164,7 +146,7 @@ UINT            status;
        This is not compulsory but some controllers demand to start in this state.  */
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL, 0);
 
-    /* The following is time critical. If we get interrupted here, the controller will go in 
+    /* The following is time critical. If we get interrupted here, the controller will go in
        suspend mode. Get the protection mutex.  */
     _ux_host_mutex_on(&_ux_system -> ux_system_mutex);
 
@@ -178,8 +160,8 @@ UINT            status;
         ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_COMMAND_STATUS);
         if ((ohci_register & OHCI_HC_CS_HCR) == 0)
             break;
-    } 
-      
+    }
+
     /* Check if the controller is reset properly.  */
     if ((ohci_register & OHCI_HC_CS_HCR) != 0)
     {
@@ -195,7 +177,7 @@ UINT            status;
 
         return(UX_CONTROLLER_INIT_FAILED);
     }
-    
+
     /* Set the HCCA pointer to the HCOR.  */
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_HCCA, (ULONG) _ux_utility_physical_address(hcd_ohci -> ux_hcd_ohci_hcca));
 
@@ -204,20 +186,20 @@ UINT            status;
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL_CURRENT_ED, 0);
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_BULK_HEAD_ED, 0);
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_BULK_CURRENT_ED, 0);
-           
-    /* Turn on the OHCI controller functional registers we will use after this operation, 
+
+    /* Turn on the OHCI controller functional registers we will use after this operation,
        the controller is operational.  */
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_CONTROL, OHCI_HC_CONTROL_VALUE);
     hcd -> ux_hcd_status =  UX_HCD_STATUS_OPERATIONAL;
 
-    /* We can safely release the mutex protection.  */    
+    /* We can safely release the mutex protection.  */
     _ux_host_mutex_off(&_ux_system -> ux_system_mutex);
 
     /* Set the controller interval.  */
     ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_FM_INTERVAL) & OHCI_HC_FM_INTERVAL_CLEAR;
     ohci_register |=  OHCI_HC_FM_INTERVAL_SET;
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_FM_INTERVAL, ohci_register);
-    
+
     /* Set HcPeriodicStart to a value that is 90% of the value in FrameInterval field of the HcFmInterval register.  */
     ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_FM_INTERVAL) & OHCI_HC_FM_INTERVAL_FI_MASK;
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_PERIODIC_START, ohci_register * 9 / 10);
@@ -225,8 +207,8 @@ UINT            status;
     /* Reset all the OHCI interrupts and re-enable only the ones we will use.  */
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_INTERRUPT_DISABLE, OHCI_HC_INTERRUPT_DISABLE_ALL);
     _ux_hcd_ohci_register_write(hcd_ohci, OHCI_HC_INTERRUPT_ENABLE, OHCI_HC_INTERRUPT_ENABLE_NORMAL);
-    
-    /* Get the number of ports on the controller. The number of ports needs to be reflected both 
+
+    /* Get the number of ports on the controller. The number of ports needs to be reflected both
        for the generic HCD container and the local OHCI container.  */
     ohci_register =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_RH_DESCRIPTOR_A);
     hcd -> ux_hcd_nb_root_hubs =  (UINT) (ohci_register & 0xff);

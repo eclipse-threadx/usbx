@@ -1,6 +1,6 @@
 /* This tests the case where the hub reports a device disconnection even though
    no device was previously on that port. This can happen if the device is connected
-   then quickly disconnected, before USBX processes the connection. The specific 
+   then quickly disconnected, before USBX processes the connection. The specific
    test case is in ux_host_class_hub_port_change_connection_process.c. */
 
 #include "usbx_ux_test_hub.h"

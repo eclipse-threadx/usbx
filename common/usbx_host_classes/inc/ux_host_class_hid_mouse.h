@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Mouse Client Class                                              */
 /**                                                                       */
@@ -20,53 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_hid_mouse.h                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_hid_mouse.h                           PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX HID mouse class.                                               */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed clients management,   */
-/*                                            resulting in version 6.1.11 */
+/*    USBX HID mouse class.                                               */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_HID_MOUSE_H
 #define UX_HOST_CLASS_HID_MOUSE_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -100,7 +83,7 @@ extern   "C" {
 typedef struct UX_HOST_CLASS_HID_MOUSE_STRUCT
 {
 
-    ULONG           ux_host_class_hid_mouse_state; 
+    ULONG           ux_host_class_hid_mouse_state;
     UX_HOST_CLASS_HID   *ux_host_class_hid_mouse_hid;
     USHORT          ux_host_class_hid_mouse_id;
     SLONG           ux_host_class_hid_mouse_x_position;
@@ -126,21 +109,21 @@ UINT    _ux_host_class_hid_mouse_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *comm
 VOID    _ux_host_class_hid_mouse_callback(UX_HOST_CLASS_HID_REPORT_CALLBACK *callback);
 UINT    _ux_host_class_hid_mouse_deactivate(UX_HOST_CLASS_HID_CLIENT_COMMAND  *command);
 UINT    _ux_host_class_hid_mouse_entry(UX_HOST_CLASS_HID_CLIENT_COMMAND *command);
-UINT    _ux_host_class_hid_mouse_buttons_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
+UINT    _ux_host_class_hid_mouse_buttons_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance,
                                             ULONG *mouse_buttons);
-UINT    _ux_host_class_hid_mouse_position_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
-                                            SLONG *mouse_x_position, 
+UINT    _ux_host_class_hid_mouse_position_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance,
+                                            SLONG *mouse_x_position,
                                             SLONG *mouse_y_position);
-UINT    _ux_host_class_hid_mouse_wheel_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
-                                            SLONG *mouse_wheel_movement); 
+UINT    _ux_host_class_hid_mouse_wheel_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance,
+                                            SLONG *mouse_wheel_movement);
 
-UINT    _uxe_host_class_hid_mouse_buttons_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
+UINT    _uxe_host_class_hid_mouse_buttons_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance,
                                             ULONG *mouse_buttons);
-UINT    _uxe_host_class_hid_mouse_position_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
-                                            SLONG *mouse_x_position, 
+UINT    _uxe_host_class_hid_mouse_position_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance,
+                                            SLONG *mouse_x_position,
                                             SLONG *mouse_y_position);
-UINT    _uxe_host_class_hid_mouse_wheel_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance, 
-                                            SLONG *mouse_wheel_movement); 
+UINT    _uxe_host_class_hid_mouse_wheel_get(UX_HOST_CLASS_HID_MOUSE *mouse_instance,
+                                            SLONG *mouse_wheel_movement);
 
 
 /* Define HID Mouse Class API prototypes.  */
@@ -162,10 +145,10 @@ UINT    _uxe_host_class_hid_mouse_wheel_get(UX_HOST_CLASS_HID_MOUSE *mouse_insta
 #endif
 
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
+}
 #endif
 
 #endif

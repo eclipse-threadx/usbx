@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -60,29 +61,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Components                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used pointer for current    */
-/*                                            selected configuration,     */
-/*                                            added notification for      */
-/*                                            device disconnection,       */
-/*                                            resulting in version 6.1.4  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_remove(UX_HCD *hcd, UX_DEVICE *parent, UINT port_index)

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Stack                                                        */
 /**                                                                       */
@@ -53,27 +54,17 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_string_length_check       Check C string and return     */
 /*                                          its length if null-terminated */
-/*    _ux_utility_memory_compare            Memory compare                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
+/*    _ux_utility_memory_compare            Memory compare                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_class_unregister(UCHAR *class_name,
@@ -116,21 +107,21 @@ ULONG                       class_index;
             /* We have found a used container with a  class. Compare the name (include null-terminator).  */
             if (ux_utility_name_match(class_inst -> ux_slave_class_name, class_name, class_name_length + 1))
             {
-                        
+
                 /* Build all the fields of the Class Command to uninitialize the class.  */
                 command.ux_slave_class_command_request    =  UX_SLAVE_CLASS_COMMAND_UNINITIALIZE;
                 command.ux_slave_class_command_class_ptr  =  class_inst;
 
                 /* Call the class uninitialization routine.  */
                 status = class_entry_function(&command);
-            
+
                 /* Check the status.  */
                 if (status != UX_SUCCESS)
                     return(status);
-            
+
                 /* Make this class unused now.  */
                 class_inst -> ux_slave_class_status = UX_UNUSED;
-            
+
                 /* Erase the instance of the class.  */
                 class_inst -> ux_slave_class_instance = UX_NULL;
 
@@ -142,7 +133,7 @@ ULONG                       class_index;
 #if UX_MAX_SLAVE_CLASS_DRIVER > 1
         /* Move to the next class.  */
         class_inst ++;
-    }    
+    }
 #endif
 
     /* No class match.  */
@@ -181,12 +172,6 @@ ULONG                       class_index;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_stack_class_unregister(UCHAR *class_name,

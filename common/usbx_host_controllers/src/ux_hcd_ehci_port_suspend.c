@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,45 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_port_suspend                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_port_suspend                           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function will suspend a specific port attached to the root     */ 
-/*    HUB.                                                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*    port_index                            Port index to suspend         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function will suspend a specific port attached to the root     */
+/*    HUB.                                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*    port_index                            Port index to suspend         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_port_suspend(UX_HCD_EHCI *hcd_ehci, ULONG port_index)
@@ -86,23 +79,23 @@ ULONG       ehci_register_port_status;
 
         return(UX_PORT_INDEX_UNKNOWN);
     }
-    
+
     /* Ensure that the downstream port has a device attached. If not, ignore the request.  */
     ehci_register_port_status =  _ux_hcd_ehci_register_read(hcd_ehci, EHCI_HCOR_PORT_SC + port_index);
-                                    
+
     /* Check Device Connection Status.  */
     if ((ehci_register_port_status & EHCI_HC_PS_CCS) == 0)
-    
+
         /* Nothing on the downstream port.  */
         return(UX_NO_DEVICE_CONNECTED);
 
     /* Set Suspend.  */
     ehci_register_port_status |= EHCI_HC_PS_SUSPEND;
-    
+
     /* Update the port status.  */
     _ux_hcd_ehci_register_write(hcd_ehci, EHCI_HCOR_PORT_SC + port_index, ehci_register_port_status);
 
     /* Not supported, return error.  */
-    return(UX_FUNCTION_NOT_SUPPORTED);  
+    return(UX_FUNCTION_NOT_SUPPORTED);
 }
 

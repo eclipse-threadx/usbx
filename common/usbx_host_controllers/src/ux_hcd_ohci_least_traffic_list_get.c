@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,44 +30,36 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_least_traffic_list_get                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_least_traffic_list_get                 PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function return a pointer to the first ED in the periodic     */ 
-/*     tree that has the least traffic registered.                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ohci                              Pointer to OHCI               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    UX_OHCI_ED  *                         Pointer to OHCI ED            */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_virtual_address           Get virtual address           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    OHCI Controller Driver                                              */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*     This function return a pointer to the first ED in the periodic     */
+/*     tree that has the least traffic registered.                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ohci                              Pointer to OHCI               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    UX_OHCI_ED  *                         Pointer to OHCI ED            */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_virtual_address           Get virtual address           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    OHCI Controller Driver                                              */
 /*                                                                        */
 /**************************************************************************/
 UX_OHCI_ED  *_ux_hcd_ohci_least_traffic_list_get(UX_HCD_OHCI *hcd_ohci)
@@ -83,13 +76,13 @@ ULONG                   bandwidth_used;
 
     /* Get the pointer to the HCCA.  */
     ohci_hcca =  hcd_ohci -> ux_hcd_ohci_hcca;
-    
+
     /* Set the min bandwidth used to a arbitrary maximum value.  */
     min_bandwidth_used =  0xffffffff;
 
     /* The first ED is the list candidate for now.  */
     min_bandwidth_ed =  _ux_utility_virtual_address(ohci_hcca -> ux_hcd_ohci_hcca_ed[0]);
-    
+
     /* All list will be scanned.  */
     for (list_index = 0; list_index < 32; list_index++)
     {
@@ -110,25 +103,25 @@ ULONG                   bandwidth_used;
             /* Add to the bandwidth used the max packet size pointed by this ED.  */
             bandwidth_used +=  (ed -> ux_ohci_ed_dw0 >> 16) & UX_OHCI_ED_MPS;
 
-            /* Next ED.  */           
+            /* Next ED.  */
             ed =  _ux_utility_virtual_address(ed -> ux_ohci_ed_next_ed);
         }
 
         /* We have processed a list, check the bandwidth used by this list.
-           If this bandwidth is the minimum, we memorize the ED.  */        
+           If this bandwidth is the minimum, we memorize the ED.  */
         if (bandwidth_used < min_bandwidth_used)
         {
 
-            /* We have found a better list with a lower used bandwidth, 
+            /* We have found a better list with a lower used bandwidth,
                memorize the bandwidth for this list.  */
             min_bandwidth_used =  bandwidth_used;
-            
+
             /* Memorize the begin ED for this list.  */
             min_bandwidth_ed =  begin_ed;
         }
     }
-    
+
     /* Return the ED list with the lowest bandwidth.  */
-    return(min_bandwidth_ed);   
+    return(min_bandwidth_ed);
 }
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,18 +30,18 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_request_control_transfer               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_request_control_transfer               PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function performs a control transfer from a transfer request. */
 /*     The USB control transfer is in 3 phases (setup, data, status).     */
 /*     This function will chain all phases of the control sequence before */
@@ -48,46 +49,30 @@
 /*                                                                        */
 /*     The max aggregated size of a data payload in EHCI is 16K. We are   */
 /*     assuming that this size will be sufficient to contain the control  */
-/*     packet.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_ed_clean                 Clean TDs                     */ 
-/*    _ux_hcd_ehci_request_transfer_add     Add transfer to ED            */ 
-/*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_utility_short_put                 Write a 16-bit value          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*     packet.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ehci_ed_clean                 Clean TDs                     */
+/*    _ux_hcd_ehci_request_transfer_add     Add transfer to ED            */
+/*    _ux_host_stack_transfer_request_abort Abort transfer request        */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*    _ux_utility_short_put                 Write a 16-bit value          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            prefixed UX to MS_TO_TICK,  */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.1.2  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_request_control_transfer(UX_HCD_EHCI *hcd_ehci, UX_TRANSFER *transfer_request)
@@ -152,7 +137,7 @@ UINT            pid;
     /* Build and hook the setup phase to the ED.  */
     status =  _ux_hcd_ehci_request_transfer_add(hcd_ehci, ed, UX_EHCI_TD_SETUP_PHASE, UX_EHCI_PID_SETUP, UX_EHCI_TOGGLE_0,
                                     setup_request, UX_SETUP_SIZE, transfer_request);
-    if (status != UX_SUCCESS)    
+    if (status != UX_SUCCESS)
     {
 
         /* We need to clean the tds attached if any.  */
@@ -167,33 +152,33 @@ UINT            pid;
         if ((transfer_request -> ux_transfer_request_type & UX_REQUEST_DIRECTION) == UX_REQUEST_IN)
 
             pid =  UX_EHCI_PID_IN;
-        else            
-        
+        else
+
             pid =  UX_EHCI_PID_OUT;
 
         status =  _ux_hcd_ehci_request_transfer_add(hcd_ehci, ed, UX_EHCI_TD_DATA_PHASE, pid, UX_EHCI_TOGGLE_1,
                                                         transfer_request -> ux_transfer_request_data_pointer,
                                                         transfer_request -> ux_transfer_request_requested_length,
                                                         transfer_request);
-        if (status != UX_SUCCESS)    
+        if (status != UX_SUCCESS)
         {
 
             /* We need to clean the tds attached if any.  */
             _ux_hcd_ehci_ed_clean(ed);
             return(status);
         }
-    }        
+    }
 
     /* Program the status phase. the PID is the opposite of the data phase.  */
     if ((transfer_request -> ux_transfer_request_type & UX_REQUEST_DIRECTION) == UX_REQUEST_IN)
         pid =  UX_EHCI_PID_OUT;
-    else            
+    else
         pid =  UX_EHCI_PID_IN;
 
     status =  _ux_hcd_ehci_request_transfer_add(hcd_ehci, ed, UX_EHCI_TD_STATUS_PHASE, pid,
                                     UX_EHCI_TOGGLE_1, UX_NULL, 0, transfer_request);
 
-    if (status != UX_SUCCESS)    
+    if (status != UX_SUCCESS)
     {
 
         /* We need to clean the tds attached if any.  */
@@ -203,8 +188,8 @@ UINT            pid;
 
     /* Set the IOC bit in the last TD.  */
     ed -> ux_ehci_ed_last_td -> ux_ehci_td_control |=  UX_EHCI_TD_IOC;
-    
-    /* Ensure the IOC bit is set before activating the TD. This is necessary 
+
+    /* Ensure the IOC bit is set before activating the TD. This is necessary
        for some processors that perform writes out of order as an optimization.  */
     UX_DATA_MEMORY_BARRIER
 
@@ -222,7 +207,7 @@ UINT            pid;
 
         /* All transfers pending need to abort. There may have been a partial transfer.  */
         _ux_host_stack_transfer_request_abort(transfer_request);
-        
+
         /* There was an error, return to the caller.  */
         transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
 
@@ -231,13 +216,13 @@ UINT            pid;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_TIMEOUT, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
-        
-    }            
+
+    }
 
     /* Free the resources.  */
     _ux_utility_memory_free(setup_request);
 
     /* Return completion status.  */
-    return(transfer_request -> ux_transfer_request_completion_code);           
+    return(transfer_request -> ux_transfer_request_completion_code);
 }
 

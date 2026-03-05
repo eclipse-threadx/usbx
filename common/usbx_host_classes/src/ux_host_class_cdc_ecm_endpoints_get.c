@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -60,21 +61,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _ux_host_class_cdc_ecm_activate        Activate cdc_ecm class       */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            use pre-calculated value    */
-/*                                            instead of wMaxPacketSize,  */
-/*                                            resulting in version 6.1.9  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked endpoint get status,*/
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_endpoints_get(UX_HOST_CLASS_CDC_ECM *cdc_ecm)

@@ -1,6 +1,6 @@
 /* This tests the case where there is no bulk in endpoint in the CDC-ECM data
    interface. Host should report an error.
-   
+
    Unfortunately, the device fails during activation if we use the 'no bulk-in
    endpoint' descriptor, so we have the device use a correct descriptor, then
    force the host to receive the invalid descriptor when it sends the GetDescriptor
@@ -115,8 +115,8 @@ static unsigned char no_bulk_in_endpoint_framework[] = {
 };
 
 static DEVICE_INIT_DATA device_init_data = {
-    .framework = default_device_framework, 
-    .framework_length = sizeof(default_device_framework), 
+    .framework = default_device_framework,
+    .framework_length = sizeof(default_device_framework),
     .dont_register_hcd = 1,
 };
 

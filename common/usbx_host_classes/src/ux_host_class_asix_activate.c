@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -71,28 +72,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    _ux_host_class_asix_entry                Entry of asix class        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            moved NX driver activate,   */
-/*                                            added reception buffer,     */
-/*                                            removed internal NX pool,   */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            masked in standalone build, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_activate(UX_HOST_CLASS_COMMAND *command)

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   ASIX Class                                                          */
 /**                                                                       */
@@ -33,30 +34,30 @@
 
 static inline UINT _ux_host_class_asix_link_up_controls(UX_HOST_CLASS_ASIX  *asix);
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_thread                          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_asix_thread                          PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This is the Asix thread that monitors the link change flag.         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    asix                                   Asix instance                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This is the Asix thread that monitors the link change flag.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    asix                                   Asix instance                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_transfer_request        Transfer request             */
 /*    _ux_host_semaphore_get                 Get semaphore                */
 /*    _ux_host_semaphore_put                 Put semaphore                */
@@ -68,34 +69,10 @@ static inline UINT _ux_host_class_asix_link_up_controls(UX_HOST_CLASS_ASIX  *asi
 /*    _ux_network_driver_link_up             Set state to link up         */
 /*    nx_packet_allocate                     Allocate NetX packet         */
 /*    nx_packet_transmit_release             Release NetX packet          */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Asix class initialization                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            removed internal NX pool,   */
-/*                                            moved NX driver activate,   */
-/*                                            refined control REQ flow,   */
-/*                                            refined reception flow,     */
-/*                                            refined interrupt flow,     */
-/*                                            resulting in version 6.2.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Asix class initialization                                           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_thread(ULONG parameter)
@@ -140,7 +117,7 @@ USB_NETWORK_DEVICE_TYPE     *ux_nx_device;
         /* Check for successful completion.  */
         if (status != UX_SUCCESS)
             return;
-    
+
         /* Check the link state. It is either pending up or down.  */
         if (asix -> ux_host_class_asix_link_state == UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_UP)
         {
@@ -464,7 +441,7 @@ USB_NETWORK_DEVICE_TYPE     *ux_nx_device;
 
                     /* Get the next packet associated with the first packet.  */
                     next_packet = current_packet -> nx_packet_queue_next;
-            
+
             }
 
             /* Communicate the state with the network driver.  */
@@ -479,7 +456,7 @@ USB_NETWORK_DEVICE_TYPE     *ux_nx_device;
             /* Unprotect thread reentry to this instance.  */
             _ux_host_semaphore_put(&asix -> ux_host_class_asix_semaphore);
         }
-    }    
+    }
 }
 
 static inline UINT _ux_host_class_asix_link_up_controls(UX_HOST_CLASS_ASIX  *asix)

@@ -993,7 +993,7 @@ UINT                status;
     _ux_utility_short_put(buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_CODE,
                             UX_DEVICE_CLASS_PIMA_OC_GET_STORAGE_IDS);
     /* Fill in the Transaction ID.  */
-    _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_TRANSACTION_ID, 
+    _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_TRANSACTION_ID,
                             pima -> ux_device_class_pima_transaction_id);
     /* Fill array.  */
     array = (ULONG*)(buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_SIZE);
@@ -1005,7 +1005,7 @@ UINT                status;
     for (i = 0; i < array_length; i ++)
         array[i] = i;
     /* Fill in the size of the response header.  */
-    _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_LENGTH, 
+    _ux_utility_long_put(buffer + UX_DEVICE_CLASS_PIMA_DATA_HEADER_LENGTH,
                             container_length);
     status = _ux_device_stack_transfer_request(transfer, trans_length, 0);
     status = _ux_device_class_pima_response_send(pima, UX_DEVICE_CLASS_PIMA_RC_OK, 0, 0, 0, 0);

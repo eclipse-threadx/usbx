@@ -143,15 +143,15 @@ static unsigned char default_hub_descriptor[] = {
 static unsigned char string_framework[] = {
 
     /* Manufacturer string descriptor : Index 1 - "Express Logic" */
-        0x09, 0x04, 0x01, 0x0c, 
-        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c, 
+        0x09, 0x04, 0x01, 0x0c,
+        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c,
         0x6f, 0x67, 0x69, 0x63,
 
     /* Product string descriptor : Index 2 - "EL Composite device" */
         0x09, 0x04, 0x02, 0x13,
         0x45, 0x4c, 0x20, 0x43, 0x6f, 0x6d, 0x70, 0x6f,
-        0x73, 0x69, 0x74, 0x65, 0x20, 0x64, 0x65, 0x76, 
-        0x69, 0x63, 0x65,                              
+        0x73, 0x69, 0x74, 0x65, 0x20, 0x64, 0x65, 0x76,
+        0x69, 0x63, 0x65,
 
     /* Serial Number string descriptor : Index 3 - "0001" */
         0x09, 0x04, 0x03, 0x04,
@@ -232,12 +232,12 @@ ULONG                       original_framework_length;
         /* Filter for GET_DESCRIPTOR/SET_DESCRIPTOR commands. If the descriptor to be returned is not a standard descriptor,
            treat the command as a CLASS command.  */
         if ((request == UX_GET_DESCRIPTOR || request == UX_SET_DESCRIPTOR) && (((request_value >> 8) & UX_REQUEST_TYPE) != UX_REQUEST_TYPE_STANDARD))
-        {        
+        {
 
             /* This request is to be handled by the class layer.  */
             request_type &=  (UINT)~UX_REQUEST_TYPE;
             request_type |= UX_REQUEST_TYPE_CLASS;
-        }                   
+        }
 
         /* Ensure it's not vendor. */
         UX_TEST_ASSERT((request_type & UX_REQUEST_TYPE) != UX_REQUEST_TYPE_VENDOR);
@@ -346,7 +346,7 @@ UX_HOST_CLASS   *class;
 
     /* In virtually all cases, we want the enumeration thread to be finished. */
     ux_test_wait_for_enum_thread_completion();
-        
+
     /* Return success.  */
     return(UX_SUCCESS);
 }
@@ -422,7 +422,7 @@ UX_HOST_CLASS   *class;
 
     /* We still need to wait for the dpump status to be live. */
     UX_TEST_CHECK_SUCCESS(ux_test_wait_for_value_uint(&g_hub_host -> ux_host_class_hub_state, UX_HOST_CLASS_INSTANCE_LIVE));
-        
+
     /* Return success.  */
     return(UX_SUCCESS);
 }
@@ -514,7 +514,7 @@ static VOID set_and_send_port_event(UINT port_status, UINT port_change)
 static VOID connect_device_to_hub_speed(UINT speed)
 {
 
-    set_and_send_port_event(speed | UX_HOST_CLASS_HUB_PORT_STATUS_CONNECTION | UX_HOST_CLASS_HUB_PORT_STATUS_POWER, 
+    set_and_send_port_event(speed | UX_HOST_CLASS_HUB_PORT_STATUS_CONNECTION | UX_HOST_CLASS_HUB_PORT_STATUS_POWER,
                             UX_HOST_CLASS_HUB_PORT_CHANGE_CONNECTION);
 }
 

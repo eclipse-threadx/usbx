@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   USBX Network Driver for NETX 5.3 and above.                         */
 /**                                                                       */
@@ -40,47 +41,34 @@ static UINT usb_network_driver_initialized;
 
 static USB_NETWORK_DEVICE_TYPE usb_network_devices[USB_NETWORK_DEVICE_MAX_INSTANCES];
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_network_init                                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_network_init                                    PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is called by the application to initialize the        */ 
-/*    USBX portion of the network driver.                                 */ 
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*    This function is called by the application to initialize the        */
+/*    USBX portion of the network driver.                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_network_driver_init(VOID)
@@ -98,68 +86,54 @@ UINT  status = NX_SUCCESS;
         /* Reset the network device memory array.  */
         _ux_utility_memory_set(&usb_network_devices[0], 0, sizeof(usb_network_devices)); /* Use case of memset is verified. */
     }
-    
+
     return(status);
 }
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_network_driver_activate                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_network_driver_activate                         PORTABLE C      */
 /*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /* The USB network driver activate function is called as the USB instance */
 /* is created. This API takes a pointer to the instance, and returns a    */
 /* ux_network_handle back to instance. Every time the instance receives   */
 /* a network packet, it should call ux_network_driver_packet_received with*/
 /* ux_network_handle.                                                     */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*  ux_instance                      Instance of the USBX network class   */ 
-/*  ux_network_device_write_function Address of the function to write a   */ 
-/*                                   packet when sent by the application  */ 
-/*  ux_network_handle                Address where to store the network   */ 
-/*                                   handle                               */ 
-/*                                                                        */ 
-/*  physical_address_msw             Most significant word of network ad  */ 
-/*                                                                        */ 
-/*  physical_address_lsw             Least significant word of network ad */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*  Result                                                                */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*  ux_instance                      Instance of the USBX network class   */
+/*  ux_network_device_write_function Address of the function to write a   */
+/*                                   packet when sent by the application  */
+/*  ux_network_handle                Address where to store the network   */
+/*                                   handle                               */
+/*                                                                        */
+/*  physical_address_msw             Most significant word of network ad  */
+/*                                                                        */
+/*  physical_address_lsw             Least significant word of network ad */
+/*                                                                        */
+/*                                                                        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*  Result                                                                */
+/*                                                                        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -167,13 +141,13 @@ UINT _ux_network_driver_activate(VOID *ux_instance, UINT(*ux_network_device_writ
                                 VOID **ux_network_handle, ULONG physical_address_msw, ULONG physical_address_lsw)
 {
 
-UX_INTERRUPT_SAVE_AREA 
+UX_INTERRUPT_SAVE_AREA
 
 UINT    i;
 
     /* Critical section.  */
     UX_DISABLE
-    
+
     /* Find an available entry in the usb_network_devices table. */
     for (i = 0; i < USB_NETWORK_DEVICE_MAX_INSTANCES; i++)
     {
@@ -181,7 +155,7 @@ UINT    i;
         /* If the ptr to instance is NULL, we have a free entry.  */
         if (usb_network_devices[i].ux_network_device_usb_instance_ptr == NX_NULL)
         {
-            
+
             /* Add the instance of the USBX class driver to the network device.  */
             usb_network_devices[i].ux_network_device_usb_instance_ptr = ux_instance;
 
@@ -202,10 +176,10 @@ UINT    i;
         /* Return error.  */
         return(USB_NETWORK_DRIVER_FAILURE);
     }
-    
+
     /* Store the write function.  */
     usb_network_devices[i].ux_network_device_write_function = ux_network_device_write_function;
-    
+
     /* Store the physical address of the network interface.  */
     usb_network_devices[i].ux_network_physical_address_msw = physical_address_msw;
     usb_network_devices[i].ux_network_physical_address_lsw = physical_address_lsw;
@@ -225,7 +199,7 @@ UINT    i;
     /* Is there an interface at the NETX level ?  */
     if (usb_network_devices[i].ux_network_device_interface_ptr)
     {
-    
+
         /* Store the physical address at the NETX level.  */
         usb_network_devices[i].ux_network_device_interface_ptr -> nx_interface_physical_address_msw = physical_address_msw;
         usb_network_devices[i].ux_network_device_interface_ptr -> nx_interface_physical_address_lsw = physical_address_lsw;
@@ -233,86 +207,72 @@ UINT    i;
         /* Is the link UP ?  */
         if (usb_network_devices[i].ux_network_device_interface_ptr -> nx_interface_link_up == NX_TRUE)
 
-            /* Yes, store its state.  */    
+            /* Yes, store its state.  */
             usb_network_devices[i].ux_network_device_link_status = NX_TRUE;
 
     }
     else
 
         /* Link not yet up.  */
-        usb_network_devices[i].ux_network_device_link_status = NX_FALSE;    
+        usb_network_devices[i].ux_network_device_link_status = NX_FALSE;
 
 
     /* Is there a network handle associated ?  */
     if (ux_network_handle)
-    
+
         /* Yes, the application wants to know its address.  */
         *ux_network_handle = (VOID*)&usb_network_devices[i];
-    
+
     /* The operation was successful.  */
     return(USB_NETWORK_DRIVER_SUCCESS);
 }
 
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_network_driver_deactivate                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_network_driver_deactivate                       PORTABLE C      */
 /*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /* The USB network driver activate function is called as the USB instance */
 /* is created. This API takes a pointer to the instance, and returns a    */
 /* ux_network_handle back to instance. Every time the instance receives   */
 /* a network packet, it should call ux_network_driver_packet_received with*/
 /* ux_network_handle.                                                     */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*  ux_instance                      Instance of the USBX network class   */ 
-/*  ux_network_device_write_function Address of the function to write a   */ 
-/*                                   packet when sent by the application  */ 
-/*  ux_network_handle                Address where to store the network   */ 
-/*                                   handle                               */ 
-/*                                                                        */ 
-/*  physical_address_msw             Most significant word of network ad  */ 
-/*                                                                        */ 
-/*  physical_address_lsw             Least significant word of network ad */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*  Result                                                                */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*  ux_instance                      Instance of the USBX network class   */
+/*  ux_network_device_write_function Address of the function to write a   */
+/*                                   packet when sent by the application  */
+/*  ux_network_handle                Address where to store the network   */
+/*                                   handle                               */
+/*                                                                        */
+/*  physical_address_msw             Most significant word of network ad  */
+/*                                                                        */
+/*  physical_address_lsw             Least significant word of network ad */
+/*                                                                        */
+/*                                                                        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*  Result                                                                */
+/*                                                                        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_network_driver_deactivate(VOID *ux_instance, VOID *ux_network_handle)
@@ -330,10 +290,10 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 
     /* Cast the network handle properly.  */
     usb_network_device = (USB_NETWORK_DEVICE_TYPE*) ux_network_handle;
-    
+
     /* Critical section.  */
     UX_DISABLE
-    
+
     /* The link is down.  */
     _ux_network_driver_link_down(ux_network_handle);
 
@@ -380,10 +340,10 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 
     /* All threads are outside of the instance, and can't re-enter because the
        link flag has been set to down. Now we can clean up.  */
-    
+
     /* Reset the instance pointer.  */
     usb_network_device -> ux_network_device_usb_instance_ptr = NX_NULL;
-                                               
+
     /* And the write function ptr.  */
     usb_network_device -> ux_network_device_write_function = NX_NULL;
 
@@ -392,61 +352,44 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device;
 
 }
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_network_driver_entry                            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_network_driver_entry                            PORTABLE C      */
 /*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /* This function is called by NETX. This is the dispatcher to all the     */
 /* NETX function to the driver layer.                                     */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*  nx_ip_driver                     Pointer to the NX_IP driver instance */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*  Result                                                                */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*  nx_ip_driver                     Pointer to the NX_IP driver instance */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*  Result                                                                */
+/*                                                                        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    NETX                                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Yajun Xia                Modified comment(s),          */
-/*                                            fixed ipv6 support issue,   */
-/*                                            resulting in version 6.1.12 */
-/*  03-08-2023     Yajun Xia                Modified comment(s),          */
-/*                                            fixed build issue with NETX,*/
-/*                                            resulting in version 6.2.1  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    NETX                                                                */
 /*                                                                        */
 /**************************************************************************/
 
 VOID _ux_network_driver_entry(NX_IP_DRIVER *nx_ip_driver)
 {
-    
-UX_INTERRUPT_SAVE_AREA 
+
+UX_INTERRUPT_SAVE_AREA
 NX_IP                           *nx_ip;
 NX_PACKET                       *packet_ptr;
 ULONG                           *ethernet_frame_ptr;
@@ -455,7 +398,7 @@ USB_NETWORK_DEVICE_TYPE         *usb_network_device_ptr;
 UINT                            i;
 
     /* Get the pointer to the NX_IP instance.  */
-    nx_ip = nx_ip_driver -> nx_ip_driver_ptr;    
+    nx_ip = nx_ip_driver -> nx_ip_driver_ptr;
 
     /* Set the default status return. */
     nx_ip_driver  -> nx_ip_driver_status =  NX_NOT_SUCCESSFUL;
@@ -477,9 +420,9 @@ UINT                            i;
             /* If the interface pointer is NULL, it is free.  */
             if (usb_network_devices[i].ux_network_device_interface_ptr == NX_NULL)
                 break;
-            
+
         }
-        
+
         /* Check if we have ran out of instances.  */
         if (i == USB_NETWORK_DEVICE_MAX_INSTANCES)
 
@@ -528,14 +471,14 @@ UINT                            i;
             /* Check if instance exists.  */
             if (usb_network_device_ptr -> ux_network_device_usb_instance_ptr)
             {
-        
+
                 /* Store the physical address in the nx interface.  */
                 nx_interface_ptr -> nx_interface_physical_address_msw = usb_network_device_ptr -> ux_network_physical_address_msw;
                 nx_interface_ptr -> nx_interface_physical_address_lsw = usb_network_device_ptr -> ux_network_physical_address_lsw;
-                
+
             }
-            else 
-            {            
+            else
+            {
 
                 /* Reset the physical address.  */
                 nx_interface_ptr -> nx_interface_physical_address_msw = 0;
@@ -543,35 +486,35 @@ UINT                            i;
             }
 
             /* Operation is successful.  */
-            nx_ip_driver  -> nx_ip_driver_status =  NX_SUCCESS;        
+            nx_ip_driver  -> nx_ip_driver_status =  NX_SUCCESS;
             break;
 
 
-        
+
 
         case NX_LINK_ENABLE:
 
             /* Set the link state to UP.  */
             nx_interface_ptr -> nx_interface_link_up = NX_TRUE;
-            
+
             /* Reflect link state in network device.  */
             if (usb_network_device_ptr -> ux_network_device_usb_link_up == NX_TRUE)
                 usb_network_device_ptr -> ux_network_device_link_status = NX_TRUE;
             else
                 usb_network_device_ptr -> ux_network_device_link_status = NX_FALSE;
-            
+
             nx_ip_driver -> nx_ip_driver_status = NX_SUCCESS;
             break;
-            
-        
+
+
         case NX_LINK_DISABLE:
-        
+
             /* Set the link down.  */
             nx_interface_ptr -> nx_interface_link_up = NX_FALSE;
             usb_network_device_ptr -> ux_network_device_link_status = NX_FALSE;
-            nx_ip_driver  -> nx_ip_driver_status =  NX_SUCCESS;        
+            nx_ip_driver  -> nx_ip_driver_status =  NX_SUCCESS;
             break;
-            
+
 
         case NX_LINK_PACKET_SEND:
         case NX_LINK_PACKET_BROADCAST:
@@ -603,13 +546,13 @@ UINT                            i;
 
                 /* Adjust the prepend pointer.  */
                 packet_ptr -> nx_packet_prepend_ptr =  packet_ptr -> nx_packet_prepend_ptr - NX_ETHERNET_SIZE;
-                
+
                 /* Adjust the packet length.  */
                 packet_ptr -> nx_packet_length = packet_ptr -> nx_packet_length + NX_ETHERNET_SIZE;
-                
+
                 /* Setup the ethernet frame pointer to build the ethernet frame.  Back up another 2 bytes to get 32-bit word alignment. */
                 ethernet_frame_ptr =  (ULONG*)(packet_ptr -> nx_packet_prepend_ptr - 2);
-                
+
                 /* Build the ethernet frame.  */
                 *ethernet_frame_ptr       = nx_ip_driver -> nx_ip_driver_physical_address_msw;
                 *(ethernet_frame_ptr + 1) = nx_ip_driver -> nx_ip_driver_physical_address_lsw;
@@ -635,12 +578,12 @@ UINT                            i;
 #ifdef FEATURE_NX_IPV6
                     else if (packet_ptr -> nx_packet_ip_version == NX_IP_VERSION_V6)
                         *(ethernet_frame_ptr+3) |= NX_ETHERNET_IPV6;
-                    else 
+                    else
                     {
                         /* Unknown IP version */
                         /* free the packet that we will not send */
                         nx_packet_transmit_release(packet_ptr);
-                        nx_ip_driver  -> nx_ip_driver_status =  NX_NOT_SUCCESSFUL;        
+                        nx_ip_driver  -> nx_ip_driver_status =  NX_NOT_SUCCESSFUL;
                         break;
                     }
 #endif /* FEATURE_NX_IPV6 */
@@ -651,9 +594,9 @@ UINT                            i;
                 NX_CHANGE_ULONG_ENDIAN(*(ethernet_frame_ptr+1));
                 NX_CHANGE_ULONG_ENDIAN(*(ethernet_frame_ptr+2));
                 NX_CHANGE_ULONG_ENDIAN(*(ethernet_frame_ptr+3));
-                
+
                 /* Write the packet or queue it.  */
-                nx_ip_driver -> nx_ip_driver_status = 
+                nx_ip_driver -> nx_ip_driver_status =
                     usb_network_device_ptr -> ux_network_device_write_function(usb_network_device_ptr -> ux_network_device_usb_instance_ptr,
                                                                               packet_ptr);
 
@@ -706,13 +649,13 @@ UINT                            i;
             }
 
             break;
-            
+
         case NX_LINK_UNINITIALIZE:
 
             usb_network_driver_initialized =  0;
 
             break;
-            
+
         case NX_LINK_MULTICAST_JOIN:
         case NX_LINK_MULTICAST_LEAVE:
         case NX_LINK_GET_STATUS:
@@ -724,7 +667,7 @@ UINT                            i;
         case NX_LINK_GET_DUPLEX_TYPE:
         case NX_LINK_USER_COMMAND :
         default:
-        
+
             /* Invalid driver request.  */
             nx_ip_driver -> nx_ip_driver_status =  NX_UNHANDLED_COMMAND;
 
@@ -737,53 +680,38 @@ UINT                            i;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_network_driver_packet_received                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_network_driver_packet_received                  PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /* This function is called by USBX when a packet has been receiver over   */
 /* the USB.                                                               */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*  ux_network_handle                Handle of the USB network instance   */ 
-/*  packet_ptr                       Pointer to packet received           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*  Result                                                                */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*  ux_network_handle                Handle of the USB network instance   */
+/*  packet_ptr                       Pointer to packet received           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*  Result                                                                */
+/*                                                                        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX                                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Yajun Xia                Modified comment(s),          */
-/*                                            fixed ipv6 support issue,   */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked packet data length  */
-/*                                            before process the packet,  */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX                                                                */
 /*                                                                        */
 /**************************************************************************/
 
@@ -820,13 +748,13 @@ NX_IP           *nx_ip;
     /* Pickup the packet header to determine where the packet needs to be
        sent.  */
     packet_type =  _ux_utility_short_get_big_endian(packet_ptr -> nx_packet_prepend_ptr + 12);
-    
+
     /* Storing in into the packet the interface.  */
     packet_ptr -> nx_packet_ip_interface =  usb_network_device_ptr -> ux_network_device_interface_ptr;
 
     /* Get the IP instance.  */
     nx_ip = usb_network_device_ptr -> ux_network_device_ip_instance;
-    
+
     /* Route the incoming packet according to its ethernet type.  */
     switch (packet_type)
     {
@@ -836,98 +764,90 @@ NX_IP           *nx_ip;
         case NX_ETHERNET_IPV6   :
 #endif /* FEATURE_NX_IPV6 */
 
-            /* Note:  The length reported by some Ethernet hardware includes 
-               bytes after the packet as well as the Ethernet header.  In some 
-               cases, the actual packet length after the Ethernet header should 
+            /* Note:  The length reported by some Ethernet hardware includes
+               bytes after the packet as well as the Ethernet header.  In some
+               cases, the actual packet length after the Ethernet header should
                be derived from the length in the IP header (lower 16 bits of
                the first 32-bit word).  */
-    
+
             /* Clean off the Ethernet header.  */
             packet_ptr -> nx_packet_prepend_ptr =  packet_ptr -> nx_packet_prepend_ptr + NX_ETHERNET_SIZE;
-     
+
             /* Adjust the packet length.  */
             packet_ptr -> nx_packet_length =  packet_ptr -> nx_packet_length - NX_ETHERNET_SIZE;
-    
+
             /* Route to the ip receive function.  */
             _nx_ip_packet_deferred_receive(nx_ip, packet_ptr);
-    
+
             break;
-    
+
         case NX_ETHERNET_ARP    :
-    
+
             /* Clean off the Ethernet header.  */
             packet_ptr -> nx_packet_prepend_ptr =  packet_ptr -> nx_packet_prepend_ptr + NX_ETHERNET_SIZE;
-    
+
             /* Adjust the packet length.  */
             packet_ptr -> nx_packet_length =   packet_ptr -> nx_packet_length - NX_ETHERNET_SIZE;
-    
+
             /* Route to the ARP receive function.  */
            _nx_arp_packet_deferred_receive(nx_ip, packet_ptr);
-        
+
             break;
-    
+
         case NX_ETHERNET_RARP   :
-    
+
             /* Clean off the Ethernet header.  */
-            packet_ptr -> nx_packet_prepend_ptr =  
+            packet_ptr -> nx_packet_prepend_ptr =
                 packet_ptr -> nx_packet_prepend_ptr + NX_ETHERNET_SIZE;
-    
+
             /* Adjust the packet length.  */
-            packet_ptr -> nx_packet_length =  
+            packet_ptr -> nx_packet_length =
                 packet_ptr -> nx_packet_length - NX_ETHERNET_SIZE;
-    
+
             /* Route to the RARP receive function.  */
             _nx_rarp_packet_deferred_receive(nx_ip, packet_ptr);
-            
+
             break;
-    
-    
+
+
         default :
-    
+
             /* Invalid ethernet header... release the packet.  */
             nx_packet_release(packet_ptr);
 
     }
 }
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_network_driver_link_up                          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_network_driver_link_up                          PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /* This function is called by USBX when the line link is up               */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*  ux_network_handle                Handle of the USB network instance   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*  Result                                                                */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*  ux_network_handle                Handle of the USB network instance   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*  Result                                                                */
+/*                                                                        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX                                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX                                                                */
 /*                                                                        */
 /**************************************************************************/
 
@@ -935,14 +855,14 @@ VOID _ux_network_driver_link_up(VOID *ux_network_handle)
 {
 
 USB_NETWORK_DEVICE_TYPE *usb_network_device_ptr = (USB_NETWORK_DEVICE_TYPE*)ux_network_handle;
- 
-    /* The USB side of the link is UP.  */        
+
+    /* The USB side of the link is UP.  */
     usb_network_device_ptr -> ux_network_device_usb_link_up = NX_TRUE;
 
     /* Check if there is an existing interface.  */
     if (usb_network_device_ptr -> ux_network_device_interface_ptr)
     {
-        
+
         /* Set link status.  */
         if (usb_network_device_ptr -> ux_network_device_interface_ptr -> nx_interface_link_up)
             usb_network_device_ptr -> ux_network_device_link_status = NX_TRUE;
@@ -952,51 +872,43 @@ USB_NETWORK_DEVICE_TYPE *usb_network_device_ptr = (USB_NETWORK_DEVICE_TYPE*)ux_n
 
 }
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_network_driver_link_down                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_network_driver_link_down                        PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /* This function is called by USBX when the link is down.                 */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*  ux_network_handle                Handle of the USB network instance   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*  Result                                                                */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*  ux_network_handle                Handle of the USB network instance   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*  Result                                                                */
+/*                                                                        */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX                                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX                                                                */
 /*                                                                        */
 /**************************************************************************/
 VOID _ux_network_driver_link_down(VOID *ux_network_handle)
 {
 
 USB_NETWORK_DEVICE_TYPE *usb_network_device_ptr = (USB_NETWORK_DEVICE_TYPE*)ux_network_handle;
- 
+
     /* Set the USB link status.  */
     usb_network_device_ptr -> ux_network_device_usb_link_up = NX_FALSE;
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -34,67 +35,43 @@
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_inquiry                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_inquiry                    PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a INQUIRY command.                           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a INQUIRY command.                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_class_storage_csw_send     Send CSW                      */
+/*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_device_stack_endpoint_stall       Stall endpoint                */
-/*    _ux_utility_memory_copy               Copy memory                   */ 
-/*    _ux_utility_memory_set                Set memory                    */ 
+/*    _ux_utility_memory_copy               Copy memory                   */
+/*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_utility_short_put_big_endian      Put 16-bit big endian         */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Storage Class                                                */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed USB CV test issues,   */
-/*                                            resulting in version 6.1.3  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            updated dCSWDataResidue,    */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked compiling options   */
-/*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_storage_inquiry(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, UX_SLAVE_ENDPOINT *endpoint_in,
@@ -129,7 +106,7 @@ UCHAR                   *inquiry_buffer;
 
     /* From the SCSI Inquiry payload, get the page code.  */
     inquiry_page_code =  *(cbwcb + UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE);
-    
+
     /* And the length to be returned. */
     inquiry_length =  storage -> ux_slave_class_storage_host_length;
 
@@ -154,7 +131,7 @@ UCHAR                   *inquiry_buffer;
     {
 
     case UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE_STANDARD:
-            
+
         /* Store the product type.  */
         inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_PERIPHERAL_TYPE] =  (UCHAR)storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_type;
 
@@ -170,7 +147,7 @@ UCHAR                   *inquiry_buffer;
         /* Store the length of the response.  There is a hack here. For CD-ROM, the data lg is fixed to 0x5B !  */
         if (storage -> ux_slave_class_storage_lun[lun].ux_slave_class_storage_media_type != UX_SLAVE_CLASS_STORAGE_MEDIA_CDROM)
             inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_ADDITIONAL_LENGTH] =  UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH;
-        else            
+        else
             inquiry_buffer[UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_ADDITIONAL_LENGTH] =  UX_SLAVE_CLASS_STORAGE_INQUIRY_RESPONSE_LENGTH_CD_ROM;
 
         /* Fill in the storage vendor ID.  */
@@ -201,7 +178,7 @@ UCHAR                   *inquiry_buffer;
         /* Send a data payload with the inquiry response buffer.  */
         if (inquiry_length > 24)
             inquiry_length = 24;
-    
+
         break;
 
     default:
@@ -221,8 +198,8 @@ UCHAR                   *inquiry_buffer;
         /* Return error.  */
         status =  UX_ERROR;
 
-        break;            
-    }    
+        break;
+    }
 
     /* Error cases.  */
     if (status != UX_SUCCESS)

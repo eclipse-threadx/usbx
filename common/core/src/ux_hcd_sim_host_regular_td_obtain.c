@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Simulator Controller Driver                                    */
 /**                                                                       */
@@ -28,50 +29,37 @@
 #include "ux_hcd_sim_host.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_regular_td_obtain                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_sim_host_regular_td_obtain                  PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function obtains a free TD from the regular TD list.          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_sim_host                          Pointer to host controller    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    UX_HCD_SIM_HOST_TD  *                 Pointer to host TD            */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_set                Set memory block              */ 
-/*    _ux_utility_mutex_on                  Get mutex protection          */ 
-/*    _ux_utility_mutex_off                 Release mutex protection      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*     This function obtains a free TD from the regular TD list.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_sim_host                          Pointer to host controller    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    UX_HCD_SIM_HOST_TD  *                 Pointer to host TD            */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_set                Set memory block              */
+/*    _ux_utility_mutex_on                  Get mutex protection          */
+/*    _ux_utility_mutex_off                 Release mutex protection      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UX_HCD_SIM_HOST_TD  *_ux_hcd_sim_host_regular_td_obtain(UX_HCD_SIM_HOST *hcd_sim_host)

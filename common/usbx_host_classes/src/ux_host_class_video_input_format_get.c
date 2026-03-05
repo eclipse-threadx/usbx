@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -29,44 +30,36 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_input_format_get               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_video_input_format_get               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function finds the input format(s) for the input terminal.     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
-/*    _ux_system_error_handler              Log system error              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function finds the input format(s) for the input terminal.     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
+/*    _ux_system_error_handler              Log system error              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Video Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_input_format_get(UX_HOST_CLASS_VIDEO *video)
@@ -85,10 +78,10 @@ ULONG                                           descriptor_found;
     /* Get the descriptor to the entire configuration.  */
     descriptor =               video -> ux_host_class_video_configuration_descriptor;
     total_descriptor_length =  video -> ux_host_class_video_configuration_descriptor_length;
-    
-    /* Default is Interface descriptor not yet found.  */    
+
+    /* Default is Interface descriptor not yet found.  */
     descriptor_found =  UX_FALSE;
-    
+
     /* Scan the descriptor for the Video Streaming interface.  */
     while (total_descriptor_length)
     {
@@ -136,7 +129,7 @@ ULONG                                           descriptor_found;
                 descriptor_found =  UX_FALSE;
             }
             break;
-                
+
 
         case UX_HOST_CLASS_VIDEO_CS_INTERFACE:
 
@@ -150,11 +143,11 @@ ULONG                                           descriptor_found;
 
 
                 case UX_HOST_CLASS_VIDEO_VS_INPUT_HEADER:
-                                        
+
                     /* Make the descriptor machine independent.  */
                     _ux_utility_descriptor_parse(descriptor, _ux_system_class_video_input_header_descriptor_structure,
                                                  UX_HOST_CLASS_VIDEO_INPUT_HEADER_DESCRIPTOR_ENTRIES, (UCHAR *) &input_header_descriptor);
-                                                        
+
                     /* Get the number of formats.  */
                     video -> ux_host_class_video_number_formats = input_header_descriptor.bNumFormats;
 
@@ -170,7 +163,7 @@ ULONG                                           descriptor_found;
                 }
             }
             break;
-        }       
+        }
 
         /* Verify if the descriptor is still valid.  */
         if (descriptor_length > total_descriptor_length)
@@ -183,7 +176,7 @@ ULONG                                           descriptor_found;
             //UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_DESCRIPTOR_CORRUPTED);
-        }            
+        }
 
         /* Jump to the next descriptor if we have not reached the end.  */
         descriptor +=  descriptor_length;

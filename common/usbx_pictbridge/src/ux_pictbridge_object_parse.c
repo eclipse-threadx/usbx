@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -28,47 +29,36 @@
 #include "ux_pictbridge.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_parse                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_object_parse                         PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function parses a XML based pictbridge object.                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pictbridge                             Pictbridge instance          */ 
-/*    xml_object_buffer                      Pointer to object buffer     */ 
-/*    xml_object_length                      Length of the object         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_get                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked tag nesting depth,  */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*    This function parses a XML based pictbridge object.                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pictbridge                             Pictbridge instance          */
+/*    xml_object_buffer                      Pointer to object buffer     */
+/*    xml_object_length                      Length of the object         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_object_get                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_object_parse(UX_PICTBRIDGE *pictbridge, UCHAR *xml_object_buffer,
@@ -90,16 +80,16 @@ UINT                                    status;
 
     /* Set the tag position at root.  */
     tag_item = _ux_pictbridge_xml_item_root;
-    
+
     /* Clear the input tags.  */
     pictbridge -> ux_pictbridge_input_tags =  0;
 
     /* Clear the input request.  */
     pictbridge -> ux_pictbridge_input_request =  0;
-    
+
     /* Tag history index is at root.  */
     tag_history_index =  0;
-    
+
     /* Closing tag count is reset.  */
     closing_tag_count = 0;
 
@@ -112,20 +102,20 @@ UINT                                    status;
     {
 
         /* Scan the object buffer for a tag.  */
-        status = _ux_pictbridge_tag_name_get(xml_object_buffer, xml_object_length, tag_name, 
-                                        variable_name, variable_string, xml_parameter,       
+        status = _ux_pictbridge_tag_name_get(xml_object_buffer, xml_object_length, tag_name,
+                                        variable_name, variable_string, xml_parameter,
                                         &xml_object_buffer, &xml_object_length, &tag_flag);
-        
+
         /* We may have an error.  Check if this is an empty line in which case we are done. */
         if (status != UX_SUCCESS)
         {
-        
+
             /* Check for empty line.  */
             if (status == UX_PICTBRIDGE_ERROR_EMPTY_LINE)
-            
+
                 /* Yes, we have an empty line. Do not proceed but we have a successful completion. */
                 status = UX_SUCCESS;
-                
+
             /* Do not proceed.  */
             break;
         }
@@ -133,7 +123,7 @@ UINT                                    status;
         /* Check if this is a closing tag ? */
         if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_CLOSING)
         {
-            
+
             /* Assume the worst.  */
             status = UX_PICTBRIDGE_ERROR_SCRIPT_SYNTAX_ERROR;
 
@@ -174,21 +164,21 @@ UINT                                    status;
             else
 
                 /* Syntax error.  */
-                break;            
-            
+                break;
+
             /* Increment the closing tag count. */
             closing_tag_count++;
-            
+
             /* If we have more than one closing tag consecutively, look for the parent.  */
             if (closing_tag_count > 1)
             {
-            
+
                 /* Get the parent for this item and set it as the current tag_item.  We may already be at the root.  */
                 if (tag_entry -> ux_pictbridge_xml_item_parent != UX_NULL)
-            
+
                     /* We have a parent, set it.  */
                     tag_item =  tag_entry -> ux_pictbridge_xml_item_parent;
-            }                    
+            }
 
             /* We set status to success.  */
             status = UX_SUCCESS;
@@ -196,10 +186,10 @@ UINT                                    status;
         }
         else
         {
-            
+
             /* The tag name is in the tag_name variable but has not been verified yet.  */
             status = _ux_pictbridge_tag_name_scan(tag_item, tag_name, &tag_entry);
-        
+
             /* We may have an error.  */
             if (status != UX_SUCCESS)
 
@@ -209,7 +199,7 @@ UINT                                    status;
             /* Check if this is a comment tag ? */
             if ((tag_flag & UX_PICTBRIDGE_TAG_FLAG_COMMENT) == 0)
             {
-        
+
                 /* Reset the closing tag count.  */
                 closing_tag_count =  0;
 
@@ -219,14 +209,14 @@ UINT                                    status;
 
                     /* Syntax error.  */
                     status = UX_BUFFER_OVERFLOW;
-                    
+
                     /* Do not proceed.  */
                     break;
                 }
 
                 /* Save the current tag in the tag history.  */
                 tag_history[tag_history_index] = tag_entry;
-                
+
                 /* Increase the current tag index.  */
                 tag_history_index++;
 
@@ -239,7 +229,7 @@ UINT                                    status;
 
                         /* This is a variable. Add it to the other ones.  */
                         pictbridge -> ux_pictbridge_input_tags |=  tag_entry -> ux_pictbridge_xml_item_tag_code;
-                        
+
                     else
 
                         /* Yes we have a tag code, memorize it.  This is a main input request. */
@@ -250,39 +240,39 @@ UINT                                    status;
                 {
                     /* There is a function associated, so call it.  */
                     status = tag_entry -> ux_pictbridge_xml_item_function(pictbridge, variable_name, variable_string, xml_parameter);
-                
+
                     /* We may have an error.  */
                     if (status != UX_SUCCESS)
-            
+
                        /* Do not proceed.  */
                         break;
-                }        
+                }
 
-                /* Check if the tag has a child attached to it. 
+                /* Check if the tag has a child attached to it.
                    If there is neither a child or a function, it means we do not treat this tag name. */
                 if (tag_entry -> ux_pictbridge_xml_item_child != UX_NULL && tag_entry -> ux_pictbridge_xml_item_child != UX_PICTBRIDGE_XML_LEAF)
-                {            
-    
+                {
+
                     /* We have a child, set it.  */
                     tag_item =  tag_entry -> ux_pictbridge_xml_item_child;
-                    
+
                     /* Reset the tag codes.  */
                     pictbridge -> ux_pictbridge_input_tags =  0;
-                }                
+                }
 
                 /* Check if this is a self closing tag ? */
                 if (tag_flag & UX_PICTBRIDGE_TAG_FLAG_SELF_CLOSING)
                 {
-    
+
                     /* Assume the worst.  */
                     status = UX_PICTBRIDGE_ERROR_SCRIPT_SYNTAX_ERROR;
-    
+
                     /* Ensure we do not have a closing tag without a prior normal tag entry.  */
                     if (tag_history_index == 0)
-    
+
                         /* Syntax error.  */
                         break;
-    
+
                     /* One step back in the tag history.  */
                     tag_history_index--;
 
@@ -303,30 +293,30 @@ UINT                                    status;
                     /* If both length do not match, no need to check for a match.  */
                     if (tag_history_length == tag_name_length)
                     {
-    
+
                         /* Both length match, we may have a tag match. Check the names */
                         if (_ux_utility_memory_compare(tag_name, tag_history[tag_history_index] -> ux_pictbridge_xml_item_tag_name,
                                             tag_name_length) != UX_SUCCESS)
-    
+
                             /* Syntax error.  */
                             break;
                     }
                     else
-    
+
                         /* Syntax error.  */
-                        break;            
-                
+                        break;
+
                     /* Increment the closing tag count. */
                     closing_tag_count++;
 
                     /* We set status to success.  */
                     status = UX_SUCCESS;
 
-                }            
+                }
             }
         }
-    }       
+    }
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
 }

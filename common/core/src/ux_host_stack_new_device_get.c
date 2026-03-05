@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,49 +29,35 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_new_device_get                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_new_device_get                       PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function obtains a free device container for the new device.   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    UX_DEVICE pointer                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_set                Set memory to a value         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions, verified       */
-/*                                            memset and memcpy cases,    */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone enum init, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*    This function obtains a free device container for the new device.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    UX_DEVICE pointer                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_set                Set memory to a value         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UX_DEVICE  *_ux_host_stack_new_device_get(VOID)
@@ -82,10 +69,10 @@ ULONG           container_index;
 UX_DEVICE       *device;
 #if defined(UX_HOST_STANDALONE)
 UX_DEVICE       *enum_next;
-#endif    
+#endif
 
     /* Start with the first device.  */
-    device =  _ux_system_host -> ux_system_host_device_array;    
+    device =  _ux_system_host -> ux_system_host_device_array;
 
 #if UX_MAX_DEVICES > 1
     /* Reset the container index.  */

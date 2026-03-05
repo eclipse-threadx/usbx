@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -65,12 +66,6 @@ static inline VOID _ux_host_class_hid_inst_tasks_run(UX_HOST_CLASS_HID *hid);
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Host Stack                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_tasks_run(UX_HOST_CLASS *hid_class)

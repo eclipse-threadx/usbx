@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   CDC ECM Class                                                       */
 /**                                                                       */
@@ -30,59 +31,39 @@
 
 
 #if !defined(UX_HOST_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_ecm_write                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_cdc_ecm_write                        PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function writes to the cdc_ecm interface. The call is          */ 
+/*                                                                        */
+/*    This function writes to the cdc_ecm interface. The call is          */
 /*    non-blocking and queues the packet if there is an on-going write.   */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_ecm                               Pointer to cdc_ecm class      */ 
-/*    packet                                Packet to write or queue      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_host_semaphore_put                Release protection semaphore  */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_ecm                               Pointer to cdc_ecm class      */
+/*    packet                                Packet to write or queue      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_host_semaphore_put                Release protection semaphore  */
 /*    nx_packet_transmit_release            Release NetX packet           */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            supported NX packet chain,  */
-/*                                            resulting in version 6.2.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_ecm_write(VOID *cdc_ecm_class, NX_PACKET *packet)
@@ -115,7 +96,7 @@ ULONG                   copied;
 
     /* Ensure the instance is valid.  */
     if (cdc_ecm -> ux_host_class_cdc_ecm_state !=  UX_HOST_CLASS_INSTANCE_LIVE)
-    {        
+    {
 
         /* Restore interrupts.  */
         UX_RESTORE
@@ -152,10 +133,10 @@ ULONG                   copied;
         /* Check the queue. See if there is something that is being sent.  */
         if (cdc_ecm -> ux_host_class_cdc_ecm_xmit_queue_head == UX_NULL)
         {
-                
+
             /* Reset the queue pointer of this packet.  */
             packet -> nx_packet_queue_next =  UX_NULL;
-            
+
             /* Memorize this packet at the beginning of the queue.  */
             cdc_ecm -> ux_host_class_cdc_ecm_xmit_queue_head =  packet;
             cdc_ecm -> ux_host_class_cdc_ecm_xmit_queue_tail =  packet;
@@ -201,7 +182,7 @@ ULONG                   copied;
             /* Setup the transaction parameters.  */
             transfer_request -> ux_transfer_request_data_pointer     =  packet_header;
             transfer_request -> ux_transfer_request_requested_length =  packet -> nx_packet_length;
-            
+
             /* Store the packet that owns this transaction.  */
             transfer_request -> ux_transfer_request_user_specific =  packet;
 
@@ -217,12 +198,12 @@ ULONG                   copied;
 
                 /* We cleared the queue, so we must free the packet. First
                    we need to clean it before passing it to NetX.  */
-                packet -> nx_packet_prepend_ptr =  packet -> nx_packet_prepend_ptr + UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE; 
+                packet -> nx_packet_prepend_ptr =  packet -> nx_packet_prepend_ptr + UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE;
                 packet -> nx_packet_length =  packet -> nx_packet_length - UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE;
 
                 /* And ask Netx to release it.  */
                 nx_packet_transmit_release(packet);
-    
+
                 /* Could not arm this transfer.  */
                 status =  UX_ERROR;
             }
@@ -255,7 +236,7 @@ ULONG                   copied;
         UX_RESTORE
 
         /* Release the packet.  */
-        packet -> nx_packet_prepend_ptr =  packet -> nx_packet_prepend_ptr + UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE; 
+        packet -> nx_packet_prepend_ptr =  packet -> nx_packet_prepend_ptr + UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE;
         packet -> nx_packet_length =  packet -> nx_packet_length - UX_HOST_CLASS_CDC_ECM_ETHERNET_SIZE;
         nx_packet_transmit_release(packet);
 
@@ -272,6 +253,6 @@ ULONG                   copied;
         _ux_host_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_bulk_out_transfer_waiting_for_check_and_arm_to_finish_semaphore);
 
     /* We are done here.  */
-    return(status);            
+    return(status);
 }
 #endif

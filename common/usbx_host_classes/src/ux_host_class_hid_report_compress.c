@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,46 +30,38 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_report_compress                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_report_compress                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function will compress a client report into a report buffer.   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*    client_report                         Pointer to client report      */ 
-/*    report_buffer                         Pointer to report buffer      */ 
-/*    report_length                         Length of report              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function will compress a client report into a report buffer.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*    client_report                         Pointer to client report      */
+/*    report_buffer                         Pointer to report buffer      */
+/*    report_length                         Length of report              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_compress(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report,
@@ -173,7 +166,7 @@ UCHAR                       is_valid_usage;
 
                 /* Isolate each bit from the report value.  */
                 value =  (UCHAR) client_value & 1;
-                
+
                 /* Shift the isolated bit to its right space in the report byte.  */
                 value =  (UCHAR)(value << data_offset_bit);
 
@@ -189,7 +182,7 @@ UCHAR                       is_valid_usage;
 
                     /* If so increment the report address.  */
                     report_buffer++;
-            
+
                     /* Reset offset bit.  */
                     data_offset_bit =  0;
                 }
@@ -197,7 +190,7 @@ UCHAR                       is_valid_usage;
                 /* Move to the next bit.  */
                 client_value =  client_value >> 1;
             }
-        }        
+        }
 
         /* Move to the next field.  */
         hid_field =  hid_field -> ux_host_class_hid_field_next_field;

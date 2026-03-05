@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,47 +29,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_new_configuration_create             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_new_configuration_create             PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function creates a new configuration for the current device    */
-/*    a device can have multiple configurations.                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    device                                Pointer to the descriptor     */ 
+/*    a device can have multiple configurations.                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    device                                Pointer to the descriptor     */
 /*                                            for the device              */
-/*    configuration_descriptor              Configuration descriptor      */ 
+/*    configuration_descriptor              Configuration descriptor      */
 /*                                            previously parsed           */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_stack_new_configuration_create(UX_DEVICE *device, UX_CONFIGURATION *configuration)
@@ -79,7 +72,7 @@ UX_CONFIGURATION    *list_configuration;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_NEW_CONFIGURATION_CREATE, device, configuration, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
-    /* The device that owns this configuration is memorized in the 
+    /* The device that owns this configuration is memorized in the
        configuration container itself, easier for back chaining.  */
     configuration -> ux_configuration_device =  device;
 
@@ -87,9 +80,9 @@ UX_CONFIGURATION    *list_configuration;
        configuration container is not corrupted.  */
     configuration -> ux_configuration_handle =  (ULONG) (ALIGN_TYPE) configuration;
 
-    /* There is 2 cases for the creation of the configuration descriptor 
+    /* There is 2 cases for the creation of the configuration descriptor
        if this is the first one, the configuration descriptor is hooked
-       to the device. If it is not the first one, the configuration is 
+       to the device. If it is not the first one, the configuration is
        hooked to the end of the chain of configurations.  */
     if (device -> ux_device_first_configuration == UX_NULL)
     {

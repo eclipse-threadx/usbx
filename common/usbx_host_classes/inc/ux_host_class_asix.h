@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   ASIX Class                                                          */
 /**                                                                       */
@@ -20,60 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_asix.h                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_asix.h                                PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX ASIX class.                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            supported NX packet chain,  */
-/*                                            refined VID/PID check flow, */
-/*                                            removed internal NX pool,   */
-/*                                            added some new definitions, */
-/*                                            refined reception handling, */
-/*                                            resulting in version 6.2.0  */
+/*    USBX ASIX class.                                                    */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_ASIX_H
 #define UX_HOST_CLASS_ASIX_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 #if !defined(UX_HOST_STANDALONE)
@@ -110,8 +86,8 @@ extern   "C" {
     UX_HOST_CLASS_ASIX_VENDOR_LINKSYS_ID, UX_HOST_CLASS_ASIX_PRODUCT_LINKSYS_ID
 #endif
 
-#define UX_HOST_CLASS_ASIX_SPEED_SELECTED_100MPBS           0x100 
-#define UX_HOST_CLASS_ASIX_SPEED_SELECTED_10MPBS            0x10 
+#define UX_HOST_CLASS_ASIX_SPEED_SELECTED_100MPBS           0x100
+#define UX_HOST_CLASS_ASIX_SPEED_SELECTED_10MPBS            0x10
 #define UX_HOST_CLASS_ASIX_LINK_STATE_DOWN                  0
 #define UX_HOST_CLASS_ASIX_LINK_STATE_UP                    1
 #define UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_UP            2
@@ -122,7 +98,7 @@ extern   "C" {
 #define UX_HOST_CLASS_ASIX_ETHERNET_IP                      0x0800
 #define UX_HOST_CLASS_ASIX_ETHERNET_ARP                     0x0806
 #define UX_HOST_CLASS_ASIX_ETHERNET_RARP                    0x8035
-#define UX_HOST_CLASS_ASIX_ETHERNET_PACKET_SIZE             1536    
+#define UX_HOST_CLASS_ASIX_ETHERNET_PACKET_SIZE             1536
 #define UX_HOST_CLASS_ASIX_NX_ALIGN_PADDING                 2
 #define UX_HOST_CLASS_ASIX_RX_HEADER_SIZE                   4
 #define UX_HOST_CLASS_ASIX_OVERHEAD_SIZE                    (UX_HOST_CLASS_ASIX_NX_ALIGN_PADDING + UX_HOST_CLASS_ASIX_RX_HEADER_SIZE)
@@ -157,7 +133,7 @@ extern   "C" {
 #define UX_HOST_CLASS_ASIX_NX_BUFF_SIZE                     (UX_HOST_CLASS_ASIX_NX_PAYLOAD_SIZE + UX_HOST_CLASS_ASIX_NX_PACKET_SIZE)
 
 #define UX_HOST_CLASS_ASIX_ETHERNET_SIZE                    14
-                                                                
+
 #define UX_HOST_CLASS_ASIX_DEVICE_INIT_DELAY                (1 * UX_PERIODIC_RATE)
 #define UX_HOST_CLASS_ASIX_CLASS_TRANSFER_TIMEOUT           300000
 #define UX_HOST_CLASS_ASIX_SETUP_BUFFER_SIZE                16
@@ -319,7 +295,7 @@ extern   "C" {
 /* Define  ASIX Class packet equivalences.  */
 
 #define UX_HOST_CLASS_ASIX_PACKET_SIZE                      128
-#define UX_HOST_CLASS_ASIX_NODE_ID_LENGTH                   6  
+#define UX_HOST_CLASS_ASIX_NODE_ID_LENGTH                   6
 
 #define UX_HOST_CLASS_ASIX_RX_PACKET_LENGTH_MASK            0xFFF
 
@@ -396,7 +372,7 @@ extern   "C" {
 
 typedef struct UX_HOST_CLASS_ASIX_STRUCT
 {
-    struct UX_HOST_CLASS_ASIX_STRUCT  
+    struct UX_HOST_CLASS_ASIX_STRUCT
                     *ux_host_class_asix_next_instance;
     UX_HOST_CLASS   *ux_host_class_asix_class;
     UX_DEVICE       *ux_host_class_asix_device;
@@ -433,10 +409,10 @@ typedef struct UX_HOST_CLASS_ASIX_STRUCT
     ULONG           ux_host_class_asix_packet_available_min;
 
     UCHAR           ux_host_class_asix_node_id[UX_HOST_CLASS_ASIX_NODE_ID_LENGTH];
-    VOID            (*ux_host_class_asix_device_status_change_callback)(struct UX_HOST_CLASS_ASIX_STRUCT *asix, 
+    VOID            (*ux_host_class_asix_device_status_change_callback)(struct UX_HOST_CLASS_ASIX_STRUCT *asix,
                                                                 ULONG  device_state);
     VOID            *ux_host_class_asix_network_handle;
-    
+
 } UX_HOST_CLASS_ASIX;
 
 
@@ -451,9 +427,9 @@ typedef struct UX_HOST_CLASS_ASIX_RECEPTION_STRUCT
     ULONG           ux_host_class_asix_reception_data_buffer_size;
     UCHAR           *ux_host_class_asix_reception_data_head;
     UCHAR           *ux_host_class_asix_reception_data_tail;
-    VOID            (*ux_host_class_asix_reception_callback)(struct UX_HOST_CLASS_ASIX_STRUCT *asix, 
+    VOID            (*ux_host_class_asix_reception_callback)(struct UX_HOST_CLASS_ASIX_STRUCT *asix,
                                                                 UINT  status,
-                                                                UCHAR *reception_buffer, 
+                                                                UCHAR *reception_buffer,
                                                                 ULONG reception_size);
 
 } UX_HOST_CLASS_ASIX_RECEPTION;
@@ -465,7 +441,7 @@ UINT  _ux_host_class_asix_configure(UX_HOST_CLASS_ASIX *asix);
 UINT  _ux_host_class_asix_deactivate(UX_HOST_CLASS_COMMAND *command);
 UINT  _ux_host_class_asix_endpoints_get(UX_HOST_CLASS_ASIX *asix);
 UINT  _ux_host_class_asix_entry(UX_HOST_CLASS_COMMAND *command);
-UINT  _ux_host_class_asix_read (UX_HOST_CLASS_ASIX *asix, UCHAR *data_pointer, 
+UINT  _ux_host_class_asix_read (UX_HOST_CLASS_ASIX *asix, UCHAR *data_pointer,
                                   ULONG requested_length, ULONG *actual_length);
 UINT  _ux_host_class_asix_write(VOID *asix_class, NX_PACKET *packet);
 VOID  _ux_host_class_asix_interrupt_notification(UX_TRANSFER *transfer_request);
@@ -473,17 +449,17 @@ VOID  _ux_host_class_asix_reception_callback (UX_TRANSFER *transfer_request);
 VOID  _ux_host_class_asix_thread(ULONG parameter);
 VOID  _ux_host_class_asix_transmission_callback (UX_TRANSFER *transfer_request);
 UINT  _ux_host_class_asix_setup(UX_HOST_CLASS_ASIX *asix);
-                                    
+
 /* Define Asix Class API prototypes.  */
 
 #define ux_host_class_asix_entry        _ux_host_class_asix_entry
 #define ux_host_class_asix_read         _ux_host_class_asix_read
 #define ux_host_class_asix_write        _ux_host_class_asix_write
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif

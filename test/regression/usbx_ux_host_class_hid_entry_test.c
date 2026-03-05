@@ -325,7 +325,7 @@ UX_HOST_CLASS_COMMAND               command;
     host_class.ux_host_class_client = UX_NULL;
     _ux_host_class_hid_entry(&command);
 
-    
+
 
     test_control_return(0);
 }

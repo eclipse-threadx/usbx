@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -29,44 +30,36 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_endpoints_get                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_video_endpoints_get                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function searches for the handle of the isochronous endpoints. */  
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_interface_endpoint_get Get interface endpoint        */ 
+/*                                                                        */
+/*    This function searches for the handle of the isochronous endpoints. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_interface_endpoint_get Get interface endpoint        */
 /*    _ux_system_error_handler              Log system error              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Video Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_endpoints_get(UX_HOST_CLASS_VIDEO *video)
@@ -80,7 +73,7 @@ UX_ENDPOINT     *endpoint;
     /* Search the ISO OUT endpoint. It is attached to the interface container.  */
     for (endpoint_index = 0; endpoint_index < video -> ux_host_class_video_streaming_interface -> ux_interface_descriptor.bNumEndpoints;
          endpoint_index++)
-    {                        
+    {
 
         /* Get interface endpoint.  */
         status =  _ux_host_stack_interface_endpoint_get(video -> ux_host_class_video_streaming_interface, endpoint_index, &endpoint);
@@ -98,13 +91,13 @@ UX_ENDPOINT     *endpoint;
                 video -> ux_host_class_video_isochronous_endpoint =  endpoint;
                 break;
             }
-        }                
-    }            
+        }
+    }
 
     /* The isochronous endpoint is mandatory. If we didn't find it, return an error.  */
     if (video -> ux_host_class_video_isochronous_endpoint == UX_NULL)
     {
-    
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_ENDPOINT_HANDLE_UNKNOWN);
 
@@ -113,8 +106,8 @@ UX_ENDPOINT     *endpoint;
 
         return(UX_ENDPOINT_HANDLE_UNKNOWN);
     }
-    
-    /* Return successful status.  */        
+
+    /* Return successful status.  */
     return(UX_SUCCESS);
 }
 
