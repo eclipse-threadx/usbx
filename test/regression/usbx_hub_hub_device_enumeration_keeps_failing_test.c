@@ -1,4 +1,4 @@
-/* This tests the case where the hub device's enumeration keeps failing. The 
+/* This tests the case where the hub device's enumeration keeps failing. The
    specific test case is in ux_host_class_hub_port_change_connection_process.c. */
 
 #include "usbx_ux_test_hub.h"

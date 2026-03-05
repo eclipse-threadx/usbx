@@ -28,7 +28,7 @@
 /* Define local/extern function prototypes.  */
 
 VOID _fx_ram_driver(FX_MEDIA *media_ptr);
-void _fx_ram_drive_format(ULONG disk_size, UINT sector_size, UINT sectors_per_cluster, 
+void _fx_ram_drive_format(ULONG disk_size, UINT sector_size, UINT sectors_per_cluster,
                                                 UINT fat_entries, UINT root_directory_entries);
 
 static void        demo_thread_entry(ULONG);

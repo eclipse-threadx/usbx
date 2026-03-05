@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Slave Simulator Controller Driver                                   */
 /**                                                                       */
@@ -51,35 +52,24 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_dcd_sim_slave_address_set         Set address                   */
 /*    _ux_dcd_sim_slave_endpoint_create     Create endpoint               */
 /*    _ux_dcd_sim_slave_endpoint_destroy    Destroy endpoint              */
 /*    _ux_dcd_sim_slave_endpoint_reset      Reset endpoint                */
 /*    _ux_dcd_sim_slave_endpoint_stall      Stall endpoint                */
-/*    _ux_dcd_sim_slave_endpoint_status     Get endpoint status           */ 
+/*    _ux_dcd_sim_slave_endpoint_status     Get endpoint status           */
 /*    _ux_dcd_sim_slave_frame_number_get    Get frame number              */
 /*    _ux_dcd_sim_slave_state_change        Change state                  */
 /*    _ux_dcd_sim_slave_transfer_abort      Abort transfer                */
 /*    _ux_dcd_sim_slave_transfer_request    Request transfer              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Device Stack                                                   */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Device Stack                                                   */
 /*                                                                        */
 /**************************************************************************/
 UINT   _ux_dcd_sim_slave_function(UX_SLAVE_DCD *dcd, UINT function, VOID *parameter)
@@ -87,7 +77,7 @@ UINT   _ux_dcd_sim_slave_function(UX_SLAVE_DCD *dcd, UINT function, VOID *parame
 
 UINT                    status;
 UX_DCD_SIM_SLAVE        *dcd_sim_slave;
-                                                        
+
 
     /* Check the status of the controller.  */
     if (dcd -> ux_slave_dcd_status == UX_UNUSED)
@@ -101,7 +91,7 @@ UX_DCD_SIM_SLAVE        *dcd_sim_slave;
 
         return(UX_CONTROLLER_UNKNOWN);
     }
-            
+
     /* Get the pointer to the Slave simulation DCD.  */
     dcd_sim_slave =  (UX_DCD_SIM_SLAVE *) dcd -> ux_slave_dcd_controller_hardware;
 
@@ -110,7 +100,7 @@ UX_DCD_SIM_SLAVE        *dcd_sim_slave;
     {
 
     case UX_DCD_GET_FRAME_NUMBER:
-            
+
         status =  _ux_dcd_sim_slave_frame_number_get(dcd_sim_slave, (ULONG *) parameter);
         break;
 
@@ -180,7 +170,7 @@ UX_DCD_SIM_SLAVE        *dcd_sim_slave;
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         status = UX_FUNCTION_NOT_SUPPORTED;
-    }        
+    }
 
     /* Return completion status.  */
     return(status);

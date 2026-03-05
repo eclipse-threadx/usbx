@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,43 +30,35 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_instance_clean                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_instance_clean                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function cleans all the components of a HID instance.          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function cleans all the components of a HID instance.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_free               Release memory block          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_instance_clean(UX_HOST_CLASS_HID *hid)
@@ -88,26 +81,26 @@ UX_HOST_CLASS_HID_FIELD      *hid_next_field;
 
         /* Get the next report before we clean the current report.  */
         hid_next_report =  hid_report -> ux_host_class_hid_report_next_report;
-        
+
         /* Get the first field in the report.  */
         hid_field =  hid_report -> ux_host_class_hid_report_field;
-        
+
         /* Clean all the fields attached.  */
         while (hid_field != UX_NULL)
         {
 
             /* Get the next field before we clean the current field.  */
-            hid_next_field =  hid_field -> ux_host_class_hid_field_next_field;        
-        
+            hid_next_field =  hid_field -> ux_host_class_hid_field_next_field;
+
             /* Free the usage table.  */
             if (hid_field -> ux_host_class_hid_field_usages != UX_NULL)
                 _ux_utility_memory_free(hid_field -> ux_host_class_hid_field_usages);
-                
+
             /* Free the value table.  */
             if (hid_field -> ux_host_class_hid_field_values != UX_NULL)
                 _ux_utility_memory_free(hid_field -> ux_host_class_hid_field_values);
-            
-            /* Now free the field memory.  */                
+
+            /* Now free the field memory.  */
             _ux_utility_memory_free(hid_field);
 
             /* Next field.  */
@@ -128,26 +121,26 @@ UX_HOST_CLASS_HID_FIELD      *hid_next_field;
 
         /* Get the next report before we clean the current report.  */
         hid_next_report =  hid_report -> ux_host_class_hid_report_next_report;
-        
+
         /* Get the first field in the report.  */
         hid_field =  hid_report -> ux_host_class_hid_report_field;
-        
+
         /* Clean all the fields attached.  */
         while (hid_field != UX_NULL)
         {
 
             /* Get the next field before we clean the current field.  */
-            hid_next_field =  hid_field -> ux_host_class_hid_field_next_field;        
-        
+            hid_next_field =  hid_field -> ux_host_class_hid_field_next_field;
+
             /* Free the usage table.  */
             if (hid_field -> ux_host_class_hid_field_usages != UX_NULL)
                 _ux_utility_memory_free(hid_field -> ux_host_class_hid_field_usages);
-                
+
             /* Free the value table.  */
             if (hid_field -> ux_host_class_hid_field_values != UX_NULL)
                 _ux_utility_memory_free(hid_field -> ux_host_class_hid_field_values);
-            
-            /* Now free the field memory.  */                
+
+            /* Now free the field memory.  */
             _ux_utility_memory_free(hid_field);
 
             /* Next field.  */
@@ -168,26 +161,26 @@ UX_HOST_CLASS_HID_FIELD      *hid_next_field;
 
         /* Get the next report before we clean the current report.  */
         hid_next_report =  hid_report -> ux_host_class_hid_report_next_report;
-        
+
         /* Get the first field in the report.  */
         hid_field =  hid_report -> ux_host_class_hid_report_field;
-        
+
         /* Clean all the fields attached.  */
         while (hid_field != UX_NULL)
         {
 
             /* Get the next field before we clean the current field.  */
-            hid_next_field =  hid_field -> ux_host_class_hid_field_next_field;        
-        
+            hid_next_field =  hid_field -> ux_host_class_hid_field_next_field;
+
             /* Free the usage table.  */
             if (hid_field -> ux_host_class_hid_field_usages != UX_NULL)
                 _ux_utility_memory_free(hid_field -> ux_host_class_hid_field_usages);
-                
+
             /* Free the value table.  */
             if (hid_field -> ux_host_class_hid_field_values != UX_NULL)
                 _ux_utility_memory_free(hid_field -> ux_host_class_hid_field_values);
-            
-            /* Now free the field memory.  */                
+
+            /* Now free the field memory.  */
             _ux_utility_memory_free(hid_field);
 
             /* Next field.  */

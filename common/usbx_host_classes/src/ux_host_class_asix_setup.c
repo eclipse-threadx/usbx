@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Asix Class                                                          */
 /**                                                                       */
@@ -29,47 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_setup                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_asix_setup                           PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function prepares the Asix chip Phy and rx and xmit registers. */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    asix                                         Pointer to asix class  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    asix                                         Pointer to asix class  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_transfer_request       Transfer request              */
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_activate                                        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_asix_activate                                        */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_asix_setup(UX_HOST_CLASS_ASIX *asix)
@@ -102,7 +93,7 @@ UINT                        status;
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Check status, if error, do not proceed.  */
-    if ((status != UX_SUCCESS) || (transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS) || 
+    if ((status != UX_SUCCESS) || (transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS) ||
             (transfer_request -> ux_transfer_request_actual_length != 2))
     {
 
@@ -113,14 +104,14 @@ UINT                        status;
         return(UX_TRANSFER_ERROR);
 
     }
-    
+
     /* Extract the  PHY IDs and the type.  */
     asix -> ux_host_class_asix_primary_phy_id = *(setup_buffer + UX_HOST_CLASS_ASIX_PHY_ID_PRIMARY) & UX_HOST_CLASS_ASIX_PHY_ID_MASK;
     asix -> ux_host_class_asix_primary_phy_type = (*(setup_buffer + UX_HOST_CLASS_ASIX_PHY_ID_PRIMARY)  >> UX_HOST_CLASS_ASIX_PHY_TYPE_SHIFT) & UX_HOST_CLASS_ASIX_PHY_TYPE_MASK;
-    
+
     asix -> ux_host_class_asix_secondary_phy_id = *(setup_buffer + UX_HOST_CLASS_ASIX_PHY_ID_SECONDARY) & UX_HOST_CLASS_ASIX_PHY_ID_MASK;
     asix -> ux_host_class_asix_secondary_phy_type = (*(setup_buffer + UX_HOST_CLASS_ASIX_PHY_ID_SECONDARY)  >> UX_HOST_CLASS_ASIX_PHY_TYPE_SHIFT) & UX_HOST_CLASS_ASIX_PHY_TYPE_MASK;
-    
+
     /* Set the GPIO 2 register.  */
     transfer_request -> ux_transfer_request_data_pointer        =  UX_NULL;
     transfer_request -> ux_transfer_request_requested_length    =  0;
@@ -272,7 +263,7 @@ UINT                        status;
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Check status, if error, do not proceed.  */
-    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS || 
+    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS ||
         transfer_request -> ux_transfer_request_actual_length != UX_HOST_CLASS_ASIX_NODE_ID_LENGTH)
     {
 
@@ -324,7 +315,7 @@ UINT                        status;
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Check status, if error, do not proceed.  */
-    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS || 
+    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS ||
         transfer_request -> ux_transfer_request_actual_length != 2)
     {
 
@@ -403,11 +394,11 @@ UINT                        status;
     transfer_request -> ux_transfer_request_index               =  UX_HOST_CLASS_ASIX_PHY_REG_BMCR;
 
     /* Set the value for the PHY reg. */
-    phy_register_value =  UX_HOST_CLASS_ASIX_PHY_REG_BMCR_RESET;    
+    phy_register_value =  UX_HOST_CLASS_ASIX_PHY_REG_BMCR_RESET;
 
     /* Insert the value into the target buffer.  */
     _ux_utility_short_put(setup_buffer, (USHORT)phy_register_value);
-    
+
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
@@ -453,15 +444,15 @@ UINT                        status;
 
     /* Isolate the speed and memorize it.  */
     if (phy_register_value & UX_HOST_CLASS_ASIX_PHY_REG_BMCR_SPEED_100MBS)
-        
+
         /* Select 100 MBPS as our speed.  */
         asix -> ux_host_class_asix_speed_selected = UX_HOST_CLASS_ASIX_SPEED_SELECTED_100MPBS;
-        
+
     else
-            
+
         /* Select 10 MBPS as our speed.  */
         asix -> ux_host_class_asix_speed_selected = UX_HOST_CLASS_ASIX_SPEED_SELECTED_10MPBS;
-        
+
     /* Set the value of the ANAR in the PHY register.  */
     transfer_request -> ux_transfer_request_data_pointer        =  setup_buffer;
     transfer_request -> ux_transfer_request_requested_length    =  2;
@@ -476,17 +467,17 @@ UINT                        status;
                           UX_HOST_CLASS_ASIX_PHY_REG_ANAR_10_FD             |
                           UX_HOST_CLASS_ASIX_PHY_REG_ANAR_TX_HD             |
                           UX_HOST_CLASS_ASIX_PHY_REG_ANAR_TX_FD             |
-                          UX_HOST_CLASS_ASIX_PHY_REG_ANAR_PAUSE);           
+                          UX_HOST_CLASS_ASIX_PHY_REG_ANAR_PAUSE);
 
     /* Insert the value into the target buffer.  */
     _ux_utility_short_put(setup_buffer, (USHORT)phy_register_value);
-    
+
 
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Check status, if error, do not proceed.  */
-    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS || 
+    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS ||
         transfer_request -> ux_transfer_request_actual_length != 2)
     {
 
@@ -508,7 +499,7 @@ UINT                        status;
 
     /* Check speed.  */
     if (asix -> ux_host_class_asix_speed_selected == UX_HOST_CLASS_ASIX_SPEED_SELECTED_100MPBS)
-    
+
         /* Set speed at 100MBPS.  */
         phy_register_value =  UX_HOST_CLASS_ASIX_PHY_REG_BMCR_SPEED_100MBS;
 
@@ -523,7 +514,7 @@ UINT                        status;
     status =  _ux_host_stack_transfer_request(transfer_request);
 
     /* Check status, if error, do not proceed.  */
-    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS || 
+    if (status != UX_SUCCESS || transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS ||
         transfer_request -> ux_transfer_request_actual_length != 2)
     {
 
@@ -538,10 +529,10 @@ UINT                        status;
 
     /* Check speed.  */
     if (asix -> ux_host_class_asix_speed_selected == UX_HOST_CLASS_ASIX_SPEED_SELECTED_100MPBS)
-    
+
         /* Set speed at 100MBPS.  */
         transfer_request -> ux_transfer_request_value =  UX_HOST_CLASS_ASIX_MEDIUM_PS;
-    
+
     /* Write the value of the Medium Mode. */
     transfer_request -> ux_transfer_request_data_pointer        =  UX_NULL;
     transfer_request -> ux_transfer_request_requested_length    =  0;

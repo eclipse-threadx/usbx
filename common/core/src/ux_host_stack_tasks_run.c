@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -93,25 +94,6 @@ static inline VOID _ux_host_stack_pending_transfers_run(VOID);
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone hub,       */
-/*                                            used shared descriptor in   */
-/*                                            device instance for enum,   */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved internal logic,    */
-/*                                            fixed activation issue on   */
-/*                                            no class linked interfaces, */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved enum transfer,     */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_host_stack_tasks_run(VOID)
@@ -841,7 +823,7 @@ INT                     immediate_state = UX_TRUE;
             /* The device is now in the unconfigured state. We need to deal
                with the amount of power the device is consuming before allowing
                it to be configured. Otherwise we may run the risk of an over
-               current fault. */        
+               current fault. */
             configuration = device -> ux_device_enum_inst.configuration;
             if (((configuration -> ux_configuration_descriptor.bmAttributes &
                     UX_CONFIGURATION_DEVICE_SELF_POWERED) == 0) &&

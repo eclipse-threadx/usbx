@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -68,20 +69,6 @@
 /*                                                                        */
 /*    EHCI Controller Driver                                              */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warning,      */
-/*                                            resulting in version 6.1.2  */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_ehci_done_queue_process(UX_HCD_EHCI *hcd_ehci)
 {
@@ -133,7 +120,7 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
         /* Process TD until there is no next available.  */
         while (td != UX_NULL)
             td =  _ux_hcd_ehci_asynch_td_process(ed.ed_ptr, td);
-        
+
         /* Next ED.  */
         ed.ed_ptr = ed.ed_ptr -> ux_ehci_ed_next_ed;
     }

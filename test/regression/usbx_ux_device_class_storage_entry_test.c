@@ -27,7 +27,7 @@
 /* Define local/extern function prototypes.  */
 
 VOID _fx_ram_driver(FX_MEDIA *media_ptr);
-void _fx_ram_drive_format(ULONG disk_size, UINT sector_size, UINT sectors_per_cluster, 
+void _fx_ram_drive_format(ULONG disk_size, UINT sector_size, UINT sectors_per_cluster,
                                                 UINT fat_entries, UINT root_directory_entries);
 
 static void        demo_thread_entry(ULONG);
@@ -467,10 +467,10 @@ UCHAR           *cbw;
 
     /* All transfers pending need to abort. There may have been a partial transfer.  */
     ux_host_stack_transfer_request_abort(transfer_request);
-    
+
     /* Set the completion code.  */
     transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
-    
+
     /* There was an error, return to the caller.  */
     return(UX_TRANSFER_TIMEOUT);
 }
@@ -503,10 +503,10 @@ UINT            status;
 
     /* All transfers pending need to abort. There may have been a partial transfer.  */
     ux_host_stack_transfer_request_abort(transfer_request);
-    
+
     /* Set the completion code.  */
     transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
-    
+
     /* There was an error, return to the caller.  */
     return(UX_TRANSFER_TIMEOUT);
 }

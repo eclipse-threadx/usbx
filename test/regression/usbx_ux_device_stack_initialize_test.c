@@ -257,7 +257,7 @@ UX_SLAVE_CLASS_HID_PARAMETER    hid_parameter;
         test_control_return(1);
     }
 #else
-    /* Successful test.  */ 
+    /* Successful test.  */
     printf("SUCCESS!\n");
     test_control_return(0);
 #endif

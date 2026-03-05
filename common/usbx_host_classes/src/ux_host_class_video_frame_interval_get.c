@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -29,49 +30,38 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_frame_interval_get             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_video_frame_interval_get             PORTABLE C      */
 /*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function finds the frame intervals within the frame.           */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
-/*    interval_parameter                    Interval request structure    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    interval_parameter                    Interval request structure    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_system_error_handler              Log system error              */
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
 /*    _ux_utility_long_get                  Get 32-bit value              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings 64b, */
-/*                                            resulting in version 6.1.2  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Video Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_frame_interval_get(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_PARAMETER_FRAME_INTERVAL *interval_parameter)
@@ -89,7 +79,7 @@ ULONG                                           i;
     /* Get the descriptor to the selected format.  */
     descriptor =  video -> ux_host_class_video_current_format_address;
     total_descriptor_length =  video -> ux_host_class_video_length_formats;
-    
+
     /* Descriptors are arranged in order. First FORMAT then FRAME.  */
     while (total_descriptor_length)
     {
@@ -119,19 +109,19 @@ ULONG                                           i;
             /* Process relative to descriptor type.  */
             switch (descriptor_subtype)
             {
-    
+
                 case UX_HOST_CLASS_VIDEO_VS_FRAME_UNCOMPRESSED  :
                 case UX_HOST_CLASS_VIDEO_VS_FRAME_MJPEG         :
                 case UX_HOST_CLASS_VIDEO_VS_FRAME_FRAME_BASED   :
-                
+
                     /* We found a Frame descriptor.  Is it the right one ? */
                     if (interval_parameter -> ux_host_class_video_parameter_frame_requested == *(descriptor + 3))
                     {
-    
+
                         /* Make the descriptor machine independent.  */
                         _ux_utility_descriptor_parse(descriptor, _ux_system_class_video_frame_descriptor_structure,
                                                      UX_HOST_CLASS_VIDEO_FRAME_DESCRIPTOR_ENTRIES, (UCHAR *) &frame_descriptor);
-                                                            
+
                         /* Check the frame interval type.  */
                         if (frame_descriptor.bFrameIntervalType == 0)
                         {
@@ -167,10 +157,10 @@ ULONG                                           i;
                         /* We are done here. */
                         return(UX_SUCCESS);
                     }
-                    
+
                     break;
-            
-            }                    
+
+            }
         }
 
         /* Verify if the descriptor is still valid.  */
@@ -184,7 +174,7 @@ ULONG                                           i;
             //UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_DESCRIPTOR_CORRUPTED);
-        }            
+        }
 
         /* Jump to the next descriptor if we have not reached the end.  */
         descriptor +=  descriptor_length;

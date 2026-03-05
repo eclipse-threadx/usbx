@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -29,63 +30,47 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_activate                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_activate                         PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs the enumeration of the HUB. The HUB          */ 
-/*    descriptor is read, the interrupt endpoint activated, power is set  */ 
-/*    to the downstream ports and the HUB instance will be awaken when    */ 
-/*    there is a status change on the HUB or one of the ports.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to command            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_configure          Configure HUB                 */ 
-/*    _ux_host_class_hub_descriptor_get     Get descriptor                */ 
+/*                                                                        */
+/*    This function performs the enumeration of the HUB. The HUB          */
+/*    descriptor is read, the interrupt endpoint activated, power is set  */
+/*    to the downstream ports and the HUB instance will be awaken when    */
+/*    there is a status change on the HUB or one of the ports.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to command            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hub_configure          Configure HUB                 */
+/*    _ux_host_class_hub_descriptor_get     Get descriptor                */
 /*    _ux_host_class_hub_interrupt_endpoint_start                         */
-/*                                          Start interrupt endpoint      */ 
-/*    _ux_host_class_hub_ports_power        Power ports                   */ 
-/*    _ux_host_stack_class_instance_create  Create class instance         */ 
-/*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
+/*                                          Start interrupt endpoint      */
+/*    _ux_host_class_hub_ports_power        Power ports                   */
+/*    _ux_host_stack_class_instance_create  Create class instance         */
+/*    _ux_host_stack_class_instance_destroy Destroy class instance        */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
 /*    _ux_utility_memory_free               Free memory block             */
-/*    _ux_host_semaphore_create             Create semaphore              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.12 */
+/*    _ux_host_semaphore_create             Create semaphore              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_activate(UX_HOST_CLASS_COMMAND *command)
@@ -111,18 +96,18 @@ UINT                status;
     hub =  (UX_HOST_CLASS_HUB *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_HOST_CLASS_HUB));
     if (hub == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
-        
+
     /* Store the class container into this instance.  */
     hub -> ux_host_class_hub_class =  command -> ux_host_class_command_class_ptr;
 
-    /* Store the device container instance in the HUB instance, this is for 
+    /* Store the device container instance in the HUB instance, this is for
        the class instance when it needs to talk to the USBX stack.  */
     hub -> ux_host_class_hub_device =  device;
 
 #if defined(UX_HOST_STANDALONE)
 
     /* Store the instance in the device container, this is for the USBX stack
-        when it needs to invoke the class.  */        
+        when it needs to invoke the class.  */
     device -> ux_device_class_instance =  (VOID *) hub;
 
     /* Store the hub interface.  */
@@ -142,29 +127,29 @@ UINT                status;
 #else
 
     /* Configure the HUB.  */
-    status =  _ux_host_class_hub_configure(hub);     
+    status =  _ux_host_class_hub_configure(hub);
     if (status == UX_SUCCESS)
     {
 
         /* Get the HUB descriptor.  */
-        status =  _ux_host_class_hub_descriptor_get(hub);        
+        status =  _ux_host_class_hub_descriptor_get(hub);
         if (status == UX_SUCCESS)
         {
 
             /* Power up the HUB downstream ports. This function always returns
-               success since we may be dealing with multiple ports.  */            
+               success since we may be dealing with multiple ports.  */
             _ux_host_class_hub_ports_power(hub);
 
             /* Search the HUB interrupt endpoint and start it.  */
-            status =  _ux_host_class_hub_interrupt_endpoint_start(hub);      
+            status =  _ux_host_class_hub_interrupt_endpoint_start(hub);
             if (status == UX_SUCCESS)
             {
 
                 /* Create this class instance.  */
                 _ux_host_stack_class_instance_create(hub -> ux_host_class_hub_class, (VOID *) hub);
-                
+
                 /* Store the instance in the device container, this is for the USBX stack
-                   when it needs to invoke the class.  */        
+                   when it needs to invoke the class.  */
                 device -> ux_device_class_instance =  (VOID *) hub;
 
                 /* Mark the HUB as live now.  */
@@ -174,7 +159,7 @@ UINT                status;
                    if a function has been programmed in the system structure.  */
                 if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
                 {
-                    
+
                     /* Call system change function.  */
                     _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, hub -> ux_host_class_hub_class, (VOID *) hub);
                 }
@@ -199,5 +184,5 @@ UINT                status;
 #endif
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
 }

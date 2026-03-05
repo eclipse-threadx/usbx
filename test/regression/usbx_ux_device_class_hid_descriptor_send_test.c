@@ -272,7 +272,7 @@ UX_SLAVE_CLASS_HID *hid_class;
     hid_class = (UX_SLAVE_CLASS_HID*)class->ux_slave_class_instance;
 
     hid_class->ux_device_class_hid_report_address = descriptor;
-    hid_class->ux_device_class_hid_report_length  = length; 
+    hid_class->ux_device_class_hid_report_length  = length;
 }
 
 /* Define what the initial system looks like.  */

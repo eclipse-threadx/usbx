@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -29,54 +30,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_deactivate                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_deactivate                      PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called when this instance of the pima has been     */
-/*    removed from the bus either directly or indirectly. The bulk in\out */ 
-/*    and interrupt pipes will be destroyed and the instance removed.     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                                PIMA   class command pointer */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
-/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_entry                Entry of pima class        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved INT EP support,    */
-/*                                            removed unused semaphore,   */
-/*                                            resulting in version 6.3.0  */
+/*    removed from the bus either directly or indirectly. The bulk in\out */
+/*    and interrupt pipes will be destroyed and the instance removed.     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                                PIMA   class command pointer */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */
+/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */
+/*    _ux_utility_memory_free               Free memory block             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_pima_entry                Entry of pima class        */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -96,8 +82,8 @@ UX_TRANSFER                     *transfer_request;
     /* We come to this point when the device has been extracted. So there may have been a transaction
        being scheduled. We make sure the transaction has been completed by the controller driver.
        When the device is extracted, the controller tries multiple times the transaction and retires it
-       with a DEVICE_NOT_RESPONDING error code.  
-       
+       with a DEVICE_NOT_RESPONDING error code.
+
        First we take care of endpoint IN.  */
     transfer_request =  &pima -> ux_host_class_pima_bulk_in_endpoint -> ux_endpoint_transfer_request;
     if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
@@ -106,20 +92,20 @@ UX_TRANSFER                     *transfer_request;
         _ux_host_stack_endpoint_transfer_abort(pima -> ux_host_class_pima_bulk_in_endpoint);
 
 
-    /* Then endpoint OUT.  */       
+    /* Then endpoint OUT.  */
     transfer_request =  &pima -> ux_host_class_pima_bulk_out_endpoint -> ux_endpoint_transfer_request;
     if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
 
         /* We need to abort transactions on the bulk Out pipe.  We normally don't need that anymore. */
         _ux_host_stack_endpoint_transfer_abort(pima -> ux_host_class_pima_bulk_out_endpoint);
 
-       
+
     /* Then interrupt endpoint.  */
     if (pima -> ux_host_class_pima_interrupt_endpoint != UX_NULL)
     {
         transfer_request =  &pima -> ux_host_class_pima_interrupt_endpoint -> ux_endpoint_transfer_request;
         if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
-        
+
             /* We need to abort transactions on the Interrupt pipe.  */
             _ux_host_stack_endpoint_transfer_abort(pima -> ux_host_class_pima_interrupt_endpoint);
 
@@ -129,7 +115,7 @@ UX_TRANSFER                     *transfer_request;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
 
     /* Free the header container buffer.  */
     if (pima -> ux_host_class_pima_container != UX_NULL)
@@ -153,11 +139,11 @@ UX_TRANSFER                     *transfer_request;
 
             /* Reset the magic field.  */
             pima_session -> ux_host_class_pima_session_magic =  0;
-            
+
             /* Declare the session closed.  */
             pima_session -> ux_host_class_pima_session_state = UX_HOST_CLASS_PIMA_SESSION_STATE_CLOSED;
 
-        }                
+        }
     }
 
     /* Destroy the instance.  */
@@ -167,7 +153,7 @@ UX_TRANSFER                     *transfer_request;
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
     {
-        
+
         /* Inform the application the device is removed.  */
         _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, pima -> ux_host_class_pima_class, (VOID *) pima);
     }
@@ -182,6 +168,6 @@ UX_TRANSFER                     *transfer_request;
     _ux_utility_memory_free(pima);
 
     /* Return successful status.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
 

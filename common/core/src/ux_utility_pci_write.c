@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Utility                                                             */
 /**                                                                       */
@@ -27,51 +28,43 @@
 #include "ux_api.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_utility_pci_write                               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_utility_pci_write                               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function writes a 32/16/8 bit value to a specific PCI bus      */ 
-/*    at a certain offset.                                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    bus_number                            PCI bus number                */ 
-/*    device_number                         Device number                 */ 
-/*    function_number                       Function number               */ 
-/*    offset                                Offset                        */ 
-/*    value                                 Value to write                */ 
-/*    write_size                            Size of write                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function writes a 32/16/8 bit value to a specific PCI bus      */
+/*    at a certain offset.                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    bus_number                            PCI bus number                */
+/*    device_number                         Device number                 */
+/*    function_number                       Function number               */
+/*    offset                                Offset                        */
+/*    value                                 Value to write                */
+/*    write_size                            Size of write                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    outpl                                 PCI output long function      */
-/*    outpw                                 PCI output word function      */ 
-/*    outpb                                 PCI output byte function      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*    outpw                                 PCI output word function      */
+/*    outpb                                 PCI output byte function      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_pci_write(ULONG bus_number, ULONG device_number, ULONG function_number,
@@ -101,16 +94,16 @@ ULONG   cfg_ctrl;
         /* Write the 32 bit content of this address.  */
         outpl(UX_PCI_CFG_DATA_ADDRESS, value);
         break;
-        
+
     case 16:
-            
+
         /* Write the address we need to write to.  */
         outpl(UX_PCI_CFG_CTRL_ADDRESS, cfg_ctrl);
 
         /* Write the 16 bit content of this address.  */
         outpw(UX_PCI_CFG_DATA_ADDRESS + (offset & 2), (USHORT) value);
         break;
-    
+
     case 8:
 
         /* Write the address we need to write to.  */
@@ -121,7 +114,7 @@ ULONG   cfg_ctrl;
         break;
 
     default:
-            
+
         break;
     }
 }

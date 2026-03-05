@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Data Pump Class                                                */
 /**                                                                       */
@@ -29,49 +30,38 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_dpump_entry                          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_dpump_entry                          PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the entry point of the dpump class. It will be     */ 
-/*    called by the USBX stack enumeration module when there is a new     */ 
-/*    dpump on the bus or when the USB dpump is removed.                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is the entry point of the dpump class. It will be     */
+/*    called by the USBX stack enumeration module when there is a new     */
+/*    dpump on the bus or when the USB dpump is removed.                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    command                                Data pump class command      */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_dpump_activate       Activate dpump class            */ 
-/*    _ux_host_class_dpump_deactivate     Deactivate dpump class          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Data pump Class                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_dpump_activate       Activate dpump class            */
+/*    _ux_host_class_dpump_deactivate     Deactivate dpump class          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Data pump Class                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_dpump_entry(UX_HOST_CLASS_COMMAND *command)
@@ -93,10 +83,10 @@ UINT    status;
                              (command -> ux_host_class_command_class == UX_HOST_CLASS_DPUMP_CLASS) &&
                              (command -> ux_host_class_command_subclass == UX_HOST_CLASS_DPUMP_SUBCLASS) &&
                              (command -> ux_host_class_command_protocol == UX_HOST_CLASS_DPUMP_PROTOCOL))
-            return(UX_SUCCESS);                        
-        else            
-            return(UX_NO_CLASS_MATCH);                        
-                
+            return(UX_SUCCESS);
+        else
+            return(UX_NO_CLASS_MATCH);
+
     case UX_HOST_CLASS_COMMAND_ACTIVATE:
 
         /* The activate command is used when the device inserted has found a parent and
@@ -109,13 +99,13 @@ UINT    status;
 
     case UX_HOST_CLASS_COMMAND_DEACTIVATE:
 
-        /* The deactivate command is used when the device has been extracted either      
+        /* The deactivate command is used when the device has been extracted either
            directly or when its parents has been extracted.  */
         status =  _ux_host_class_dpump_deactivate(command);
         return(status);
 
-    default: 
-            
+    default:
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_FUNCTION_NOT_SUPPORTED);
 
@@ -123,6 +113,6 @@ UINT    status;
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_FUNCTION_NOT_SUPPORTED);
-    }   
+    }
 }
 

@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -38,75 +39,6 @@
 /*    USBX library are built with UX_INCLUDE_USER_DEFINE_FILE defined.    */
 /*    Note that all the defines in this file may also be made on the      */
 /*    command line when building USBX library and application objects.    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Xiuwen Cai               Modified comment(s), added    */
-/*                                            compile option for using    */
-/*                                            packet pool from NetX,      */
-/*                                            resulting in version 6.1.4  */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added DFU_UPLOAD option,    */
-/*                                            added macro to enable       */
-/*                                            device bi-dir-endpoints,    */
-/*                                            added macro to disable CDC- */
-/*                                            ACM transmission support,   */
-/*                                            resulting in version 6.1.6  */
-/*  06-02-2021     Xiuwen Cai               Modified comment(s), added    */
-/*                                            transfer timeout value      */
-/*                                            options,                    */
-/*                                            resulting in version 6.1.7  */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added option for assert,    */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            added option for device     */
-/*                                            audio feedback endpoint,    */
-/*                                            added option for MTP,       */
-/*                                            added options for HID       */
-/*                                            interrupt OUT support,      */
-/*                                            added option to validate    */
-/*                                            class code in enumeration,  */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added audio class features, */
-/*                                            added device CDC_ACM and    */
-/*                                            printer write auto ZLP,     */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            deprecated ECM pool option, */
-/*                                            added align minimal config, */
-/*                                            added host stack instance   */
-/*                                            creation strategy control,  */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added option to disable dev */
-/*                                            alternate setting support,  */
-/*                                            added option to disable dev */
-/*                                            framework initialize scan,  */
-/*                                            added option to reference   */
-/*                                            names by pointer to chars,  */
-/*                                            added option to enable      */
-/*                                            basic USBX error checking,  */
-/*                                            resulting in version 6.2.1  */
-/*  10-31-2023     Xiuwen Cai, CQ Xiao      Modified comment(s),          */
-/*                                            refined memory management,  */
-/*                                            added zero copy support     */
-/*                                            in many device classes,     */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            added option for get string */
-/*                                            requests with zero wIndex,  */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 

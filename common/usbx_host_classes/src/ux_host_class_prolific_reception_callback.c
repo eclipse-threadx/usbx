@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Prolific Class                                                      */
 /**                                                                       */
@@ -29,45 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_prolific_reception_callback          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_prolific_reception_callback          PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the callback from the USBX transfer functions,     */ 
-/*    it is called when a full or partial transfer has been done for a    */ 
+/*                                                                        */
+/*    This function is the callback from the USBX transfer functions,     */
+/*    it is called when a full or partial transfer has been done for a    */
 /*    bulk in transfer. It calls back the application.                    */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_prolific_reception_callback (UX_TRANSFER *transfer_request)
@@ -75,27 +68,27 @@ VOID  _ux_host_class_prolific_reception_callback (UX_TRANSFER *transfer_request)
 
 UX_HOST_CLASS_PROLIFIC               *prolific;
 UX_HOST_CLASS_PROLIFIC_RECEPTION     *prolific_reception;
-    
+
     /* Get the class instance for this transfer request.  */
     prolific =  (UX_HOST_CLASS_PROLIFIC *) transfer_request -> ux_transfer_request_class_instance;
-    
+
     /* Get the pointer to the prolific reception structure.  */
     prolific_reception =  prolific -> ux_host_class_prolific_reception;
 
     /* Check the state of the transfer.  If there is an error, we do not proceed with this report.  */
     if (transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS)
     {
-        
+
         /* The reception is stopped.  */
         prolific_reception -> ux_host_class_prolific_reception_state =  UX_HOST_CLASS_PROLIFIC_RECEPTION_STATE_STOPPED;
-        
+
         /* We may have an device extraction. We cannot continue.  Report to the application.  */
-        prolific_reception -> ux_host_class_prolific_reception_callback(prolific, transfer_request -> ux_transfer_request_completion_code, UX_NULL, 0); 
-        
+        prolific_reception -> ux_host_class_prolific_reception_callback(prolific, transfer_request -> ux_transfer_request_completion_code, UX_NULL, 0);
+
 
         /* We do not proceed.  */
-        return;        
-        
+        return;
+
     }
 
     /* Check if the class is in shutdown.  */
@@ -105,7 +98,7 @@ UX_HOST_CLASS_PROLIFIC_RECEPTION     *prolific_reception;
         return;
 
     /* And move to the next reception buffer.  Check if we are at the end of the application buffer.  */
-    if (prolific_reception -> ux_host_class_prolific_reception_data_head + prolific_reception -> ux_host_class_prolific_reception_block_size >= 
+    if (prolific_reception -> ux_host_class_prolific_reception_data_head + prolific_reception -> ux_host_class_prolific_reception_block_size >=
         prolific_reception -> ux_host_class_prolific_reception_data_buffer + prolific_reception -> ux_host_class_prolific_reception_data_buffer_size)
     {
 
@@ -120,19 +113,19 @@ UX_HOST_CLASS_PROLIFIC_RECEPTION     *prolific_reception;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_BUFFER_OVERFLOW, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             /* We have an overflow. We cannot continue.  Report to the application.  */
-            prolific_reception -> ux_host_class_prolific_reception_callback(prolific, UX_BUFFER_OVERFLOW, UX_NULL, 0); 
-            
+            prolific_reception -> ux_host_class_prolific_reception_callback(prolific, UX_BUFFER_OVERFLOW, UX_NULL, 0);
+
             /* And stop the transfer in progress flag.  */
             prolific_reception -> ux_host_class_prolific_reception_state =  UX_HOST_CLASS_PROLIFIC_RECEPTION_STATE_STOPPED;
-            
+
             return;
         }
         else
-        
+
             /* Program the head to be at the beginning of the application buffer.  */
             prolific_reception -> ux_host_class_prolific_reception_data_head =  prolific_reception -> ux_host_class_prolific_reception_data_buffer;
-                    
-    }        
+
+    }
     else
 
             /* Program the head to be after the current buffer.  */
@@ -140,7 +133,7 @@ UX_HOST_CLASS_PROLIFIC_RECEPTION     *prolific_reception;
 
 
     /* We need to report this transfer to the application.  */
-    prolific_reception -> ux_host_class_prolific_reception_callback(prolific, 
+    prolific_reception -> ux_host_class_prolific_reception_callback(prolific,
                                                                     transfer_request -> ux_transfer_request_completion_code,
                                                                     transfer_request -> ux_transfer_request_data_pointer,
                                                                     transfer_request -> ux_transfer_request_actual_length);
@@ -151,6 +144,6 @@ UX_HOST_CLASS_PROLIFIC_RECEPTION     *prolific_reception;
     _ux_host_stack_transfer_request(transfer_request);
 
     /* There is no status to be reported back to the stack.  */
-    return; 
+    return;
 }
 

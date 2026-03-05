@@ -194,7 +194,7 @@ UINT   _ux_test_dcd_sim_slave_function(UX_SLAVE_DCD *dcd, UINT function, VOID *p
 UINT                                                status;
 UX_TEST_OVERRIDE_UX_DCD_SIM_SLAVE_FUNCTION_PARAMS   params = { dcd, function, parameter };
 UX_TEST_ACTION                                      action;
-                                                        
+
 
     /* Perform hooked callbacks.  */
     ux_test_do_hooks_before(UX_TEST_OVERRIDE_UX_DCD_SIM_SLAVE_FUNCTION, &params);

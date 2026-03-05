@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -29,55 +30,47 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_port_reset                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_port_reset                       PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function will reset a downstream port of the HUB. When the     */ 
-/*    port is reset, the hardware logic of the HUB also enables it.       */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hub                                   Pointer to HUB class          */ 
-/*    port                                  Port number                   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_port_change_reset_process Reset HUB              */ 
-/*    _ux_host_class_hub_feature            Set HUB class feature         */ 
-/*    _ux_host_class_hub_status_get         Get HUB status                */ 
-/*    _ux_utility_delay_ms                  Thread sleep                  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function will reset a downstream port of the HUB. When the     */
+/*    port is reset, the hardware logic of the HUB also enables it.       */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hub                                   Pointer to HUB class          */
+/*    port                                  Port number                   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hub_port_change_reset_process Reset HUB              */
+/*    _ux_host_class_hub_feature            Set HUB class feature         */
+/*    _ux_host_class_hub_status_get         Get HUB status                */
+/*    _ux_utility_delay_ms                  Thread sleep                  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_port_reset(UX_HOST_CLASS_HUB *hub, UINT port)
 {
 
 UINT        status;
-UINT        port_enable_retry;    
+UINT        port_enable_retry;
 USHORT      port_status;
 USHORT      port_change;
 
@@ -99,16 +92,16 @@ USHORT      port_change;
         status =  _ux_host_class_hub_status_get(hub, port, &port_status, &port_change);
         if (status != UX_SUCCESS)
             return(status);
-            
-        /* On return of the GET_STATUS, the port_change field has been updated. 
+
+        /* On return of the GET_STATUS, the port_change field has been updated.
            Check for each of the bits it may contain. */
         if (port_change & UX_HOST_CLASS_HUB_PORT_CHANGE_RESET)
         {
- 
+
             /* The port has been successfully reset.  */
 
             /* Clear the RESET change bit.  */
-            _ux_host_class_hub_port_change_reset_process(hub, port, port_status);       
+            _ux_host_class_hub_port_change_reset_process(hub, port, port_status);
 
             /* Return success.  */
             return(UX_SUCCESS);

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -20,53 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_hub.h                                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_hub.h                                 PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX HUB class.                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized USB descriptors,  */
-/*                                            resulting in version 6.3.0  */
+/*    USBX HUB class.                                                     */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_HUB_H
 #define UX_HOST_CLASS_HUB_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Define HUB Class constants.  */
@@ -82,7 +65,7 @@ extern   "C" {
 #define UX_HOST_CLASS_HUB_GANG_POWER_SWITCHING                  0x00
 #define UX_HOST_CLASS_HUB_INDIVIDUAL_POWER_SWITCHING            0x01
 #define UX_HOST_CLASS_HUB_NO_POWER_SWITCHING                    0x02
-                                                        
+
 #define UX_HOST_CLASS_HUB_COMPOUND_DEVICE                       0x04
 
 #define UX_HOST_CLASS_HUB_GLOBAL_OVERCURRENT                    0x00
@@ -217,7 +200,7 @@ typedef struct UX_HOST_CLASS_HUB_STRUCT
     UINT            ux_host_class_hub_instance_status;
     UINT            ux_host_class_hub_state;
     UINT            ux_host_class_hub_change_semaphore;
-    struct UX_HUB_DESCRIPTOR_STRUCT         
+    struct UX_HUB_DESCRIPTOR_STRUCT
                     ux_host_class_hub_descriptor;
     UINT            ux_host_class_hub_port_state;
     UINT            ux_host_class_hub_port_power;
@@ -266,11 +249,11 @@ VOID    _ux_host_class_hub_transfer_request_completed(UX_TRANSFER *transfer_requ
 
 UINT    _ux_host_class_hub_tasks_run(UX_HOST_CLASS *hub_class);
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif
 

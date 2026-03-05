@@ -126,8 +126,8 @@ static unsigned char non_data_interface_after_zero_endpoint_data_interface_frame
 };
 
 static DEVICE_INIT_DATA device_init_data = {
-    .framework = non_data_interface_after_zero_endpoint_data_interface_framework, 
-    .framework_length = sizeof(non_data_interface_after_zero_endpoint_data_interface_framework), 
+    .framework = non_data_interface_after_zero_endpoint_data_interface_framework,
+    .framework_length = sizeof(non_data_interface_after_zero_endpoint_data_interface_framework),
     .dont_register_hcd = 1,
 };
 

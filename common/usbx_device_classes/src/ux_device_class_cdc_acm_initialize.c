@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -65,34 +66,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Source Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added macro to disable      */
-/*                                            transmission support,       */
-/*                                            moved transmission resource */
-/*                                            allocate to here (init),    */
-/*                                            resulting in version 6.1.6  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -293,9 +266,9 @@ UINT                                    status;
     {
 
         /* Free resources and return error.  */
-        if (cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread.tx_thread_id)
+        if (_ux_device_thread_created(&cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread))
             _ux_utility_thread_delete(&cdc_acm -> ux_slave_class_cdc_acm_bulkin_thread);
-        if (cdc_acm -> ux_slave_class_cdc_acm_event_flags_group.tx_event_flags_group_id)
+        if (_ux_device_event_flags_created(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group))
             _ux_utility_event_flags_delete(&cdc_acm -> ux_slave_class_cdc_acm_event_flags_group);
         if (cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack)
             _ux_utility_memory_free(cdc_acm -> ux_slave_class_cdc_acm_bulkout_thread_stack);

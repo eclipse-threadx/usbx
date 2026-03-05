@@ -116,7 +116,7 @@ static UCHAR language_id_framework[] = {
 static VOID error_callback(UINT system_level, UINT system_context, UINT error_code)
 {
 
-    if (error_code != UX_DESCRIPTOR_CORRUPTED && 
+    if (error_code != UX_DESCRIPTOR_CORRUPTED &&
         error_code != UX_DEVICE_ENUMERATION_FAILURE)
     {
 

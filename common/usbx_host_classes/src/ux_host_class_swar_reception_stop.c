@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Sierra Wireless AR module class                                */
 /**                                                                       */
@@ -29,53 +30,45 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_reception_stop                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_swar_reception_stop                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function starts a reception with the Sierra modem. This way    */ 
-/*    allows for non blocking calls based on a packet orientated round    */ 
+/*                                                                        */
+/*    This function starts a reception with the Sierra modem. This way    */
+/*    allows for non blocking calls based on a packet orientated round    */
 /*    robbin buffer. When a packet is fully or partially received, an     */
 /*    application callback function is invoked and a new transfer request */
 /*    is rescheduled.                                                     */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    swar                               Pointer to swar class            */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    swar                               Pointer to swar class            */
 /*    swar_reception                     Pointer to reception struct      */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_verify  Verify the class instance     */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_verify  Verify the class instance     */
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort transfer                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar, 
+UINT  _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception)
 {
 
@@ -84,7 +77,7 @@ UINT  _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
 
     /* Ensure the instance is valid.  */
     if (_ux_host_stack_class_instance_verify(_ux_system_host_class_swar_name, (VOID *) swar) != UX_SUCCESS)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -98,7 +91,7 @@ UINT  _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
     /* Check if we do have transfers for this application. If none, nothing to do. */
     if (swar_reception -> ux_host_class_swar_reception_state ==  UX_HOST_CLASS_SWAR_RECEPTION_STATE_STOPPED)
         return(UX_SUCCESS);
-        
+
     /* We need to abort transactions on the bulk In pipe.  */
     _ux_host_stack_endpoint_transfer_abort(swar -> ux_host_class_swar_bulk_in_endpoint);
 
@@ -141,14 +134,8 @@ UINT  _ux_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
 /*                                                                        */
 /*    Application                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
-/*                                                                        */
 /**************************************************************************/
-UINT  _uxe_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar, 
+UINT  _uxe_host_class_swar_reception_stop (UX_HOST_CLASS_SWAR *swar,
                                     UX_HOST_CLASS_SWAR_RECEPTION *swar_reception)
 {
 

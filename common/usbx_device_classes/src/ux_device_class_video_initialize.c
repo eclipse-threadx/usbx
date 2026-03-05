@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -60,20 +61,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Device Video Class                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  04-25-2022     Chaoqiong Xiao           Initial Version 6.1.11        */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes  */
-/*                                            with zero copy enabled,     */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_video_initialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -250,7 +237,7 @@ ULONG                                   i;
     {
 
 #if !defined(UX_DEVICE_STANDALONE)
-        if (stream -> ux_device_class_video_stream_thread.tx_thread_id)
+        if (_ux_device_thread_created(&stream -> ux_device_class_video_stream_thread))
             _ux_utility_thread_delete(&stream -> ux_device_class_video_stream_thread);
         if (stream -> ux_device_class_video_stream_thread_stack)
             _ux_utility_memory_free(stream -> ux_device_class_video_stream_thread_stack);
@@ -293,12 +280,6 @@ ULONG                                   i;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Device Video Class                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_video_initialize(UX_SLAVE_CLASS_COMMAND *command)

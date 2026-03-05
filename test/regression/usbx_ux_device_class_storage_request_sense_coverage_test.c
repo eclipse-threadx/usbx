@@ -30,7 +30,7 @@ void    usbx_device_class_storage_request_sense_coverage_test_application_define
 
     _ux_system_slave = &system_slave;
     cbwcb_data[UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE] = UX_SLAVE_CLASS_STORAGE_INQUIRY_PAGE_CODE_SERIAL;
-    
+
     slave_storage.ux_slave_class_storage_host_length = 0;
 
     endpoint_in.ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer = data_pointer;

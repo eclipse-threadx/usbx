@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Stack                                                        */
 /**                                                                       */
@@ -49,29 +50,15 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_dcd_function)               DCD dispatch function         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_dcd_function)               DCD dispatch function         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_endpoint_stall(UX_SLAVE_ENDPOINT *endpoint)
@@ -88,7 +75,7 @@ UINT                status;
     /* Get the pointer to the DCD.  */
     dcd =  &_ux_system_slave -> ux_system_slave_dcd;
 
-    /* Assume device is in an invalid state here in order to reduce code in following 
+    /* Assume device is in an invalid state here in order to reduce code in following
        section where interrupts are disabled.  */
     status =  UX_ERROR;
 
@@ -96,7 +83,7 @@ UINT                status;
        resets it.  */
     UX_DISABLE
 
-    /* Check if the device is in a valid state; as soon as the device is out 
+    /* Check if the device is in a valid state; as soon as the device is out
        of the RESET state, transfers occur and thus endpoints may be stalled. */
     if (_ux_system_slave -> ux_system_slave_device.ux_slave_device_state != UX_DEVICE_RESET &&
         endpoint -> ux_slave_endpoint_state != UX_ENDPOINT_HALTED)
@@ -115,6 +102,6 @@ UINT                status;
     UX_RESTORE
 
     /* Return completion status.  */
-    return(status);       
+    return(status);
 }
 

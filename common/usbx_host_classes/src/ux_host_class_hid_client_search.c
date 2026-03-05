@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,44 +30,36 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_client_search                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_client_search                    PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function searches for a HID client that wants to own this HID  */
-/*    device.                                                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_host_class_hid_client_handler)    HID client handler            */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*    device.                                                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_host_class_hid_client_handler)    HID client handler            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_client_search(UX_HOST_CLASS_HID *hid)
@@ -84,10 +77,10 @@ UX_HOST_CLASS_HID_CLIENT_COMMAND    hid_client_command;
     hid_client_command.ux_host_class_hid_client_command_instance =   hid;
     hid_client_command.ux_host_class_hid_client_command_container =  (VOID *) hid -> ux_host_class_hid_class;
     hid_client_command.ux_host_class_hid_client_command_request =    UX_HOST_CLASS_COMMAND_QUERY;
-        
+
     /* Dereference the client pointer into a HID client pointer.  */
     hid_client =  (UX_HOST_CLASS_HID_CLIENT *) hid -> ux_host_class_hid_class -> ux_host_class_client;
-    
+
     /* If the hid_client pointer is NULL, the array of clients was not initialized.  */
     if (hid_client == UX_NULL)
     {
@@ -100,7 +93,7 @@ UX_HOST_CLASS_HID_CLIENT_COMMAND    hid_client_command;
 
         return(UX_HOST_CLASS_HID_UNKNOWN);
     }
-            
+
     /* We need to parse the hid client driver table to find a registered client.  */
     for (hid_client_index = 0; hid_client_index < UX_HOST_CLASS_HID_MAX_CLIENTS; hid_client_index++)
     {
@@ -111,7 +104,7 @@ UX_HOST_CLASS_HID_CLIENT_COMMAND    hid_client_command;
 
             /* Call the HID client with a query command.  */
             status =  hid_client -> ux_host_class_hid_client_handler(&hid_client_command);
-    
+
             /* Have we found a HID client?  */
             if (status == UX_SUCCESS)
             {
@@ -128,7 +121,7 @@ UX_HOST_CLASS_HID_CLIENT_COMMAND    hid_client_command;
                 /* Unmount the client if activation fail. */
                 if (status != UX_SUCCESS)
                     hid -> ux_host_class_hid_client = UX_NULL;
-        
+
                 /* Return completion status.  */
                 return(status);
             }
@@ -136,7 +129,7 @@ UX_HOST_CLASS_HID_CLIENT_COMMAND    hid_client_command;
 
         /* Try the next HID client.  */
         hid_client++;
-    }    
+    }
 
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_HID_UNKNOWN);

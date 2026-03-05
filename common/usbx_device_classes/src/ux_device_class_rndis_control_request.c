@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device RNDIS Class                                                  */
 /**                                                                       */
@@ -34,32 +35,32 @@
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_rndis_control_request              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_rndis_control_request              PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function manages the based sent by the host on the control     */ 
-/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    rndis                           Pointer to rndis class              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_endpoint_stall       Endpoint stall                */ 
+/*                                                                        */
+/*    This function manages the based sent by the host on the control     */
+/*    endpoints with a CLASS or VENDOR SPECIFIC type.                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    rndis                           Pointer to rndis class              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_endpoint_stall       Endpoint stall                */
 /*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_utility_memory_copy               Copy memory                   */
@@ -70,33 +71,10 @@
 /*    _ux_device_class_rndis_msg_set        Command set                   */
 /*    _ux_device_class_rndis_msg_reset      Command reset                 */
 /*    _ux_device_class_rndis_msg_keep_alive Command keep alive            */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    RNDIS Class                                                         */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases, used UX prefix to    */
-/*                                            refer to TX symbols instead */
-/*                                            of using them directly,     */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked compiling options   */
-/*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_rndis_control_request(UX_SLAVE_CLASS_COMMAND *command)
@@ -129,18 +107,18 @@ UX_SLAVE_CLASS_RNDIS    *rndis;
 
     /* Get the class container.  */
     class_ptr =  command -> ux_slave_class_command_class_ptr;
-    
+
     /* Get the rndis instance from this class container.  */
     rndis =  (UX_SLAVE_CLASS_RNDIS *) class_ptr -> ux_slave_class_instance;
-    
+
     /* Here we proceed only the standard request we know of at the device level.  */
     switch (request)
     {
 
-            
+
         case UX_DEVICE_CLASS_RNDIS_SEND_ENCAPSULATED_COMMAND    :
-        
-            
+
+
             /* We have received a command. Check if the command is valid and dispatch it.  */
             rndis_command = _ux_utility_long_get(transfer_request -> ux_slave_transfer_request_data_pointer);
 
@@ -148,37 +126,37 @@ UX_SLAVE_CLASS_RNDIS    *rndis;
             {
 
                 case    UX_DEVICE_CLASS_RNDIS_MSG_INITIALIZE            :
-                
+
                     _ux_device_class_rndis_msg_initialize(rndis, transfer_request);
                     break;
-                    
+
                 case    UX_DEVICE_CLASS_RNDIS_MSG_HALT                  :
                     break;
-                    
-                
+
+
                 case    UX_DEVICE_CLASS_RNDIS_MSG_QUERY                 :
                     _ux_device_class_rndis_msg_query(rndis, transfer_request);
                     break;
-                    
-                
+
+
                 case    UX_DEVICE_CLASS_RNDIS_MSG_SET                   :
                     _ux_device_class_rndis_msg_set(rndis, transfer_request);
                     break;
-                    
-                
+
+
                 case    UX_DEVICE_CLASS_RNDIS_MSG_RESET                 :
                     _ux_device_class_rndis_msg_reset(rndis, transfer_request);
                     break;
-                    
-                
+
+
                 case    UX_DEVICE_CLASS_RNDIS_MSG_INDICATE_STATUS    :
                     break;
-                    
-                
+
+
                 case    UX_DEVICE_CLASS_RNDIS_MSG_KEEP_ALIVE            :
                     _ux_device_class_rndis_msg_keep_alive(rndis, transfer_request);
                     break;
-                    
+
                 default                                                :
 
                     /* Unknown function. Stall the endpoint.  */
@@ -186,8 +164,8 @@ UX_SLAVE_CLASS_RNDIS    *rndis;
                     break;
 
             }
-            
-            /* Check the return status. If no error, we set the interrupt pipe to reply response available.  
+
+            /* Check the return status. If no error, we set the interrupt pipe to reply response available.
               All RNDIS events are on the interrupt endpoint IN, from the host.  */
             transfer_request_in =  &rndis -> ux_slave_class_rndis_interrupt_endpoint -> ux_slave_endpoint_transfer_request;
 
@@ -198,13 +176,13 @@ UX_SLAVE_CLASS_RNDIS    *rndis;
             transfer_request_in -> ux_slave_transfer_request_data_pointer[0] = UX_DEVICE_CLASS_RNDIS_INTERRUPT_RESPONSE_AVAILABLE_FLAG;
 
             /* Set an event to wake up the interrupt thread.  */
-            _ux_device_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_INTERRUPT_EVENT, UX_OR);                
-            
+            _ux_device_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_INTERRUPT_EVENT, UX_OR);
+
             break;
-            
+
         case UX_DEVICE_CLASS_RNDIS_GET_ENCAPSULATED_RESPONSE    :
-        
-           
+
+
             /* Copy the response into the request data buffer.  */
             _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, rndis -> ux_slave_class_rndis_response,
                                     rndis -> ux_slave_class_rndis_response_length); /* Use case of memcpy is verified. */
@@ -214,9 +192,9 @@ UX_SLAVE_CLASS_RNDIS    *rndis;
 
             /* We can return the RNDIS response.  */
             _ux_device_stack_transfer_request(transfer_request, rndis -> ux_slave_class_rndis_response_length, request_length);
-        
+
             break ;
-            
+
         default:
 
             /* Unknown function. It's not handled.  */

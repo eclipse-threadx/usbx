@@ -1,4 +1,4 @@
-/* This tests the case where the port reset fails because the hub never reports that the port was RESET. 
+/* This tests the case where the port reset fails because the hub never reports that the port was RESET.
    The specific test case is in ux_host_class_hub_port_reset.c. */
 
 #include "usbx_ux_test_hub.h"

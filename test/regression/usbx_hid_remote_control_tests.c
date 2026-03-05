@@ -347,7 +347,7 @@ CHAR    *memory_pointer;
         printf("Error on line %d\n", __LINE__);
         test_control_return(1);
     }
-    
+
     global_hcd = &_ux_system_host->ux_system_host_hcd_array[0];
 
     /* Create the main host simulation thread.  */
@@ -472,7 +472,7 @@ ULONG   expected_volume_value;
         if (usage != (0x00090000 | expected_keypad_value) || value != expected_keypad_value)
         {
 
-            printf("Error on line %d. usage: 0x%lx, expected usage: 0x%lx, value: 0x%lx, expected_keypad_value: 0x%lx\n", 
+            printf("Error on line %d. usage: 0x%lx, expected usage: 0x%lx, value: 0x%lx, expected_keypad_value: 0x%lx\n",
                    __LINE__, usage, 0x00090000 | expected_keypad_value, value, expected_keypad_value);
             test_control_return(1);
         }
@@ -646,7 +646,7 @@ static void test_main_thread_entry(ULONG arg)
 
 UINT    status;
 UINT    i;
-void    (*tests[])() = 
+void    (*tests[])() =
 {
     basic_test,
     host_event_buffer_test,

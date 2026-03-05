@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Slave Simulator Controller Driver                                   */
 /**                                                                       */
@@ -45,35 +46,20 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    None                                                                */ 
+/*    None                                                                */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_dcd_function)               DCD dispatch function         */ 
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_dcd_function)               DCD dispatch function         */
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Slave Simulator Controller Driver                                   */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            prefixed UX to MS_TO_TICK,  */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added framework init cases, */
-/*                                            resulting in version 6.1.6  */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            filled payload size,        */
-/*                                            resulting in version 6.1.9  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_dcd_sim_slave_initialize_complete(VOID)
@@ -83,7 +69,7 @@ UX_SLAVE_DCD            *dcd;
 UX_SLAVE_DEVICE         *device;
 UCHAR *                 device_framework;
 UX_SLAVE_TRANSFER       *transfer_request;
-                                                                            
+
 
     /* Get the pointer to the DCD.  */
     dcd =  &_ux_system_slave -> ux_system_slave_dcd;
@@ -116,28 +102,28 @@ UX_SLAVE_TRANSFER       *transfer_request;
                                 _ux_system_device_descriptor_structure,
                                 UX_DEVICE_DESCRIPTOR_ENTRIES,
                                 (UCHAR *) &device -> ux_slave_device_descriptor);
-        
+
     /* Now we create a transfer request to accept the first SETUP packet
        and get the ball running. First get the address of the endpoint
        transfer request container.  */
     transfer_request =  &device -> ux_slave_device_control_endpoint.ux_slave_endpoint_transfer_request;
-    
+
     /* Set the timeout to be for Control Endpoint.  */
     transfer_request -> ux_slave_transfer_request_timeout =  UX_MS_TO_TICK(UX_CONTROL_TRANSFER_TIMEOUT);
-    
+
     /* Adjust the current data pointer as well.  */
-    transfer_request -> ux_slave_transfer_request_current_data_pointer =  
+    transfer_request -> ux_slave_transfer_request_current_data_pointer =
                             transfer_request -> ux_slave_transfer_request_data_pointer;
-    
+
     /* Update the transfer request endpoint pointer with the default endpoint.  */
     transfer_request -> ux_slave_transfer_request_endpoint =  &device -> ux_slave_device_control_endpoint;
 
     /* The control endpoint max packet size needs to be filled manually in its descriptor.  */
     transfer_request -> ux_slave_transfer_request_endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize =
                                 device -> ux_slave_device_descriptor.bMaxPacketSize0;
-                                
+
     /* On the control endpoint, always expect the maximum.  */
-    transfer_request -> ux_slave_transfer_request_requested_length =  
+    transfer_request -> ux_slave_transfer_request_requested_length =
                                 device -> ux_slave_device_descriptor.bMaxPacketSize0;
     transfer_request -> ux_slave_transfer_request_transfer_length =
                                 device -> ux_slave_device_descriptor.bMaxPacketSize0;
@@ -147,15 +133,15 @@ UX_SLAVE_TRANSFER       *transfer_request;
 
     /* Create the default control endpoint attached to the device.
        Once this endpoint is enabled, the host can then send a setup packet
-       The device controller will receive it and will call the setup function 
+       The device controller will receive it and will call the setup function
        module.  */
     dcd -> ux_slave_dcd_function(dcd, UX_DCD_CREATE_ENDPOINT,
                                     (VOID *) &device -> ux_slave_device_control_endpoint);
-    
+
     /* Ensure the control endpoint is properly reset.  */
     device -> ux_slave_device_control_endpoint.ux_slave_endpoint_state = UX_ENDPOINT_RESET;
 
-    /* A SETUP packet is a DATA IN operation.  */            
+    /* A SETUP packet is a DATA IN operation.  */
     transfer_request -> ux_slave_transfer_request_phase =  UX_TRANSFER_PHASE_DATA_IN;
 
     /* We are now ready for the USB device to accept the first packet when connected.  */

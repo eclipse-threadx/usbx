@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -34,64 +35,46 @@
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_read_toc                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_read_toc                   PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a READ_TOC SCSI command. This is only for    */ 
-/*    supporting CD-ROM emulation and is hardwired to what Windows wants. */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a READ_TOC SCSI command. This is only for    */
+/*    supporting CD-ROM emulation and is hardwired to what Windows wants. */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
+/*    _ux_device_class_storage_csw_send     Send CSW                      */
 /*    _ux_utility_memory_set                Set memory                    */
 /*    _ux_utility_memory_copy               Copy memory                   */
 /*    _ux_utility_short_get_big_endian      Get 16-bit big endian         */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Storage Class                                                */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked compiling options   */
-/*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_read_toc(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
+UINT  _ux_device_class_storage_read_toc(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
                                             UX_SLAVE_ENDPOINT *endpoint_in,
                                             UX_SLAVE_ENDPOINT *endpoint_out, UCHAR * cbwcb)
 {
@@ -127,16 +110,16 @@ UCHAR                   *toc_buffer;
     /* Insert the fist and last tack number.  */
     toc_buffer[2] =  0x01;
     toc_buffer[3] =  0x01;
-    
+
     /* Set TOC length by default.  */
     toc_length = 20;
-    
+
     /* Insert the ADR and control values.  */
     toc_buffer[5] =  0x14;
-    
+
     /* Insert the TOC tack number.  */
     toc_buffer[6] =  0x01;
-        
+
     /* Check if the request is for the TOC or time stamp.  */
     switch (*(cbwcb + UX_SLAVE_CLASS_STORAGE_READ_TOC_FORMAT))
     {
@@ -145,41 +128,41 @@ UCHAR                   *toc_buffer;
 
             /* Set the toc buffer length.  */
             toc_length  = 20;
-        
+
             /* Insert the TOC buffer length.  */
             toc_buffer[1] =  0x12;
-            
+
             /* Insert some time values.  */
             toc_buffer[10] =  0x02;
             toc_buffer[13] =  0x17;
             toc_buffer[14] =  0xAA;
             toc_buffer[18] =  0x04;
             toc_buffer[19] =  0x1a;
-            
+
             break;
 
         case 0x01 :
 
             /* Set the toc buffer length.  */
             toc_length  = 19;
-        
+
             /* Insert the TOC buffer length.  */
             toc_buffer[1] =  0x12;
-            
+
             toc_buffer[13] =  0x17;
             toc_buffer[14] =  0xAA;
             toc_buffer[19] =  0xb0;
-            
+
             break;
 
         case 0x00 :
-        
+
             /* Set the toc buffer length.  */
             toc_length  = 20;
-        
+
             /* Insert the TOC buffer length.  */
             toc_buffer[1] =  0x12;
-            
+
             /* Insert some time values.  */
             toc_buffer[10] =  0x02;
             toc_buffer[13] =  0x17;
@@ -189,13 +172,13 @@ UCHAR                   *toc_buffer;
 
             break;
     }
-            
+
     /* Check how much we can send back.  */
     if (allocation_length > toc_length)
-    
+
         /* We return less than demanded.  */
         allocation_length = toc_length;
-    
+
 #if defined(UX_DEVICE_STANDALONE)
 
     /* Next: Transfer (DATA).  */
@@ -216,9 +199,9 @@ UCHAR                   *toc_buffer;
     /* Now we set the CSW with success.  */
     storage -> ux_slave_class_storage_csw_status = UX_SLAVE_CLASS_STORAGE_CSW_PASSED;
     status = UX_SUCCESS;
-    
+
     /* Return completion status.  */
     return(status);
-    
+
 }
-    
+

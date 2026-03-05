@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -29,53 +30,37 @@
 #include "ux_device_class_pima.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpsclient_object_info_send           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_dpsclient_object_info_send           PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    Receive the info data set of a new object to be stored.             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                   Pima instance associated     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    user application                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases, used UX prefix to    */
-/*                                            refer to TX symbols instead */
-/*                                            of using them directly,     */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed string length check,  */
-/*                                            used macros for RTOS calls, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*    Receive the info data set of a new object to be stored.             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                   Pima instance associated     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    user application                                                    */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_pictbridge_dpsclient_object_info_send(UX_SLAVE_CLASS_PIMA *pima, UX_SLAVE_CLASS_PIMA_OBJECT *object, 
+UINT  _ux_pictbridge_dpsclient_object_info_send(UX_SLAVE_CLASS_PIMA *pima, UX_SLAVE_CLASS_PIMA_OBJECT *object,
                                                 ULONG storage_id,
                                                 ULONG parent_object_handle,
                                                 ULONG *object_handle)
@@ -93,7 +78,7 @@ UINT                            length, length1;
 
     /* We only have one object.  */
     object_info = (UX_SLAVE_CLASS_PIMA_OBJECT *) pictbridge -> ux_pictbridge_object_host;
-    
+
      /* Copy the demanded object info set.  */
     _ux_utility_memory_copy(object_info, object, UX_SLAVE_CLASS_PIMA_OBJECT_DATA_LENGTH); /* Use case of memcpy is verified. */
 
@@ -106,7 +91,7 @@ UINT                            length, length1;
     {
 
         /* We are in the discovery mode. Check for file name. It must match HDISCVRY.DPS in Unicode mode.  */
-        /* Check if this is a script.  */        
+        /* Check if this is a script.  */
         if (object_info -> ux_device_class_pima_object_format == UX_DEVICE_CLASS_PIMA_OFC_SCRIPT)
         {
 
@@ -126,33 +111,33 @@ UINT                            length, length1;
 
                     /* Get the file name in a ascii format (with null-terminator). */
                     _ux_utility_unicode_to_string(object_info -> ux_device_class_pima_object_filename, string_discovery_name);
-                
+
                     /* So far, the length of name of the files are the same.
                     Compare names now (since length is same just compare without null-terminator). */
                     if (_ux_utility_memory_compare(_ux_pictbridge_hdiscovery_name, string_discovery_name,
                                                     length) ==  UX_SUCCESS)
                     {
-                        
-                        /* We are done with discovery of the printer. We can now send notifications when the camera wants to print an object.  */        
+
+                        /* We are done with discovery of the printer. We can now send notifications when the camera wants to print an object.  */
                         pictbridge -> ux_pictbridge_discovery_state = UX_PICTBRIDGE_DPSCLIENT_DISCOVERY_COMPLETE;
-                        
+
                         /* Set an event flag if the application is listening.  */
                         _ux_system_event_flags_set(&pictbridge -> ux_pictbridge_event_flags_group, UX_PICTBRIDGE_EVENT_FLAG_DISCOVERY, UX_OR);
-                        
+
                         /* There is no object during the discovery cycle.  */
                         return(UX_SUCCESS);
                     }
                 }
             }
-        }            
+        }
     }
 
     /* What cycle are we in ? */
     if (pictbridge -> ux_pictbridge_host_client_state_machine == UX_PICTBRIDGE_STATE_MACHINE_IDLE)
-    
+
         /* Since we are in idle state, we must have received a request from the host.  */
         pictbridge -> ux_pictbridge_host_client_state_machine = UX_PICTBRIDGE_STATE_MACHINE_HOST_REQUEST;
-    
+
 
     /* We have copied the requested data. Return OK.  */
     return(UX_SUCCESS);

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Utility                                                             */
 /**                                                                       */
@@ -27,19 +28,19 @@
 #include "ux_api.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_utility_string_to_unicode                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_utility_string_to_unicode                       PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function converts a ascii string to a unicode string.          */ 
+/*                                                                        */
+/*    This function converts a ascii string to a unicode string.          */
 /*                                                                        */
 /*    Note:                                                               */
 /*    The unicode string length (including NULL-terminator) is limited by */
@@ -48,32 +49,24 @@
 /*    are converted if the string is too long.                            */
 /*    The buffer of destination must have enough space for result, at     */
 /*    least 1 + (strlen(source) + 1) * 2 bytes.                           */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    source                                Ascii String                  */ 
-/*    destination                           Unicode String                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    none                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    source                                Ascii String                  */
+/*    destination                           Unicode String                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    none                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_string_length_check       Check and return C string     */
 /*                                          length                        */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_string_to_unicode(UCHAR *source, UCHAR *destination)
@@ -85,7 +78,7 @@ UINT   string_length;
     string_length = 254;
     _ux_utility_string_length_check(source, &string_length, 254);
 
-    /* Set the length of the string as the first byte of the unicode string.  
+    /* Set the length of the string as the first byte of the unicode string.
        The length is casted as a byte since Unicode strings cannot be more than 255 chars.  */
     *destination++ = (UCHAR)(string_length + 1);
 
@@ -96,7 +89,7 @@ UINT   string_length;
 
         /* Second character of unicode word is 0.  */
         *destination++ = 0;
-    }    
+    }
 
     /* Finish with a 0.  */
     *destination++ = 0;

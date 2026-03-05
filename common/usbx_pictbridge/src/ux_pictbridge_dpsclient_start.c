@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -142,51 +143,34 @@ static UINT _dpsclient_storage_format(struct UX_SLAVE_CLASS_PIMA_STRUCT *pima,
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpsclient_start                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_dpsclient_start                      PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function starts the DPS client (usually a camera or phone)     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                   Pima instance associated     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    user application                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used macros for RTOS calls, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            initialized PIMA callbacks, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*    This function starts the DPS client (usually a camera or phone)     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                   Pima instance associated     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    user application                                                    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpsclient_start(UX_PICTBRIDGE *pictbridge)
@@ -199,7 +183,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
     /* Check status. */
     if (pictbridge -> ux_pictbridge_object_host  == UX_NULL)
-        return(UX_MEMORY_INSUFFICIENT);    
+        return(UX_MEMORY_INSUFFICIENT);
 
     /* Initialize status to success for things going on.  */
     status = UX_SUCCESS;
@@ -209,7 +193,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
     /* Check status. */
     if (pictbridge -> ux_pictbridge_object_client  == UX_NULL)
-        status = (UX_MEMORY_INSUFFICIENT);    
+        status = (UX_MEMORY_INSUFFICIENT);
 
     /* Allocate 1 object for the job.  */
     if (status == UX_SUCCESS)
@@ -218,7 +202,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
         /* Check status. */
         if (pictbridge -> ux_pictbridge_jobinfo.ux_pictbridge_jobinfo_object  == UX_NULL)
-            status = (UX_MEMORY_INSUFFICIENT);    
+            status = (UX_MEMORY_INSUFFICIENT);
     }
 
     /* Allocate some memory for the XML objects.  For the client script. */
@@ -229,7 +213,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
         /* Check status. */
         if (object_info -> ux_device_class_pima_object_buffer == UX_NULL)
-            status = (UX_MEMORY_INSUFFICIENT);    
+            status = (UX_MEMORY_INSUFFICIENT);
     }
 
     /* Allocate some memory for the XML objects.  For the host script. */
@@ -240,9 +224,9 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
         /* Check status. */
         if (object_info -> ux_device_class_pima_object_buffer == UX_NULL)
-            return(UX_MEMORY_INSUFFICIENT);    
+            return(UX_MEMORY_INSUFFICIENT);
     }
-        
+
     /* Create a event flag group for the client to communicate with the application.  */
     if (status == UX_SUCCESS)
     {
@@ -268,7 +252,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
     /* Allocate a Thread stack.  */
     if (status == UX_SUCCESS)
     {
-        pictbridge -> ux_pictbridge_thread_stack =  
+        pictbridge -> ux_pictbridge_thread_stack =
                     _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_PICTBRIDGE_THREAD_STACK_SIZE);
 
         /* Check the completion status.  */
@@ -283,13 +267,13 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
     {
         status =  _ux_system_thread_create(&pictbridge -> ux_pictbridge_thread,
                                 "ux_pictbridge_thread", _ux_pictbridge_dpsclient_thread,
-                                (ULONG)(ALIGN_TYPE) pictbridge, 
+                                (ULONG)(ALIGN_TYPE) pictbridge,
                                 pictbridge -> ux_pictbridge_thread_stack,
-                                UX_PICTBRIDGE_THREAD_STACK_SIZE, 
+                                UX_PICTBRIDGE_THREAD_STACK_SIZE,
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
                                 UX_NO_TIME_SLICE, UX_AUTO_START);
-                    
+
         /* Check the completion status.  */
         if (status != UX_SUCCESS)
 
@@ -305,10 +289,10 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
         /* Initialize the pictbridge request/response state to request expected.  */
         pictbridge -> ux_pictbridge_request_response = UX_PICTBRIDGE_REQUEST;
 
-        /* Set the host/client cycle to idle.  */    
+        /* Set the host/client cycle to idle.  */
         pictbridge -> ux_pictbridge_host_client_state_machine = UX_PICTBRIDGE_STATE_MACHINE_IDLE;
-        
-        /* Initialize the first XML object valid in the pictbridge instance.  Initialize the handle, type and file name. 
+
+        /* Initialize the first XML object valid in the pictbridge instance.  Initialize the handle, type and file name.
         The storage handle and the object handle have a fixed value of 1 in our implementation. */
         object_info = pictbridge -> ux_pictbridge_object_client;
         object_info -> ux_device_class_pima_object_format = UX_DEVICE_CLASS_PIMA_OFC_SCRIPT;
@@ -316,7 +300,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
         object_info -> ux_device_class_pima_object_handle_id = 2;
         _ux_utility_string_to_unicode(_ux_pictbridge_ddiscovery_name, object_info -> ux_device_class_pima_object_filename);
 
-        /* Initialize the head and tail of the notification round robin buffers. 
+        /* Initialize the head and tail of the notification round robin buffers.
         At first, the head and tail are pointing to the beginning of the array.  */
         pictbridge -> ux_pictbridge_event_array_head =  pictbridge -> ux_pictbridge_event_array;
         pictbridge -> ux_pictbridge_event_array_tail =  pictbridge -> ux_pictbridge_event_array;
@@ -340,10 +324,10 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_number_get             = _ux_pictbridge_dpsclient_object_number_get;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_handles_get            = _ux_pictbridge_dpsclient_object_handles_get;
-        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_info_get               = _ux_pictbridge_dpsclient_object_info_get;   
-        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_data_get               = _ux_pictbridge_dpsclient_object_data_get;   
-        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_info_send              = _ux_pictbridge_dpsclient_object_info_send;  
-        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_data_send              = _ux_pictbridge_dpsclient_object_data_send;  
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_info_get               = _ux_pictbridge_dpsclient_object_info_get;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_data_get               = _ux_pictbridge_dpsclient_object_data_get;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_info_send              = _ux_pictbridge_dpsclient_object_info_send;
+        pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_data_send              = _ux_pictbridge_dpsclient_object_data_send;
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_object_delete                 = _ux_pictbridge_dpsclient_object_delete;
 
 #ifdef UX_PIMA_WITH_MTP_SUPPORT
@@ -363,16 +347,16 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
         /* Store the instance owner.  */
         pictbridge -> ux_pictbridge_pima_parameter.ux_device_class_pima_parameter_application                   = (VOID *) pictbridge;
-        
+
         /* Initialize the device pima class. The class is connected with interface 0 */
-        status = _ux_device_stack_class_register(_ux_system_slave_class_pima_name, _ux_device_class_pima_entry, 
+        status = _ux_device_stack_class_register(_ux_system_slave_class_pima_name, _ux_device_class_pima_entry,
                                                     1, 0, (VOID *)&pictbridge -> ux_pictbridge_pima_parameter);
     }
 
     /* Check status.  */
     if (status != UX_SUCCESS)
     {
-            
+
         /* Free resources allocated so far.  */
         if (_ux_system_thread_created(&pictbridge -> ux_pictbridge_thread))
             _ux_system_thread_delete(&pictbridge -> ux_pictbridge_thread);
@@ -400,7 +384,7 @@ UX_SLAVE_CLASS_PIMA_OBJECT          *object_info;
 
         /* Do not proceed if error.  */
         return(status);
-    }        
+    }
 
     /* We are done.  */
     return(UX_SUCCESS);

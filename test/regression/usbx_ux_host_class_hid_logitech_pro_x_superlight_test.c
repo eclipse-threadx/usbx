@@ -435,13 +435,13 @@ DEMO_HID_REPORT                 *device_report = (DEMO_HID_REPORT*)hid_event.ux_
         {
             /* Wait for 2s. */
             tx_thread_sleep(2 * TX_TIMER_TICKS_PER_SECOND);
-    
+
             /* Report ID set to 0.  */
             hid_event.ux_device_class_hid_event_report_id = 0;
-    
+
             /* Report type set to OUTPUT.  */
             hid_event.ux_device_class_hid_event_report_type = UX_DEVICE_CLASS_HID_REPORT_TYPE_INPUT;
-            
+
             /* Length is fixed to 1.  */
             hid_event.ux_device_class_hid_event_length = sizeof(DEMO_HID_REPORT);
 
