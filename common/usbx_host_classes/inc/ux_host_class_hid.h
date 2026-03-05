@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -34,29 +35,6 @@
 /*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
 /*    USBX HID class.                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly, fixed struct */
-/*                                            field definition issues,    */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Xiuwen Cai, CQ Xiao      Modified comment(s),          */
-/*                                            added interrupt OUT support,*/
-/*                                            added standalone mode,      */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized USB descriptors,  */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -1095,7 +1073,7 @@ UINT    _ux_host_class_hid_report_decompress(UX_HOST_CLASS_HID *hid, UX_HOST_CLA
 UINT    _ux_host_class_hid_report_descriptor_get(UX_HOST_CLASS_HID *hid, ULONG length);
 UINT    _ux_host_class_hid_report_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
 UINT    _ux_host_class_hid_report_id_get(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_REPORT_GET_ID *report_id);
-UINT    _ux_host_class_hid_report_item_analyse(UCHAR *descriptor, UX_HOST_CLASS_HID_ITEM *item);
+UINT    _ux_host_class_hid_report_item_analyse(UCHAR *descriptor, ULONG length, UX_HOST_CLASS_HID_ITEM *item);
 UINT    _ux_host_class_hid_report_set(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
 UINT    _ux_host_class_hid_resources_free(UX_HOST_CLASS_HID *hid);
 VOID    _ux_host_class_hid_transfer_request_completed(UX_TRANSFER *transfer_request);

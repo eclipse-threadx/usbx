@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -71,25 +72,6 @@ static inline VOID _ux_device_class_cdc_acm_transmission_write_run(UX_SLAVE_CLAS
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Device Stack                                                        */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            supported write auto ZLP,   */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_tasks_run(VOID *instance)
@@ -396,7 +378,7 @@ UINT                        zlp = UX_FALSE;
 
         /* On a out, we copy the buffer to the caller. Not very efficient but it makes the API
            easier.  */
-        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer, 
+        _ux_utility_memory_copy(transfer_request -> ux_slave_transfer_request_data_pointer,
                             cdc_acm -> ux_device_class_cdc_acm_write_buffer,
                             cdc_acm -> ux_device_class_cdc_acm_write_transfer_length); /* Use case of memcpy is verified. */
 

@@ -91,7 +91,7 @@ static unsigned char device_framework_high_speed[] = {
     /* Configuration Descriptor */
     0x09, /* bLength */
     0x02, /* bDescriptorType */
-    
+
 #ifdef USE_ZERO_ENDPOINT_SETTING
     0x58, 0x00, /* wTotalLength */
 #else
@@ -398,21 +398,21 @@ UX_ENDPOINT *endpoint;
             /* Fix it, now! - we need to add the RNDIS header. */
 
             /* Copy that packet payload. */
-            memcpy(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH, 
-                   transfer_request->ux_transfer_request_data_pointer, 
+            memcpy(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH,
+                   transfer_request->ux_transfer_request_data_pointer,
                    transfer_request->ux_transfer_request_requested_length);
 
             /* Add the RNDIS header to this packet.  */
 
             _ux_utility_long_put(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_TYPE, UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_MSG);
 
-            _ux_utility_long_put(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_LENGTH, 
+            _ux_utility_long_put(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_MESSAGE_LENGTH,
                                  transfer_request->ux_transfer_request_requested_length + UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH);
 
             _ux_utility_long_put(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_DATA_OFFSET,
                                  UX_DEVICE_CLASS_RNDIS_PACKET_HEADER_LENGTH - UX_DEVICE_CLASS_RNDIS_PACKET_DATA_OFFSET);
 
-            _ux_utility_long_put(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_DATA_LENGTH, 
+            _ux_utility_long_put(host_bulk_endpoint_transfer_data + UX_DEVICE_CLASS_RNDIS_PACKET_DATA_LENGTH,
                                  transfer_request->ux_transfer_request_requested_length);
 
             /* The original data pointer points to the packet, so no leak. We also
@@ -576,7 +576,7 @@ UX_SLAVE_TRANSFER   *interrupt_transfer;
 
     UX_TEST_CHECK_SUCCESS(nx_packet_pool_create(&packet_pool_device, "NetX Device Packet Pool", PACKET_PAYLOAD, packet_pool_memory_device, PACKET_POOL_SIZE));
 
-    UX_TEST_CHECK_SUCCESS(nx_ip_create(&nx_ip_device, "NetX Device Thread", DEVICE_IP_ADDRESS, 0xFF000000L, &packet_pool_device, 
+    UX_TEST_CHECK_SUCCESS(nx_ip_create(&nx_ip_device, "NetX Device Thread", DEVICE_IP_ADDRESS, 0xFF000000L, &packet_pool_device,
                                        _ux_network_driver_entry, ip_thread_stack_device, DEMO_IP_THREAD_STACK_SIZE, 1));
 
     /* Setup ARP.  */
@@ -602,7 +602,7 @@ UX_SLAVE_TRANSFER   *interrupt_transfer;
     /* Set the parameters for callback when insertion/extraction of a CDC device. */
     rndis_parameter.ux_slave_class_rndis_instance_activate   =  demo_rndis_instance_activate;
     rndis_parameter.ux_slave_class_rndis_instance_deactivate =  demo_rndis_instance_deactivate;
-    
+
     /* Define a local NODE ID.  */
     rndis_parameter.ux_slave_class_rndis_parameter_local_node_id[0] = 0x00;
     rndis_parameter.ux_slave_class_rndis_parameter_local_node_id[1] = 0x1e;
@@ -657,7 +657,7 @@ UX_SLAVE_TRANSFER   *interrupt_transfer;
 
         /* Set the request itself.  */
         *(notification_buffer + UX_SETUP_REQUEST) = 0;
-        
+
         /* Set the value. It is the network link.  */
         _ux_utility_short_put(notification_buffer + UX_SETUP_VALUE, (USHORT)(rndis_device->ux_slave_class_rndis_link_state));
 

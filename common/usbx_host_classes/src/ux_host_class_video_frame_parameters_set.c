@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -70,27 +71,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            validated max payload size, */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Yajun xia, CQ Xiao       Modified comment(s),          */
-/*                                            improved interval checking, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_frame_parameters_set(UX_HOST_CLASS_VIDEO *video, ULONG frame_format, ULONG width, ULONG height, ULONG frame_interval)
@@ -351,12 +331,6 @@ ULONG                                           max_payload_size;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_video_frame_parameters_set(UX_HOST_CLASS_VIDEO *video, ULONG frame_format, ULONG width, ULONG height, ULONG frame_interval)

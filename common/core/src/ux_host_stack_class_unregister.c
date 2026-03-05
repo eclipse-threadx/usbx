@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -64,12 +65,6 @@
 /*                                                                        */
 /*    Application                                                         */
 /*    USBX Components                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  09-30-2020     Chaoqiong Xiao           Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_class_unregister(UINT (*class_entry_function)(struct UX_HOST_CLASS_COMMAND_STRUCT *))

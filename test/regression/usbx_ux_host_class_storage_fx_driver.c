@@ -183,7 +183,7 @@ VOID  _ux_host_class_storage_driver_entry(FX_MEDIA *media)
 UINT                            status;
 UX_HOST_CLASS_STORAGE           *storage;
 UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
-    
+
 
     /* Get the pointer to the storage media instance.  */
     storage_media =  (UX_HOST_CLASS_STORAGE_MEDIA *) media -> fx_media_driver_info;
@@ -268,10 +268,10 @@ UX_HOST_CLASS_STORAGE_MEDIA     *storage_media;
 
     case FX_DRIVER_INIT:
 
-        /* Check for media protection.  We must do this operation here because FileX clears all the 
+        /* Check for media protection.  We must do this operation here because FileX clears all the
            media fields before init.  */
         if (storage -> ux_host_class_storage_write_protected_media ==  UX_TRUE)
-        
+
             /* The media is Write Protected. We tell FileX.  */
             media -> fx_media_driver_write_protect = UX_TRUE;
 

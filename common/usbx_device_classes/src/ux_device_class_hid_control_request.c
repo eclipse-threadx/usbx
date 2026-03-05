@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -62,34 +63,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    HID Class                                                           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            prefixed UX to MS_TO_TICK,  */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings 64b, */
-/*                                            resulting in version 6.1.2  */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added Get/Set Protocol      */
-/*                                            request support,            */
-/*                                            resulting in version 6.1.3  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command)

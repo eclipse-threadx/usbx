@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -66,35 +67,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed control OUT transfer, */
-/*                                            supported bi-dir-endpoints, */
-/*                                            resulting in version 6.1.6  */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved check for tests,   */
-/*                                            added error trap case,      */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            cleared transfer status     */
-/*                                            before semaphore wakeup to  */
-/*                                            avoid a race condition,     */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined device ZLP flow,    */
-/*                                            adjusted control request    */
-/*                                            data length handling,       */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_transaction_schedule(UX_HCD_SIM_HOST *hcd_sim_host, UX_HCD_SIM_HOST_ED *ed)
@@ -167,10 +139,10 @@ UX_SLAVE_DCD            *dcd;
     /* Get the pointer to the transfer request.  */
     slave_transfer_request =  &slave_endpoint -> ux_slave_endpoint_transfer_request;
 
-    /* Check the phase for this transfer, if this is the SETUP phase, treatment is different.  Explanation of how 
-       control transfers are handled in the simulator: if the data phase is OUT, we handle it immediately, meaning we 
-       send all the data to the device and remove the STATUS TD in the same scheduler call. If the data phase is IN, we 
-       only take out the SETUP TD and handle the data phase like any other non-control transactions (i.e. the scheduler 
+    /* Check the phase for this transfer, if this is the SETUP phase, treatment is different.  Explanation of how
+       control transfers are handled in the simulator: if the data phase is OUT, we handle it immediately, meaning we
+       send all the data to the device and remove the STATUS TD in the same scheduler call. If the data phase is IN, we
+       only take out the SETUP TD and handle the data phase like any other non-control transactions (i.e. the scheduler
        calls us again with the DATA TDs).  */
     if (td -> ux_sim_host_td_status &  UX_HCD_SIM_HOST_TD_SETUP_PHASE)
     {
@@ -286,10 +258,10 @@ UX_SLAVE_DCD            *dcd;
         else
         {
 
-            /* There is a hub. We need to call the correct Control Transfer dispatcher. 
-               If the device is a hub and this transfer is for one of the devices on the 
-               hub, then we must invoke a separate Control Transfer dispatcher besides 
-               the regular device stack's. This is because the current device stack doesn't 
+            /* There is a hub. We need to call the correct Control Transfer dispatcher.
+               If the device is a hub and this transfer is for one of the devices on the
+               hub, then we must invoke a separate Control Transfer dispatcher besides
+               the regular device stack's. This is because the current device stack doesn't
                handle control transfers to device's other than itself.  */
 
             /* Is this meant for the device itself?  */
@@ -517,7 +489,7 @@ UX_SLAVE_DCD            *dcd;
             if (wake_host == UX_TRUE)
             {
 
-                /* If the slave has less data to send than the host wants to receive, then there may still be 
+                /* If the slave has less data to send than the host wants to receive, then there may still be
                    TDs left to free. Note that this should only happen for IN transactions, since the only way
                    an OUT transfer can complete is if all the data was sent i.e. all the TDs were sent and freed. */
                 if (ed -> ux_sim_host_ed_head_td != ed -> ux_sim_host_ed_tail_td)

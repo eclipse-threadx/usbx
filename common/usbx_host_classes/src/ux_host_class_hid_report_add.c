@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,58 +30,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_report_add                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_report_add                       PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function adds a report (input/output/feature) to the current   */ 
-/*    parser.                                                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*    descriptor                            Pointer to descriptor         */ 
-/*    item                                  Pointer to item               */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_item_data_get      Get data item                 */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_copy               Copy memory block             */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed field managing issue, */
-/*                                            improved usage handling,    */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*    This function adds a report (input/output/feature) to the current   */
+/*    parser.                                                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*    descriptor                            Pointer to descriptor         */
+/*    item                                  Pointer to item               */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_item_data_get      Get data item                 */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_copy               Copy memory block             */
+/*    _ux_utility_memory_free               Release memory block          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_report_add(UX_HOST_CLASS_HID *hid, UCHAR *descriptor, UX_HOST_CLASS_HID_ITEM *item)
@@ -107,7 +91,7 @@ ULONG                       current_field_address;
     if (new_hid_report == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
-    /* We need to select the report entry based on the type of report. If the entry in the 
+    /* We need to select the report entry based on the type of report. If the entry in the
        report chain is NULL, this is the first report so update the start of the chain.  */
     switch (item -> ux_host_class_hid_item_report_tag)
     {
@@ -120,7 +104,7 @@ ULONG                       current_field_address;
 
         /* This is a Input report.  */
         new_hid_report -> ux_host_class_hid_report_type = UX_HOST_CLASS_HID_REPORT_TYPE_INPUT;
-        break;              
+        break;
 
     case UX_HOST_CLASS_HID_MAIN_TAG_OUTPUT:
 
@@ -131,7 +115,7 @@ ULONG                       current_field_address;
         /* This is output report.  */
         new_hid_report -> ux_host_class_hid_report_type = UX_HOST_CLASS_HID_REPORT_TYPE_OUTPUT;
         break;
-        
+
     case UX_HOST_CLASS_HID_MAIN_TAG_FEATURE:
 
         hid_report =  hid_parser -> ux_host_class_hid_parser_feature_report;
@@ -140,7 +124,7 @@ ULONG                       current_field_address;
 
         /* This is a Feature report.  */
         new_hid_report -> ux_host_class_hid_report_type = UX_HOST_CLASS_HID_REPORT_TYPE_FEATURE;
-        break;              
+        break;
 
 
     default:
@@ -155,7 +139,7 @@ ULONG                       current_field_address;
 
         /* Return an error.  */
         return(UX_HOST_CLASS_HID_REPORT_ERROR);
-    }    
+    }
 
     /* If there is a preceding report, locate the end of the report chain.  */
     if (hid_report != UX_NULL)
@@ -163,9 +147,9 @@ ULONG                       current_field_address;
 
         while (hid_report -> ux_host_class_hid_report_next_report != UX_NULL)
             hid_report =  hid_report -> ux_host_class_hid_report_next_report;
-    }       
+    }
 
-    /* If this report is part of the current global report, use the last report 
+    /* If this report is part of the current global report, use the last report
        to add the fields.  */
     if ((hid_report != UX_NULL) && (hid_report -> ux_host_class_hid_report_id == hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_id))
     {
@@ -201,7 +185,7 @@ ULONG                       current_field_address;
     hid_field_count =  hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_count;
 
     /* If the field count is null, this is only padding and there is no field to be allocated to the report.  */
-    if (hid_field_count == 0)       
+    if (hid_field_count == 0)
         return(UX_SUCCESS);
 
     /* Create the field structure.  */
@@ -256,14 +240,14 @@ ULONG                       current_field_address;
 
         /* Allocate memory for the usages.  */
         new_hid_field -> ux_host_class_hid_field_usages =  _ux_utility_memory_allocate_mulc_safe(UX_NO_ALIGN, UX_REGULAR_MEMORY, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage, 4);
-        if (new_hid_field -> ux_host_class_hid_field_usages == UX_NULL)                   
+        if (new_hid_field -> ux_host_class_hid_field_usages == UX_NULL)
         {
 
             _ux_utility_memory_free(new_hid_field -> ux_host_class_hid_field_values);
             _ux_utility_memory_free(new_hid_field);
             return(UX_MEMORY_INSUFFICIENT);
         }
-        
+
         /* Copy the current usages in the field structure.  */
         _ux_utility_memory_copy(new_hid_field -> ux_host_class_hid_field_usages, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_usages, hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage * 4); /* Use case of memcpy is verified. */
     }
@@ -271,8 +255,8 @@ ULONG                       current_field_address;
     /* Save the number of usages.  */
     new_hid_field -> ux_host_class_hid_field_number_usage = hid_parser -> ux_host_class_hid_parser_local.ux_host_class_hid_local_item_number_usage;
 
-    /* Attach the new field to the report. The report may already contain a field, if so parse the chain 
-       until we reach the end of the chain.  */    
+    /* Attach the new field to the report. The report may already contain a field, if so parse the chain
+       until we reach the end of the chain.  */
     new_hid_report -> ux_host_class_hid_report_number_item += hid_field_count;
     if (new_hid_report -> ux_host_class_hid_report_field == UX_NULL)
     {

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -64,18 +65,6 @@
 /*                                                                        */
 /*    Application                                                         */
 /*    USBX Components                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  02-02-2021     Chaoqiong Xiao           Initial Version 6.1.4         */
-/*  06-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed trace enabled error,  */
-/*                                            resulting in version 6.1.7  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_activate(UX_CONFIGURATION *configuration)
@@ -216,12 +205,6 @@ UINT                    status;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_device_configuration_activate(UX_CONFIGURATION *configuration)

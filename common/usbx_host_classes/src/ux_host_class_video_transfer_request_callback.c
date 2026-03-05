@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -60,17 +61,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Video Class                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked pending state,      */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_video_transfer_request_callback(UX_TRANSFER *transfer_request)

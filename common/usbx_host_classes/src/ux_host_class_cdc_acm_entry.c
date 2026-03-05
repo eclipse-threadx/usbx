@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Acm Cdc Class                                                       */
 /**                                                                       */
@@ -46,58 +47,43 @@ static inline UINT  _ux_host_class_cdc_acm_activate_wait(UX_HOST_CLASS_COMMAND *
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_acm_entry                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_cdc_acm_entry                        PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the entry point of the cdc_acm class. It will be   */ 
-/*    called by the USBX stack enumeration module when there is a new     */ 
-/*    cdc_acm on the bus or when the USB cdc_acm is removed.              */ 
-/*                                                                        */ 
-/*    A CDC class can have multiple interfaces, one for Control and one   */ 
-/*    for Data. Here we filter for the Communication Class with ACM       */ 
-/*    subclass and the Communication Data Class.                          */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is the entry point of the cdc_acm class. It will be   */
+/*    called by the USBX stack enumeration module when there is a new     */
+/*    cdc_acm on the bus or when the USB cdc_acm is removed.              */
+/*                                                                        */
+/*    A CDC class can have multiple interfaces, one for Control and one   */
+/*    for Data. Here we filter for the Communication Class with ACM       */
+/*    subclass and the Communication Data Class.                          */
+/*                                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    command                                  Acm Cdc class command      */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_acm_activate       Activate cdc_acm class        */ 
-/*    _ux_host_class_cdc_acm_deactivate     Deactivate cdc_acm class      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Acm Cdc Class                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_cdc_acm_activate       Activate cdc_acm class        */
+/*    _ux_host_class_cdc_acm_deactivate     Deactivate cdc_acm class      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Acm Cdc Class                                                       */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_entry(UX_HOST_CLASS_COMMAND *command)
@@ -124,31 +110,31 @@ UINT    status;
         {
             /* Check for IAD presence.  */
             if ((command -> ux_host_class_command_iad_class == 0) && (command -> ux_host_class_command_iad_subclass == 0))
-            
+
                 /* No IAD, we accept this class.  */
-                return(UX_SUCCESS);            
-            
+                return(UX_SUCCESS);
+
             else
             {
 
                 if ((command -> ux_host_class_command_iad_class == UX_HOST_CLASS_CDC_CONTROL_CLASS) &&
                         (command -> ux_host_class_command_iad_subclass == UX_HOST_CLASS_CDC_ACM_SUBCLASS))
-            
+
                     /* There is an IAD and this is for CDC-ACM.  */
-                    return(UX_SUCCESS);                        
+                    return(UX_SUCCESS);
 
                 else
-                
+
                     /* The IAD does not match with CDC-ACM.  */
-                    return(UX_NO_CLASS_MATCH);                        
+                    return(UX_NO_CLASS_MATCH);
             }
         }
 
-        else            
+        else
 
             /* No match.  */
-            return(UX_NO_CLASS_MATCH);                        
-                
+            return(UX_NO_CLASS_MATCH);
+
     case UX_HOST_CLASS_COMMAND_ACTIVATE:
 
         /* The activate command is used when the device inserted has found a parent and
@@ -164,13 +150,13 @@ UINT    status;
 
     case UX_HOST_CLASS_COMMAND_DEACTIVATE:
 
-        /* The deactivate command is used when the device has been extracted either      
+        /* The deactivate command is used when the device has been extracted either
            directly or when its parents has been extracted.  */
         status =  _ux_host_class_cdc_acm_deactivate(command);
         return(status);
 
-    default: 
-            
+    default:
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_FUNCTION_NOT_SUPPORTED);
 
@@ -178,7 +164,7 @@ UINT    status;
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_FUNCTION_NOT_SUPPORTED, 0, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_FUNCTION_NOT_SUPPORTED);
-    }   
+    }
 }
 
 #if defined(UX_HOST_STANDALONE)
@@ -546,7 +532,7 @@ ULONG                       tick, diff;
         {
 
             /* On error case, it's possible data buffer allocated for interrupt endpoint and transfer started, stop and free it.  */
-            if (cdc_acm -> ux_host_class_cdc_acm_interrupt_endpoint && 
+            if (cdc_acm -> ux_host_class_cdc_acm_interrupt_endpoint &&
                 cdc_acm -> ux_host_class_cdc_acm_interrupt_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_data_pointer)
             {
 

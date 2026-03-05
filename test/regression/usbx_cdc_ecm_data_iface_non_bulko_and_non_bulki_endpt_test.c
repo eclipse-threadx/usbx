@@ -141,8 +141,8 @@ static unsigned char non_bulk_out_endpoint[] = {
 };
 
 static DEVICE_INIT_DATA device_init_data = {
-    .framework = non_bulk_out_endpoint, 
-    .framework_length = sizeof(non_bulk_out_endpoint), 
+    .framework = non_bulk_out_endpoint,
+    .framework_length = sizeof(non_bulk_out_endpoint),
     .dont_register_hcd = 1,
 };
 

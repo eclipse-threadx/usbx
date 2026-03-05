@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Sierra Wireless AR module class                                */
 /**                                                                       */
@@ -29,52 +30,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_activate                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_swar_activate                        PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function calls the USBX stack to activate the class.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Dpump class command pointer   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_configure           Configure swar class        */ 
-/*    _ux_host_class_swar_endpoints_get       Get endpoints of swar       */ 
-/*    _ux_host_stack_class_instance_create    Create class instance       */ 
-/*    _ux_host_stack_class_instance_destroy   Destroy the class instance  */ 
-/*    _ux_utility_memory_allocate             Allocate memory block       */ 
-/*    _ux_utility_memory_free                 Free memory block           */ 
-/*    _ux_host_semaphore_create               Create swar semaphore       */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_entry            Entry of swar class            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*    This function calls the USBX stack to activate the class.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Dpump class command pointer   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_swar_configure           Configure swar class        */
+/*    _ux_host_class_swar_endpoints_get       Get endpoints of swar       */
+/*    _ux_host_stack_class_instance_create    Create class instance       */
+/*    _ux_host_stack_class_instance_destroy   Destroy the class instance  */
+/*    _ux_utility_memory_allocate             Allocate memory block       */
+/*    _ux_utility_memory_free                 Free memory block           */
+/*    _ux_host_semaphore_create               Create swar semaphore       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_swar_entry            Entry of swar class            */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_activate(UX_HOST_CLASS_COMMAND *command)
@@ -83,7 +73,7 @@ UINT  _ux_host_class_swar_activate(UX_HOST_CLASS_COMMAND *command)
 UX_DEVICE                           *device;
 UX_HOST_CLASS_SWAR                  *swar;
 UINT                                status;
-    
+
 
     /* The Sierra Wireless class is always activated by the device descriptor. */
     device =  (UX_DEVICE *) command -> ux_host_class_command_container;
@@ -100,7 +90,7 @@ UINT                                status;
     swar -> ux_host_class_swar_device =  device;
 
     /* Store the instance in the device container, this is for the USBX stack
-       when it needs to invoke the class for deactivation.  */        
+       when it needs to invoke the class for deactivation.  */
     device -> ux_device_class_instance =  (VOID *) swar;
 
     /* Create this class instance.  */
@@ -154,6 +144,6 @@ UINT                                status;
     _ux_utility_memory_free(swar);
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
 }
 

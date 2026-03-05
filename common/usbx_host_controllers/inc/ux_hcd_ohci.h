@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -20,63 +21,42 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_hcd_ohci.h                                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_hcd_ohci.h                                       PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX host OHCI Controller.                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used unsigned defines,      */
-/*                                            resulting in version 6.1.2  */
-/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Xiuwen Cai               Modified comment(s),          */
-/*                                            fixed HcPeriodicStart value,*/
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Yajun Xia                Modified comment(s),          */
-/*                                            fixed OHCI PRSC issue,      */
-/*                                            resulting in version 6.1.12 */
+/*    USBX host OHCI Controller.                                          */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HCD_OHCI_H
 #define UX_HCD_OHCI_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Define generic OHCI constants.  */
 
 #define UX_OHCI_CONTROLLER                                  1
 #define UX_OHCI_MAX_PAYLOAD                                 4096
-#define UX_OHCI_FRAME_DELAY                                 4u   
+#define UX_OHCI_FRAME_DELAY                                 4u
 
 
 /* Define OHCI HCOR register mapping.  */
@@ -111,22 +91,22 @@ extern   "C" {
 #define OHCI_HC_CR_CBSR_1                                   0x00000001u
 #define OHCI_HC_CR_CBSR_2                                   0x00000002u
 #define OHCI_HC_CR_CBSR_3                                   0x00000003u
-#define OHCI_HC_CR_PLE                                      0x00000004u   
-#define OHCI_HC_CR_IE                                       0x00000008u   
-#define OHCI_HC_CR_CLE                                      0x00000010u   
-#define OHCI_HC_CR_BLE                                      0x00000020u   
+#define OHCI_HC_CR_PLE                                      0x00000004u
+#define OHCI_HC_CR_IE                                       0x00000008u
+#define OHCI_HC_CR_CLE                                      0x00000010u
+#define OHCI_HC_CR_BLE                                      0x00000020u
 #define OHCI_HC_CR_RESET                                    0x00000000u
 #define OHCI_HC_CR_RESUME                                   0x00000040u
 #define OHCI_HC_CR_OPERATIONAL                              0x00000080u
 #define OHCI_HC_CR_SUSPEND                                  0x000000c0u
-#define OHCI_HC_CR_IR                                       0x00000100u   
-#define OHCI_HC_CR_RWC                                      0x00000200u   
-#define OHCI_HC_CR_RWE                                      0x00000400u   
+#define OHCI_HC_CR_IR                                       0x00000100u
+#define OHCI_HC_CR_RWC                                      0x00000200u
+#define OHCI_HC_CR_RWE                                      0x00000400u
 
 #define OHCI_HC_CONTROL_VALUE                               (OHCI_HC_CR_CBSR_3 | OHCI_HC_CR_OPERATIONAL | OHCI_HC_CR_PLE | OHCI_HC_CR_IE | OHCI_HC_CR_CLE | OHCI_HC_CR_BLE)
 
 
-/* Define OHCI HCOR command/status bitmaps.  */ 
+/* Define OHCI HCOR command/status bitmaps.  */
 
 #define OHCI_HC_CS_HCR                                      0x00000001u
 #define OHCI_HC_CS_CLF                                      0x00000002u
@@ -166,7 +146,7 @@ extern   "C" {
 
 #define OHCI_HC_INT_SO                                      0x00000001u
 #define OHCI_HC_INT_WDH                                     0x00000002u
-#define OHCI_HC_INT_SF                                      0x00000004u    
+#define OHCI_HC_INT_SF                                      0x00000004u
 #define OHCI_HC_INT_RD                                      0x00000008u
 #define OHCI_HC_INT_UE                                      0x00000010u
 #define OHCI_HC_INT_FNO                                     0x00000020u
@@ -176,7 +156,7 @@ extern   "C" {
 #define OHCI_HC_INT_MIE                                     0x80000000u
 
 
-#define OHCI_HC_INTERRUPT_ENABLE_NORMAL                     (OHCI_HC_INT_WDH | OHCI_HC_INT_RD | OHCI_HC_INT_UE | OHCI_HC_INT_RHSC | OHCI_HC_INT_MIE)     
+#define OHCI_HC_INTERRUPT_ENABLE_NORMAL                     (OHCI_HC_INT_WDH | OHCI_HC_INT_RD | OHCI_HC_INT_UE | OHCI_HC_INT_RHSC | OHCI_HC_INT_MIE)
 
 #define OHCI_HC_INTERRUPT_DISABLE_ALL                       (OHCI_HC_INT_SO   |  \
                                                             OHCI_HC_INT_WDH  |  \
@@ -240,7 +220,7 @@ typedef struct UX_HCD_OHCI_HCCA_STRUCT
                     *ux_hcd_ohci_hcca_ed[32];
     USHORT          ux_hcd_ohci_hcca_frame_number;
     USHORT          ux_hcd_ohci_hcca_reserved1;
-    struct UX_OHCI_TD_STRUCT               
+    struct UX_OHCI_TD_STRUCT
                     *ux_hcd_ohci_hcca_done_head;
     UCHAR           ux_hcd_ohci_hcca_reserved2[116];
 } UX_HCD_OHCI_HCCA;
@@ -251,19 +231,19 @@ typedef struct UX_HCD_OHCI_HCCA_STRUCT
 typedef struct UX_HCD_OHCI_STRUCT
 {
 
-    struct UX_HCD_STRUCT     
+    struct UX_HCD_STRUCT
                     *ux_hcd_ohci_hcd_owner;
-    struct UX_HCD_OHCI_HCCA_STRUCT     
+    struct UX_HCD_OHCI_HCCA_STRUCT
                     *ux_hcd_ohci_hcca;
     ULONG           *ux_hcd_ohci_hcor;
     UINT            ux_hcd_ohci_nb_root_hubs;
-    struct UX_OHCI_TD_STRUCT               
+    struct UX_OHCI_TD_STRUCT
                     *ux_hcd_ohci_done_head;
-    struct UX_OHCI_ED_STRUCT           
+    struct UX_OHCI_ED_STRUCT
                     *ux_hcd_ohci_ed_list;
-    struct UX_OHCI_TD_STRUCT           
+    struct UX_OHCI_TD_STRUCT
                     *ux_hcd_ohci_td_list;
-    struct UX_OHCI_ISO_TD_STRUCT       
+    struct UX_OHCI_ISO_TD_STRUCT
                     *ux_hcd_ohci_iso_td_list;
     UX_EVENT_FLAGS_GROUP
                     ux_hcd_ohci_event_flags_group;
@@ -276,16 +256,16 @@ typedef struct UX_OHCI_ED_STRUCT
 {
 
     ULONG           ux_ohci_ed_dw0;
-    struct UX_OHCI_TD_STRUCT               
+    struct UX_OHCI_TD_STRUCT
                     *ux_ohci_ed_tail_td;
-    struct UX_OHCI_TD_STRUCT               
+    struct UX_OHCI_TD_STRUCT
                     *ux_ohci_ed_head_td;
-    struct UX_OHCI_ED_STRUCT               
+    struct UX_OHCI_ED_STRUCT
                     *ux_ohci_ed_next_ed;
-    struct UX_OHCI_ED_STRUCT               
+    struct UX_OHCI_ED_STRUCT
                     *ux_ohci_ed_previous_ed;
     ULONG           ux_ohci_ed_status;
-    struct UX_ENDPOINT_STRUCT          
+    struct UX_ENDPOINT_STRUCT
                     *ux_ohci_ed_endpoint;
     ULONG           ux_ohci_ed_frame;
 } UX_OHCI_ED;
@@ -303,24 +283,24 @@ typedef struct UX_OHCI_ED_STRUCT
 #define UX_OHCI_ED_MASK_TD                                  (~0x00000003u)
 
 #define UX_OHCI_ED_OUT                                      0x0800u
-#define UX_OHCI_ED_IN                                       0x1000u   
+#define UX_OHCI_ED_IN                                       0x1000u
 
 
 /* Define OHCI TD structure.  */
 
 typedef struct UX_OHCI_TD_STRUCT
-{                                                
+{
     ULONG           ux_ohci_td_dw0;
     UCHAR *         ux_ohci_td_cbp;
-    struct UX_OHCI_TD_STRUCT              
+    struct UX_OHCI_TD_STRUCT
                     *ux_ohci_td_next_td;
     UCHAR *         ux_ohci_td_be;
     ULONG           ux_ohci_td_reserved_1[4];
-    struct UX_TRANSFER_STRUCT          
+    struct UX_TRANSFER_STRUCT
                     *ux_ohci_td_transfer_request;
-    struct UX_OHCI_TD_STRUCT              
+    struct UX_OHCI_TD_STRUCT
                     *ux_ohci_td_next_td_transfer_request;
-    struct UX_OHCI_ED_STRUCT              
+    struct UX_OHCI_ED_STRUCT
                     *ux_ohci_td_ed;
     ULONG           ux_ohci_td_length;
     ULONG           ux_ohci_td_status;
@@ -333,13 +313,13 @@ typedef struct UX_OHCI_TD_STRUCT
 #define UX_OHCI_TD_OUT                                      0x00080000u
 #define UX_OHCI_TD_IN                                       0x00100000u
 #define UX_OHCI_TD_DEFAULT_DW0                              0xf0000000u
-#define UX_OHCI_TD_DATA0                                    0x02000000u   
-#define UX_OHCI_TD_DATA1                                    0x03000000u   
-#define UX_OHCI_TD_R                                        0x00040000u   
+#define UX_OHCI_TD_DATA0                                    0x02000000u
+#define UX_OHCI_TD_DATA1                                    0x03000000u
+#define UX_OHCI_TD_R                                        0x00040000u
 
-#define UX_OHCI_TD_SETUP_PHASE                              0x00010000u  
-#define UX_OHCI_TD_DATA_PHASE                               0x00020000u   
-#define UX_OHCI_TD_STATUS_PHASE                             0x00040000u  
+#define UX_OHCI_TD_SETUP_PHASE                              0x00010000u
+#define UX_OHCI_TD_DATA_PHASE                               0x00020000u
+#define UX_OHCI_TD_STATUS_PHASE                             0x00040000u
 #define UX_OHCI_TD_CC                                       28u
 
 
@@ -350,15 +330,15 @@ typedef struct UX_OHCI_ISO_TD_STRUCT
 
     ULONG           ux_ohci_iso_td_dw0;
     UCHAR *         ux_ohci_iso_td_bp0;
-    struct UX_OHCI_TD_STRUCT              
+    struct UX_OHCI_TD_STRUCT
                     *ux_ohci_iso_td_next_td;
     UCHAR *         ux_ohci_iso_td_be;
     USHORT          ux_ohci_iso_td_offset_psw[8];
-    struct UX_TRANSFER_STRUCT          
+    struct UX_TRANSFER_STRUCT
                     *ux_ohci_iso_td_transfer_request;
-    struct UX_OHCI_TD_STRUCT              
+    struct UX_OHCI_TD_STRUCT
                     *ux_ohci_iso_td_next_td_transfer_request;
-    struct UX_OHCI_ED_STRUCT              
+    struct UX_OHCI_ED_STRUCT
                     *ux_ohci_iso_td_ed;
     ULONG           ux_ohci_iso_td_length;
     ULONG           ux_ohci_iso_td_status;
@@ -418,11 +398,11 @@ VOID    _ux_hcd_ohci_transfer_request_process(UX_TRANSFER *transfer_request);
 #define ux_hcd_ohci_initialize                      _ux_hcd_ohci_initialize
 #define ux_hcd_ohci_interrupt_handler               _ux_hcd_ohci_interrupt_handler
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif
 

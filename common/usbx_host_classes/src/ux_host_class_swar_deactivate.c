@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Sierra Wireless AR module class                                */
 /**                                                                       */
@@ -29,54 +30,43 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_deactivate                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_swar_deactivate                      PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called when this instance of the swar has been     */
-/*    removed from the bus either directly or indirectly. The bulk in\out */ 
-/*    pipes will be destroyed and the instanced removed.                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                                  Swar class command pointer */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
+/*    removed from the bus either directly or indirectly. The bulk in\out */
+/*    pipes will be destroyed and the instanced removed.                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                                  Swar class command pointer */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */
 /*    _ux_host_stack_endpoint_transfer_abort                              */
-/*                                          Abort endpoint transfer       */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
+/*                                          Abort endpoint transfer       */
+/*    _ux_utility_memory_free               Free memory block             */
+/*    _ux_host_semaphore_get                Get protection semaphore      */
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_entry                Entry of swar class        */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_swar_entry                Entry of swar class        */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -95,7 +85,7 @@ UINT                        status;
     /* Protect thread reentry to this instance.  */
     status =  _ux_host_semaphore_get(&swar -> ux_host_class_swar_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
-    {       
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -105,7 +95,7 @@ UINT                        status;
 
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     }
-    
+
     /* We need to abort transactions on the bulk Out pipe.  */
     _ux_host_stack_endpoint_transfer_abort(swar -> ux_host_class_swar_bulk_out_endpoint);
 
@@ -114,7 +104,7 @@ UINT                        status;
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(swar -> ux_host_class_swar_class, (VOID *) swar);
@@ -126,7 +116,7 @@ UINT                        status;
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
     {
-        
+
         /* Inform the application the device is removed.  */
         _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, swar -> ux_host_class_swar_class, (VOID *) swar);
     }
@@ -140,6 +130,6 @@ UINT                        status;
     _ux_utility_memory_free(swar);
 
     /* Return successful status.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Stack                                                        */
 /**                                                                       */
@@ -65,53 +66,31 @@ UX_SYSTEM_SLAVE *_ux_system_slave;
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    device_framework_high_speed           Pointer to high speed FW      */ 
-/*    device_framework_length_high_speed    Length of high speed FW       */ 
-/*    device_framework_full_speed           Pointer to full speed FW      */ 
-/*    device_framework_length_full_speed    Length of full speed FW       */ 
-/*    string_framework                      Pointer to string FW          */ 
-/*    string_framework_length               Length of string FW           */ 
-/*    language_id_framework                 Pointer to language ID FW     */ 
-/*    language_id_framework_length          Length of language ID FW      */ 
-/*    (ux_system_slave_change_function)     Pointer to callback function  */ 
-/*                                            for device changes          */ 
+/*    device_framework_high_speed           Pointer to high speed FW      */
+/*    device_framework_length_high_speed    Length of high speed FW       */
+/*    device_framework_full_speed           Pointer to full speed FW      */
+/*    device_framework_length_full_speed    Length of full speed FW       */
+/*    string_framework                      Pointer to string FW          */
+/*    string_framework_length               Length of string FW           */
+/*    language_id_framework                 Pointer to language ID FW     */
+/*    language_id_framework_length          Length of language ID FW      */
+/*    (ux_system_slave_change_function)     Pointer to callback function  */
+/*                                            for device changes          */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_allocate           Allocate memory               */ 
-/*    _ux_utility_memory_free               Free memory                   */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_allocate           Allocate memory               */
+/*    _ux_utility_memory_free               Free memory                   */
 /*    _ux_utility_semaphore_create          Create semaphore              */
 /*    _ux_utility_semaphore_delete          Delete semaphore              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            added printer support,      */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added CCID support,         */
-/*                                            added video support,        */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,
@@ -163,7 +142,7 @@ UCHAR                           *memory;
 
     /* Store the max number of slave class drivers in the project structure.  */
     UX_SYSTEM_DEVICE_MAX_CLASS_SET(UX_MAX_SLAVE_CLASS_DRIVER);
-    
+
     /* Store the device state change function callback.  */
     _ux_system_slave -> ux_system_slave_change_function =  ux_system_slave_change_function;
 
@@ -174,11 +153,11 @@ UCHAR                           *memory;
     memory =  _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_SLAVE_CLASS) * UX_MAX_SLAVE_CLASS_DRIVER);
     if (memory == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
-    
+
     /* Save this memory allocation in the USBX project.  */
     _ux_system_slave -> ux_system_slave_class_array =  (UX_SLAVE_CLASS *) ((void *) memory);
 
-    /* Allocate some memory for the Control Endpoint.  First get the address of the transfer request for the 
+    /* Allocate some memory for the Control Endpoint.  First get the address of the transfer request for the
        control endpoint. */
     transfer_request =  &device -> ux_slave_device_control_endpoint.ux_slave_endpoint_transfer_request;
 
@@ -208,7 +187,7 @@ UCHAR                           *memory;
     if (status == UX_SUCCESS)
     {
 
-        /* We need to determine the maximum number of interfaces and endpoints declared in the device framework.  
+        /* We need to determine the maximum number of interfaces and endpoints declared in the device framework.
         This mechanism requires that both framework behave the same way regarding the number of interfaces
         and endpoints.  */
         device_framework        =  _ux_system_slave -> ux_system_slave_device_framework_full_speed;
@@ -225,17 +204,17 @@ UCHAR                           *memory;
 
             /* Get the length of this descriptor.  */
             descriptor_length =  (ULONG) *device_framework;
-        
+
             /* And its type.  */
             descriptor_type =  *(device_framework + 1);
-                    
+
             /* Check if this is an endpoint descriptor.  */
             switch(descriptor_type)
             {
 
             case UX_INTERFACE_DESCRIPTOR_ITEM:
 
-                /* Check if this is alternate setting 0. If not, do not add another interface found.  
+                /* Check if this is alternate setting 0. If not, do not add another interface found.
                 If this is alternate setting 0, reset the endpoints count for this interface.  */
                 if (*(device_framework + 3) == 0)
                 {
@@ -245,16 +224,16 @@ UCHAR                           *memory;
 
                     /* Read the number of endpoints for this alternate setting.  */
                     endpoints_in_interface_found = (ULONG) *(device_framework + 4);
-                    
+
                     /* Increment the number of interfaces found in the current configuration.  */
                     local_interfaces_found++;
-                }                
+                }
                 else
                 {
 
                     /* Compare the number of endpoints found in this non 0 alternate setting.  */
                     if (endpoints_in_interface_found < (ULONG) *(device_framework + 4))
-                    
+
                         /* Adjust the number of maximum endpoints in this interface.  */
                         endpoints_in_interface_found = (ULONG) *(device_framework + 4);
                 }
@@ -269,7 +248,7 @@ UCHAR                           *memory;
 
                 /* Check if the number of interfaces found in this configuration is the maximum so far. */
                 if (local_interfaces_found > interfaces_found)
-                    
+
                     /* We need to adjust the number of maximum interfaces.  */
                     interfaces_found =  local_interfaces_found;
 
@@ -281,7 +260,7 @@ UCHAR                           *memory;
 
                 /* Check if the number of endpoints found in the previous configuration is the maximum so far. */
                 if (local_endpoints_found > endpoints_found)
-                    
+
                     /* We need to adjust the number of maximum endpoints.  */
                     endpoints_found =  local_endpoints_found;
 
@@ -301,20 +280,20 @@ UCHAR                           *memory;
             /* Point to the next descriptor.  */
             device_framework +=  descriptor_length;
         }
-        
+
         /* Add the cumulated number of endpoints in the previous interface.  */
         local_endpoints_found += endpoints_in_interface_found;
 
         /* Check if the number of endpoints found in the previous interface is the maximum so far. */
         if (local_endpoints_found > endpoints_found)
-                    
+
             /* We need to adjust the number of maximum endpoints.  */
             endpoints_found =  local_endpoints_found;
 
 
         /* Check if the number of interfaces found in this configuration is the maximum so far. */
         if (local_interfaces_found > interfaces_found)
-            
+
             /* We need to adjust the number of maximum interfaces.  */
             interfaces_found =  local_interfaces_found;
 
@@ -389,7 +368,7 @@ UCHAR                           *memory;
 #if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 0
 
                 /* Obtain some memory.  */
-                endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer = 
+                endpoints_pool -> ux_slave_endpoint_transfer_request.ux_slave_transfer_request_data_pointer =
                                 _ux_utility_memory_allocate(UX_NO_ALIGN, UX_CACHE_SAFE_MEMORY, UX_SLAVE_REQUEST_DATA_MAX_LENGTH);
 
                 /* Ensure we could allocate memory.  */
@@ -410,7 +389,7 @@ UCHAR                           *memory;
                     status = UX_SEMAPHORE_ERROR;
                     break;
                 }
-        
+
                 /* Next endpoint.  */
                 endpoints_pool++;
             }
@@ -422,7 +401,7 @@ UCHAR                           *memory;
     /* Return successful completion.  */
     if (status == UX_SUCCESS)
         return(UX_SUCCESS);
-    
+
     /* Free resources when there is error.  */
 
     /* Free device -> ux_slave_device_endpoints_pool.  */
@@ -499,12 +478,6 @@ UCHAR                           *memory;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_stack_initialize(UCHAR * device_framework_high_speed, ULONG device_framework_length_high_speed,

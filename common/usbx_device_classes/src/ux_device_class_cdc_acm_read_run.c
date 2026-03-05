@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -73,21 +74,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  10-31-2022     Yajun Xia                Modified comment(s),          */
-/*                                            fixed return code,          */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Yajun Xia, CQ Xiao       Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            fixed return code,          */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,
@@ -309,7 +295,7 @@ UINT                        status = UX_SUCCESS;
         cdc_acm -> ux_device_class_cdc_acm_read_status = UX_INVALID_STATE;
         break;
     }
-    
+
 
     /* Error cases.  */
     return(UX_STATE_EXIT);
@@ -357,12 +343,6 @@ UINT                        status = UX_SUCCESS;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm,

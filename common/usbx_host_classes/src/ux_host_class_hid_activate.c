@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,59 +30,44 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_activate                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_activate                         PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs the enumeration of the HID class.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Pointer to command            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_client_search      HID client search             */ 
-/*    _ux_host_class_hid_configure          Configure HID                 */ 
-/*    _ux_host_class_hid_descriptor_parse   Parse descriptor              */ 
-/*    _ux_host_class_hid_interrupt_endpoint_search  Search endpoint       */ 
+/*                                                                        */
+/*    This function performs the enumeration of the HID class.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Pointer to command            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_client_search      HID client search             */
+/*    _ux_host_class_hid_configure          Configure HID                 */
+/*    _ux_host_class_hid_descriptor_parse   Parse descriptor              */
+/*    _ux_host_class_hid_interrupt_endpoint_search  Search endpoint       */
 /*    _ux_host_class_hid_instance_clean     Clean up instance resources   */
-/*    _ux_host_stack_class_instance_create  Create class instance         */ 
-/*    _ux_host_stack_class_instance_destroy Destroy class instance        */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
+/*    _ux_host_stack_class_instance_create  Create class instance         */
+/*    _ux_host_stack_class_instance_destroy Destroy class instance        */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
 /*    _ux_utility_memory_free               Free memory                   */
-/*    _ux_host_semaphore_create             Create semaphore              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*    _ux_host_semaphore_create             Create semaphore              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_activate(UX_HOST_CLASS_COMMAND  *command)
@@ -95,12 +81,12 @@ UINT                status;
     /* The HID is always activated by the interface descriptor and not the
        device descriptor.  */
     interface_ptr =  (UX_INTERFACE *) command -> ux_host_class_command_container;
-    
+
     /* Instantiate this HID class */
     hid =  _ux_utility_memory_allocate(UX_NO_ALIGN,  UX_REGULAR_MEMORY,sizeof(UX_HOST_CLASS_HID));
     if (hid == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
-        
+
     /* Store the class container into this instance.  */
     hid -> ux_host_class_hid_class =  command -> ux_host_class_command_class_ptr;
 
@@ -144,7 +130,7 @@ UINT                status;
     {
 
         /* Search the HID interrupt endpoint but do not start it.  */
-        status =  _ux_host_class_hid_interrupt_endpoint_search(hid);     
+        status =  _ux_host_class_hid_interrupt_endpoint_search(hid);
     }
 
     /* If HID interrupt endpoint is found, goes on. */
@@ -179,7 +165,7 @@ UINT                status;
             UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, hid, 0, 0, 0)
 
             /* Return completion code.  */
-            return(status);    
+            return(status);
         }
         else
         {

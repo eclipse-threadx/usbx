@@ -9,8 +9,8 @@
 UINT  _ux_host_stack_transfer_request(UX_TRANSFER *transfer_request)
 {
 
-UX_ENDPOINT     *endpoint;  
-UX_DEVICE       *device;    
+UX_ENDPOINT     *endpoint;
+UX_DEVICE       *device;
 UX_HCD          *hcd;
 UINT            status;
 #ifdef BUGFIX /* USBX_162 */
@@ -29,7 +29,7 @@ UX_TEST_ACTION                              action;
 
     /* Get the device container from the endpoint.  */
     device =  endpoint -> ux_endpoint_device;
-    
+
 #ifdef BUGFIX /* USBX_162 */
     /* Get the pointer to this thread.  */
     this_thread = tx_thread_identify();
@@ -41,7 +41,7 @@ UX_TEST_ACTION                              action;
     if ((device -> ux_device_state == UX_DEVICE_ATTACHED) || (device -> ux_device_state == UX_DEVICE_ADDRESSED)
             || (device -> ux_device_state == UX_DEVICE_CONFIGURED))
     {
-        
+
         /* Set the pending transfer request.  */
         transfer_request -> ux_transfer_request_completion_code  =     UX_TRANSFER_STATUS_PENDING;
 
@@ -58,7 +58,7 @@ UX_TEST_ACTION                              action;
 
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_TRANSFER_REQUEST, device, endpoint, transfer_request, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
-    
+
     /* With the device we have the pointer to the HCD.  */
     hcd = UX_DEVICE_HCD_GET(device);
 
@@ -67,23 +67,23 @@ UX_TEST_ACTION                              action;
     {
 
         /* Check if the class has already protected it.  */
-        if (device -> ux_device_protection_semaphore.tx_semaphore_count != 0)        
+        if (device -> ux_device_protection_semaphore.tx_semaphore_count != 0)
         {
 
             /* We are using endpoint 0. Protect with semaphore.  */
             status =  _ux_utility_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
-    
+
             /* Check for status.  */
             if (status != UX_SUCCESS)
-            
+
                 /* Something went wrong. */
                 return(status);
-        }        
-    }             
-    
-    /* Send the command to the controller.  */    
+        }
+    }
+
+    /* Send the command to the controller.  */
     status =  hcd -> ux_hcd_entry_function(hcd, UX_HCD_TRANSFER_REQUEST, transfer_request);
-    
+
     /* Check result from transfer request preparation.  */
     if (status == UX_SUCCESS)
     {
@@ -93,58 +93,58 @@ UX_TEST_ACTION                              action;
 
             /* We are using endpoint 0. Unprotect with semaphore.  */
             _ux_utility_semaphore_put(&device -> ux_device_protection_semaphore);
-    }                
+    }
 #else
     /* We can only transfer when the device is ATTACHED, ADDRESSED OR CONFIGURED.  */
     if ((device -> ux_device_state == UX_DEVICE_ATTACHED) || (device -> ux_device_state == UX_DEVICE_ADDRESSED)
             || (device -> ux_device_state == UX_DEVICE_CONFIGURED))
-    {            
-    
+    {
+
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_TRANSFER_REQUEST, device, endpoint, transfer_request, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
-        
+
         /* With the device we have the pointer to the HCD.  */
         hcd = UX_DEVICE_HCD_GET(device);
-    
+
         /* If this is endpoint 0, we protect the endpoint from a possible re-entry.  */
         if ((endpoint -> ux_endpoint_descriptor.bEndpointAddress & (UINT)~UX_ENDPOINT_DIRECTION) == 0)
         {
 
             /* Check if the class has already protected it.  */
-            if (device -> ux_device_protection_semaphore.tx_semaphore_count != 0)        
+            if (device -> ux_device_protection_semaphore.tx_semaphore_count != 0)
             {
-    
+
                 /* We are using endpoint 0. Protect with semaphore.  */
                 status =  _ux_utility_semaphore_get(&device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
-        
+
                 /* Check for status.  */
                 if (status != UX_SUCCESS)
-                
+
                     /* Something went wrong. */
                     return(status);
-            }        
-        }             
-        
+            }
+        }
+
         /* Set the pending transfer request.  */
         transfer_request -> ux_transfer_request_completion_code  =     UX_TRANSFER_STATUS_PENDING;
-        
-        /* Send the command to the controller.  */    
+
+        /* Send the command to the controller.  */
         status =  hcd -> ux_hcd_entry_function(hcd, UX_HCD_TRANSFER_REQUEST, transfer_request);
-        
+
         /* Check result from transfer request preparation.  */
         if (status == UX_SUCCESS)
         {
-    
+
             /* If this is endpoint 0, we unprotect the endpoint. */
             if ((endpoint -> ux_endpoint_descriptor.bEndpointAddress & (UINT)~UX_ENDPOINT_DIRECTION) == 0)
-    
+
                 /* We are using endpoint 0. Unprotect with semaphore.  */
                 _ux_utility_semaphore_put(&device -> ux_device_protection_semaphore);
-        }                
+        }
     }
     else
-    
+
         /* We come here when the device is not in a state which allows transmission.  */
         status = UX_TRANSFER_NOT_READY;
 #endif

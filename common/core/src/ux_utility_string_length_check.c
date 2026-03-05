@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Utility                                                             */
 /**                                                                       */
@@ -27,57 +28,47 @@
 #include "ux_api.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_utility_string_length_check                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_utility_string_length_check                     PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks if a NULL-terminated C string reaches its end  */ 
-/*    before specified length exceeds.                                    */ 
-/*                                                                        */ 
-/*    On success the actual length of C string is written back to UINT    */ 
-/*    variable pointed by string_length_ptr (if not NULL).                */ 
-/*    Otherwise the variable keeps untouched.                             */ 
+/*                                                                        */
+/*    This function checks if a NULL-terminated C string reaches its end  */
+/*    before specified length exceeds.                                    */
+/*                                                                        */
+/*    On success the actual length of C string is written back to UINT    */
+/*    variable pointed by string_length_ptr (if not NULL).                */
+/*    Otherwise the variable keeps untouched.                             */
 /*                                                                        */
 /*    Note NULL terminator is not counted in string length                */
 /*    (same as C strlen).                                                 */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    string                                Pointer to string             */ 
-/*    string_length_ptr                     Pointer to UINT to receive    */ 
-/*                                            the string length           */ 
-/*    max_string_length                     Max string length             */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    returns success if the string length was less than the max length,  */ 
-/*    else it returns error                                               */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    string                                Pointer to string             */
+/*    string_length_ptr                     Pointer to UINT to receive    */
+/*                                            the string length           */
+/*    max_string_length                     Max string length             */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    returns success if the string length was less than the max length,  */
+/*    else it returns error                                               */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_utility_string_length_check(UCHAR *string, UINT *string_length_ptr, UINT max_string_length)
@@ -111,6 +102,6 @@ UINT    string_length;
     if (string_length_ptr)
         *string_length_ptr = string_length;
 
-    return(UX_SUCCESS); 
+    return(UX_SUCCESS);
 }
 

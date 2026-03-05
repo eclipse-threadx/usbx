@@ -33,7 +33,7 @@ static TX_THREAD                           tx_demo_thread_slave_simulation;
 static void                                tx_demo_thread_host_simulation_entry(ULONG);
 static void                                tx_demo_thread_slave_simulation_entry(ULONG);
 static void                                demo_thread_host_reception_callback(UX_HOST_CLASS_CDC_ACM *cdc_acm, UINT status, UCHAR *reception_buffer, ULONG reception_size);
-static VOID                                demo_cdc_instance_activate(VOID  *cdc_instance);             
+static VOID                                demo_cdc_instance_activate(VOID  *cdc_instance);
 static VOID                                demo_cdc_instance_deactivate(VOID *cdc_instance);
 static UINT                                demo_usbx_simulator_cdc_acm_host_send_at_command(UCHAR *string, ULONG length);
 static UINT                                tx_demo_thread_slave_simulation_response(UCHAR *string, ULONG length);
@@ -61,7 +61,7 @@ static ULONG                               error_counter;
 
 /* Define device framework.  */
 
-#define             DEVICE_FRAMEWORK_LENGTH_FULL_SPEED      93 
+#define             DEVICE_FRAMEWORK_LENGTH_FULL_SPEED      93
 #define             DEVICE_FRAMEWORK_LENGTH_HIGH_SPEED      103
 #define             STRING_FRAMEWORK_LENGTH                 47
 #define             LANGUAGE_ID_FRAMEWORK_LENGTH            2
@@ -72,173 +72,173 @@ static unsigned char device_framework_full_speed[] = {
        0x02 bDeviceClass:    CDC class code
        0x00 bDeviceSubclass: CDC class sub code
        0x00 bDeviceProtocol: CDC Device protocol
-    
+
        idVendor & idProduct - http://www.linux-usb.org/usb.ids
     */
-    0x12, 0x01, 0x10, 0x01,     
-    0xEF, 0x02, 0x01,           
-    0x08,                       
-    0x84, 0x84, 0x00, 0x00,     
-    0x00, 0x01,                 
-    0x01, 0x02, 03,             
-    0x01,                       
+    0x12, 0x01, 0x10, 0x01,
+    0xEF, 0x02, 0x01,
+    0x08,
+    0x84, 0x84, 0x00, 0x00,
+    0x00, 0x01,
+    0x01, 0x02, 03,
+    0x01,
 
     /* Configuration 1 descriptor 9 bytes */
-    0x09, 0x02, 0x4b, 0x00,     
-    0x02, 0x01, 0x00,           
-    0x40, 0x00,                 
+    0x09, 0x02, 0x4b, 0x00,
+    0x02, 0x01, 0x00,
+    0x40, 0x00,
 
     /* Interface association descriptor. 8 bytes.  */
     0x08, 0x0b, 0x00, 0x02, 0x02, 0x02, 0x00, 0x00,
 
     /* Communication Class Interface Descriptor Requirement. 9 bytes.   */
-    0x09, 0x04, 0x00,           
-    0x00,                       
-    0x01,                       
-    0x02, 0x02, 0x01,           
-    0x00,                       
+    0x09, 0x04, 0x00,
+    0x00,
+    0x01,
+    0x02, 0x02, 0x01,
+    0x00,
 
     /* Header Functional Descriptor 5 bytes */
-    0x05, 0x24, 0x00,           
-    0x10, 0x01,                 
+    0x05, 0x24, 0x00,
+    0x10, 0x01,
 
     /* ACM Functional Descriptor 4 bytes */
-    0x04, 0x24, 0x02,           
-    0x0f,                       
+    0x04, 0x24, 0x02,
+    0x0f,
 
     /* Union Functional Descriptor 5 bytes */
-    0x05, 0x24, 0x06,           
+    0x05, 0x24, 0x06,
     0x00,                          /* Master interface */
     0x01,                          /* Slave interface  */
 
     /* Call Management Functional Descriptor 5 bytes */
-    0x05, 0x24, 0x01,           
-    0x03,                       
+    0x05, 0x24, 0x01,
+    0x03,
     0x01,                          /* Data interface   */
 
     /* Endpoint 1 descriptor 7 bytes */
-    0x07, 0x05, 0x83,           
-    0x03,                       
-    0x08, 0x00,                 
-    0xFF,                       
+    0x07, 0x05, 0x83,
+    0x03,
+    0x08, 0x00,
+    0xFF,
 
     /* Data Class Interface Descriptor Requirement 9 bytes */
-    0x09, 0x04, 0x01,           
-    0x00,                       
-    0x02,                       
-    0x0A, 0x00, 0x00,           
-    0x00,                       
+    0x09, 0x04, 0x01,
+    0x00,
+    0x02,
+    0x0A, 0x00, 0x00,
+    0x00,
 
     /* First alternate setting Endpoint 1 descriptor 7 bytes*/
-    0x07, 0x05, 0x02,           
-    0x02,                       
-    0x40, 0x00,                 
-    0x00,                       
+    0x07, 0x05, 0x02,
+    0x02,
+    0x40, 0x00,
+    0x00,
 
     /* Endpoint 2 descriptor 7 bytes */
-    0x07, 0x05, 0x81,           
-    0x02,                       
-    0x40, 0x00,                 
-    0x00,                       
+    0x07, 0x05, 0x81,
+    0x02,
+    0x40, 0x00,
+    0x00,
 
 };
 
 static unsigned char device_framework_high_speed[] = {
 
-    /* Device descriptor    
+    /* Device descriptor
        0x02 bDeviceClass:    CDC class code
        0x00 bDeviceSubclass: CDC class sub code
        0x00 bDeviceProtocol: CDC Device protocol
-    
+
        idVendor & idProduct - http://www.linux-usb.org/usb.ids
     */
-    0x12, 0x01, 0x00, 0x02,     
-    0xEF, 0x02, 0x01,           
-    0x40,                       
-    0x84, 0x84, 0x00, 0x00,     
-    0x00, 0x01,                 
-    0x01, 0x02, 03,             
-    0x01,                       
+    0x12, 0x01, 0x00, 0x02,
+    0xEF, 0x02, 0x01,
+    0x40,
+    0x84, 0x84, 0x00, 0x00,
+    0x00, 0x01,
+    0x01, 0x02, 03,
+    0x01,
 
     /* Device qualifier descriptor */
-    0x0a, 0x06, 0x00, 0x02,     
-    0x02, 0x00, 0x00,           
-    0x40,                       
-    0x01,                       
-    0x00,                       
+    0x0a, 0x06, 0x00, 0x02,
+    0x02, 0x00, 0x00,
+    0x40,
+    0x01,
+    0x00,
 
     /* Configuration 1 descriptor */
-    0x09, 0x02, 0x4b, 0x00,     
-    0x02, 0x01, 0x00,           
-    0x40, 0x00,                 
+    0x09, 0x02, 0x4b, 0x00,
+    0x02, 0x01, 0x00,
+    0x40, 0x00,
 
     /* Interface association descriptor. */
     0x08, 0x0b, 0x00, 0x02, 0x02, 0x02, 0x00, 0x00,
 
     /* Communication Class Interface Descriptor Requirement */
-    0x09, 0x04, 0x01,           
-    0x00,                       
-    0x01,                       
-    0x02, 0x02, 0x01,           
-    0x00,                       
+    0x09, 0x04, 0x01,
+    0x00,
+    0x01,
+    0x02, 0x02, 0x01,
+    0x00,
 
     /* Header Functional Descriptor */
-    0x05, 0x24, 0x00,           
-    0x10, 0x01,                 
+    0x05, 0x24, 0x00,
+    0x10, 0x01,
 
     /* ACM Functional Descriptor */
-    0x04, 0x24, 0x02,           
-    0x0f,                       
+    0x04, 0x24, 0x02,
+    0x0f,
 
     /* Union Functional Descriptor */
-    0x05, 0x24, 0x06,           
-    0x00,                       
-    0x01,                       
+    0x05, 0x24, 0x06,
+    0x00,
+    0x01,
 
     /* Call Management Functional Descriptor */
-    0x05, 0x24, 0x01,           
-    0x00,                       
-    0x01,                       
+    0x05, 0x24, 0x01,
+    0x00,
+    0x01,
 
     /* Endpoint 1 descriptor */
-    0x07, 0x05, 0x83,           
-    0x03,                       
-    0x08, 0x00,                 
-    0xFF,                       
+    0x07, 0x05, 0x83,
+    0x03,
+    0x08, 0x00,
+    0xFF,
 
     /* Data Class Interface Descriptor Requirement */
-    0x09, 0x04, 0x01,           
-    0x00,                       
-    0x02,                       
-    0x0A, 0x00, 0x00,           
-    0x00,                       
+    0x09, 0x04, 0x01,
+    0x00,
+    0x02,
+    0x0A, 0x00, 0x00,
+    0x00,
 
     /* First alternate setting Endpoint 1 descriptor */
-    0x07, 0x05, 0x02,           
-    0x02,                       
-    0x40, 0x00,                 
-    0x00,                       
+    0x07, 0x05, 0x02,
+    0x02,
+    0x40, 0x00,
+    0x00,
 
     /* Endpoint 2 descriptor */
-    0x07, 0x05, 0x81,           
-    0x02,                       
-    0x40, 0x00,                 
-    0x00,                        
+    0x07, 0x05, 0x81,
+    0x02,
+    0x40, 0x00,
+    0x00,
 
 };
 
 static unsigned char string_framework[] = {
 
     /* Manufacturer string descriptor : Index 1 - "Express Logic" */
-        0x09, 0x04, 0x01, 0x0c, 
-        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c, 
+        0x09, 0x04, 0x01, 0x0c,
+        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c,
         0x6f, 0x67, 0x69, 0x63,
 
     /* Product string descriptor : Index 2 - "EL Composite device" */
         0x09, 0x04, 0x02, 0x13,
         0x45, 0x4c, 0x20, 0x43, 0x6f, 0x6d, 0x70, 0x6f,
-        0x73, 0x69, 0x74, 0x65, 0x20, 0x64, 0x65, 0x76, 
-        0x69, 0x63, 0x65,                              
+        0x73, 0x69, 0x74, 0x65, 0x20, 0x64, 0x65, 0x76,
+        0x69, 0x63, 0x65,
 
     /* Serial Number string descriptor : Index 3 - "0001" */
         0x09, 0x04, 0x03, 0x04,
@@ -276,7 +276,7 @@ static void    test_isr(void)
 
     /* For further expansion of interrupt-level testing.  */
 }
-    
+
 
 static UINT  demo_class_cdc_acm_get(void)
 {
@@ -292,7 +292,7 @@ UX_HOST_CLASS_CDC_ACM               *cdc_acm_host;
         return(status);
 
     /* We get the first instance of the cdc_acm device */
-    do  
+    do
     {
 
         status =  ux_host_stack_class_instance_get(class, 0, (void **) &cdc_acm_host);
@@ -305,17 +305,17 @@ UX_HOST_CLASS_CDC_ACM               *cdc_acm_host;
 
     /* Isolate both the control and data interfaces.  */
     if (cdc_acm_host -> ux_host_class_cdc_acm_interface -> ux_interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_DATA_CLASS)
-    {            
+    {
         /* This is the data interface.  */
         cdc_acm_host_data = cdc_acm_host;
-        
+
         /* In that case, the second one should be the control interface.  */
         status =  ux_host_stack_class_instance_get(class, 1, (void **) &cdc_acm_host);
 
         /* Check error.  */
         if (status != UX_SUCCESS)
             return(status);
-        
+
         /* Check for the control interfaces.  */
         if (cdc_acm_host -> ux_host_class_cdc_acm_interface -> ux_interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_CONTROL_CLASS)
         {
@@ -324,7 +324,7 @@ UX_HOST_CLASS_CDC_ACM               *cdc_acm_host;
             cdc_acm_host_control = cdc_acm_host;
 
             return(UX_SUCCESS);
-        
+
         }
     }
     else
@@ -342,30 +342,30 @@ UX_HOST_CLASS_CDC_ACM               *cdc_acm_host;
             /* Check error.  */
             if (status != UX_SUCCESS)
                 return(status);
-        
+
             /* Check for the data interface.  */
             if (cdc_acm_host -> ux_host_class_cdc_acm_interface -> ux_interface_descriptor.bInterfaceClass == UX_HOST_CLASS_CDC_DATA_CLASS)
             {
 
                 /* This is the data interface.  */
                 cdc_acm_host_data = cdc_acm_host;
-            
+
                 return(UX_SUCCESS);
-        
+
             }
         }
     }
-        
+
     /* Return ERROR.  */
     return(UX_ERROR);
 }
 
-static VOID    demo_cdc_instance_activate(VOID *cdc_instance)   
+static VOID    demo_cdc_instance_activate(VOID *cdc_instance)
 {
 
     /* Save the CDC instance.  */
     cdc_acm_slave = (UX_SLAVE_CLASS_CDC_ACM *) cdc_instance;
-}           
+}
 static VOID    demo_cdc_instance_deactivate(VOID *cdc_instance)
 {
 
@@ -385,7 +385,7 @@ void    usbx_cdc_acm_device_dtr_rts_reset_on_disconnect_test_application_define(
 CHAR *              stack_pointer;
 CHAR *              memory_pointer;
 UINT                status;
-    
+
     /* Initialize the free memory pointer */
     stack_pointer = (CHAR *) usbx_memory;
     memory_pointer = stack_pointer + (UX_DEMO_STACK_SIZE * 2);
@@ -409,7 +409,7 @@ UINT                status;
         printf("Running CDC ACM Basic Functionality Test............................ ERROR #2\n");
         test_control_return(1);
     }
-    
+
     /* Register CDC-ACM class.  */
     status =  ux_host_stack_class_register(_ux_system_host_class_cdc_acm_name, ux_host_class_cdc_acm_entry);
     if (status != UX_SUCCESS)
@@ -446,7 +446,7 @@ UINT                status;
     parameter.ux_slave_class_cdc_acm_instance_deactivate =  demo_cdc_instance_deactivate;
 
     /* Initialize the device cdc class. This class owns both interfaces starting with 0. */
-     status =  ux_device_stack_class_register(_ux_system_slave_class_cdc_acm_name, ux_device_class_cdc_acm_entry, 
+     status =  ux_device_stack_class_register(_ux_system_slave_class_cdc_acm_name, ux_device_class_cdc_acm_entry,
                                                 1,0,  &parameter);
 
     if(status!=UX_SUCCESS)
@@ -466,12 +466,12 @@ UINT                status;
         printf("Running CDC ACM Basic Functionality Test............................ ERROR #7\n");
         test_control_return(1);
     }
-    
+
     /* Create the main host simulation thread.  */
-    status =  tx_thread_create(&tx_demo_thread_host_simulation, "tx demo host simulation", tx_demo_thread_host_simulation_entry, 0,  
-            stack_pointer, UX_DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&tx_demo_thread_host_simulation, "tx demo host simulation", tx_demo_thread_host_simulation_entry, 0,
+            stack_pointer, UX_DEMO_STACK_SIZE,
             20, 20, 1, TX_AUTO_START);
-      
+
     /* Check for error.  */
     if (status != TX_SUCCESS)
     {

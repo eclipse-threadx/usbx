@@ -68,8 +68,8 @@ UX_TRANSFER     *transfer_request;
 
     /* Inform user.  */
     printf("Running USB host Class Hub Port Change Coverage Test ............... ");
-    
-    ux_system_initialize(usb_memory_pool_area, USB_MEMORY_POOL_SIZE, 
+
+    ux_system_initialize(usb_memory_pool_area, USB_MEMORY_POOL_SIZE,
         usb_cache_safe_memory_pool_area, USB_CACHE_SAFE_MEMORY_POOL_SIZE);
 
 

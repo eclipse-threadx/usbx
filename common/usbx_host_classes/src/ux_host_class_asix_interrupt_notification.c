@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   ASIX Class                                                          */
 /**                                                                       */
@@ -29,56 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_asix_interrupt_notification          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_asix_interrupt_notification          PORTABLE C      */
 /*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is called by the stack when an interrupt packet as    */ 
-/*    been received.                                                      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is called by the stack when an interrupt packet as    */
+/*    been received.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_semaphore_put                Put semaphore                 */
 /*    _ux_host_stack_transfer_request       Transfer request              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX stack                                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            use pre-calculated value    */
-/*                                            instead of wMaxPacketSize,  */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined link up/down flow,  */
-/*                                            refined interrupt flow,     */
-/*                                            resulting in version 6.2.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX stack                                                          */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_asix_interrupt_notification(UX_TRANSFER *transfer_request)
@@ -88,7 +70,7 @@ UX_HOST_CLASS_ASIX                      *asix;
 
     /* Get the class instance for this transfer request.  */
     asix =  (UX_HOST_CLASS_ASIX *) transfer_request -> ux_transfer_request_class_instance;
-    
+
     /* Check the state of the transfer.  If there is an error, we do not proceed with this notification.  */
     if (transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS)
 
@@ -105,12 +87,12 @@ UX_HOST_CLASS_ASIX                      *asix;
     asix -> ux_host_class_asix_notification_count++;
 
     /* Ensure the length of our interrupt pipe data is correct.  */
-    if (transfer_request -> ux_transfer_request_actual_length == 
+    if (transfer_request -> ux_transfer_request_actual_length ==
             transfer_request -> ux_transfer_request_requested_length)
     {
 
         /* Check if the first byte is a interrupt packet signature.  */
-        if (*(transfer_request -> ux_transfer_request_data_pointer + UX_HOST_CLASS_ASIX_INTERRUPT_SIGNATURE_OFFSET) == 
+        if (*(transfer_request -> ux_transfer_request_data_pointer + UX_HOST_CLASS_ASIX_INTERRUPT_SIGNATURE_OFFSET) ==
                 UX_HOST_CLASS_ASIX_INTERRUPT_SIGNATURE_VALUE)
         {
 
@@ -120,28 +102,28 @@ UX_HOST_CLASS_ASIX                      *asix;
             {
 
                 /* Link is up. See if we know about that.  */
-                if (asix -> ux_host_class_asix_link_state != UX_HOST_CLASS_ASIX_LINK_STATE_UP && 
+                if (asix -> ux_host_class_asix_link_state != UX_HOST_CLASS_ASIX_LINK_STATE_UP &&
                     asix -> ux_host_class_asix_link_state != UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_UP)
                 {
-            
+
                     /* Memorize the new link state.  */
-                    asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_UP;                    
-                    
+                    asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_UP;
+
                     /* We need to inform the asix thread of this change.  */
                     _ux_host_semaphore_put(&asix -> ux_host_class_asix_interrupt_notification_semaphore);
 
                     /* Reactivate interrupt pipe after link up handled.  */
                     return;
                 }
-            }                    
+            }
             else
             {
 
                 /* Link is down. See if we know about that.  */
-                if (asix -> ux_host_class_asix_link_state != UX_HOST_CLASS_ASIX_LINK_STATE_DOWN && 
+                if (asix -> ux_host_class_asix_link_state != UX_HOST_CLASS_ASIX_LINK_STATE_DOWN &&
                     asix -> ux_host_class_asix_link_state != UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_DOWN)
                 {
-            
+
                     /* Memorize the new link state.  */
                     asix -> ux_host_class_asix_link_state = UX_HOST_CLASS_ASIX_LINK_STATE_PENDING_DOWN;
 

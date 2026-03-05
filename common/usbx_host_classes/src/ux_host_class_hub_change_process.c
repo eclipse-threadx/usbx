@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Hub Class                                                           */
 /**                                                                       */
@@ -29,46 +30,38 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_change_process                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_change_process                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called by the topology thread when there has been  */
-/*    activity on the HUB.                                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hub                                   Pointer to HUB                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_port_change_process Port change process          */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_short_get                 Get 16-bit word               */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*    activity on the HUB.                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hub                                   Pointer to HUB                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hub_port_change_process Port change process          */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_short_get                 Get 16-bit word               */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_change_process(UX_HOST_CLASS_HUB *hub)
@@ -78,14 +71,14 @@ UX_TRANSFER     *transfer_request;
 USHORT          port_status_change_bits;
 UINT            port_index;
 UINT            status;
-    
+
 
     /* Now get the transfer_request attached to the interrupt endpoint.  */
     transfer_request =  &hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_transfer_request;
 
-    /* The interrupt pipe buffer contains the status change for each of the ports 
+    /* The interrupt pipe buffer contains the status change for each of the ports
        the length of the buffer can be 1 or 2 depending on the number of ports.
-       Usually, since HUBs can be bus powered the maximum number of ports is 4. 
+       Usually, since HUBs can be bus powered the maximum number of ports is 4.
        We must be taking precautions on how we read the buffer content for
        big endian machines.  */
     if (transfer_request -> ux_transfer_request_actual_length == 1)
@@ -104,7 +97,7 @@ UINT            status;
     /* The HUB could also have changed.  */
     if (port_status_change_bits & 1)
         _ux_host_class_hub_hub_change_process(hub);
-        
+
     /* The actual length should be cleared for the next transfer.  */
     transfer_request -> ux_transfer_request_actual_length =  0;
 

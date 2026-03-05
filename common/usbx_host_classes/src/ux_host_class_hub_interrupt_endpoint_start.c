@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**  HUB Class                                                            */
 /**                                                                       */
@@ -29,56 +30,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_interrupt_endpoint_start         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_interrupt_endpoint_start         PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function search for the handle of the only interrupt endpoint  */
-/*    in the default alternate setting of the HUB interface. The          */ 
+/*    in the default alternate setting of the HUB interface. The          */
 /*    interrupt endpoint should always be there. When it is located, the  */
 /*    first transfer for this endpoint is made. The HUB will report status*/
-/*    changes on this pipe.                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hub                                   Pointer to HUB class          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_interface_endpoint_get Get endpoint of interface     */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            use pre-calculated value    */
-/*                                            instead of wMaxPacketSize,  */
-/*                                            resulting in version 6.1.9  */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added timeout value init,   */
-/*                                            resulting in version 6.1.12 */
+/*    changes on this pipe.                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hub                                   Pointer to HUB class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_interface_endpoint_get Get endpoint of interface     */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_interrupt_endpoint_start(UX_HOST_CLASS_HUB *hub)
@@ -94,8 +80,8 @@ UX_TRANSFER     *transfer_request;
     /* Check completion status.  */
     if (status != UX_SUCCESS)
         return(status);
-    
-    /* Do a sanity check on the nature of the endpoint. Must be interrupt and its direction must be IN.  */        
+
+    /* Do a sanity check on the nature of the endpoint. Must be interrupt and its direction must be IN.  */
     if (((hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_IN) &&
         ((hub -> ux_host_class_hub_interrupt_endpoint -> ux_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_INTERRUPT_ENDPOINT))
     {
@@ -118,7 +104,7 @@ UX_TRANSFER     *transfer_request;
         transfer_request -> ux_transfer_request_completion_function =  _ux_host_class_hub_transfer_request_completed;
 
         /* Obtain a buffer for this transaction. The buffer will always be reused.  */
-        transfer_request -> ux_transfer_request_data_pointer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, 
+        transfer_request -> ux_transfer_request_data_pointer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY,
                                                                 transfer_request -> ux_transfer_request_requested_length);
 
         /* Check the memory pointer.  */
@@ -137,8 +123,8 @@ UX_TRANSFER     *transfer_request;
 
         /* Return completion status.  */
         return(status);
-    }            
-    
+    }
+
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_HUB, UX_ENDPOINT_HANDLE_UNKNOWN);
 

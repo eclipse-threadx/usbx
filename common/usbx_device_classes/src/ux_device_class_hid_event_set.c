@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -61,27 +62,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX                                                             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            verified memset and memcpy  */
-/*                                            cases, used UX prefix to    */
-/*                                            refer to TX symbols instead */
-/*                                            of using them directly,     */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
@@ -209,12 +189,6 @@ UCHAR                       *next_position;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,

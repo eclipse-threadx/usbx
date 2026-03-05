@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -29,46 +30,35 @@
 #include "ux_host_class_pima.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpshost_startjob                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_dpshost_startjob                     PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function requests one or more files from the camera to be      */ 
-/*    printed.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pictbridge                             Pictbridge instance          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpshost_thread                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Yajun Xia                Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*    This function requests one or more files from the camera to be      */
+/*    printed.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pictbridge                             Pictbridge instance          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_dpshost_thread                                       */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_startjob(UX_PICTBRIDGE *pictbridge)
@@ -90,7 +80,7 @@ UCHAR                               *object_buffer;
 
     /* Get the session in a properly casted format.  */
     pima_session = (UX_HOST_CLASS_PIMA_SESSION *) pictbridge -> ux_pictbridge_session;
-    
+
     /* We have 2 structures that tell us about the job(s) to do. The jobinfo which
        applies to all the jobs and one or more instances of the printinfo structure
        which applies to each file\object to be printed.  */
@@ -98,12 +88,12 @@ UCHAR                               *object_buffer;
 
     /* Get the first printinfo structure.  */
     printinfo =  jobinfo -> ux_pictbridge_jobinfo_printinfo_start;
-    
+
     /* Parse all the job info.  */
     while (printinfo != UX_NULL)
     {
         /* Set the current print job.  */
-        jobinfo -> ux_pictbridge_jobinfo_printinfo_current = printinfo;        
+        jobinfo -> ux_pictbridge_jobinfo_printinfo_current = printinfo;
 
         /* Change status from idle to printing.  */
         pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_dpsprintservicestatus =  UX_PICTBRIDGE_DPS_PRINTSERVICE_STATUS_ACTIVE;
@@ -134,7 +124,7 @@ UCHAR                               *object_buffer;
             return(status);
 
         /* Get the object info for this fileID to be printed.  */
-        status = _ux_host_class_pima_object_info_get(pima, pima_session, 
+        status = _ux_host_class_pima_object_info_get(pima, pima_session,
                                                 printinfo -> ux_pictbridge_printinfo_fileid, &pima_object);
         if (status != UX_SUCCESS)
         {
@@ -145,14 +135,14 @@ UCHAR                               *object_buffer;
             /* Change NewJob status to print ok.  */
             pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_newjobok = UX_PICTBRIDGE_NEW_JOB_TRUE;
 
-            return(status);        
+            return(status);
         }
 
         /* Get the object length from the object info.  */
         object_length = pima_object.ux_host_class_pima_object_compressed_size;
-        
+
         /* Open the object.  */
-         status = _ux_host_class_pima_object_open(pima, pima_session, 
+         status = _ux_host_class_pima_object_open(pima, pima_session,
                                                 printinfo -> ux_pictbridge_printinfo_fileid, &pima_object);
          if (status != UX_SUCCESS)
          {
@@ -162,7 +152,7 @@ UCHAR                               *object_buffer;
 
             /* Change NewJob status to print ok.  */
             pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_newjobok = UX_PICTBRIDGE_NEW_JOB_TRUE;
-            
+
 
             return(status);
          }
@@ -173,48 +163,48 @@ UCHAR                               *object_buffer;
         /* Check for memory error.  */
         if (object_buffer == UX_NULL)
         {
-        
+
             /* Change status from printing to idle.  */
             pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_dpsprintservicestatus =  UX_PICTBRIDGE_DPS_PRINTSERVICE_STATUS_IDLE;
 
             /* Change NewJob status to print ok.  */
             pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_newjobok = UX_PICTBRIDGE_NEW_JOB_TRUE;
 
-            
+
             /* Close the object.  */
             _ux_host_class_pima_object_close(pima, pima_session,
                                                 printinfo -> ux_pictbridge_printinfo_fileid, &pima_object);
             /* Return an error.  */
              return(UX_MEMORY_INSUFFICIENT);
-        
+
         }
 
         /* Reset the current object offset.  */
         object_offset = 0;
-        
+
          /* Obtain all the object data.  */
          while(object_length != 0)
-         {            
+         {
 
              /* Calculate what length to request.  */
              if (object_length > UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER)
-                 
+
                  /* Request maximum length.  */
                  requested_length = UX_PICTBRIDGE_MAX_PIMA_OBJECT_BUFFER;
-                 
+
              else
-                                 
+
                  /* Request remaining length.  */
                  requested_length = object_length;
-                 
-        
+
+
              /* Get the object data.  */
-             status = _ux_host_class_pima_object_get(pima, pima_session, printinfo -> ux_pictbridge_printinfo_fileid, &pima_object, 
+             status = _ux_host_class_pima_object_get(pima, pima_session, printinfo -> ux_pictbridge_printinfo_fileid, &pima_object,
                                                             object_buffer, requested_length, &actual_length);
              if (status != UX_SUCCESS)
              {
-                        
-                /* Abort the current transfer.  */                    
+
+                /* Abort the current transfer.  */
                 _ux_host_class_pima_object_transfer_abort(pima, pima_session, printinfo -> ux_pictbridge_printinfo_fileid, &pima_object);
 
                 /* Change status from printing to idle.  */
@@ -226,20 +216,20 @@ UCHAR                               *object_buffer;
 
                 /* Free memory of the object.  */
                 _ux_utility_memory_free(object_buffer);
-        
+
                 /* Return error.  */
                 return(status);
-             }            
-        
+             }
+
             /* If there is an application callback function, associated with this object, call it.  */
             if (pictbridge -> ux_pictbridge_application_object_data_write != UX_NULL)
             {
-            
+
                 /* Call the callback function.  */
-                status = pictbridge -> ux_pictbridge_application_object_data_write(pictbridge, 
-                                                                                    object_buffer, 
-                                                                                    object_offset, 
-                                                                                    pima_object.ux_host_class_pima_object_compressed_size, 
+                status = pictbridge -> ux_pictbridge_application_object_data_write(pictbridge,
+                                                                                    object_buffer,
+                                                                                    object_offset,
+                                                                                    pima_object.ux_host_class_pima_object_compressed_size,
                                                                                     actual_length);
 
                 if (status != UX_SUCCESS)
@@ -265,11 +255,11 @@ UCHAR                               *object_buffer;
 
              /* We have received some data, update the length remaining.  */
              object_length -= actual_length;
-             
+
              /* Update the offset.  */
              object_offset += actual_length;
-         }    
-        
+         }
+
          /* Close the object.  */
          status = _ux_host_class_pima_object_close(pima, pima_session,
                                                 printinfo -> ux_pictbridge_printinfo_fileid, &pima_object);
@@ -283,13 +273,13 @@ UCHAR                               *object_buffer;
             /* Change NewJob status to print ok.  */
             pictbridge -> ux_pictbridge_dpslocal.ux_pictbridge_devinfo_newjobok = UX_PICTBRIDGE_NEW_JOB_TRUE;
 
-        
+
             /* Free memory of the object.  */
             _ux_utility_memory_free(object_buffer);
 
             return(status);
         }
-        
+
         /* Free resources.  */
         _ux_utility_memory_free(object_buffer);
 
@@ -322,11 +312,11 @@ UCHAR                               *object_buffer;
 
         /* Next printinfo.  */
         printinfo = printinfo -> ux_pictbridge_printinfo_next;
-                
+
     }
 
     /* Return status successful.  */
     return(UX_SUCCESS);
-           
+
 }
 

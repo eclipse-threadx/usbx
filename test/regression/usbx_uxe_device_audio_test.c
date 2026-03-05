@@ -497,7 +497,7 @@ UX_DEVICE_CLASS_AUDIO_STREAM            dummy_stream_inst;
 UX_DEVICE_CLASS_AUDIO_STREAM            *dummy_stream = &dummy_stream_inst;
 UCHAR                                   *dummy_buffer;
 ULONG                                   dummy_dw;
-UX_SLAVE_TRANSFER                       dummy_transfer; 
+UX_SLAVE_TRANSFER                       dummy_transfer;
 UX_DEVICE_CLASS_AUDIO10_CONTROL_GROUP   dummy_group10;
 UX_DEVICE_CLASS_AUDIO20_CONTROL_GROUP   dummy_group20;
 

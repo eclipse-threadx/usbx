@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Stack                                                        */
 /**                                                                       */
@@ -51,30 +52,15 @@
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_dcd_function)               DCD controller function       */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_dcd_function)               DCD controller function       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Stack                                                        */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions, stalled on not */
-/*                                            supported device requests,  */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_set_feature(ULONG request_type, ULONG request_value, ULONG request_index)
@@ -103,7 +89,7 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
     /* The feature can be for either the device or the endpoint.  */
     switch (request_type & UX_REQUEST_TARGET)
     {
-    
+
     case UX_REQUEST_TARGET_DEVICE:
 
         /* Check if we have a DEVICE_REMOTE_WAKEUP Feature.  */
@@ -166,7 +152,7 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
 #endif
             /* Get the first endpoint for this interface.  */
             endpoint_target =  interface_ptr -> ux_slave_interface_first_endpoint;
-                
+
             /* Parse all the endpoints.  */
             while (endpoint_target != UX_NULL)
             {
@@ -196,11 +182,11 @@ UX_SLAVE_ENDPOINT       *endpoint_target;
         /* Intentionally fall through into the default case. */
         /* fall through */
     default:
-        
+
         /* We stall the command.  */
         dcd -> ux_slave_dcd_function(dcd, UX_DCD_STALL_ENDPOINT, endpoint);
-    
+
         /* No more work to do here.  The command failed but the upper layer does not depend on it.  */
-        return(UX_SUCCESS);            
+        return(UX_SUCCESS);
     }
 }

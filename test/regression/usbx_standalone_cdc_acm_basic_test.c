@@ -920,7 +920,7 @@ static VOID test_cdc_acm_host_write_callback(UX_HOST_CLASS_CDC_ACM *cdc_acm,
 /* Uses _write_with_callback.  */
 
 static UINT test_cdc_acm_host_write(UX_HOST_CLASS_CDC_ACM *cdc_acm,
-                                    UCHAR *data_pointer, 
+                                    UCHAR *data_pointer,
                                     ULONG requested_length,
                                     ULONG *actual_length)
 {

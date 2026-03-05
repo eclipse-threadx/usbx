@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -73,12 +74,6 @@
 /*                                                                        */
 /*    Application                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2022        Yajun xia             Initial Version 6.2.0         */
-/*                                                                        */
 /**************************************************************************/
 UINT _ux_device_class_printer_read_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length)
@@ -124,10 +119,10 @@ UINT                        status = UX_SUCCESS;
     /* Run the transfer state machine.  */
     if (printer -> ux_device_class_printer_read_state == UX_STATE_RESET)
     {
-            
+
             /* If trace is enabled, insert this event into the trace buffer.  */
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_PRINTER_READ, printer, buffer, requested_length, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
-    
+
             printer -> ux_device_class_printer_read_state = UX_DEVICE_CLASS_PRINTER_READ_START;
             printer -> ux_device_class_printer_read_status = UX_TRANSFER_NO_ANSWER;
             transfer_request -> ux_slave_transfer_request_data_pointer = buffer;
@@ -323,12 +318,6 @@ UINT                        status = UX_SUCCESS;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_printer_read_run(UX_DEVICE_CLASS_PRINTER *printer, UCHAR *buffer,

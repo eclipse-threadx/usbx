@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device CDC_ECM Class                                                */
 /**                                                                       */
@@ -27,30 +28,30 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_ecm_change                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_ecm_change                     PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function changes the interface of the CDC_ECM device           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                           Pointer to cdc_ecm command        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function changes the interface of the CDC_ECM device           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                           Pointer to cdc_ecm command        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_network_driver_link_up            Link status up                */
 /*    _ux_network_driver_link_down          Link status down              */
 /*    _ux_utility_memory_set                Set memory                    */
@@ -58,43 +59,16 @@
 /*    _ux_device_event_flags_set            Set event flags               */
 /*    _ux_device_stack_transfer_all_request_abort                         */
 /*                                          Abort transfer                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Source Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases, used UX prefix to    */
-/*                                            refer to TX symbols instead */
-/*                                            of using them directly,     */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Source Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_cdc_ecm_change(UX_SLAVE_CLASS_COMMAND *command)
 {
 
-UX_SLAVE_INTERFACE                      *interface_ptr;            
+UX_SLAVE_INTERFACE                      *interface_ptr;
 UX_SLAVE_CLASS                          *class_ptr;
 UX_SLAVE_CLASS_CDC_ECM                  *cdc_ecm;
 UX_SLAVE_ENDPOINT                       *endpoint;
@@ -107,27 +81,27 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
     /* Get the interface that owns this instance.  */
     interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
-    
+
     /* Locate the endpoints.  Control and Bulk in/out for Data Interface.  */
     endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
-    
+
     /* If the interface to mount has a non zero alternate setting, the class is really active with
        the endpoints active.  If the interface reverts to alternate setting 0, it needs to have
        the pending transactions terminated.  */
-    if (interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting != 0)       
+    if (interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting != 0)
     {
-    
+
         /* Parse all endpoints.  */
         while (endpoint != UX_NULL)
         {
-        
+
             /* Check the endpoint direction, and type.  */
             if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_IN)
             {
-    
+
                 /* Look at type.  */
                 if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_BULK_ENDPOINT)
-            
+
                     /* We have found the bulk in endpoint, save it.  */
                     cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint =  endpoint;
 #if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
@@ -140,7 +114,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
             {
                 /* Look at type for out endpoint.  */
                 if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_BULK_ENDPOINT)
-            
+
                     /* We have found the bulk out endpoint, save it.  */
                     cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint =  endpoint;
 #if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_CDC_ECM_ZERO_COPY)
@@ -148,8 +122,8 @@ UX_SLAVE_ENDPOINT                       *endpoint;
                         ux_slave_transfer_request_data_pointer =
                                 UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER(cdc_ecm);
 #endif
-            }                
-    
+            }
+
             /* Next endpoint.  */
             endpoint =  endpoint -> ux_slave_endpoint_next_endpoint;
         }
@@ -162,7 +136,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
         /* Declare the link to be up. */
         cdc_ecm -> ux_slave_class_cdc_ecm_link_state = UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_UP;
-        
+
         /* Communicate the state with the network driver.  */
         _ux_network_driver_link_up(cdc_ecm -> ux_slave_class_cdc_ecm_network_handle);
 
@@ -172,25 +146,25 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 #else
 
         /* Reset the endpoint buffers.  */
-        _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint -> ux_slave_endpoint_transfer_request. 
+        _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_endpoint -> ux_slave_endpoint_transfer_request.
                                         ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_CDC_ECM_BULKOUT_BUFFER_SIZE); /* Use case of memset is verified. */
-        _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint -> ux_slave_endpoint_transfer_request. 
+        _ux_utility_memory_set(cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_endpoint -> ux_slave_endpoint_transfer_request.
                                         ux_slave_transfer_request_data_pointer, 0, UX_DEVICE_CLASS_CDC_ECM_BULKIN_BUFFER_SIZE); /* Use case of memset is verified. */
 #endif
 
         /* Resume the endpoint threads.  */
-        _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread); 
-        _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread); 
-        
+        _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkout_thread);
+        _ux_device_thread_resume(&cdc_ecm -> ux_slave_class_cdc_ecm_bulkin_thread);
+
         /* Wake up the Interrupt thread and send a network notification to the host.  */
-        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                
+        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);
 
         /* If there is an activate function call it.  */
         if (cdc_ecm -> ux_slave_class_cdc_ecm_parameter.ux_slave_class_cdc_ecm_instance_activate != UX_NULL)
 
             /* Invoke the application.  */
             cdc_ecm -> ux_slave_class_cdc_ecm_parameter.ux_slave_class_cdc_ecm_instance_activate(cdc_ecm);
-    }                
+    }
     else
     {
 
@@ -198,7 +172,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
         /* Declare the link to be down.  */
         cdc_ecm -> ux_slave_class_cdc_ecm_link_state = UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_DOWN;
-        
+
         /* Communicate the state with the network driver.  */
         _ux_network_driver_link_down(cdc_ecm -> ux_slave_class_cdc_ecm_network_handle);
 
@@ -208,10 +182,10 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
         /* Notify the thread waiting for network notification events. In this case,
            the event is that the link state has been switched to down.  */
-        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);                
+        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, UX_OR);
 
         /* Wake up the bulk in thread so that it can clean up the xmit queue.  */
-        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);                
+        _ux_device_event_flags_set(&cdc_ecm -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NEW_DEVICE_STATE_CHANGE_EVENT, UX_OR);
 
         /* If there is a deactivate function call it.  */
         if (cdc_ecm -> ux_slave_class_cdc_ecm_parameter.ux_slave_class_cdc_ecm_instance_deactivate != UX_NULL)

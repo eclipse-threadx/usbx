@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Simulator Controller Driver                                    */
 /**                                                                       */
@@ -28,44 +29,36 @@
 #include "ux_hcd_sim_host.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_periodic_tree_create               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_sim_host_periodic_tree_create               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function creates the periodic static tree for the interrupt   */ 
-/*     and isochronous EDs.                                               */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_sim_host                          Pointer to host controller    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_ed_obtain            Obtain host ED                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*     This function creates the periodic static tree for the interrupt   */
+/*     and isochronous EDs.                                               */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_sim_host                          Pointer to host controller    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_sim_host_ed_obtain            Obtain host ED                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_periodic_tree_create(UX_HCD_SIM_HOST *hcd_sim_host)
@@ -77,8 +70,8 @@ UINT                    list_entries;
 UINT                    current_list_entry;
 UX_HCD_SIM_HOST_ED      *ed_list[32];
 UX_HCD_SIM_HOST_ED      *ed_start_list[32];
-    
-    
+
+
     /* Start with the 1st list - it has 32 entries.  */
     list_entries =  32;
 
@@ -95,7 +88,7 @@ UX_HCD_SIM_HOST_ED      *ed_start_list[32];
             if (ed == UX_NULL)
                 return(UX_NO_ED_AVAILABLE);
 
-            /* Mark this anchor ED as static by putting it as SKIPPED, the host simulator  controller will 
+            /* Mark this anchor ED as static by putting it as SKIPPED, the host simulator  controller will
                not look into its tail and head list and will simply jump to the next ED.  */
             ed -> ux_sim_host_ed_status =  UX_HCD_SIM_HOST_ED_STATIC;
 
@@ -123,8 +116,8 @@ UX_HCD_SIM_HOST_ED      *ed_start_list[32];
     }
 
     /* The tree has been completed but the entries in the interrupt list are in the wrong order.
-       We need to swap each entry according to the host simulator specified entry order list 
-       so that we have a fair interval frequency for each periodic ED. The primary EDs are 
+       We need to swap each entry according to the host simulator specified entry order list
+       so that we have a fair interval frequency for each periodic ED. The primary EDs are
        fetched from the start list, and stored in the interrupt list.  */
     for (current_list_entry = 0; current_list_entry < 32; current_list_entry++)
     {

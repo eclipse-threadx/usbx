@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -65,21 +66,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USB application                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  10-31-2023     Yajun xia                Modified comment(s),          */
-/*                                            resulting in version 6.3.0  */
-/*  xx-xx-xxxx     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed unicode string copy,  */
-/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima,
@@ -223,12 +209,6 @@ ULONG                                unicode_string_length, unicode_string_bytes
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USB application                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023        Yajun xia             Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima,

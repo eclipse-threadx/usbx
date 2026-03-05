@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,50 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_regular_td_obtain                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_regular_td_obtain                      PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function obtains a free TD from the regular TD list.          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    UX_EHCI_TD *                          Pointer to TD                 */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_set                Set memory block              */ 
+/*                                                                        */
+/*     This function obtains a free TD from the regular TD list.          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    UX_EHCI_TD *                          Pointer to TD                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_set                Set memory block              */
 /*    _ux_host_mutex_on                     Get protection mutex          */
 /*    _ux_host_mutex_off                    Release protection mutex      */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
 /*                                                                        */
 /**************************************************************************/
 UX_EHCI_TD  *_ux_hcd_ehci_regular_td_obtain(UX_HCD_EHCI *hcd_ehci)
@@ -105,7 +93,7 @@ ULONG           td_element;
             td_element =  UX_EHCI_TD_T;
             td -> ux_ehci_td_link_pointer =  (UX_EHCI_TD *) td_element;
             td -> ux_ehci_td_alternate_link_pointer =  (UX_EHCI_TD *) td_element;
-            
+
             /* Release the protection.  */
             _ux_host_mutex_off(&_ux_system -> ux_system_mutex);
 

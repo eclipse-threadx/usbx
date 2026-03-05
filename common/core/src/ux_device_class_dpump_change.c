@@ -1,16 +1,17 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device DPUMP Class                                                  */
 /**                                                                       */
@@ -27,64 +28,43 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_dpump_change                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_dpump_change                       PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function changes the interface of the DPUMP device             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                             Pointer to dpump command        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function changes the interface of the DPUMP device             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                             Pointer to dpump command        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_memory_set              Set memory                      */
 /*    _ux_device_stack_transfer_all_request_abort                         */
 /*                                        Abort request                   */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Source Code                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Source Code                                                    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_dpump_change(UX_SLAVE_CLASS_COMMAND *command)
 {
-                                          
-UX_SLAVE_INTERFACE                      *interface_ptr;            
+
+UX_SLAVE_INTERFACE                      *interface_ptr;
 UX_SLAVE_CLASS                          *class_ptr;
 UX_SLAVE_CLASS_DPUMP                    *dpump;
 UX_SLAVE_ENDPOINT                       *endpoint;
@@ -97,30 +77,30 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
     /* Get the interface that owns this instance.  */
     interface_ptr =  (UX_SLAVE_INTERFACE  *) command -> ux_slave_class_command_interface;
-    
+
     /* Locate the endpoints.  Control and Bulk in/out for data.  */
     endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
-    
+
     /* Keep the alternate setting in the dpump structure. */
     dpump -> ux_slave_class_dpump_alternate_setting =  interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting;
 
     /* If the interface to mount has a non zero alternate setting, the class is really active with
        the endpoints active.  If the interface reverts to alternate setting 0, it needs to have
        the pending transactions terminated.  */
-    if (interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting != 0)       
+    if (interface_ptr -> ux_slave_interface_descriptor.bAlternateSetting != 0)
     {
-    
+
         /* Parse all endpoints.  */
         while (endpoint != UX_NULL)
         {
-        
+
             /* Check the endpoint direction, and type.  */
             if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) == UX_ENDPOINT_IN)
             {
-    
+
                 /* Look at type.  */
                 if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_BULK_ENDPOINT)
-            
+
                     /* We have found the bulk in endpoint, save it.  */
                     dpump -> ux_slave_class_dpump_bulkin_endpoint =  endpoint;
 #if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
@@ -133,7 +113,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
             {
                 /* Look at type for out endpoint.  */
                 if ((endpoint -> ux_slave_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_BULK_ENDPOINT)
-            
+
                     /* We have found the bulk out endpoint, save it.  */
                     dpump -> ux_slave_class_dpump_bulkout_endpoint =  endpoint;
 #if UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1
@@ -141,8 +121,8 @@ UX_SLAVE_ENDPOINT                       *endpoint;
                             ux_slave_transfer_request_data_pointer =
                                     UX_DEVICE_CLASS_DPUMP_READ_BUFFER(dpump);
 #endif
-            }                
-    
+            }
+
             /* Next endpoint.  */
             endpoint =  endpoint -> ux_slave_endpoint_next_endpoint;
         }
@@ -155,9 +135,9 @@ UX_SLAVE_ENDPOINT                       *endpoint;
             return(UX_ERROR);
 
         /* Reset the endpoint buffers.  */
-        _ux_utility_memory_set(dpump -> ux_slave_class_dpump_bulkout_endpoint -> ux_slave_endpoint_transfer_request. 
+        _ux_utility_memory_set(dpump -> ux_slave_class_dpump_bulkout_endpoint -> ux_slave_endpoint_transfer_request.
                                         ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
-        _ux_utility_memory_set(dpump -> ux_slave_class_dpump_bulkin_endpoint -> ux_slave_endpoint_transfer_request. 
+        _ux_utility_memory_set(dpump -> ux_slave_class_dpump_bulkin_endpoint -> ux_slave_endpoint_transfer_request.
                                         ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_REQUEST_DATA_MAX_LENGTH); /* Use case of memset is verified. */
 
         /* Keep the alternate setting in the dpump structure. */
@@ -175,7 +155,7 @@ UX_SLAVE_ENDPOINT                       *endpoint;
 
             /* Invoke the application.  */
             dpump -> ux_slave_class_dpump_parameter.ux_slave_class_dpump_instance_activate(dpump);
-    }                
+    }
     else
     {
 

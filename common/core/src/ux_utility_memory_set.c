@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Utility                                                             */
 /**                                                                       */
@@ -27,45 +28,37 @@
 #include "ux_api.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_set                              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_utility_memory_set                              PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function sets a memory block with a specific value.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    destination                           Destination address           */ 
-/*    value                                 8-bit value                   */ 
-/*    length                                Size of memory to set         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function sets a memory block with a specific value.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    destination                           Destination address           */
+/*    value                                 8-bit value                   */
+/*    length                                Size of memory to set         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_utility_memory_set(VOID *destination, UCHAR value, ULONG length)
@@ -86,6 +79,6 @@ UCHAR *    work_ptr;
     }
 
     /* Return to caller.  */
-    return; 
+    return;
 }
 

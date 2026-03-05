@@ -271,8 +271,8 @@ static unsigned char language_id_framework[] = {
         0x09, 0x04
     };
 
-static DEVICE_INIT_DATA default_device_init_data = { 
-    .framework = default_device_framework, 
+static DEVICE_INIT_DATA default_device_init_data = {
+    .framework = default_device_framework,
     .framework_length = sizeof(default_device_framework),
     .string_framework = default_string_framework,
     .string_framework_length = sizeof(default_string_framework)
@@ -392,9 +392,9 @@ static void ux_test_device_class_cdc_ecm_set_link_state(UX_SLAVE_CLASS_CDC_ECM *
     /* Declare the link to be down. */
     cdc_ecm_device -> ux_slave_class_cdc_ecm_link_state =  new_link_state;
 
-    /* We have a thread waiting for an event, we wake it up with a NETWORK NOTIFICATION CHANGE event. 
+    /* We have a thread waiting for an event, we wake it up with a NETWORK NOTIFICATION CHANGE event.
        In turn they will release the NetX resources used and suspend.  */
-    UX_TEST_CHECK_SUCCESS(_ux_utility_event_flags_set(&cdc_ecm_device -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, TX_OR)); 
+    UX_TEST_CHECK_SUCCESS(_ux_utility_event_flags_set(&cdc_ecm_device -> ux_slave_class_cdc_ecm_event_flags_group, UX_DEVICE_CLASS_CDC_ECM_NETWORK_NOTIFICATION_EVENT, TX_OR));
 }
 
 static void read_packet_tcp(NX_TCP_SOCKET *tcp_socket, ULONG num_reads, CHAR *name)
@@ -692,7 +692,7 @@ DEVICE_INIT_DATA *device_init_data;
     UX_TEST_CHECK_SUCCESS(nx_packet_pool_create(&packet_pool_device, "NetX Device Packet Pool", PACKET_PAYLOAD, packet_pool_memory_device, PACKET_POOL_SIZE));
     UX_TEST_CHECK_SUCCESS(nx_packet_pool_create(&ip_pool_device, "NetX Device IP Pool", PACKET_PAYLOAD, packet_pool_memory_device+PACKET_POOL_SIZE, DEVICE_IP_POOL_SIZE));
 
-    UX_TEST_CHECK_SUCCESS(nx_ip_create(&nx_ip_device, "NetX Device Thread", DEVICE_IP_ADDRESS, 0xFF000000L, &ip_pool_device, 
+    UX_TEST_CHECK_SUCCESS(nx_ip_create(&nx_ip_device, "NetX Device Thread", DEVICE_IP_ADDRESS, 0xFF000000L, &ip_pool_device,
                                        _ux_network_driver_entry, ip_thread_stack_device, DEMO_IP_THREAD_STACK_SIZE, 1));
 
     /* Setup ARP.  */

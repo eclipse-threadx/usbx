@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -29,10 +30,10 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
 /*    _ux_host_class_video_control_list_get               PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
@@ -40,33 +41,25 @@
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function obtains the controls for the video device.            */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
 /*    _ux_system_error_handler              Log system error              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Video Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_control_list_get(UX_HOST_CLASS_VIDEO *video)
@@ -85,7 +78,7 @@ ULONG                                           interface_found;
     /* Get the descriptor to the selected format.  */
     descriptor =  video -> ux_host_class_video_configuration_descriptor;
     total_descriptor_length =  video -> ux_host_class_video_configuration_descriptor_length;
-    
+
     /* Haven't found it yet.  */
     interface_found =  UX_FALSE;
 
@@ -116,16 +109,16 @@ ULONG                                           interface_found;
         {
 
             case UX_INTERFACE_DESCRIPTOR_ITEM:
-    
+
                 /* Parse the interface descriptor and make it machine independent.  */
                 _ux_utility_descriptor_parse(descriptor, _ux_system_interface_descriptor_structure,
                                                 UX_INTERFACE_DESCRIPTOR_ENTRIES, (UCHAR *) &interface_descriptor);
-    
+
                 /* Ensure we have the correct interface for Video Control.  */
                 if ((interface_descriptor.bInterfaceClass == UX_HOST_CLASS_VIDEO_CLASS) &&
                     (interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_VIDEO_SUBCLASS_CONTROL))
                 {
-    
+
                     /* Mark we have found it.  */
                     interface_found =  UX_TRUE;
 
@@ -135,15 +128,15 @@ ULONG                                           interface_found;
                 }
                 else
                 {
-    
+
                     /* Haven't found it.  */
                     interface_found =  UX_FALSE;
                 }
                 break;
-            
-                    
+
+
             case UX_HOST_CLASS_VIDEO_CS_INTERFACE:
-    
+
                 /* First make sure we have found the correct generic interface descriptor.  */
                 if ((interface_found == UX_TRUE) && (descriptor_subtype == UX_HOST_CLASS_VIDEO_VC_PROCESSING_UNIT))
                 {
@@ -157,7 +150,7 @@ ULONG                                           interface_found;
                     /* We are done here.  */
                     return(UX_SUCCESS);
                 }
-    
+
                 break;
         }
 
@@ -172,7 +165,7 @@ ULONG                                           interface_found;
             //UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_DESCRIPTOR_CORRUPTED);
-        }            
+        }
 
         /* Jump to the next descriptor if we have not reached the end.  */
         descriptor +=  descriptor_length;

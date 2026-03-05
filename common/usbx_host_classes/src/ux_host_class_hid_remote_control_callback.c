@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Remote Control Class                                            */
 /**                                                                       */
@@ -30,43 +31,35 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_remote_control_callback          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_remote_control_callback          PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the callback mechanism for a report registration.  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    callback                              Pointer to callback           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Remote Control Class                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function is the callback mechanism for a report registration.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    callback                              Pointer to callback           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Remote Control Class                                            */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_remote_control_callback(UX_HOST_CLASS_HID_REPORT_CALLBACK *callback)
@@ -93,8 +86,8 @@ ULONG                               *array_head_next;
     array_head =   remote_control_instance -> ux_host_class_hid_remote_control_usage_array_head;
     array_tail =   remote_control_instance -> ux_host_class_hid_remote_control_usage_array_tail;
 
-    /* We have a single usage/value. We have to store it into the array. If the array overflows, 
-       there is no mechanism for flow control here so we ignore the usage/value until the 
+    /* We have a single usage/value. We have to store it into the array. If the array overflows,
+       there is no mechanism for flow control here so we ignore the usage/value until the
        applications makes more room in the array.  */
 
     /* Get position where next head will be.  */
@@ -127,6 +120,6 @@ ULONG                               *array_head_next;
     }
 
     /* Return to caller.  */
-    return;    
+    return;
 }
 
