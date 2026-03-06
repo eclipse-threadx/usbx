@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,52 +29,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_interface_setting_select             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_interface_setting_select             PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function selects a specific alternate setting for a given      */
-/*    interface belonging to the selected configuration.                  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    interface                             Pointer to interface          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_interface_instance_create  Create interface instance */ 
-/*    _ux_host_stack_interface_instance_delete  Delete interface instance */ 
-/*    _ux_host_stack_interface_set              Set interface instance    */ 
+/*    interface belonging to the selected configuration.                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    interface                             Pointer to interface          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_interface_instance_create  Create interface instance */
+/*    _ux_host_stack_interface_instance_delete  Delete interface instance */
+/*    _ux_host_stack_interface_set              Set interface instance    */
 /*    _ux_host_semaphore_get                    Get semaphore             */
 /*    _ux_host_semaphore_put                    Put semaphore             */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            protected control request,  */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_interface_setting_select(UX_INTERFACE *interface_ptr)
@@ -86,7 +76,7 @@ UX_INTERFACE        *main_interface;
 UINT                current_interface_number;
 UINT                current_alternate_setting;
 UINT                status;
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_INTERFACE_SETTING_SELECT, interface_ptr, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
@@ -101,7 +91,7 @@ UINT                status;
     }
 
     /* From the interface, get the configuration container and the first
-       interface hooked to this configuration.  */    
+       interface hooked to this configuration.  */
     configuration =             interface_ptr -> ux_interface_configuration;
     current_interface_number =  interface_ptr -> ux_interface_descriptor.bInterfaceNumber;
     current_interface =         configuration -> ux_configuration_first_interface;
@@ -154,7 +144,7 @@ UINT                status;
                 break;
 
             }
-        }                    
+        }
 
         /* Move to the next interface. */
         current_interface =  current_interface -> ux_interface_next_interface;
@@ -209,7 +199,7 @@ UINT                status;
         _ux_host_semaphore_put(&configuration -> ux_configuration_device -> ux_device_protection_semaphore);
         return(status);
     }
-    
+
     /* Return to caller.  */
     return(status);
 }
@@ -246,12 +236,6 @@ UINT                status;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_interface_setting_select(UX_INTERFACE *interface_ptr)

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -28,43 +29,35 @@
 #include "ux_pictbridge.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_element_to_decimal                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_element_to_decimal                   PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function translates an element into a decimal value.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    element                                Where to store the element   */ 
-/*    decimal_value                          Value to be returned         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_parse                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function translates an element into a decimal value.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    element                                Where to store the element   */
+/*    decimal_value                          Value to be returned         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_object_parse                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_element_to_decimal(UCHAR *element, ULONG *decimal_value)
@@ -87,63 +80,63 @@ UINT                    status;
 
     /* Get the element length. Should not be more than 8 characters.  */
     element_length = string_length;
-       
+
     /* Check the length. Error if 0.  */
     if (element_length == 0)
-        
+
         /* We have a syntax violation.  */
-        return(UX_ERROR);                     
+        return(UX_ERROR);
 
     /* Reset the local decimal value.  */
     local_decimal_value =  0;
-    
+
     /* Calculate the multiplier value.  First reset it. */
     multiplier = 1;
-    
+
     /* Set the length of the string.  */
     multiplier_length = element_length;
-    
+
     /* Build the multiplier : 10 square length.  */
     while (multiplier_length-- > 1)
-    
+
         /* Add another decimal.  */
         multiplier = multiplier * 10;
-    
+
     /* We parse the element and build the decimal value one byte at a type.  */
     while(element_length)
     {
-    
+
         /* Get the element content.  */
         element_content = *element;
-        
+
         /* Check for the element content. Should be >0 <9.  */
         if (element_content >= '0' && element_content <= '9')
-            
+
             /* We have a digit.  */
             element_decimal = (UCHAR)(element_content - '0');
 
-        else            
+        else
             /* We have a syntax violation.  */
-            return(UX_ERROR);                     
+            return(UX_ERROR);
 
         /* Add the found value to the current cumulated decimal value.  */
         local_decimal_value += (ULONG) element_decimal * multiplier;
 
         /* Next position.  */
         element++;
-    
+
         /* Update length.  */
         element_length--;
 
         /* Reduce the multiplier by one decimal. */
         multiplier = multiplier / 10;
-        
-    }       
+
+    }
 
     /* We have finished building the 32 bit decimal value.  */
-    *decimal_value = local_decimal_value;    
+    *decimal_value = local_decimal_value;
 
     /* Operation was successful.  */
-    return(UX_SUCCESS);    
+    return(UX_SUCCESS);
 }
 

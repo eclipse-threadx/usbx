@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Slave Simulator Controller Driver                                   */
 /**                                                                       */
@@ -20,55 +21,36 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_dcd_sim_slave.h                                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_dcd_sim_slave.h                                  PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX slave simulator. It is designed to work ONLY with the USBX     */ 
-/*    host simulator.                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added HCD connected to,     */
-/*                                            supported bi-dir-endpoints, */
-/*                                            resulting in version 6.1.6  */
-/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*    USBX slave simulator. It is designed to work ONLY with the USBX     */
+/*    host simulator.                                                     */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DCD_SIM_SLAVE_H
 #define UX_DCD_SIM_SLAVE_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Define USB slave simulator major equivalences.  */
@@ -110,7 +92,7 @@ extern   "C" {
 
 /* Define USB slave simulator physical endpoint structure.  */
 
-typedef struct UX_DCD_SIM_SLAVE_ED_STRUCT 
+typedef struct UX_DCD_SIM_SLAVE_ED_STRUCT
 {
 
     ULONG           ux_sim_slave_ed_status;
@@ -119,7 +101,7 @@ typedef struct UX_DCD_SIM_SLAVE_ED_STRUCT
     ULONG           ux_sim_slave_ed_ping_pong;
     ULONG           ux_sim_slave_ed_status_register;
     ULONG           ux_sim_slave_ed_configuration_value;
-    struct UX_SLAVE_ENDPOINT_STRUCT             
+    struct UX_SLAVE_ENDPOINT_STRUCT
                     *ux_sim_slave_ed_endpoint;
 } UX_DCD_SIM_SLAVE_ED;
 
@@ -127,14 +109,14 @@ typedef struct UX_DCD_SIM_SLAVE_ED_STRUCT
 /* Define USB slave simulator DCD structure definition.  */
 
 typedef struct UX_DCD_SIM_SLAVE_STRUCT
-{                                 
+{
 
-    struct UX_SLAVE_DCD_STRUCT                 
+    struct UX_SLAVE_DCD_STRUCT
                     *ux_dcd_sim_slave_dcd_owner;
-    struct UX_DCD_SIM_SLAVE_ED_STRUCT              
+    struct UX_DCD_SIM_SLAVE_ED_STRUCT
                     ux_dcd_sim_slave_ed[UX_DCD_SIM_SLAVE_MAX_ED];
 #ifdef UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
-    struct UX_DCD_SIM_SLAVE_ED_STRUCT              
+    struct UX_DCD_SIM_SLAVE_ED_STRUCT
                     ux_dcd_sim_slave_ed_in[UX_DCD_SIM_SLAVE_MAX_ED];
 #endif
     UINT            (*ux_dcd_sim_slave_dcd_control_request_process_hub)(UX_SLAVE_TRANSFER *transfer_request);
@@ -154,6 +136,7 @@ UINT    _ux_dcd_sim_slave_frame_number_get(UX_DCD_SIM_SLAVE *dcd_sim_slave, ULON
 UINT    _ux_dcd_sim_slave_function(UX_SLAVE_DCD *dcd, UINT function, VOID *parameter);
 UINT    _ux_dcd_sim_slave_initialize(VOID);
 UINT    _ux_dcd_sim_slave_initialize_complete(VOID);
+UINT    _ux_dcd_sim_slave_uninitialize(VOID);
 UINT    _ux_dcd_sim_slave_state_change(UX_DCD_SIM_SLAVE *dcd_sim_slave, ULONG state);
 UINT    _ux_dcd_sim_slave_transfer_request(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_TRANSFER *transfer_request);
 UINT    _ux_dcd_sim_slave_transfer_run(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLAVE_TRANSFER *transfer_request);
@@ -162,11 +145,12 @@ UINT    _ux_dcd_sim_slave_transfer_abort(UX_DCD_SIM_SLAVE *dcd_sim_slave, UX_SLA
 /* Define Device Simulator Class API prototypes.  */
 
 #define ux_dcd_sim_slave_initialize                 _ux_dcd_sim_slave_initialize
+#define ux_dcd_sim_slave_uninitialize               _ux_dcd_sim_slave_uninitialize
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
+}
 #endif
 
 #endif

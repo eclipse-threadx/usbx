@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -28,51 +29,43 @@
 #include "ux_pictbridge.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_xml_function_root_dps                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_xml_function_root_dps                PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function decodes the "dps" tag                                 */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pictbridge                             Pictbridge instance          */ 
-/*    input_variable                         Pointer to variable          */ 
-/*    input_string                           Pointer to string            */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_parse                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function decodes the "dps" tag                                 */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pictbridge                             Pictbridge instance          */
+/*    input_variable                         Pointer to variable          */
+/*    input_string                           Pointer to string            */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_object_parse                                         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_pictbridge_xml_function_root_dps(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable, 
+UINT  _ux_pictbridge_xml_function_root_dps(UX_PICTBRIDGE *pictbridge, UCHAR *input_variable,
                                         UCHAR *input_string, UCHAR *xml_parameter)
 {
 UINT    status;
-UINT    input_length = 0;      
+UINT    input_length = 0;
 UINT    length = 0;
 
     UX_PARAMETER_NOT_USED(xml_parameter);
@@ -82,7 +75,7 @@ UINT    length = 0;
     status = _ux_utility_string_length_check(input_variable, &input_length, UX_PICTBRIDGE_MAX_VARIABLE_SIZE);
     if (status != UX_SUCCESS)
         return(status);
-    
+
     /* Get the length of the "xmlns " variable.  */
     status = _ux_utility_string_length_check(_ux_pictbridge_xml_variable_xmlns, &length, UX_PICTBRIDGE_MAX_VARIABLE_SIZE);
     if (status != UX_SUCCESS)
@@ -95,12 +88,12 @@ UINT    length = 0;
         /* Both length match, we may have a variable name match. Check the names */
         if (_ux_utility_memory_compare(_ux_pictbridge_xml_variable_xmlns,input_variable, length) == UX_SUCCESS)
         {
-        
+
             /* Get the length of the string. */
             status = _ux_utility_string_length_check(input_string, &input_length, UX_PICTBRIDGE_MAX_STRING_SIZE);
             if (status != UX_SUCCESS)
                 return(status);
-    
+
             /* Get the length of the "xmlns" string.  */
             status = _ux_utility_string_length_check(_ux_pictbridge_xml_string_xmlns, &length, UX_PICTBRIDGE_MAX_STRING_SIZE);
             if (status != UX_SUCCESS)
@@ -115,12 +108,12 @@ UINT    length = 0;
 
                     /* The variable name is OK. We are done.  */
                     return(UX_SUCCESS);
-            }        
+            }
         }
 
     }
     /* We get here when we reached an unexpected end of the XML object.  */
-    return(UX_ERROR);    
+    return(UX_ERROR);
 }
 
 

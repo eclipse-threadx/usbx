@@ -7,7 +7,7 @@
 typedef struct UX_HOST_CLASS_DUMMY_STRUCT
 {
 
-    struct UX_HOST_CLASS_DUMMY_STRUCT  
+    struct UX_HOST_CLASS_DUMMY_STRUCT
                         *ux_host_class_dummy_next_instance;
 
     UX_HOST_CLASS       *ux_host_class_dummy_class;

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Stack                                                        */
 /**                                                                       */
@@ -45,32 +46,20 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    interface                             Pointer to interface          */ 
+/*    interface                             Pointer to interface          */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
-/*    Completion Status                                                   */ 
+/*    Completion Status                                                   */
 /*                                                                        */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    (ux_slave_class_entry_function)       Device class entry function   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    (ux_slave_class_entry_function)       Device class entry function   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*    Device Stack                                                        */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_stack_interface_start(UX_SLAVE_INTERFACE *interface_ptr)
@@ -105,7 +94,7 @@ UX_SLAVE_CLASS_COMMAND      class_command;
 
     /* We can now memorize the interface pointer associated with this class.  */
     class_ptr -> ux_slave_class_interface = interface_ptr;
-    
+
     /* We have found a potential candidate. Call this registered class entry function.  */
     status = class_ptr -> ux_slave_class_entry_function(&class_command);
 
@@ -115,10 +104,10 @@ UX_SLAVE_CLASS_COMMAND      class_command;
 
         /* Store the class container. */
         class_command.ux_slave_class_command_class_ptr =  class_ptr;
-        
+
         /* Store the command.  */
         class_command.ux_slave_class_command_request =  UX_SLAVE_CLASS_COMMAND_ACTIVATE;
-        
+
         /* Activate the class.  */
         status = class_ptr -> ux_slave_class_entry_function(&class_command);
 
@@ -126,7 +115,7 @@ UX_SLAVE_CLASS_COMMAND      class_command;
         if(status == UX_SUCCESS)
             interface_ptr -> ux_slave_interface_class =  class_ptr;
 
-        return(status); 
+        return(status);
     }
 
     /* There is no driver who want to own this class!  */

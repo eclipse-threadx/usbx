@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -29,64 +30,43 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_port_change_connection_process   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_port_change_connection_process   PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function will process a connection change on the port. This    */
-/*    indicates that a device has been attached to the port.              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hub                                   Pointer to HUB class          */ 
-/*    port                                  Port number                   */ 
-/*    port_status                           Port status                   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_feature            Set HUB feature               */ 
-/*    _ux_host_class_hub_port_reset         Reset port                    */ 
-/*    _ux_host_class_hub_status_get         Get status                    */ 
-/*    _ux_host_stack_new_device_create      Create new device             */ 
-/*    _ux_host_stack_device_remove          Remove device                 */ 
-/*    _ux_utility_delay_ms                  Thread sleep                  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            handled more fail cases,    */
-/*                                            updated internal call,      */
-/*                                            added notification for      */
-/*                                            device connection,          */
-/*                                            added disconnection check   */
-/*                                            in enumeration retries,     */
-/*                                            resulting in version 6.1.4  */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.12 */
+/*    indicates that a device has been attached to the port.              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hub                                   Pointer to HUB class          */
+/*    port                                  Port number                   */
+/*    port_status                           Port status                   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hub_feature            Set HUB feature               */
+/*    _ux_host_class_hub_port_reset         Reset port                    */
+/*    _ux_host_class_hub_status_get         Get status                    */
+/*    _ux_host_stack_new_device_create      Create new device             */
+/*    _ux_host_stack_device_remove          Remove device                 */
+/*    _ux_utility_delay_ms                  Thread sleep                  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hub_port_change_connection_process(UX_HOST_CLASS_HUB *hub, UINT port, UINT port_status)
@@ -102,14 +82,14 @@ UINT        status;
 USHORT      local_port_status;
 USHORT      local_port_change;
 #endif
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_HUB_PORT_CHANGE_CONNECTION_PROCESS, hub, port, port_status, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
     /* Get the HCD used by this instance.  */
     hcd = UX_DEVICE_HCD_GET(hub -> ux_host_class_hub_device);
 
-    /* If there is a device attached on this HUB, there is a new device and it should 
+    /* If there is a device attached on this HUB, there is a new device and it should
        be enumerated.  */
     if (port_status & UX_HOST_CLASS_HUB_PORT_STATUS_CONNECTION)
     {
@@ -122,10 +102,10 @@ USHORT      local_port_change;
 
             /* There was a device attached previously. Perform a removal.  */
             _ux_host_stack_device_remove(hcd, hub -> ux_host_class_hub_device, port);
-            
+
         }
         else
-            
+
             /* Mark device connection.  */
             hub -> ux_host_class_hub_port_state |= (UINT)(1 << port);
 
@@ -133,7 +113,7 @@ USHORT      local_port_change;
         /* Port operations are done outside.  */
 #else
 
-        /* Tell the hub to clear the change bit for this port so that we do 
+        /* Tell the hub to clear the change bit for this port so that we do
            not process the same change event again.  */
         _ux_host_class_hub_feature(hub, port, UX_CLEAR_FEATURE, UX_HOST_CLASS_HUB_C_PORT_CONNECTION);
 
@@ -148,7 +128,7 @@ USHORT      local_port_change;
             status =  _ux_host_class_hub_port_reset(hub, port);
             if (status != UX_SUCCESS)
                 return;
-                
+
             /* Reset succeeded, so perform a new port status after reset to force speed reevaluation.  */
             status =  _ux_host_class_hub_status_get(hub, port, &local_port_status, &local_port_change);
             if (status != UX_SUCCESS)
@@ -166,18 +146,18 @@ USHORT      local_port_change;
 
                 if (local_port_status & UX_HOST_CLASS_HUB_PORT_STATUS_HIGH_SPEED)
                     device_speed =  UX_HIGH_SPEED_DEVICE;
-                else    
+                else
                     device_speed =  UX_FULL_SPEED_DEVICE;
-            }    
-    
-            /* Decide how much power this device can draw. This depends if the HUB is self 
+            }
+
+            /* Decide how much power this device can draw. This depends if the HUB is self
                powered or bus powered.  */
             if (hub -> ux_host_class_hub_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED)
 
                 /* Hub is bus powered.  */
                 port_power =  UX_MAX_BUS_POWER;
-            else            
-            
+            else
+
                 /* Hub is self powered.  */
                 port_power =  UX_MAX_SELF_POWER;
 
@@ -244,7 +224,7 @@ USHORT      local_port_change;
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DEVICE_ENUMERATION_FAILURE, port, 0, 0, UX_TRACE_ERRORS, 0, 0)
 #endif
-    }           
+    }
     else
     {
 
@@ -271,7 +251,7 @@ USHORT      local_port_change;
         /* We must clear the connection change condition so that we don't get awaken again.  */
         _ux_host_class_hub_feature(hub, port, UX_CLEAR_FEATURE, UX_HOST_CLASS_HUB_C_PORT_CONNECTION);
 #endif
-    }        
+    }
 
     /* Return to caller.  */
     return;

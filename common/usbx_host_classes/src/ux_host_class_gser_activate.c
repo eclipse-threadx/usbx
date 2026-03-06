@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Generic Serial Host module class                                    */
 /**                                                                       */
@@ -29,54 +30,40 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_gser_activate                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_gser_activate                        PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function calls the USBX stack to activate the class.           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                               Dpump class command pointer   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_gser_configure           Configure gser class        */ 
-/*    _ux_host_class_gser_endpoints_get       Get endpoints of gser       */ 
-/*    _ux_host_stack_class_instance_create    Create class instance       */ 
-/*    _ux_host_stack_class_instance_destroy   Destroy the class instance  */ 
-/*    _ux_utility_memory_allocate             Allocate memory block       */ 
-/*    _ux_utility_memory_free                 Free memory block           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_gser_entry            Entry of gser class            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved error handling,    */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*    This function calls the USBX stack to activate the class.           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                               Dpump class command pointer   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_gser_configure           Configure gser class        */
+/*    _ux_host_class_gser_endpoints_get       Get endpoints of gser       */
+/*    _ux_host_stack_class_instance_create    Create class instance       */
+/*    _ux_host_stack_class_instance_destroy   Destroy the class instance  */
+/*    _ux_utility_memory_allocate             Allocate memory block       */
+/*    _ux_utility_memory_free                 Free memory block           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_gser_entry            Entry of gser class            */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_gser_activate(UX_HOST_CLASS_COMMAND *command)
@@ -101,9 +88,9 @@ ULONG                               interface_index;
 
     /* Store the device container into the gser class instance.  */
     gser -> ux_host_class_gser_device =  device;
-  
+
     /* Store the instance in the device container, this is for the USBX stack
-       when it needs to invoke the class for deactivation.  */        
+       when it needs to invoke the class for deactivation.  */
     device -> ux_device_class_instance =  (VOID *) gser;
 
     /* Create this class instance.  */
@@ -127,14 +114,14 @@ ULONG                               interface_index;
         if a function has been programmed in the system structure.  */
         if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
         {
-            
+
             /* Call system change function.  */
             _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, gser -> ux_host_class_gser_class, (VOID *) gser);
         }
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_GSER_ACTIVATE, gser, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
-    
+
         /* If trace is enabled, register this object.  */
         UX_TRACE_OBJECT_REGISTER(UX_TRACE_HOST_OBJECT_TYPE_INTERFACE, gser, 0, 0, 0)
 

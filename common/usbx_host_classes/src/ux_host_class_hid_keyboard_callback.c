@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Keyboard Client                                                 */
 /**                                                                       */
@@ -29,59 +30,46 @@
 #include "ux_host_class_hid_keyboard.h"
 #include "ux_host_stack.h"
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_keyboard_callback                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_keyboard_callback                PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is the callback mechanism for a report registration.  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    callback                              Pointer to callback           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_memory_copy               Copy memory                   */ 
-/*    _ux_utility_memory_set                Set memory                    */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class when a report is generated                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*    This function is the callback mechanism for a report registration.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    callback                              Pointer to callback           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_memory_copy               Copy memory                   */
+/*    _ux_utility_memory_set                Set memory                    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class when a report is generated                                */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_hid_keyboard_callback(UX_HOST_CLASS_HID_REPORT_CALLBACK *callback)
 {
 
-/* This array contains the bit for each alternate key (modifier or lock key) 
-   that we report to the application.  For example, if you wanted to set the 
+/* This array contains the bit for each alternate key (modifier or lock key)
+   that we report to the application.  For example, if you wanted to set the
    bit for the CAPS_LOCK key, you would do:
         keyboard_instance -> ux_host_class_hid_keyboard_alternate_key_state |= alternate_key_bits[0];
-   Index 0 is used since it corresponds to the CAPS_LOCK bit in the array. Note 
+   Index 0 is used since it corresponds to the CAPS_LOCK bit in the array. Note
    that _alternate_key_state is what we report to the application.  */
 const ULONG                         alternate_key_bits[] = {
     UX_HID_KEYBOARD_STATE_CAPS_LOCK,
@@ -297,7 +285,7 @@ UCHAR                               *state_action;
         switch(key_usage)
         {
 
-        /* This is the usage of a modifier key. Set or clear the appropriate 
+        /* This is the usage of a modifier key. Set or clear the appropriate
            bits in the alternate key state bitmap.  */
         case    UX_HID_MODIFIER_KEY_LEFT_SHIFT           :
         case    UX_HID_MODIFIER_KEY_RIGHT_SHIFT          :
@@ -341,8 +329,8 @@ UCHAR                               *state_action;
             key_state = KEY_STATE_NO_KEY;
             break;
 #endif
-        
-        /* This is the usage of a regular key. Here, we just get the decoded 
+
+        /* This is the usage of a regular key. Here, we just get the decoded
            value; we will add it to the queue later.  */
         default :
 
@@ -528,7 +516,7 @@ UCHAR                               *state_action;
 #endif
         }
 
-        /* If we get here, then we have a regular key. Now it's time to save 
+        /* If we get here, then we have a regular key. Now it's time to save
            raw/decoded key in the key queue.  */
 
         /* This key should now be inserted in the circular array for the application to retrieve it.  */
@@ -568,7 +556,7 @@ UCHAR                               *state_action;
 #if !defined(UX_HOST_CLASS_HID_KEYBOARD_EVENTS_KEY_CHANGES_MODE)
 
     /* Copy the current lock key states to the previous states. Note that if
-       a lock key wasn't down in this report, its current state would have 
+       a lock key wasn't down in this report, its current state would have
        remained zero (not pressed).  */
     _ux_utility_memory_copy(previous_lock_key_states, current_lock_key_states, 3); /* Use case of memcpy is verified. */
 #else
@@ -578,6 +566,6 @@ UCHAR                               *state_action;
 #endif
 
     /* Return to caller.  */
-    return;    
+    return;
 }
 

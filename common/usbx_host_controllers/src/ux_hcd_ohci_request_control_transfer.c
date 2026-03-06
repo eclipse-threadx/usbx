@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,67 +30,52 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_request_control_transfer               PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_request_control_transfer               PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function performs a control transfer from a transfer request. */ 
+/*                                                                        */
+/*     This function performs a control transfer from a transfer request. */
 /*     The USB control transfer is in 3 phases (setup, data, status).     */
 /*     This function will chain all phases of the control sequence before */
 /*     setting the OHCI endpoint as a candidate for transfer.             */
 /*                                                                        */
 /*     The maximum aggregated size of a data payload in OHCI is 4K. We    */
-/*     are assuming that this size will be sufficient to contain the      */ 
-/*     control packet.                                                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ohci                              Pointer to OHCI controller    */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_register_read            Read OHCI register            */ 
-/*    _ux_hcd_ohci_register_write           Write OHCI register           */ 
-/*    _ux_hcd_ohci_regular_td_obtain        Get regular TD                */ 
-/*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_utility_physical_address          Get physical address          */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_utility_short_put                 Write 16-bit value            */ 
-/*    _ux_utility_virtual_address           Get virtual address           */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    OHCI Controller Driver                                              */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            prefixed UX to MS_TO_TICK,  */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.1.2  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
+/*     are assuming that this size will be sufficient to contain the      */
+/*     control packet.                                                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ohci                              Pointer to OHCI controller    */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ohci_register_read            Read OHCI register            */
+/*    _ux_hcd_ohci_register_write           Write OHCI register           */
+/*    _ux_hcd_ohci_regular_td_obtain        Get regular TD                */
+/*    _ux_host_stack_transfer_request_abort Abort transfer request        */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
+/*    _ux_utility_physical_address          Get physical address          */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*    _ux_utility_short_put                 Write 16-bit value            */
+/*    _ux_utility_virtual_address           Get virtual address           */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    OHCI Controller Driver                                              */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ohci_request_control_transfer(UX_HCD_OHCI *hcd_ohci, UX_TRANSFER *transfer_request)
@@ -106,8 +92,8 @@ UX_OHCI_TD      *tail_td;
 UX_OHCI_TD      *status_td;
 ULONG           ohci_register;
 UINT            status;
-    
-    
+
+
     /* Get the pointer to the Endpoint and the Device.  */
     endpoint =  (UX_ENDPOINT *) transfer_request -> ux_transfer_request_endpoint;
     device =    endpoint -> ux_endpoint_device;
@@ -151,7 +137,7 @@ UINT            status;
     setup_td -> ux_ohci_td_status |=  UX_OHCI_TD_SETUP_PHASE;
 
     /* Check if there is a data phase, if not jump to status phase.  */
-    data_td =  UX_NULL;    
+    data_td =  UX_NULL;
     if (transfer_request -> ux_transfer_request_requested_length != 0)
     {
 
@@ -224,7 +210,7 @@ UINT            status;
     /* Hook the status phase to the previous TD.  */
     chain_td -> ux_ohci_td_next_td =  _ux_utility_physical_address(status_td);
 
-    /* Since we have consumed out tail TD for the setup packet, we must get another 
+    /* Since we have consumed out tail TD for the setup packet, we must get another
        one and hook it to the ED's tail.  */
     tail_td =  _ux_hcd_ohci_regular_td_obtain(hcd_ohci);
     if (tail_td == UX_NULL)
@@ -239,7 +225,7 @@ UINT            status;
 
     /* Hook the new TD to the status TD.  */
     status_td -> ux_ohci_td_next_td =  _ux_utility_physical_address(tail_td);
-            
+
     /* At this stage, the Head and Tail in the ED are still the same and
        the OHCI controller will skip this ED until we have hooked the new
        tail TD.  */
@@ -260,7 +246,7 @@ UINT            status;
 
         /* All transfers pending need to abort. There may have been a partial transfer. */
         _ux_host_stack_transfer_request_abort(transfer_request);
-        
+
         /* There was an error, return to the caller.  */
         transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
 
@@ -269,13 +255,13 @@ UINT            status;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_TIMEOUT, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
-        
-    }            
+
+    }
 
     /* Free the resources.  */
     _ux_utility_memory_free(setup_request);
 
     /* Return the completion status.  */
-    return(transfer_request -> ux_transfer_request_completion_code);           
+    return(transfer_request -> ux_transfer_request_completion_code);
 }
 

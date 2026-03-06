@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -51,43 +52,12 @@
 /*                                                                        */
 /*  CALLS                                                                 */
 /*                                                                        */
+/*    _ux_utility_thread_resume         Resume a suspended thread         */
 /*    _ux_system_error_handler          System error trap                 */
 /*                                                                        */
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Device Audio Class                                                  */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            replaced wMaxPacketSize by  */
-/*                                            calculated payload size,    */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added feedback support,     */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            rx full packet for          */
-/*                                            feedback,                   */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Yajun Xia                Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes  */
-/*                                            with zero copy enabled,     */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_audio_change(UX_SLAVE_CLASS_COMMAND *command)
@@ -149,7 +119,7 @@ ULONG                                    endpoint_dir;
                         UX_ENDPOINT_OUT: UX_ENDPOINT_IN;
 #else
 
-        endpoint_dir = (stream -> ux_device_class_audio_stream_thread.tx_thread_entry ==
+        endpoint_dir = (_ux_device_thread_entry(&stream -> ux_device_class_audio_stream_thread) ==
                         _ux_device_class_audio_read_thread_entry) ?
                         UX_ENDPOINT_OUT : UX_ENDPOINT_IN;
 #endif

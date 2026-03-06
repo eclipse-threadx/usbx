@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Generic Serial Host module class                                    */
 /**                                                                       */
@@ -20,50 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_class_gser.h                                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_class_gser.h                                PORTABLE C      */
 /*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX Generic Serial Class.                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
+/*    USBX Generic Serial Class.                                          */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_CLASS_GSER_H
 #define UX_HOST_CLASS_GSER_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -78,7 +64,7 @@ extern   "C" {
 #define UX_HOST_CLASS_GSER_CLASS_TRANSFER_TIMEOUT               300000
 #ifndef UX_HOST_CLASS_GSER_VENDOR_ID
 #define UX_HOST_CLASS_GSER_VENDOR_ID                            0X05C6
-#define UX_HOST_CLASS_GSER_PRODUCT_ID                           0X9002 
+#define UX_HOST_CLASS_GSER_PRODUCT_ID                           0X9002
 #endif
 
 /* Define  serial interfaces equivalences.  */
@@ -105,7 +91,7 @@ extern   "C" {
 #define UX_HOST_CLASS_GSER_REQ_SET_LINE_STATE                   0x22
 #define UX_HOST_CLASS_GSER_REQ_SEND_BREAK                       0x23
 #define UX_HOST_CLASS_GSER_REQ_SET_RINGER_PARMS                 0x30
-#define UX_HOST_CLASS_GSER_REQ_GET_RINGER_PARMS                 0x31 
+#define UX_HOST_CLASS_GSER_REQ_GET_RINGER_PARMS                 0x31
 #define UX_HOST_CLASS_GSER_REQ_SET_OPERATION_PARMS              0x32
 #define UX_HOST_CLASS_GSER_REQ_GET_OPERATION_PARMS              0x33
 #define UX_HOST_CLASS_GSER_REQ_SET_LINE_PARMS                   0x34
@@ -196,7 +182,7 @@ typedef struct UX_HOST_CLASS_GSER_STRUCT
     UINT                                        ux_host_class_gser_state;
     struct UX_HOST_CLASS_GSER_INTERFACE_STRUCT  ux_host_class_gser_interface_array[UX_HOST_CLASS_GSER_INTERFACE_NUMBER];
     ULONG                                       ux_host_class_gser_device_state;
-    VOID                                        (*ux_host_class_gser_device_status_change_callback)(struct UX_HOST_CLASS_GSER_STRUCT *gser, 
+    VOID                                        (*ux_host_class_gser_device_status_change_callback)(struct UX_HOST_CLASS_GSER_STRUCT *gser,
                                                                     ULONG  notification_type, ULONG notification_value);
 } UX_HOST_CLASS_GSER;
 
@@ -213,9 +199,9 @@ typedef struct UX_HOST_CLASS_GSER_RECEPTION_STRUCT
     ULONG           ux_host_class_gser_reception_data_buffer_size;
     UCHAR           *ux_host_class_gser_reception_data_head;
     UCHAR           *ux_host_class_gser_reception_data_tail;
-    VOID            (*ux_host_class_gser_reception_callback)(struct UX_HOST_CLASS_GSER_STRUCT *gser, 
+    VOID            (*ux_host_class_gser_reception_callback)(struct UX_HOST_CLASS_GSER_STRUCT *gser,
                                                                 UINT  status,
-                                                                UCHAR *reception_buffer, 
+                                                                UCHAR *reception_buffer,
                                                                 ULONG reception_size);
 
 } UX_HOST_CLASS_GSER_RECEPTION;
@@ -260,32 +246,32 @@ UINT    _ux_host_class_gser_configure(UX_HOST_CLASS_GSER *gser);
 UINT    _ux_host_class_gser_deactivate(UX_HOST_CLASS_COMMAND *command);
 UINT    _ux_host_class_gser_endpoints_get(UX_HOST_CLASS_GSER *gser);
 UINT    _ux_host_class_gser_entry(UX_HOST_CLASS_COMMAND *command);
-UINT    _ux_host_class_gser_read (UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer, 
+UINT    _ux_host_class_gser_read (UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
-UINT    _ux_host_class_gser_write(UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer, 
+UINT    _ux_host_class_gser_write(UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
 UINT    _ux_host_class_gser_command(UX_HOST_CLASS_GSER *gser, ULONG interface_index, ULONG command,
                                     ULONG value, UCHAR *data_buffer, ULONG data_length);
 UINT    _ux_host_class_gser_ioctl(UX_HOST_CLASS_GSER *gser, ULONG interface_index, ULONG ioctl_function,
                                     VOID *parameter);
 VOID    _ux_host_class_gser_reception_callback (UX_TRANSFER *transfer_request);
-UINT    _ux_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser, 
+UINT    _ux_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser,
                                     UX_HOST_CLASS_GSER_RECEPTION *gser_reception);
-UINT    _ux_host_class_gser_reception_start (UX_HOST_CLASS_GSER *gser, 
+UINT    _ux_host_class_gser_reception_start (UX_HOST_CLASS_GSER *gser,
                                     UX_HOST_CLASS_GSER_RECEPTION *gser_reception);
 
 
-UINT    _uxe_host_class_gser_read (UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer, 
+UINT    _uxe_host_class_gser_read (UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
-UINT    _uxe_host_class_gser_write(UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer, 
+UINT    _uxe_host_class_gser_write(UX_HOST_CLASS_GSER *gser, ULONG interface_index,UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length);
 UINT    _uxe_host_class_gser_command(UX_HOST_CLASS_GSER *gser, ULONG interface_index, ULONG command,
                                     ULONG value, UCHAR *data_buffer, ULONG data_length);
 UINT    _uxe_host_class_gser_ioctl(UX_HOST_CLASS_GSER *gser, ULONG interface_index, ULONG ioctl_function,
                                     VOID *parameter);
-UINT    _uxe_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser, 
+UINT    _uxe_host_class_gser_reception_stop (UX_HOST_CLASS_GSER *gser,
                                     UX_HOST_CLASS_GSER_RECEPTION *gser_reception);
-UINT    _uxe_host_class_gser_reception_start (UX_HOST_CLASS_GSER *gser, 
+UINT    _uxe_host_class_gser_reception_start (UX_HOST_CLASS_GSER *gser,
                                     UX_HOST_CLASS_GSER_RECEPTION *gser_reception);
 
 
@@ -311,10 +297,10 @@ UINT    _uxe_host_class_gser_reception_start (UX_HOST_CLASS_GSER *gser,
 
 #endif
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif

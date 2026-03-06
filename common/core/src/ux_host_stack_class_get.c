@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,57 +29,45 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_get                            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_class_get                            PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function returns a pointer to the class container. A class     */ 
-/*    needs to obtain its container from the USBX stack to search for     */ 
-/*    instances when a driver or an application wants to open a device.   */ 
+/*                                                                        */
+/*    This function returns a pointer to the class container. A class     */
+/*    needs to obtain its container from the USBX stack to search for     */
+/*    instances when a driver or an application wants to open a device.   */
 /*                                                                        */
 /*    Note: The C string of class_name must be NULL-terminated and the    */
 /*    length of it (without the NULL-terminator itself) must be no larger */
 /*    than UX_MAX_CLASS_NAME_LENGTH.                                      */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    class_name                            Name of class                 */ 
-/*    host_class                            Class pointer                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class_name                            Name of class                 */
+/*    host_class                            Class pointer                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_string_length_check       Check C string and return its */
 /*                                          length if null-terminated     */
-/*    _ux_utility_memory_compare            Compare memory blocks         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.3.0  */
+/*    _ux_utility_memory_compare            Compare memory blocks         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **host_class)
@@ -115,7 +104,7 @@ ULONG               class_index;
 
             /* We have found a container. Check if this is the one we need (compare including null-terminator).  */
             if (ux_utility_name_match(class_ptr -> ux_host_class_name, class_name, class_name_length + 1))
-            {           
+            {
 
                 /* The class container was found. Update the pointer to the class container for the caller.  */
                 *host_class =  class_ptr;
@@ -134,7 +123,7 @@ ULONG               class_index;
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_UNKNOWN, class_name, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
-    /* This class does not exist, return an error.  */    
+    /* This class does not exist, return an error.  */
     return(UX_HOST_CLASS_UNKNOWN);
 }
 
@@ -169,12 +158,6 @@ ULONG               class_index;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **host_class)

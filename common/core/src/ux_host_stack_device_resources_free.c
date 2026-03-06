@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,65 +29,44 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_device_resources_free                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_device_resources_free                PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function will free all the device resources allocated.         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    device                                Device pointer                */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function will free all the device resources allocated.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    device                                Device pointer                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_endpoint_transfer_abort                              */
 /*                                          Abort transfer                */
 /*    _ux_host_stack_endpoint_instance_delete                             */
-/*                                          Delete endpoint instance      */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_utility_memory_set                Set memory with a value       */ 
-/*    _ux_utility_semaphore_delete          Semaphore delete              */ 
+/*                                          Delete endpoint instance      */
+/*    _ux_utility_memory_free               Free memory block             */
+/*    _ux_utility_memory_set                Set memory with a value       */
+/*    _ux_utility_semaphore_delete          Semaphore delete              */
 /*    _ux_utility_thread_schedule_other     Sleep thread to let others    */
 /*                                          run                           */
-/*    (ux_hcd_entry_function)               HCD entry function            */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions, verified       */
-/*                                            memset and memcpy cases,    */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            fixed standalone enum free, */
-/*                                            freed shared device config  */
-/*                                            descriptor for enum scan,   */
-/*                                            resulting in version 6.1.12 */
+/*    (ux_hcd_entry_function)               HCD entry function            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_resources_free(UX_DEVICE *device)
@@ -152,7 +132,7 @@ UX_DEVICE               *enum_next;
     /* Parse all the configurations, remove all resources for the possible configuration.  */
     while (configuration != UX_NULL)
     {
-        
+
         /* We have the correct configuration, search the interface(s).  */
         interface_ptr =  configuration -> ux_configuration_first_interface;
 
@@ -164,10 +144,10 @@ UX_DEVICE               *enum_next;
             if (interface_ptr -> ux_interface_descriptor.bAlternateSetting == 0)
                 current_alternate_setting = interface_ptr -> ux_interface_current_alternate_setting;
 
-            /* If this is the selected interface, we need to free all the endpoints 
+            /* If this is the selected interface, we need to free all the endpoints
             attached to the alternate setting for this interface.  */
             endpoint =  interface_ptr -> ux_interface_first_endpoint;
-            
+
             /* Parse all the endpoints.  */
             while (endpoint != UX_NULL)
             {
@@ -181,20 +161,20 @@ UX_DEVICE               *enum_next;
                 }
 
                 /* Memorize the endpoint container address.  */
-                container =  (VOID *) endpoint;                  
-                
-                /* Get the next endpoint.  */      
+                container =  (VOID *) endpoint;
+
+                /* Get the next endpoint.  */
                 endpoint =  endpoint -> ux_endpoint_next_endpoint;
-                
+
                 /* Delete the endpoint container.  */
                 _ux_utility_memory_free(container);
             }
-            
-            
+
+
             /* Memorize the interface container address.  */
-            container =  (VOID *) interface_ptr;                  
-                
-            /* Get the next interface.  */      
+            container =  (VOID *) interface_ptr;
+
+            /* Get the next interface.  */
             interface_ptr =  interface_ptr -> ux_interface_next_interface;
 
             /* Delete the interface container.  */
@@ -205,11 +185,11 @@ UX_DEVICE               *enum_next;
         container =  (VOID *) configuration;
 
         /* Move to the next configuration in the list.  */
-        configuration =  configuration -> ux_configuration_next_configuration;                                
+        configuration =  configuration -> ux_configuration_next_configuration;
 
         /* Free the configuration.  */
         _ux_utility_memory_free(container);
-    }                       
+    }
 
     /* If there was a copy of packed descriptor, free it.  */
     if (device -> ux_device_packed_configuration)
@@ -229,11 +209,11 @@ UX_DEVICE               *enum_next;
 
         /* There may be pending transactions on the control endpoint. They need to be aborted.  */
         _ux_host_stack_endpoint_transfer_abort(&device -> ux_device_control_endpoint);
-    
+
         /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
             the control endpoint to exit properly.  */
-        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
-    
+        _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
+
         /* The control endpoint should be destroyed at the HCD level.  */
         hcd -> ux_hcd_entry_function(hcd, UX_HCD_DESTROY_ENDPOINT, (VOID *) &device -> ux_device_control_endpoint);
     }
@@ -243,17 +223,17 @@ UX_DEVICE               *enum_next;
 
 #if UX_MAX_DEVICES > 1
     /* Check if the device had an assigned address.  */
-    if (device -> ux_device_address != 0)    
+    if (device -> ux_device_address != 0)
     {
 
         /* The USB address of this device can now be returned to the pool
            We need the HCD pointer for this operation.  */
 
         /* Calculate in which byte index the device address belongs.  */
-        device_address_byte_index =  (UINT) (device -> ux_device_address-1)/8;        
+        device_address_byte_index =  (UINT) (device -> ux_device_address-1)/8;
 
         /* Now calculate the amount left in the byte index in bit.  */
-        device_address_bit_index =  (UINT) (device -> ux_device_address-1)%8;     
+        device_address_bit_index =  (UINT) (device -> ux_device_address-1)%8;
 
         /* Build the mask for the address.  */
         device_address_byte =  (UCHAR)(1 << device_address_bit_index);

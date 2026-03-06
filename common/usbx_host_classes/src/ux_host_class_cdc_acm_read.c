@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   ACM CDC Class                                                       */
 /**                                                                       */
@@ -29,56 +30,45 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_acm_read                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_cdc_acm_read                         PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function reads from the cdc_acm interface. The call is         */ 
-/*    blocking and only returns when there is either an error or when     */ 
+/*                                                                        */
+/*    This function reads from the cdc_acm interface. The call is         */
+/*    blocking and only returns when there is either an error or when     */
 /*    the transfer is complete.                                           */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_acm                               Pointer to cdc_acm class      */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_acm                               Pointer to cdc_acm class      */
 /*    data_pointer                          Pointer to buffer             */
 /*    requested_length                      Requested data read           */
 /*    actual_length                         Actual data read              */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_host_stack_transfer_request_abort Abort transfer request        */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_host_stack_transfer_request_abort Abort transfer request        */
+/*    _ux_host_semaphore_get                Get protection semaphore      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_class_cdc_acm_read (UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer, 
+UINT  _ux_host_class_cdc_acm_read (UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length)
 {
 
@@ -88,13 +78,13 @@ ULONG           transfer_request_length;
 #if defined(UX_HOST_STANDALONE)
 ULONG           transfer_flags;
 #endif
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_CLASS_CDC_ACM_READ, cdc_acm, 0, 0, 0, UX_TRACE_HOST_CLASS_EVENTS, 0, 0)
 
     /* Ensure the instance is valid.  */
     if (cdc_acm -> ux_host_class_cdc_acm_state !=  UX_HOST_CLASS_INSTANCE_LIVE)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -108,7 +98,7 @@ ULONG           transfer_flags;
     /* As further protection, we must ensure this instance of the interface is the data interface and not
        the control interface !  */
     if (cdc_acm -> ux_host_class_cdc_acm_interface -> ux_interface_descriptor.bInterfaceClass != UX_HOST_CLASS_CDC_DATA_CLASS)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -118,7 +108,7 @@ ULONG           transfer_flags;
 
         return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
     }
-    
+
     /* Start by resetting the actual length of the transfer to zero.  */
     *actual_length =  0;
 
@@ -142,11 +132,11 @@ ULONG           transfer_flags;
             transfer_request_length =  transfer_request -> ux_transfer_request_maximum_length;
         else
             transfer_request_length =  requested_length;
-                    
+
         /* Initialize the transfer request.  */
         transfer_request -> ux_transfer_request_data_pointer =      data_pointer;
         transfer_request -> ux_transfer_request_requested_length =  transfer_request_length;
-        
+
         /* Perform the transfer.  */
         status =  _ux_host_stack_transfer_request(transfer_request);
 
@@ -165,20 +155,20 @@ ULONG           transfer_flags;
 
                 /* All transfers pending need to abort. There may have been a partial transfer.  */
                 _ux_host_stack_transfer_request_abort(transfer_request);
-                
-                /* Update the length of the actual data transferred. We do this after the 
+
+                /* Update the length of the actual data transferred. We do this after the
                    abort of the transfer request in case some data was actually received.  */
                 *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
-            
+
                 /* Set the completion code.  */
                 transfer_request -> ux_transfer_request_completion_code =  UX_TRANSFER_TIMEOUT;
-        
+
                 /* Error trap. */
                 _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_TRANSFER_TIMEOUT);
 
                 /* If trace is enabled, insert this event into the trace buffer.  */
                 UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_TRANSFER_TIMEOUT, transfer_request, 0, 0, UX_TRACE_ERRORS, 0, 0)
-        
+
                 /* There was an error, return to the caller */
                 return(UX_TRANSFER_TIMEOUT);
             }
@@ -189,7 +179,7 @@ ULONG           transfer_flags;
 
 #if defined(UX_HOST_STANDALONE)
 
-            /* Update the length of the actual data transferred. We do this after the 
+            /* Update the length of the actual data transferred. We do this after the
                 abort of the transfer request in case some data was actually received.  */
             *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
 
@@ -203,23 +193,23 @@ ULONG           transfer_flags;
 
         /* Update the length of the transfer. Normally all the data has to be received.  */
         *actual_length +=  transfer_request -> ux_transfer_request_actual_length;
-        
+
         /* Check for completion of transfer. If the transfer is partial, return to caller.
            The transfer is marked as successful but the caller will need to check the length
            actually received and determine if a partial transfer is OK.  */
         if (transfer_request_length != transfer_request -> ux_transfer_request_actual_length)
         {
-        
+
             /* Return success to caller.  */
             return(UX_SUCCESS);
         }
 
-        /* Update the data pointer for next transfer. */        
+        /* Update the data pointer for next transfer. */
         data_pointer +=  transfer_request_length;
-        
+
         /* Update what is left to receive.  */
-        requested_length -=  transfer_request_length;          
-    }    
+        requested_length -=  transfer_request_length;
+    }
 
 #if defined(UX_HOST_STANDALONE)
 
@@ -228,7 +218,7 @@ ULONG           transfer_flags;
 #endif
 
     /* We get here when all the transfers went through without errors.  */
-    return(UX_SUCCESS); 
+    return(UX_SUCCESS);
 }
 
 
@@ -265,14 +255,8 @@ ULONG           transfer_flags;
 /*                                                                        */
 /*    Application                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
-/*                                                                        */
 /**************************************************************************/
-UINT  _uxe_host_class_cdc_acm_read (UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer, 
+UINT  _uxe_host_class_cdc_acm_read (UX_HOST_CLASS_CDC_ACM *cdc_acm, UCHAR *data_pointer,
                                     ULONG requested_length, ULONG *actual_length)
 {
 

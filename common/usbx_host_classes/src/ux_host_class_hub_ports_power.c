@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HUB Class                                                           */
 /**                                                                       */
@@ -29,59 +30,51 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_ports_power                      PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hub_ports_power                      PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function will power up each downstream port attached to the    */
-/*    HUB. There is a delay after powering up each port, otherwise we may */ 
+/*    HUB. There is a delay after powering up each port, otherwise we may */
 /*    not detect device insertion.                                        */
 /*                                                                        */
 /*    There are 3 port power modes:                                       */
 /*                                                                        */
-/*      1) Gang power:          In this case we only power the first      */ 
-/*                              port and all ports should be powered at   */ 
+/*      1) Gang power:          In this case we only power the first      */
+/*                              port and all ports should be powered at   */
 /*                              the same time                             */
 /*                                                                        */
-/*      2) Individual power:    In this case we power individually each   */ 
+/*      2) Individual power:    In this case we power individually each   */
 /*                              port                                      */
 /*                                                                        */
 /*      3) No power switching:  In this case the power is applied to the  */
 /*                              downstream ports when the upstream port   */
-/*                              receives power.                           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hub                                   Pointer to HUB class          */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hub_feature            Set HUB class feature         */ 
-/*    _ux_utility_delay_ms                  Thread sleep                  */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HUB Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                              receives power.                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hub                                   Pointer to HUB class          */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hub_feature            Set HUB class feature         */
+/*    _ux_utility_delay_ms                  Thread sleep                  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HUB Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hub_ports_power(UX_HOST_CLASS_HUB *hub)
@@ -90,7 +83,7 @@ UINT  _ux_host_class_hub_ports_power(UX_HOST_CLASS_HUB *hub)
 UINT        nb_ports;
 UINT        port_index;
 UINT        status;
-    
+
 
     /* Check for the power management mode: no power switching.  */
     if(hub -> ux_host_class_hub_descriptor.wHubCharacteristics & UX_HOST_CLASS_HUB_NO_POWER_SWITCHING)
@@ -116,10 +109,10 @@ UINT        status;
         }
         else
         {
-        
+
             /* Now we need to wait for the power to be stable.  */
             _ux_utility_delay_ms(((ULONG) (hub -> ux_host_class_hub_descriptor.bPwrOn2PwrGood) * 2));
-        
+
             /* Set the HUB status to powered.  */
             hub -> ux_host_class_hub_port_power  |= (UINT)(1 << port_index);
         }

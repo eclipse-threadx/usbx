@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Simulator Controller Driver                                    */
 /**                                                                       */
@@ -28,51 +29,40 @@
 #include "ux_hcd_sim_host.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_request_bulk_transfer              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_sim_host_request_bulk_transfer              PORTABLE C      */
 /*                                                           6.1.3        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function performs a bulk transfer request. A bulk transfer    */ 
-/*     can be larger than the size of the sim_host buffer so it may be    */ 
-/*     required to chain multiple TDs to accommodate this transfer        */ 
-/*     request. A bulk transfer is non blocking, so we return before the  */ 
-/*     transfer request is completed.                                     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_sim_host                          Pointer to host controller    */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_regular_td_obtain    Obtain regular TD             */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*     This function performs a bulk transfer request. A bulk transfer    */
+/*     can be larger than the size of the sim_host buffer so it may be    */
+/*     required to chain multiple TDs to accommodate this transfer        */
+/*     request. A bulk transfer is non blocking, so we return before the  */
+/*     transfer request is completed.                                     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_sim_host                          Pointer to host controller    */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_sim_host_regular_td_obtain    Obtain regular TD             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed ZLP sending,          */
-/*                                            resulting in version 6.1.3  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_request_bulk_transfer(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request)
@@ -88,7 +78,7 @@ UX_HCD_SIM_HOST_ED      *ed;
 ULONG                   transfer_request_payload_length;
 ULONG                   bulk_packet_payload_length;
 UCHAR *                 data_pointer;
-    
+
 
     /* Get the pointer to the Endpoint.  */
     endpoint =  (UX_ENDPOINT *) transfer_request -> ux_transfer_request_endpoint;
@@ -101,16 +91,16 @@ UCHAR *                 data_pointer;
     data_td =  ed -> ux_sim_host_ed_tail_td;
     previous_td =  data_td;
 
-    /* Reset the first obtained data TD in case there is a TD shortage while building 
+    /* Reset the first obtained data TD in case there is a TD shortage while building
        the list of TDs.  */
     start_data_td =  0;
 
     /* It may take more than one TD if the transfer_request length is more than the
-       maximum length for a host simulator TD (this is irrelevant of the MaxPacketSize value 
+       maximum length for a host simulator TD (this is irrelevant of the MaxPacketSize value
        in the endpoint descriptor). Host simulator data payload has a maximum size of 4K.  */
     transfer_request_payload_length =  transfer_request -> ux_transfer_request_requested_length;
     data_pointer =  transfer_request -> ux_transfer_request_data_pointer;
-    
+
     do
     {
 
@@ -178,14 +168,14 @@ UCHAR *                 data_pointer;
             if (start_data_td == UX_NULL)
                 start_data_td =  data_td;
 
-            /* Attach this new TD to the previous one.  */                                
+            /* Attach this new TD to the previous one.  */
             previous_td -> ux_sim_host_td_next_td =  data_td;
             previous_td -> ux_sim_host_td_next_td_transfer_request =  data_td;
             previous_td =  data_td;
         }
     } while (transfer_request_payload_length != 0);
-        
-    /* At this stage, the Head and Tail in the ED are still the same and the host simulator 
+
+    /* At this stage, the Head and Tail in the ED are still the same and the host simulator
        controller will skip this ED until we have hooked the new tail TD.  */
     tail_td =  _ux_hcd_sim_host_regular_td_obtain(hcd_sim_host);
     if (tail_td == UX_NULL)
@@ -194,7 +184,7 @@ UCHAR *                 data_pointer;
         /* If there was already a TD chain in progress, free it.  */
         if (start_data_td != UX_NULL)
         {
- 
+
             data_td =  start_data_td;
             while (data_td)
             {
@@ -218,6 +208,6 @@ UCHAR *                 data_pointer;
     hcd_sim_host -> ux_hcd_sim_host_queue_empty =  UX_FALSE;
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);           
+    return(UX_SUCCESS);
 }
 

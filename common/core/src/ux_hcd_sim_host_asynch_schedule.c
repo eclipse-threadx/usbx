@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Simulator Controller Driver                                    */
 /**                                                                       */
@@ -28,43 +29,35 @@
 #include "ux_hcd_sim_host.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_asynch_schedule                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_sim_host_asynch_schedule                    PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function schedules new transfers from the control/bulk lists.  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_sim_host                          Pointer to host controller    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_transaction_schedule Schedule simulator transaction*/ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function schedules new transfers from the control/bulk lists.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_sim_host                          Pointer to host controller    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_sim_host_transaction_schedule Schedule simulator transaction*/
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_hcd_sim_host_asynch_schedule(UX_HCD_SIM_HOST *hcd_sim_host)
@@ -73,7 +66,7 @@ VOID  _ux_hcd_sim_host_asynch_schedule(UX_HCD_SIM_HOST *hcd_sim_host)
 UX_HCD_SIM_HOST_ED      *ed;
 UX_HCD_SIM_HOST_ED      *first_ed;
 UINT                    status;
-                        
+
 
     /* Get the pointer to the current ED in the asynchronous list.  */
     ed =  hcd_sim_host -> ux_hcd_sim_host_asynch_current_ed;
@@ -93,7 +86,7 @@ UINT                    status;
     first_ed =  ed;
 
     /* In simulation, we are not tied to bandwidth limitation.  */
-    do 
+    do
     {
 
         /* Check if this ED has a tail and head TD different.  */
@@ -103,15 +96,15 @@ UINT                    status;
             /* Schedule this transaction with the device simulator.  */
             status =  _ux_hcd_sim_host_transaction_schedule(hcd_sim_host, ed);
 
-            /* If the TD has been added to the list, we can memorize this ED has 
-               being served and make the next ED as the one to be first scanned 
+            /* If the TD has been added to the list, we can memorize this ED has
+               being served and make the next ED as the one to be first scanned
                at the next SOF.  */
             if (status == UX_SUCCESS)
             {
 
                 if (ed -> ux_sim_host_ed_next_ed == UX_NULL)
                     hcd_sim_host -> ux_hcd_sim_host_asynch_current_ed =  hcd_sim_host -> ux_hcd_sim_host_asynch_head_ed;
-                else            
+                else
                     hcd_sim_host -> ux_hcd_sim_host_asynch_current_ed =  ed -> ux_sim_host_ed_next_ed;
             }
         }
@@ -119,7 +112,7 @@ UINT                    status;
         /* Point to the next ED in the list. Check if at end of list.  */
         if (ed -> ux_sim_host_ed_next_ed == UX_NULL)
             ed =  hcd_sim_host -> ux_hcd_sim_host_asynch_head_ed;
-        else            
+        else
             ed =  ed -> ux_sim_host_ed_next_ed;
 
     } while ((ed) && (ed != first_ed));

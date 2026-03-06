@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,51 +29,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_verify                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_verify                PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function ensures that a given instance exists. An application  */
-/*    is not responsible for keeping the instance valid pointer. The      */ 
-/*    class is responsible for the instance checks if the instance is     */ 
-/*    still valid.                                                        */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    class_name                            Name of class                 */ 
-/*    class_instance                        Pointer to class instance     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*    is not responsible for keeping the instance valid pointer. The      */
+/*    class is responsible for the instance checks if the instance is     */
+/*    still valid.                                                        */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    class_name                            Name of class                 */
+/*    class_instance                        Pointer to class instance     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_utility_string_length_check       Check C string and return its */
 /*                                          length if null-terminated     */
-/*    _ux_utility_memory_compare            Compare blocks of memory      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
+/*    _ux_utility_memory_compare            Compare blocks of memory      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_class_instance_verify(UCHAR *class_name, VOID *class_instance)
@@ -110,8 +101,8 @@ UINT            class_name_length =  0;
 
             /* Start with the first class instance attached to the class container.  */
             current_class_instance =  class_inst -> ux_host_class_first_instance;
-    
-            /* Traverse the list of the class instances until we find the correct instance.  */        
+
+            /* Traverse the list of the class instances until we find the correct instance.  */
             while (current_class_instance != UX_NULL)
             {
 
@@ -133,12 +124,12 @@ UINT            class_name_length =  0;
 
         /* Move to the next class.  */
         class_inst ++;
-    }    
+    }
 #endif
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_INSTANCE_UNKNOWN, class_instance, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
-    /* This class does not exist.  */    
+    /* This class does not exist.  */
     return(UX_HOST_CLASS_INSTANCE_UNKNOWN);
 }

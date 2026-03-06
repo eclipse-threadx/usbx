@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -82,32 +83,32 @@
 
 #endif /* ifndef UX_HCD_EHCI_EXT_USBPHY_HIGHSPEED_MODE_SET */
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_port_status_get                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_port_status_get                        PORTABLE C      */
 /*                                                           6.1.8        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function will return the status for each port attached to the  */
-/*    root HUB.                                                           */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*    port_index                            Port index to get status for  */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Port Status                                                         */ 
-/*                                                                        */ 
+/*    root HUB.                                                           */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*    port_index                            Port index to get status for  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Port Status                                                         */
+/*                                                                        */
 /*      Status of the root hub port with the following format:            */
-/*                                                                        */ 
+/*                                                                        */
 /*               bit 0         device connection status                   */
 /*                             if 0 : no device connected                 */
 /*                             if 1 : device connected to the port        */
@@ -130,25 +131,13 @@
 /*                             if 00 : low speed device attached          */
 /*                             if 01 : full speed device attached         */
 /*                             if 10 : high speed device attached         */
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_register_read            Read EHCI register            */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ehci_register_read            Read EHCI register            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed NXP register base,    */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _ux_hcd_ehci_port_status_get(UX_HCD_EHCI *hcd_ehci, ULONG port_index)
@@ -170,12 +159,12 @@ ULONG       port_status;
 
         return(UX_PORT_INDEX_UNKNOWN);
     }
-    
+
     /* The port is valid, build the status mask for this port. This function
        returns a controller agnostic bit field.  */
     port_status =  0;
     ehci_register_port_status =  _ux_hcd_ehci_register_read(hcd_ehci, EHCI_HCOR_PORT_SC + port_index);
-                                    
+
     /* Device Connection Status.  */
     if (ehci_register_port_status & EHCI_HC_PS_CCS)
         port_status |=  UX_PS_CCS;
@@ -185,7 +174,7 @@ ULONG       port_status;
         /* When disconnected PHY does not know speed.  */
         UX_HCD_EHCI_EXT_USBPHY_HIGHSPEED_MODE_SET(hcd_ehci, UX_FALSE);
     }
-                                    
+
     /* Port Enable Status.  */
     if (ehci_register_port_status & EHCI_HC_PS_PE)
         port_status |=  UX_PS_PES;
@@ -211,8 +200,8 @@ ULONG       port_status;
     if (ehci_register_port_status & EHCI_HC_PS_PP)
         port_status |=  UX_PS_PPS;
 
-    /* Port Device Attached speed. This field is valid only if the CCS bit is active. 
-       Only EHCI high speed devices are meaningful in a regular EHCI controller. 
+    /* Port Device Attached speed. This field is valid only if the CCS bit is active.
+       Only EHCI high speed devices are meaningful in a regular EHCI controller.
        In embedded EHCI with built-in TTs some bits reflect the true speed of
        the device behind the TT. */
     if (ehci_register_port_status & EHCI_HC_PS_CCS)
@@ -220,28 +209,28 @@ ULONG       port_status;
         /* Check for EHCI with embedded TT.  */
         if (hcd_ehci -> ux_hcd_ehci_embedded_tt == UX_TRUE)
         {
-    
+
             /* Isolate speed from the non EHCI compliant POTSC bits.  */
             switch (ehci_register_port_status & EHCI_HC_PS_EMBEDDED_TT_SPEED_MASK)
             {
-            
+
                 case EHCI_HC_PS_EMBEDDED_TT_SPEED_FULL        :
 
                     /* Full speed.  */
                     port_status |=  UX_PS_DS_FS;
-                    break;        
+                    break;
 
                 case EHCI_HC_PS_EMBEDDED_TT_SPEED_LOW         :
 
                     /* Low speed.  */
                     port_status |=  UX_PS_DS_LS;
-                    break;        
+                    break;
 
                 case EHCI_HC_PS_EMBEDDED_TT_SPEED_HIGH        :
 
                     /* High speed.  */
                     port_status |=  UX_PS_DS_HS;
-                    break;        
+                    break;
 
             }
         }
@@ -250,8 +239,8 @@ ULONG       port_status;
             /* No embedded TT. Fall back to default HS.  */
             port_status |=  UX_PS_DS_HS;
     }
-            
+
     /* Return port status.  */
-    return(port_status);            
+    return(port_status);
 }
 

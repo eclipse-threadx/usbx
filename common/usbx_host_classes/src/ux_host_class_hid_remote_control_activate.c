@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Remote Control Class                                            */
 /**                                                                       */
@@ -30,49 +31,38 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_remote_control_activate          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_remote_control_activate          PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs the enumeration of a HID Remote Control      */ 
-/*    class.                                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function performs the enumeration of a HID Remote Control      */
+/*    class.                                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    command                               Pointer to command            */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_periodic_report_start    Start periodic report   */ 
-/*    _ux_host_class_hid_report_callback_register Register callback       */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Remote Control Class                                            */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed clients management,   */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_periodic_report_start    Start periodic report   */
+/*    _ux_host_class_hid_report_callback_register Register callback       */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Remote Control Class                                            */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_remote_control_activate(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -92,7 +82,7 @@ UINT                                     status = UX_SUCCESS;
     /* Get some memory for both the HID class instance and copy of this client
        and for the callback.  */
     client_remote_control =  (UX_HOST_CLASS_HID_CLIENT_REMOTE_CONTROL *)
-                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
+                    _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY,
                                 sizeof(UX_HOST_CLASS_HID_CLIENT_REMOTE_CONTROL));
     if (client_remote_control == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
@@ -116,7 +106,7 @@ UINT                                     status = UX_SUCCESS;
      * Size calculation overflow is checked near where _USAGE_ARRAY_LENGTH is defined.
      */
     remote_control_instance -> ux_host_class_hid_remote_control_usage_array =  (ULONG *)
-                            _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, 
+                            _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY,
                                                         UX_HOST_CLASS_HID_REMOTE_CONTROL_USAGE_ARRAY_LENGTH*4);
 
     /* Check memory pointer. */
@@ -183,6 +173,6 @@ UINT                                     status = UX_SUCCESS;
     _ux_utility_memory_free(remote_control_instance);
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
 }
 

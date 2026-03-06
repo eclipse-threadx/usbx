@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Keyboard Client                                                 */
 /**                                                                       */
@@ -44,51 +45,40 @@ static inline UINT  _ux_host_class_hid_keyboard_activate_wait(UX_HOST_CLASS_HID_
 #endif
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_keyboard_entry                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_keyboard_entry                   PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is the entry point of the HID keyboard client.        */
-/*    This function is called by the HID class after it has parsed a new  */ 
-/*    HID report descriptor and is searching for a HID client.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
+/*    This function is called by the HID class after it has parsed a new  */
+/*    HID report descriptor and is searching for a HID client.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
 /*    command                               Pointer to command            */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_keyboard_activate                                */ 
-/*                                              Activate HID keyboard     */ 
-/*    _ux_host_class_hid_keyboard_deactivate                              */ 
-/*                                              Deactivate HID keyboard   */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_keyboard_activate                                */
+/*                                              Activate HID keyboard     */
+/*    _ux_host_class_hid_keyboard_deactivate                              */
+/*                                              Deactivate HID keyboard   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_keyboard_entry(UX_HOST_CLASS_HID_CLIENT_COMMAND *command)
@@ -109,10 +99,10 @@ UINT        status;
            this device or not */
         if ((command -> ux_host_class_hid_client_command_page == UX_HOST_CLASS_HID_PAGE_GENERIC_DESKTOP_CONTROLS) &&
             (command -> ux_host_class_hid_client_command_usage == UX_HOST_CLASS_HID_GENERIC_DESKTOP_KEYBOARD))
-            return(UX_SUCCESS);                        
-        else            
-            return(UX_NO_CLASS_MATCH);                        
-           
+            return(UX_SUCCESS);
+        else
+            return(UX_NO_CLASS_MATCH);
+
 
     case UX_HOST_CLASS_COMMAND_ACTIVATE:
 
@@ -138,7 +128,7 @@ UINT        status;
 
         /* Return completion status.  */
         return(status);
-    }   
+    }
 
     /* Return error status.  */
     return(UX_ERROR);
@@ -249,7 +239,7 @@ UINT                                    status;
             if a function has been programmed in the system structure.  */
         if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
         {
-            
+
             /* Call system change function.  */
             _ux_system_host ->  ux_system_host_change_function(UX_HID_CLIENT_INSERTION, hid -> ux_host_class_hid_class, (VOID *) hid_client);
         }

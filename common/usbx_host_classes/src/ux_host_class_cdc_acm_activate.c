@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -68,27 +69,6 @@
 /*                                                                        */
 /*    _ux_host_class_cdc_acm_entry          Entry of cdc_acm class        */
 /*    _ux_utility_delay_ms                  Delay ms                      */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            used defined line coding    */
-/*                                            instead of magic number,    */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved error handling,    */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved control searching, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_cdc_acm_activate(UX_HOST_CLASS_COMMAND *command)
@@ -345,7 +325,7 @@ UX_HOST_CLASS_CDC_ACM_LINE_STATE    line_state;
 #endif
 
     /* On error case, it's possible data buffer allocated for interrupt endpoint and transfer started, stop and free it.  */
-    if (cdc_acm -> ux_host_class_cdc_acm_interrupt_endpoint && 
+    if (cdc_acm -> ux_host_class_cdc_acm_interrupt_endpoint &&
         cdc_acm -> ux_host_class_cdc_acm_interrupt_endpoint -> ux_endpoint_transfer_request.ux_transfer_request_data_pointer)
     {
 

@@ -1433,8 +1433,8 @@ UX_SLAVE_TRANSFER                                  *slave_transfer_request;
 
     UCHAR string_descriptor_manufacturer_length = *(string_framework + 3);
     UCHAR get_string_descriptor_manufacturer_expected[] = {
-        /* bLength. '2 +' is for bLength and bDescriptorType, '0x0c' is the length of 
-           the string, and '*2' is because it's 16-bit unicode, where each character 
+        /* bLength. '2 +' is for bLength and bDescriptorType, '0x0c' is the length of
+           the string, and '*2' is because it's 16-bit unicode, where each character
            is 2 bytes, the LSB is the value, and MSB is 0 (for ascii anyways). */
         (UCHAR)(2 + string_descriptor_manufacturer_length*2),
 
@@ -1446,7 +1446,7 @@ UX_SLAVE_TRANSFER                                  *slave_transfer_request;
         0x78, 0x00,
         0x70, 0x00,
         0x72, 0x00,
-        0x65, 0x00, 
+        0x65, 0x00,
         0x73, 0x00,
         0x20, 0x00,
         0x4c, 0x00,

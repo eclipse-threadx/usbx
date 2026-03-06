@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -20,68 +21,35 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_host_stack.h                                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_host_stack.h                                     PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
-/*    USBX Host Stack component.                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added uninitialize APIs,    */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added configuration activate*/
-/*                                            and deactivate support,     */
-/*                                            added host device string    */
-/*                                            descriptor get support,     */
-/*                                            updated internal function,  */
-/*                                            resulting in version 6.1.4  */
-/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            added standalone HUB,       */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added error checks support, */
-/*                                            resulting in version 6.3.0  */
+/*    USBX Host Stack component.                                          */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_HOST_STACK_H
 #define UX_HOST_STACK_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -145,7 +113,7 @@ UINT    _ux_host_stack_configuration_descriptor_parse(UX_DEVICE *device, UX_CONF
 UINT    _ux_host_stack_configuration_enumerate(UX_DEVICE *device);
 UINT    _ux_host_stack_configuration_instance_create(UX_CONFIGURATION *configuration);
 VOID    _ux_host_stack_configuration_instance_delete(UX_CONFIGURATION *configuration);
-UINT    _ux_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
+UINT    _ux_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration,
                                                 UINT interface_index, UINT alternate_setting_index,
                                                 UX_INTERFACE **ux_interface);
 UINT    _ux_host_stack_configuration_interface_scan(UX_CONFIGURATION *configuration);
@@ -183,7 +151,7 @@ UINT    _ux_host_stack_interface_setting_select(UX_INTERFACE *ux_interface);
 UINT    _ux_host_stack_interfaces_scan(UX_CONFIGURATION *configuration, UCHAR * descriptor);
 VOID    _ux_host_stack_new_configuration_create(UX_DEVICE *device, UX_CONFIGURATION *configuration);
 UX_DEVICE  *_ux_host_stack_new_device_get(VOID);
-UINT    _ux_host_stack_new_device_create(UX_HCD *hcd, UX_DEVICE *device_owner, 
+UINT    _ux_host_stack_new_device_create(UX_HCD *hcd, UX_DEVICE *device_owner,
                                 UINT port_index, UINT device_speed,
                                 UINT port_max_power,
                                 UX_DEVICE **created_device);
@@ -208,7 +176,7 @@ UINT    _uxe_host_stack_class_get(UCHAR *class_name, UX_HOST_CLASS **ux_class);
 UINT    _uxe_host_stack_class_instance_get(UX_HOST_CLASS *class, UINT class_index, VOID **class_instance);
 UINT    _uxe_host_stack_class_register(UCHAR *class_name,
                         UINT (*class_entry_function)(struct UX_HOST_CLASS_COMMAND_STRUCT *));
-UINT    _uxe_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
+UINT    _uxe_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration,
                                                 UINT interface_index, UINT alternate_setting_index,
                                                 UX_INTERFACE **ux_interface);
 UINT    _uxe_host_stack_device_configuration_activate(UX_CONFIGURATION *configuration);
@@ -228,10 +196,10 @@ UINT    _uxe_host_stack_transfer_request_abort(UX_TRANSFER *transfer_request);
 UINT    _uxe_host_stack_transfer_run(UX_TRANSFER *transfer_request);
 
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
+}
 #endif
 
 #endif

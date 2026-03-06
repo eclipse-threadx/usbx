@@ -138,7 +138,7 @@ UINT num_writes = 0;
                process the link down while we're still writing packets. This
                should be improved in the future. I don't want to be the poor
                SOB that has to do it!
-               
+
                We cheat here by calling a device API from the host. */
             ux_test_device_class_cdc_ecm_set_link_state(cdc_ecm_device, UX_DEVICE_CLASS_CDC_ECM_LINK_STATE_DOWN);
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Simulator Controller Driver                                    */
 /**                                                                       */
@@ -28,59 +29,42 @@
 #include "ux_hcd_sim_host.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_request_isochronous_transfer       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_sim_host_request_isochronous_transfer       PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function performs an isochronous transfer request.            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_sim_host                          Pointer to host controller    */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_frame_number_get       Get frame number            */ 
-/*    _ux_hcd_sim_host_isochronous_td_obtain  Obtain isochronous TD       */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*     This function performs an isochronous transfer request.            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_sim_host                          Pointer to host controller    */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_sim_host_frame_number_get       Get frame number            */
+/*    _ux_hcd_sim_host_isochronous_td_obtain  Obtain isochronous TD       */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed payload calculation,  */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed partial transfer,     */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_sim_host_request_isochronous_transfer(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER *transfer_request)
 {
-                        
+
 UX_ENDPOINT                 *endpoint;
 UX_HCD_SIM_HOST_ISO_TD      *data_td;
 UX_HCD_SIM_HOST_ISO_TD      *start_data_td;
@@ -93,7 +77,7 @@ ULONG                       isoch_packet_payload_length;
 UCHAR *                     data_pointer;
 ULONG                       current_frame_number;
 ULONG                       n_trans, packet_size;
-    
+
 
     /* Get the pointer to the Endpoint.  */
     endpoint =  (UX_ENDPOINT *) transfer_request -> ux_transfer_request_endpoint;
@@ -132,7 +116,7 @@ ULONG                       n_trans, packet_size;
     /* Reset the first obtained data TD in case there is a TD shortage while building the list of TDs.  */
     start_data_td =  UX_NULL;
 
-    /* Calculate the frame number to be used to send this payload. If there are no current transfers, 
+    /* Calculate the frame number to be used to send this payload. If there are no current transfers,
        we take the current frame number and add a safety value (2-5) to it. If here is pending transactions,
        we use the frame number stored in the transfer request.  */
     if (ed -> ux_sim_host_ed_tail_td == ed -> ux_sim_host_ed_head_td)
@@ -150,7 +134,7 @@ ULONG                       n_trans, packet_size;
     /* Load the start buffer address and URB length to split the URB in multiple TD transfer.  */
     transfer_request_payload_length =  transfer_request -> ux_transfer_request_requested_length;
     data_pointer =  transfer_request -> ux_transfer_request_data_pointer;
-    
+
     while (transfer_request_payload_length != 0)
     {
 
@@ -215,16 +199,16 @@ ULONG                       n_trans, packet_size;
             if (start_data_td == UX_NULL)
                 start_data_td =  data_td;
 
-            /* Attach this new TD to the previous one.  */                                
+            /* Attach this new TD to the previous one.  */
             previous_td -> ux_sim_host_iso_td_next_td =  data_td;
             previous_td =  data_td;
         }
     }
-        
+
     /* Memorize the next frame number for this ED.  */
     ed -> ux_sim_host_ed_frame =  current_frame_number;
 
-    /* At this stage, the Head and Tail in the ED are still the same and the host simulator controller 
+    /* At this stage, the Head and Tail in the ED are still the same and the host simulator controller
        will skip this ED until we have hooked the new tail TD.  */
     tail_td =  _ux_hcd_sim_host_isochronous_td_obtain(hcd_sim_host);
     if (tail_td == UX_NULL)
@@ -255,6 +239,6 @@ ULONG                       n_trans, packet_size;
     ed -> ux_sim_host_ed_tail_td =  (UX_HCD_SIM_HOST_TD *) ((void *) tail_td);
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);           
+    return(UX_SUCCESS);
 }
 

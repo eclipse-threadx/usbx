@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device CDC Class                                                    */
 /**                                                                       */
@@ -29,74 +30,48 @@
 
 
 #if !defined(UX_DEVICE_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_cdc_acm_read                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_cdc_acm_read                       PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function reads from the CDC class.                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function reads from the CDC class.                             */
+/*                                                                        */
 /*    It's for RTOS mode.                                                 */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    cdc_acm                                   Address of cdc_acm class  */ 
-/*                                              instance                  */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    cdc_acm                                   Address of cdc_acm class  */
+/*                                              instance                  */
 /*    buffer                                    Pointer to buffer to save */
 /*                                              received data             */
 /*    requested_length                          Length of bytes to read   */
 /*    actual_length                             Pointer to save number of */
 /*                                              bytes read                */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
-/*    _ux_utility_memory_copy               Copy memory                   */ 
-/*    _ux_device_mutex_off                  Release mutex                 */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
+/*    _ux_utility_memory_copy               Copy memory                   */
+/*    _ux_device_mutex_off                  Release mutex                 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Application                                                         */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile issue,        */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022x    Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Yajun Xia, CQ Xiao       Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+UINT _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length)
 {
 
@@ -114,17 +89,17 @@ ULONG                       local_requested_length;
 
     /* Check if current cdc-acm is using callback or not. We cannot use direct reads with callback on.  */
     if (cdc_acm -> ux_slave_class_cdc_acm_transmission_status == UX_TRUE)
-    
+
         /* Not allowed. */
         return(UX_ERROR);
 #endif
 
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
-    
+
     /* As long as the device is in the CONFIGURED state.  */
     if (device -> ux_slave_device_state != UX_DEVICE_CONFIGURED)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CONFIGURATION_HANDLE_UNKNOWN);
@@ -132,17 +107,17 @@ ULONG                       local_requested_length;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONFIGURATION_HANDLE_UNKNOWN, device, 0, 0, UX_TRACE_ERRORS, 0, 0)
-    
+
         /* Cannot proceed with command, the interface is down.  */
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
     }
-    
+
     /* This is the first time we are activated. We need the interface to the class.  */
     interface_ptr =  cdc_acm -> ux_slave_class_cdc_acm_interface;
-    
+
     /* Locate the endpoints.  */
     endpoint =  interface_ptr -> ux_slave_interface_first_endpoint;
-    
+
     /* Check the endpoint direction, if OUT we have the correct endpoint.  */
     if ((endpoint -> ux_slave_endpoint_descriptor.bEndpointAddress & UX_ENDPOINT_DIRECTION) != UX_ENDPOINT_OUT)
     {
@@ -185,48 +160,48 @@ ULONG                       local_requested_length;
 
     /* Check if we need more transactions.  */
     while (device -> ux_slave_device_state == UX_DEVICE_CONFIGURED && requested_length != 0)
-    { 
-        
+    {
+
         /* Check if we have enough in the local buffer.  */
         if (requested_length > endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize)
-    
+
             /* We have too much to transfer.  */
             local_requested_length = endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize;
-            
+
         else
-        
+
             /* We can proceed with the demanded length.  */
             local_requested_length = requested_length;
-        
+
         /* Send the request to the device controller.  */
         status =  _ux_device_stack_transfer_request(transfer_request, local_requested_length, local_requested_length);
-        
-        /* Check the status */    
+
+        /* Check the status */
         if (status == UX_SUCCESS)
         {
 
             /* We need to copy the buffer locally.  */
             _ux_utility_memory_copy(buffer, transfer_request -> ux_slave_transfer_request_data_pointer,
                             transfer_request -> ux_slave_transfer_request_actual_length); /* Use case of memcpy is verified. */
-    
+
             /* Next buffer address.  */
             buffer += transfer_request -> ux_slave_transfer_request_actual_length;
-    
+
             /* Set the length actually received. */
-            *actual_length += transfer_request -> ux_slave_transfer_request_actual_length; 
-    
+            *actual_length += transfer_request -> ux_slave_transfer_request_actual_length;
+
             /* Decrement what left has to be done.  */
             requested_length -= transfer_request -> ux_slave_transfer_request_actual_length;
 
 
             /* Is this a short packet or a ZLP indicating we are done with this transfer ?  */
             if (transfer_request -> ux_slave_transfer_request_actual_length < endpoint -> ux_slave_endpoint_descriptor.wMaxPacketSize)
-            {            
+            {
 
                 /* We are done.  */
                 /* Free Mutex resource.  */
                 _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
-    
+
                 /* Return with success.  */
                 return(UX_SUCCESS);
 
@@ -234,13 +209,13 @@ ULONG                       local_requested_length;
         }
         else
         {
-            
+
             /* Free Mutex resource.  */
             _ux_device_mutex_off(&cdc_acm -> ux_slave_class_cdc_acm_endpoint_out_mutex);
-    
+
             /* We got an error.  */
             return(status);
-        }            
+        }
     }
 
 #endif
@@ -250,7 +225,7 @@ ULONG                       local_requested_length;
 
     /* Check why we got here, either completion or device was extracted.  */
     if (device -> ux_slave_device_state != UX_DEVICE_CONFIGURED)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_TRANSFER_NO_ANSWER);
@@ -262,9 +237,9 @@ ULONG                       local_requested_length;
         return (UX_TRANSFER_NO_ANSWER);
     }
     else
-    
+
         /* Simply return the last transaction result.  */
-        return(status);        
+        return(status);
 }
 
 /**************************************************************************/
@@ -302,12 +277,6 @@ ULONG                       local_requested_length;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Yajun Xia                Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   CDC ECM Class                                                       */
 /**                                                                       */
@@ -29,50 +30,36 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_cdc_ecm_interrupt_notification       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_cdc_ecm_interrupt_notification       PORTABLE C      */
 /*                                                           6.1.11       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function is called by the stack when an interrupt packet as    */ 
-/*    been received.                                                      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function is called by the stack when an interrupt packet as    */
+/*    been received.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX stack                                                          */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX stack                                                          */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_host_class_cdc_ecm_interrupt_notification(UX_TRANSFER *transfer_request)
@@ -85,7 +72,7 @@ ULONG                                       notification_value;
 
     /* Get the control class instance for this transfer request.  */
     cdc_ecm =  (UX_HOST_CLASS_CDC_ECM *) transfer_request -> ux_transfer_request_class_instance;
-    
+
     /* Check the state of the transfer.  If there is an error, we do not proceed with this notification.  */
     if (transfer_request -> ux_transfer_request_completion_code != UX_SUCCESS)
 
@@ -102,10 +89,10 @@ ULONG                                       notification_value;
     cdc_ecm -> ux_host_class_cdc_ecm_notification_count++;
 
     /* Get the notification.  */
-    notification_type = (ULONG) *(transfer_request -> ux_transfer_request_data_pointer + UX_HOST_CLASS_CDC_ECM_NPF_NOTIFICATION_TYPE);    
-    
+    notification_type = (ULONG) *(transfer_request -> ux_transfer_request_data_pointer + UX_HOST_CLASS_CDC_ECM_NPF_NOTIFICATION_TYPE);
+
     /* And the value.  */
-    notification_value = (ULONG) *(transfer_request -> ux_transfer_request_data_pointer + UX_HOST_CLASS_CDC_ECM_NPF_VALUE);    
+    notification_value = (ULONG) *(transfer_request -> ux_transfer_request_data_pointer + UX_HOST_CLASS_CDC_ECM_NPF_VALUE);
 
     /* Check if the notification is a Network notification.  */
     if (notification_type == UX_HOST_CLASS_CDC_ECM_NOTIFICATION_NETWORK_CONNECTION)
@@ -116,13 +103,13 @@ ULONG                                       notification_value;
         {
 
             /* Link is up. See if we know about that.  */
-            if (cdc_ecm -> ux_host_class_cdc_ecm_link_state != UX_HOST_CLASS_CDC_ECM_LINK_STATE_UP && 
+            if (cdc_ecm -> ux_host_class_cdc_ecm_link_state != UX_HOST_CLASS_CDC_ECM_LINK_STATE_UP &&
                 cdc_ecm -> ux_host_class_cdc_ecm_link_state != UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_UP)
             {
-        
+
                 /* Memorize the new link state.  */
-                cdc_ecm -> ux_host_class_cdc_ecm_link_state =  UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_UP;                    
-                
+                cdc_ecm -> ux_host_class_cdc_ecm_link_state =  UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_UP;
+
                 /* We need to inform the cdc_ecm thread of this change.  */
                 _ux_host_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
             }
@@ -131,7 +118,7 @@ ULONG                                       notification_value;
         {
 
             /* Link is down. See if we know about that.  */
-            if (cdc_ecm -> ux_host_class_cdc_ecm_link_state != UX_HOST_CLASS_CDC_ECM_LINK_STATE_DOWN && 
+            if (cdc_ecm -> ux_host_class_cdc_ecm_link_state != UX_HOST_CLASS_CDC_ECM_LINK_STATE_DOWN &&
                 cdc_ecm -> ux_host_class_cdc_ecm_link_state != UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_DOWN)
             {
 
@@ -141,7 +128,7 @@ ULONG                                       notification_value;
                 cdc_ecm -> ux_host_class_cdc_ecm_link_state =  UX_HOST_CLASS_CDC_ECM_LINK_STATE_PENDING_DOWN;
 
                 /* Now abort all transfers. It's possible we're executing right before the transfer
-                   is armed. If this is the case, then the transfer will not be aborted if we do the abort right now; instead, 
+                   is armed. If this is the case, then the transfer will not be aborted if we do the abort right now; instead,
                    we should wait until after the transfer is armed. We must look at the CDC-ECM thread's state.  */
 
                 /* Is it in the process of checking the link state and arming the transfer?  */
@@ -166,8 +153,8 @@ ULONG                                       notification_value;
                 /* We need to inform the CDC-ECM thread of this change.  */
                 _ux_host_semaphore_put(&cdc_ecm -> ux_host_class_cdc_ecm_interrupt_notification_semaphore);
             }
-        }           
-    }        
+        }
+    }
 
     /* Reactivate the CDC_ECM interrupt pipe.  */
     _ux_host_stack_transfer_request(transfer_request);
