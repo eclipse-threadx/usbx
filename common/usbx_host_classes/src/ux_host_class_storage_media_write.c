@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Storage Class                                                       */
 /**                                                                       */
@@ -75,55 +76,41 @@ ULONG       command_length;
 }
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_media_write                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_storage_media_write                  PORTABLE C      */
 /*                                                           6.2.1        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function will write one or more logical sector to the media.   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
-/*    sector_start                          Starting sector               */ 
-/*    sector_count                          Number of sectors to write    */ 
-/*    data_pointer                          Pointer to data to write      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_cbw_initialize Initialize the CBW            */ 
-/*    _ux_host_class_storage_transport      Send command                  */ 
-/*    _ux_utility_long_put_big_endian       Put 32-bit word               */ 
-/*    _ux_utility_short_put_big_endian      Put 16-bit word               */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Storage Class                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked device removal,     */
-/*                                            resulting in version 6.2.1  */
+/*                                                                        */
+/*    This function will write one or more logical sector to the media.   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    sector_start                          Starting sector               */
+/*    sector_count                          Number of sectors to write    */
+/*    data_pointer                          Pointer to data to write      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_cbw_initialize Initialize the CBW            */
+/*    _ux_host_class_storage_transport      Send command                  */
+/*    _ux_utility_long_put_big_endian       Put 32-bit word               */
+/*    _ux_utility_short_put_big_endian      Put 16-bit word               */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Storage Class                                                       */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_media_write(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,
@@ -166,7 +153,7 @@ UINT            media_retry;
     }
 
     /* Return sense error.  */
-    return(UX_HOST_CLASS_STORAGE_SENSE_ERROR);                                            
+    return(UX_HOST_CLASS_STORAGE_SENSE_ERROR);
 #endif
 }
 
@@ -203,12 +190,6 @@ UINT            media_retry;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_storage_media_write(UX_HOST_CLASS_STORAGE *storage, ULONG sector_start,

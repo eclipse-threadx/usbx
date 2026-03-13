@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
+/**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
 /**   User Specific                                                       */
@@ -20,11 +21,11 @@
 /**************************************************************************/
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  PORT SPECIFIC C INFORMATION                            RELEASE        */ 
-/*                                                                        */ 
-/*    ux_user.h                                           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
+/*                                                                        */
+/*    ux_user.h                                           PORTABLE C      */
 /*                                                           6.3.0        */
 /*                                                                        */
 /*  AUTHOR                                                                */
@@ -32,81 +33,12 @@
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file contains user defines for configuring USBX in specific    */ 
-/*    ways. This file will have an effect only if the application and     */ 
-/*    USBX library are built with UX_INCLUDE_USER_DEFINE_FILE defined.    */ 
-/*    Note that all the defines in this file may also be made on the      */ 
-/*    command line when building USBX library and application objects.    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Xiuwen Cai               Modified comment(s), added    */
-/*                                            compile option for using    */
-/*                                            packet pool from NetX,      */
-/*                                            resulting in version 6.1.4  */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added DFU_UPLOAD option,    */
-/*                                            added macro to enable       */
-/*                                            device bi-dir-endpoints,    */
-/*                                            added macro to disable CDC- */
-/*                                            ACM transmission support,   */
-/*                                            resulting in version 6.1.6  */
-/*  06-02-2021     Xiuwen Cai               Modified comment(s), added    */
-/*                                            transfer timeout value      */
-/*                                            options,                    */
-/*                                            resulting in version 6.1.7  */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            resulting in version 6.1.8  */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added option for assert,    */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            added option for device     */
-/*                                            audio feedback endpoint,    */
-/*                                            added option for MTP,       */
-/*                                            added options for HID       */
-/*                                            interrupt OUT support,      */
-/*                                            added option to validate    */
-/*                                            class code in enumeration,  */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added audio class features, */
-/*                                            added device CDC_ACM and    */
-/*                                            printer write auto ZLP,     */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            deprecated ECM pool option, */
-/*                                            added align minimal config, */
-/*                                            added host stack instance   */
-/*                                            creation strategy control,  */
-/*                                            resulting in version 6.2.0  */
-/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added option to disable dev */
-/*                                            alternate setting support,  */
-/*                                            added option to disable dev */
-/*                                            framework initialize scan,  */
-/*                                            added option to reference   */
-/*                                            names by pointer to chars,  */
-/*                                            added option to enable      */
-/*                                            basic USBX error checking,  */
-/*                                            resulting in version 6.2.1  */
-/*  10-31-2023     Xiuwen Cai, CQ Xiao      Modified comment(s),          */
-/*                                            refined memory management,  */
-/*                                            added zero copy support     */
-/*                                            in many device classes,     */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            added option for get string */
-/*                                            requests with zero wIndex,  */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*    This file contains user defines for configuring USBX in specific    */
+/*    ways. This file will have an effect only if the application and     */
+/*    USBX library are built with UX_INCLUDE_USER_DEFINE_FILE defined.    */
+/*    Note that all the defines in this file may also be made on the      */
+/*    command line when building USBX library and application objects.    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -115,15 +47,15 @@
 
 
 /* Define various build options for the USBX port.  The application should either make changes
-   here by commenting or un-commenting the conditional compilation defined OR supply the defines 
+   here by commenting or un-commenting the conditional compilation defined OR supply the defines
    though the compiler's equivalent of the -D option.  */
 
 /* Define USBX Generic Thread Stack Size.  */
 /* #define UX_THREAD_STACK_SIZE                                (2 * 1024) */
 
 /* Define USBX Host Enum Thread Stack Size. The default is to use UX_THREAD_STACK_SIZE */
-/* 
-#define UX_HOST_ENUM_THREAD_STACK_SIZE                      UX_THREAD_STACK_SIZE 
+/*
+#define UX_HOST_ENUM_THREAD_STACK_SIZE                      UX_THREAD_STACK_SIZE
 */
 
 
@@ -137,14 +69,14 @@
 #define UX_HOST_HNP_POLLING_THREAD_STACK                    UX_THREAD_STACK_SIZE
 */
 
-/* Override various options with default values already assigned in ux_api.h or ux_port.h. Please 
+/* Override various options with default values already assigned in ux_api.h or ux_port.h. Please
    also refer to ux_port.h for descriptions on each of these options.  */
 
 /* Defined, this value represents minimal allocated memory alignment in number of bytes.
    The default is UX_ALIGN_8 (0x07) to align allocated memory to 8 bytes.  */
 /* #define UX_ALIGN_MIN UX_ALIGN_8  */
 
-/* Defined, this value represents how many ticks per seconds for a specific hardware platform. 
+/* Defined, this value represents how many ticks per seconds for a specific hardware platform.
    The default is 1000 indicating 1 tick per millisecond.  */
 
 /* #define UX_PERIODIC_RATE 1000
@@ -167,7 +99,7 @@
 /* Defined, this value is the maximum number of classes that can be loaded by USBX. This value
    represents the class container and not the number of instances of a class. For instance, if a
    particular implementation of USBX needs the hub class, the printer class, and the storage
-   class, then the UX_MAX_CLASSES value can be set to 3 regardless of the number of devices 
+   class, then the UX_MAX_CLASSES value can be set to 3 regardless of the number of devices
    that belong to these classes.  */
 
 /* #define UX_MAX_CLASSES  3
@@ -185,9 +117,9 @@
 /* #define UX_MAX_SLAVE_INTERFACES    16
 */
 
-/* Defined, this value represents the number of different host controllers available in the system. 
-   For USB 1.1 support, this value will usually be 1. For USB 2.0 support, this value can be more 
-   than 1. This value represents the number of concurrent host controllers running at the same time. 
+/* Defined, this value represents the number of different host controllers available in the system.
+   For USB 1.1 support, this value will usually be 1. For USB 2.0 support, this value can be more
+   than 1. This value represents the number of concurrent host controllers running at the same time.
    If for instance there are two instances of OHCI running, or one EHCI and one OHCI controller
    running, the UX_MAX_HCD should be set to 2.  */
 
@@ -196,8 +128,8 @@
 
 
 /* Defined, this value represents the maximum number of devices that can be attached to the USB.
-   Normally, the theoretical maximum number on a single USB is 127 devices. This value can be 
-   scaled down to conserve memory. Note that this value represents the total number of devices 
+   Normally, the theoretical maximum number on a single USB is 127 devices. This value can be
+   scaled down to conserve memory. Note that this value represents the total number of devices
    regardless of the number of USB buses in the system.  */
 
 /* #define UX_MAX_DEVICES  127
@@ -213,7 +145,7 @@
 
 /* Defined, this value represents the maximum number of SCSI logical units represented in the
    host storage class driver.  */
-   
+
 /* #define UX_MAX_HOST_LUN 1
 */
 
@@ -274,13 +206,13 @@
 
 
 /* Defined, this value represents the maximum number of bytes that can be received or transmitted
-   on any endpoint. This value cannot be less than the maximum packet size of any endpoint. The default 
-   is 4096 bytes but can be reduced in memory constrained environments. For cd-rom support in the storage 
+   on any endpoint. This value cannot be less than the maximum packet size of any endpoint. The default
+   is 4096 bytes but can be reduced in memory constrained environments. For cd-rom support in the storage
    class, this value cannot be less than 2048.  */
 
 #define UX_SLAVE_REQUEST_DATA_MAX_LENGTH    (1024 * 2)
 
-/* Defined, this enables processing of Get String Descriptor requests with zero Language ID.  
+/* Defined, this enables processing of Get String Descriptor requests with zero Language ID.
    The first language ID in the language ID framwork will be used if the request has a zero
    Language ID.  */
 /* #define UX_DEVICE_ENABLE_GET_STRING_WITH_ZERO_LANGUAGE_ID  */
@@ -297,7 +229,7 @@
 
 /* Define USBX Mass Storage Thread Stack Size. The default is to use UX_THREAD_STACK_SIZE. */
 
-/* #define UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE             UX_THREAD_STACK_SIZE 
+/* #define UX_HOST_CLASS_STORAGE_THREAD_STACK_SIZE             UX_THREAD_STACK_SIZE
  */
 
 /* Defined, this value represents the maximum number of Ed, regular TDs and Isochronous TDs. These values
@@ -313,13 +245,13 @@
 
 #define UX_HOST_CLASS_HID_DECOMPRESSION_BUFFER              4096
 
-/* Defined, this value represents the maximum number of HID usages for a HID device. 
+/* Defined, this value represents the maximum number of HID usages for a HID device.
    Default is 2048 but for simple HID devices like keyboard and mouse it can be reduced a lot. */
 
 #define UX_HOST_CLASS_HID_USAGES                            2048
 
 
-/* By default, each key in each HID report from the device is reported by ux_host_class_hid_keyboard_key_get 
+/* By default, each key in each HID report from the device is reported by ux_host_class_hid_keyboard_key_get
    (a HID report from the device is received whenever there is a change in a key state i.e. when a key is pressed
    or released. The report contains every key that is down). There are limitations to this method such as not being
    able to determine when a key has been released.
@@ -352,13 +284,13 @@
 /* #define UX_HOST_CLASS_HID_KEYBOARD_EVENTS_KEY_CHANGES_MODE_REPORT_MODIFIER_KEYS */
 
 
-/* Defined, this value represents the maximum number of media for the host storage class. 
+/* Defined, this value represents the maximum number of media for the host storage class.
    Default is 8 but for memory constrained resource systems this can ne reduced to 1. */
 
 #define UX_HOST_CLASS_STORAGE_MAX_MEDIA                     2
 
 /* Defined, this value includes code to handle storage devices that use the CB
-   or CBI protocol (such as floppy disks). It is off by default because these 
+   or CBI protocol (such as floppy disks). It is off by default because these
    protocols are obsolete, being superseded by the Bulk Only Transport (BOT) protocol
    which virtually all modern storage devices use.
 */
@@ -415,8 +347,8 @@
 
 /* #define UX_DEVICE_CLASS_HID_EVENT_BUFFER_LENGTH          64 */
 
-/* Defined, this value represents the the maximum number of HID events/reports 
-   that can be queued at once.                   
+/* Defined, this value represents the the maximum number of HID events/reports
+   that can be queued at once.
  */
 
 /* #define UX_DEVICE_CLASS_HID_MAX_EVENTS_QUEUE             8  */
@@ -485,7 +417,7 @@
 /* #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT  */
 
 /* Defined, this macro disables interface alternate setting support.
-   Device stalls 
+   Device stalls
  */
 /* UX_DEVICE_ALTERNATE_SETTING_SUPPORT_DISABLE  */
 
@@ -563,13 +495,13 @@
 /* Defined, this value will include the OTG polling thread. OTG can only be active if both host/device are present.
 */
 
-#ifndef UX_HOST_SIDE_ONLY 
-#ifndef UX_DEVICE_SIDE_ONLY 
+#ifndef UX_HOST_SIDE_ONLY
+#ifndef UX_DEVICE_SIDE_ONLY
 
 /* #define UX_OTG_SUPPORT */
 
-#endif 
-#endif 
+#endif
+#endif
 
 /* Defined, this macro will enable the standalone mode of usbx.  */
 /* #define UX_STANDALONE  */
@@ -591,6 +523,10 @@
 */
 
 #define UX_HOST_CLASS_STORAGE_MAX_TRANSFER_SIZE             (1024 * 1)
+
+/* Defined, this option enables error log.  */
+
+/* #define UX_ENABLE_DEBUG_LOG  */
 
 /* Defined, this value represents the size of the log pool.
 */
@@ -641,7 +577,7 @@
 #include "usbh_hcs.h"
 #include "usbh_stdreq.h"
 #include "usbh_core.h"
-#endif 
+#endif
 
-#endif 
+#endif
 

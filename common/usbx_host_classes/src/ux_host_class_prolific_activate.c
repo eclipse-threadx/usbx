@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Prolific Class                                                      */
 /**                                                                       */
@@ -29,54 +30,43 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_prolific_activate                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_prolific_activate                    PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function creates the prolific instance, configure the device.  */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                                DLC  class command pointer   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_prolific_configure        Configure prolific class   */ 
+/*                                                                        */
+/*    This function creates the prolific instance, configure the device.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                                DLC  class command pointer   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_prolific_configure        Configure prolific class   */
 /*    _ux_host_class_prolific_endpoints_get    Get endpoints of prolific  */
-/*    _ux_host_class_prolific_setup            Set up prolific device     */ 
-/*    _ux_host_stack_class_instance_create     Create class instance      */ 
-/*    _ux_host_stack_class_instance_destroy    Destroy the class instance */ 
-/*    _ux_utility_memory_allocate              Allocate memory block      */ 
-/*    _ux_utility_memory_free                  Free memory block          */ 
+/*    _ux_host_class_prolific_setup            Set up prolific device     */
+/*    _ux_host_stack_class_instance_create     Create class instance      */
+/*    _ux_host_stack_class_instance_destroy    Destroy the class instance */
+/*    _ux_utility_memory_allocate              Allocate memory block      */
+/*    _ux_utility_memory_free                  Free memory block          */
 /*    _ux_host_semaphore_create                Create prolific semaphore  */
 /*    _ux_host_class_prolific_ioctl            IOCTL function for DLC     */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_prolific_entry            Entry of prolific class    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_prolific_entry            Entry of prolific class    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_prolific_activate(UX_HOST_CLASS_COMMAND *command)
@@ -103,16 +93,16 @@ UINT                                status;
     prolific -> ux_host_class_prolific_device =  device;
 
     /* Store the instance in the device container, this is for the USBX stack
-       when it needs to invoke the class for deactivation.  */        
+       when it needs to invoke the class for deactivation.  */
     device -> ux_device_class_instance =  (VOID *) prolific;
 
     /* Create this class instance.  */
     _ux_host_stack_class_instance_create(prolific -> ux_host_class_prolific_class, (VOID *) prolific);
 
     /* Configure the prolific.  */
-    status =  _ux_host_class_prolific_configure(prolific);     
+    status =  _ux_host_class_prolific_configure(prolific);
 
-    /* Get the prolific endpoint(s). We need to search for Bulk Out and Bulk In endpoints 
+    /* Get the prolific endpoint(s). We need to search for Bulk Out and Bulk In endpoints
        and the interrupt endpoint.  */
     if (status == UX_SUCCESS)
         status =  _ux_host_class_prolific_endpoints_get(prolific);
@@ -122,7 +112,7 @@ UINT                                status;
     {
 
         /* Store chip version for further reference.  */
-        prolific -> ux_host_class_prolific_version = device -> ux_device_descriptor.bcdDevice; 
+        prolific -> ux_host_class_prolific_version = device -> ux_device_descriptor.bcdDevice;
 
         /* Mark the prolific instance as mounting now.  */
         prolific -> ux_host_class_prolific_state =  UX_HOST_CLASS_INSTANCE_MOUNTING;
@@ -149,7 +139,7 @@ UINT                                status;
         line_state.ux_host_class_prolific_line_state_dtr       = 1;
         status = _ux_host_class_prolific_ioctl(prolific, UX_HOST_CLASS_PROLIFIC_IOCTL_SET_LINE_STATE, (VOID *) &line_state);
     }
-    
+
     /* Create the semaphore to protect 2 threads from accessing the same prolific instance.  */
     if (status == UX_SUCCESS)
     {
@@ -169,7 +159,7 @@ UINT                                status;
         if a function has been programmed in the system structure.  */
         if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
         {
-            
+
             /* Call system change function.  */
             _ux_system_host ->  ux_system_host_change_function(UX_DEVICE_INSERTION, prolific -> ux_host_class_prolific_class, (VOID *) prolific);
         }
@@ -191,6 +181,6 @@ UINT                                status;
     _ux_utility_memory_free(prolific);
 
     /* Return completion status.  */
-    return(status);    
+    return(status);
 }
 

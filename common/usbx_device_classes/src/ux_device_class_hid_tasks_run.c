@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -47,7 +49,7 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    hid_class                                 Address of hid class      */
+/*    hid_instance                              Address of hid class      */
 /*                                                container               */
 /*                                                                        */
 /*  OUTPUT                                                                */
@@ -67,17 +69,8 @@
 /*                                                                        */
 /*    USBX Device Stack                                                   */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
-UINT _ux_device_class_hid_tasks_run(VOID *instance)
+UINT _ux_device_class_hid_tasks_run(VOID *hid_instance)
 {
 
 UX_SLAVE_CLASS_HID          *hid;
@@ -89,7 +82,7 @@ UINT                        status;
 
 
     /* Get HID instance.  */
-    hid = (UX_SLAVE_CLASS_HID *) instance;
+    hid = (UX_SLAVE_CLASS_HID *) hid_instance;
 
     /* Get the pointer to the device.  */
     device =  &_ux_system_slave -> ux_system_slave_device;
@@ -208,4 +201,4 @@ UINT                        status;
         return(UX_STATE_IDLE);
     }
 }
-#endif
+#endif /* UX_DEVICE_STANDALONE */

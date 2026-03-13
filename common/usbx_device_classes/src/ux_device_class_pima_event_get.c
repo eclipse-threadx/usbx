@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device PIMA Class                                                   */
 /**                                                                       */
@@ -28,47 +29,39 @@
 #include "ux_device_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_pima_event_get                     PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_pima_event_get                     PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function checks if there is an event from the application      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                     Address of pima class      */ 
-/*    event                                    Pointer of the event       */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    status                                   UX_SUCCESS if there is an  */ 
-/*                                             event                      */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function checks if there is an event from the application      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                     Address of pima class      */
+/*    event                                    Pointer of the event       */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                   UX_SUCCESS if there is an  */
+/*                                             event                      */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    None                                                                */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    ThreadX                                                             */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX                                                             */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_pima_event_get(UX_SLAVE_CLASS_PIMA *pima, 
+UINT  _ux_device_class_pima_event_get(UX_SLAVE_CLASS_PIMA *pima,
                                       UX_SLAVE_CLASS_PIMA_EVENT *pima_event)
 {
 
@@ -78,15 +71,15 @@ UX_SLAVE_CLASS_PIMA_EVENT   *current_pima_event;
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_DEVICE_CLASS_PIMA_EVENT_GET, pima, pima_event, 0, 0, UX_TRACE_DEVICE_CLASS_EVENTS, 0, 0)
 
     /* Check if the head and the tail of the event array is the same.  */
-    if (pima -> ux_device_class_pima_event_array_head == 
+    if (pima -> ux_device_class_pima_event_array_head ==
         pima -> ux_device_class_pima_event_array_tail)
 
         /* No event to report.  */
-        return(UX_ERROR);        
+        return(UX_ERROR);
 
     /* There is an event to report, get the current pointer to the event.  */
     current_pima_event =  pima -> ux_device_class_pima_event_array_tail;
-    
+
     /* fill in the event structure from the user.  */
     pima_event -> ux_device_class_pima_event_code            =  current_pima_event -> ux_device_class_pima_event_code;
     pima_event -> ux_device_class_pima_event_session_id      =  pima -> ux_device_class_pima_session_id;
@@ -101,8 +94,8 @@ UX_SLAVE_CLASS_PIMA_EVENT   *current_pima_event;
 
         /* We are at the end, go back to the beginning.  */
         pima -> ux_device_class_pima_event_array_tail =  pima -> ux_device_class_pima_event_array;
-        
-    else        
+
+    else
         /* We are not at the end, increment the tail position.  */
         pima -> ux_device_class_pima_event_array_tail++;
 

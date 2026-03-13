@@ -1,5 +1,5 @@
-/* This tests the case where the get hub status commmand fails 
-   when a device connected to the hub is being enumerated. The specific test case 
+/* This tests the case where the get hub status commmand fails
+   when a device connected to the hub is being enumerated. The specific test case
    is in ux_host_class_hub_port_change_process.c. */
 
 #include "usbx_ux_test_hub.h"

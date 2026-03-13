@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Storage Class                                                       */
 /**                                                                       */
@@ -29,54 +30,41 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_request_sense                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_storage_request_sense                PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function will send a request sense to the device to see what   */ 
-/*    error happened during the last command. Request sense commands      */ 
-/*    cannot be nested.                                                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_cbw_initialize Initialize CBW                */ 
-/*    _ux_host_class_storage_transport      Send command                  */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_copy               Copy memory block             */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Storage Class                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*    This function will send a request sense to the device to see what   */
+/*    error happened during the last command. Request sense commands      */
+/*    cannot be nested.                                                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_cbw_initialize Initialize CBW                */
+/*    _ux_host_class_storage_transport      Send command                  */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_copy               Copy memory block             */
+/*    _ux_utility_memory_free               Release memory block          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Storage Class                                                       */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_request_sense(UX_HOST_CLASS_STORAGE *storage)
@@ -95,7 +83,7 @@ ULONG           sense_code;
 
     /* Clear the former sense code value.  */
     storage -> ux_host_class_storage_sense_code =  0;
-    
+
     /* Use a pointer for the cbw, easier to manipulate.  */
     cbw =  (UCHAR *) storage -> ux_host_class_storage_cbw;
 
@@ -112,17 +100,17 @@ ULONG           sense_code;
     /* Check of we are reentering a REQUEST SENSE command which is illegal.  */
     if (*(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_OPERATION) == UX_HOST_CLASS_STORAGE_SCSI_REQUEST_SENSE)
         return(UX_ERROR);
-                                                
-    /* Save the current command so that we can re-initiate it after the 
+
+    /* Save the current command so that we can re-initiate it after the
        REQUEST_SENSE command.  */
     _ux_utility_memory_copy(storage -> ux_host_class_storage_saved_cbw, storage -> ux_host_class_storage_cbw, UX_HOST_CLASS_STORAGE_CBW_LENGTH); /* Use case of memcpy is verified. */
 
     /* Initialize the CBW for this command.  */
     _ux_host_class_storage_cbw_initialize(storage, UX_HOST_CLASS_STORAGE_DATA_IN, UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH, command_length);
-    
+
     /* Prepare the REQUEST SENSE command block.  */
     *(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_OPERATION) =  UX_HOST_CLASS_STORAGE_SCSI_REQUEST_SENSE;
-    
+
     /* Store the length of the Request Sense Response.  */
     *(cbw + UX_HOST_CLASS_STORAGE_CBW_CB + UX_HOST_CLASS_STORAGE_REQUEST_SENSE_ALLOCATION_LENGTH) =  UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_LENGTH;
 
@@ -150,8 +138,8 @@ ULONG           sense_code;
     if (status == UX_SUCCESS)
     {
 
-        /* We have a successful transaction, even though the sense code could reflect an error. The sense code 
-           will be assembled and store in the device instance.  */ 
+        /* We have a successful transaction, even though the sense code could reflect an error. The sense code
+           will be assembled and store in the device instance.  */
         sense_code = UX_HOST_CLASS_STORAGE_SENSE_STATUS(
             (ULONG) *(request_sense_response +
                       UX_HOST_CLASS_STORAGE_REQUEST_SENSE_RESPONSE_SENSE_KEY),
@@ -162,7 +150,7 @@ ULONG           sense_code;
 
         /* Store the sense code in the storage instance.  */
         storage -> ux_host_class_storage_sense_code =  sense_code;
-    }       
+    }
 
     /* Free the memory resource used for the command response.  */
     _ux_utility_memory_free(request_sense_response);
@@ -170,8 +158,8 @@ ULONG           sense_code;
     /* Restore the current CBW command.  */
     _ux_utility_memory_copy(storage -> ux_host_class_storage_cbw, storage -> ux_host_class_storage_saved_cbw, UX_HOST_CLASS_STORAGE_CBW_LENGTH); /* Use case of memcpy is verified. */
 
-    /* Return completion code.  */    
-    return(status);                                            
+    /* Return completion code.  */
+    return(status);
 #endif
 }
 

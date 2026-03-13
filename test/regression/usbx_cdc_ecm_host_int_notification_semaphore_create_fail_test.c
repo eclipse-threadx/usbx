@@ -3,8 +3,8 @@
 #include "usbx_ux_test_cdc_ecm.h"
 
 static DEVICE_INIT_DATA device_init_data = {
-    .framework = default_device_framework, 
-    .framework_length = sizeof(default_device_framework), 
+    .framework = default_device_framework,
+    .framework_length = sizeof(default_device_framework),
     .dont_register_hcd = 1,
 };
 

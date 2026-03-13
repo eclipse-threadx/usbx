@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -14,7 +15,7 @@
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   HID Class                                                           */
+/**   Device HID Class                                                    */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -34,41 +35,6 @@
 /*                                                                        */
 /*    This file contains all the header and extern functions used by the  */
 /*    USBX HID class.                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added Get/Set Protocol      */
-/*                                            request support,            */
-/*                                            resulting in version 6.1.3  */
-/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            added interrupt OUT support,*/
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added receiver callback,    */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone int out,   */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            moved build option check,   */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 
@@ -389,7 +355,7 @@ typedef struct UX_SLAVE_CLASS_HID_PARAMETER_STRUCT
 
 /* Define HID Class function prototypes.  */
 UINT  _ux_device_class_hid_descriptor_send(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
-                                            ULONG request_index, ULONG host_length);
+                                           ULONG request_index, ULONG host_length);
 UINT  _ux_device_class_hid_activate(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_control_request(UX_SLAVE_CLASS_COMMAND *command);
@@ -398,18 +364,18 @@ VOID  _ux_device_class_hid_interrupt_thread(ULONG hid_class);
 UINT  _ux_device_class_hid_initialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_uninitialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
-                                      UX_SLAVE_CLASS_HID_EVENT *hid_event);
+                                     UX_SLAVE_CLASS_HID_EVENT *hid_event);
 UINT  _ux_device_class_hid_event_check(UX_SLAVE_CLASS_HID *hid,
                                        UX_DEVICE_CLASS_HID_EVENT **hid_event);
 VOID  _ux_device_class_hid_event_free(UX_SLAVE_CLASS_HID *hid);
 UINT  _ux_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid,
-                                      UX_SLAVE_CLASS_HID_EVENT *hid_event);
+                                     UX_SLAVE_CLASS_HID_EVENT *hid_event);
 UINT  _ux_device_class_hid_report_set(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
-                                            ULONG request_index, ULONG host_length);
+                                      ULONG request_index, ULONG host_length);
 UINT  _ux_device_class_hid_report_get(UX_SLAVE_CLASS_HID *hid, ULONG descriptor_type,
-                                            ULONG request_index, ULONG host_length);
+                                      ULONG request_index, ULONG host_length);
 
-UINT  _ux_device_class_hid_tasks_run(VOID *class_instance);
+UINT  _ux_device_class_hid_tasks_run(VOID *hid_instance);
 
 UINT  _ux_device_class_hid_read(UX_SLAVE_CLASS_HID *hid,
                                 UCHAR *buffer, ULONG requested_length,
@@ -417,16 +383,16 @@ UINT  _ux_device_class_hid_read(UX_SLAVE_CLASS_HID *hid,
 
 VOID  _ux_device_class_hid_receiver_thread(ULONG hid_class);
 UINT  _ux_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
-                                    UX_SLAVE_CLASS_HID_PARAMETER *parameter,
-                                    UX_DEVICE_CLASS_HID_RECEIVER **receiver);
+                                               UX_SLAVE_CLASS_HID_PARAMETER *parameter,
+                                               UX_DEVICE_CLASS_HID_RECEIVER **receiver);
 VOID  _ux_device_class_hid_receiver_uninitialize(UX_DEVICE_CLASS_HID_RECEIVER *receiver);
 UINT  _ux_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
-                                UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
+                                              UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
 UINT  _ux_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 
 UINT  _ux_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid,
-                                UCHAR *buffer, ULONG requested_length,
-                                ULONG *actual_length);
+                                    UCHAR *buffer, ULONG requested_length,
+                                    ULONG *actual_length);
 UINT  _ux_device_class_hid_receiver_tasks_run(UX_SLAVE_CLASS_HID *hid);
 
 
@@ -436,16 +402,16 @@ UINT  _uxe_device_class_hid_event_set(UX_SLAVE_CLASS_HID *hid,
 UINT  _uxe_device_class_hid_event_get(UX_SLAVE_CLASS_HID *hid,
                                       UX_SLAVE_CLASS_HID_EVENT *hid_event);
 UINT  _uxe_device_class_hid_read(UX_SLAVE_CLASS_HID *hid,
-                                UCHAR *buffer, ULONG requested_length,
-                                ULONG *actual_length);
+                                 UCHAR *buffer, ULONG requested_length,
+                                 ULONG *actual_length);
 UINT  _uxe_device_class_hid_read_run(UX_SLAVE_CLASS_HID *hid,
-                                UCHAR *buffer, ULONG requested_length,
-                                ULONG *actual_length);
+                                     UCHAR *buffer, ULONG requested_length,
+                                     ULONG *actual_length);
 UINT  _uxe_device_class_hid_receiver_initialize(UX_SLAVE_CLASS_HID *hid,
-                                    UX_SLAVE_CLASS_HID_PARAMETER *parameter,
-                                    UX_DEVICE_CLASS_HID_RECEIVER **receiver);
+                                                UX_SLAVE_CLASS_HID_PARAMETER *parameter,
+                                                UX_DEVICE_CLASS_HID_RECEIVER **receiver);
 UINT  _uxe_device_class_hid_receiver_event_get(UX_SLAVE_CLASS_HID *hid,
-                                UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
+                                               UX_DEVICE_CLASS_HID_RECEIVED_EVENT *event);
 UINT  _uxe_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 
 
@@ -493,4 +459,4 @@ UINT  _uxe_device_class_hid_receiver_event_free(UX_SLAVE_CLASS_HID *hid);
 }
 #endif
 
-#endif
+#endif  /* UX_DEVICE_CLASS_HID_H */

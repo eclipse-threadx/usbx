@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,47 +30,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_request_interrupt_transfer             PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_request_interrupt_transfer             PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*     This function performs an interrupt transfer request. An interrupt */ 
-/*     transfer can only be as large as the MaxpacketField in the         */ 
+/*                                                                        */
+/*     This function performs an interrupt transfer request. An interrupt */
+/*     transfer can only be as large as the MaxpacketField in the         */
 /*     endpoint descriptor. This was verified at the upper layer and does */
-/*     not need to be reverified here.                                    */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*    transfer_request                      Pointer to transfer request   */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_request_transfer_add     Add transfer to ED            */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*     not need to be reverified here.                                    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*    transfer_request                      Pointer to transfer request   */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ehci_request_transfer_add     Add transfer to ED            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_request_interrupt_transfer(UX_HCD_EHCI *hcd_ehci, UX_TRANSFER *transfer_request)
@@ -80,7 +73,7 @@ UX_EHCI_ED      *ed;
 ULONG           pid;
 ULONG           td_component;
 UINT            status;
-    
+
 
     /* Get the pointer to the endpoint.  */
     endpoint =  (UX_ENDPOINT *) transfer_request -> ux_transfer_request_endpoint;
@@ -102,7 +95,7 @@ UINT            status;
     /* Get the correct PID for this transfer.  */
     if ((transfer_request -> ux_transfer_request_type & UX_REQUEST_DIRECTION) == UX_REQUEST_IN)
         pid =  UX_EHCI_PID_IN;
-    else            
+    else
         pid =  UX_EHCI_PID_OUT;
 
     /* Add this transfer request to the ED.  */
@@ -113,12 +106,12 @@ UINT            status;
 
     /* Ensure we got the TD allocated properly.  */
     if (status == UX_SUCCESS)
-    {    
+    {
 
         /* Set the IOC bit in the last TD.  */
         ed -> ux_ehci_ed_last_td -> ux_ehci_td_control |=  UX_EHCI_TD_IOC;
-        
-        /* Ensure the IOC bit is set before activating the TD. This is necessary 
+
+        /* Ensure the IOC bit is set before activating the TD. This is necessary
            for some processors that perform writes out of order as an optimization.  */
         UX_DATA_MEMORY_BARRIER
 
@@ -128,7 +121,7 @@ UINT            status;
         ed -> ux_ehci_ed_queue_element =  (UX_EHCI_TD *) td_component;
 
     }
-    
+
     /* Return completion status.  */
     return(status);
 }

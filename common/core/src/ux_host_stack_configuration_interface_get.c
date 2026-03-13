@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,61 +29,49 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_configuration_interface_get          PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_configuration_interface_get          PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function returns an interface container based on a             */ 
-/*    configuration handle, an interface index and an alternate setting   */ 
-/*    index.                                                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    configuration                         Pointer to configuration      */ 
-/*    interface_index                       Index of interface            */ 
-/*    alternate_setting_index               Index of alternate setting    */ 
-/*    interface                             Destination of interface      */ 
-/*                                            pointer                     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Application                                                         */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*    This function returns an interface container based on a             */
+/*    configuration handle, an interface index and an alternate setting   */
+/*    index.                                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    configuration                         Pointer to configuration      */
+/*    interface_index                       Index of interface            */
+/*    alternate_setting_index               Index of alternate setting    */
+/*    interface                             Destination of interface      */
+/*                                            pointer                     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application                                                         */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
+UINT  _ux_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration,
                                                 UINT interface_index, UINT alternate_setting_index,
                                                 UX_INTERFACE **ux_interface)
 {
-    
+
 UINT                current_interface_number;
 UINT                container_index;
 UX_INTERFACE        *current_interface;
@@ -94,20 +83,20 @@ UX_INTERFACE        *current_interface;
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONFIGURATION_HANDLE_UNKNOWN, configuration, 0, 0, UX_TRACE_ERRORS, 0, 0)
-    
+
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
     }
-            
+
     /* Start with the interface attached to the configuration.  */
     current_interface =  configuration -> ux_configuration_first_interface;
 
-    /* The first interface has the index 0 */    
+    /* The first interface has the index 0 */
     container_index =  0;
-    
+
     /* Reset the interface number */
     current_interface_number =  0;
-    
-    /* Traverse the list of the interfaces until we found the right one */        
+
+    /* Traverse the list of the interfaces until we found the right one */
     while (current_interface != UX_NULL)
     {
 
@@ -118,7 +107,7 @@ UX_INTERFACE        *current_interface;
             /* We have found the correct interface, now search for the alternate setting.  */
             current_interface_number =  current_interface -> ux_interface_descriptor.bInterfaceNumber;
 
-            /* The first alternate setting has the index 0.  */    
+            /* The first alternate setting has the index 0.  */
             container_index =  0;
 
             /* Loop on all the alternate settings for this interface.  */
@@ -143,11 +132,11 @@ UX_INTERFACE        *current_interface;
                 /* Move to the next alternate setting.   */
                 current_interface =  current_interface -> ux_interface_next_interface;
 
-    
+
                 /* Check new interface pointer, might be the end.  */
                 if (current_interface != UX_NULL)
                 {
-    
+
                     /* And verify that we are still in the same interface.  */
                     if (current_interface -> ux_interface_descriptor.bInterfaceNumber != current_interface_number)
                     {
@@ -159,23 +148,23 @@ UX_INTERFACE        *current_interface;
                         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_INTERFACE_HANDLE_UNKNOWN, ux_interface, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
                         return(UX_INTERFACE_HANDLE_UNKNOWN);
-                    }                    
+                    }
                 }
-            }       
+            }
         }
-        
+
         /* Check the current interface, we may already be at the end ... */
         if (current_interface != UX_NULL)
         {
-        
+
             /* Move to the next interface.  */
             current_interface =  current_interface -> ux_interface_next_interface;
-        
+
             /* Move to the next interface index. */
             container_index++;
-        }            
+        }
     }
-    
+
     /* Error trap. */
     _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_ENUMERATOR, UX_INTERFACE_HANDLE_UNKNOWN);
 
@@ -222,14 +211,8 @@ UX_INTERFACE        *current_interface;
 /*                                                                        */
 /*    Application                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
-/*                                                                        */
 /**************************************************************************/
-UINT  _uxe_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration, 
+UINT  _uxe_host_stack_configuration_interface_get(UX_CONFIGURATION *configuration,
                                                 UINT interface_index, UINT alternate_setting_index,
                                                 UX_INTERFACE **ux_interface)
 {

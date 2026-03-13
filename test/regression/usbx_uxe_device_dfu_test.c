@@ -98,16 +98,16 @@ static TX_THREAD                           ux_test_thread_simulation_0;
     0x00,                                                                       \
 
 #define DEVICE_FRAMEWORK_LENGTH_FULL_SPEED sizeof(device_framework_full_speed)
-static UCHAR device_framework_full_speed[] = { 
+static UCHAR device_framework_full_speed[] = {
 
     /* Device descriptor */
     0x12, 0x01, 0x10, 0x01, 0x00, 0x00, 0x00, 0x40,
     0x99, 0x99, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02,
-    0x03, 0x01,                                      
+    0x03, 0x01,
 
     /* Configuration descriptor */
     0x09, 0x02, 0x1b, 0x00, 0x01, 0x01, 0x00, 0xc0,
-    0x32, 
+    0x32,
 
     /* Interface descriptor for DFU (bInterfaceProtocol = 1).  */
     DFU_INTERFACE_DESCRIPTOR(0x00, 0x01)
@@ -115,12 +115,12 @@ static UCHAR device_framework_full_speed[] = {
 };
 
 #define DEVICE_FRAMEWORK_LENGTH_HIGH_SPEED sizeof(device_framework_high_speed)
-static UCHAR device_framework_high_speed[] = { 
+static UCHAR device_framework_high_speed[] = {
 
     /* Device descriptor */
     0x12, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x40,
     0x99, 0x99, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02,
-    0x03, 0x01,                                      
+    0x03, 0x01,
 
     /* Device qualifier descriptor */
     0x0a, 0x06, 0x00, 0x02, 0x00, 0x00, 0x00, 0x40,
@@ -128,7 +128,7 @@ static UCHAR device_framework_high_speed[] = {
 
     /* Configuration descriptor */
     0x09, 0x02, 0x1b, 0x00, 0x01, 0x01, 0x00, 0xc0,
-    0x32, 
+    0x32,
 
     /* Interface descriptor for DFU (bInterfaceProtocol = 1).  */
     DFU_INTERFACE_DESCRIPTOR(0x00, 0x01)
@@ -172,16 +172,16 @@ static UCHAR language_id_framework[] = {
 
 
 #define DEVICE_FRAMEWORK_LENGTH_DFU sizeof(device_framework_dfu)
-static UCHAR device_framework_dfu[] = { 
+static UCHAR device_framework_dfu[] = {
 
     /* Device descriptor */
     0x12, 0x01, 0x10, 0x01, 0x00, 0x00, 0x00, 0x40,
     0x99, 0x99, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02,
-    0x03, 0x01,                                      
+    0x03, 0x01,
 
     /* Configuration descriptor */
     0x09, 0x02, 0x1B, 0x00, 0x01, 0x01, 0x00, 0xc0,
-    0x32, 
+    0x32,
 
     /* Interface descriptor for DFU (bInterfaceProtocol = 2).  */
     DFU_INTERFACE_DESCRIPTOR(0x00, 0x02)
@@ -316,7 +316,7 @@ ULONG                   test_n;
     dfu_parameter.ux_slave_class_dfu_parameter_instance_activate               =  demo_thread_dfu_activate;
     dfu_parameter.ux_slave_class_dfu_parameter_instance_deactivate             =  demo_thread_dfu_deactivate;
     dfu_parameter.ux_slave_class_dfu_parameter_read                            =  demo_thread_dfu_read;
-    dfu_parameter.ux_slave_class_dfu_parameter_write                           =  demo_thread_dfu_write; 
+    dfu_parameter.ux_slave_class_dfu_parameter_write                           =  demo_thread_dfu_write;
     dfu_parameter.ux_slave_class_dfu_parameter_get_status                      =  demo_thread_dfu_get_status;
     dfu_parameter.ux_slave_class_dfu_parameter_notify                          =  demo_thread_dfu_notify;
 #ifdef UX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE
@@ -326,9 +326,9 @@ ULONG                   test_n;
     dfu_parameter.ux_slave_class_dfu_parameter_framework_length                =  DEVICE_FRAMEWORK_LENGTH_DFU;
 
     /* Initilize the device dfu class. The class is connected with interface 1 on configuration 1. */
-    // status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry, 
+    // status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry,
     //                                          1, 0, (VOID *)&dfu_parameter);
-    status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry, 
+    status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry,
                                              1, 0, UX_NULL);
     if(status != UX_INVALID_PARAMETER)
     {
@@ -337,7 +337,7 @@ ULONG                   test_n;
         test_control_return(1);
     }
 
-    status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry, 
+    status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry,
                                              1, 0, (VOID *)&dfu_parameter);
     if(status != UX_INVALID_PARAMETER)
     {
@@ -347,7 +347,7 @@ ULONG                   test_n;
     }
 
     dfu_parameter.ux_slave_class_dfu_parameter_framework = device_framework_dfu;
-    status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry, 
+    status =  ux_device_stack_class_register(_ux_system_slave_class_dfu_name, ux_device_class_dfu_entry,
                                              1, 0, (VOID *)&dfu_parameter);
     if(status != UX_SUCCESS)
     {
@@ -355,7 +355,7 @@ ULONG                   test_n;
         printf("ERROR #%d\n", __LINE__);
         test_control_return(1);
     }
-    
+
     /* Create the simulation thread.  */
     status =  tx_thread_create(&ux_test_thread_simulation_0, "test simulation", ux_test_thread_simulation_0_entry, 0,
             stack_pointer, UX_DEMO_STACK_SIZE,
@@ -563,7 +563,7 @@ static UINT    demo_thread_dfu_get_status(VOID *dfu, ULONG *media_status)
 
     /* Return media status ok.  */
     *media_status =  UX_SLAVE_CLASS_DFU_MEDIA_STATUS_OK    ;
-    
+
     return(UX_SUCCESS);
 }
 
@@ -578,12 +578,12 @@ static UINT    demo_thread_dfu_notify(VOID *dfu, ULONG notification)
 
             /* Begin of Download. */
             break;
-            
+
         case    UX_SLAVE_CLASS_DFU_NOTIFICATION_END_DOWNLOAD        :
 
             /* Completion of Download. */
             break;
-            
+
         case    UX_SLAVE_CLASS_DFU_NOTIFICATION_ABORT_DOWNLOAD        :
 
             /* Download was aborted. */
@@ -593,17 +593,17 @@ static UINT    demo_thread_dfu_notify(VOID *dfu, ULONG notification)
 
             /* Begin of UPLOAD. */
             break;
-            
+
         case    UX_SLAVE_CLASS_DFU_NOTIFICATION_END_UPLOAD        :
 
             /* Completion of UPLOAD. */
             break;
-            
+
         case    UX_SLAVE_CLASS_DFU_NOTIFICATION_ABORT_UPLOAD        :
 
             /* Download was aborted. */
             break;
-            
+
         default :
 
             /* Bad notification signal. Should never get here.  */

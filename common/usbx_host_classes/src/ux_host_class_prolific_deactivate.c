@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Prolific Class                                                      */
 /**                                                                       */
@@ -29,54 +30,43 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_prolific_deactivate                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_prolific_deactivate                  PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function is called when this instance of the prolific has been */
-/*    removed from the bus either directly or indirectly. The bulk in\out */ 
-/*    and optional interrupt pipes will be destroyed and the instance     */ 
-/*    removed.                                                            */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    command                              Prolific class command pointer */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */ 
-/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */ 
-/*    _ux_utility_memory_free               Free memory block             */ 
-/*    _ux_host_semaphore_get                Get protection semaphore      */ 
-/*    _ux_host_semaphore_delete             Delete protection semaphore   */ 
+/*    removed from the bus either directly or indirectly. The bulk in\out */
+/*    and optional interrupt pipes will be destroyed and the instance     */
+/*    removed.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    command                              Prolific class command pointer */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_destroy Destroy the class instance    */
+/*    _ux_host_stack_endpoint_transfer_abort Abort endpoint transfer      */
+/*    _ux_utility_memory_free               Free memory block             */
+/*    _ux_host_semaphore_get                Get protection semaphore      */
+/*    _ux_host_semaphore_delete             Delete protection semaphore   */
 /*    _ux_utility_thread_schedule_other     Schedule other threads        */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_prolific_entry         Entry of prolific class       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_prolific_entry         Entry of prolific class       */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_prolific_deactivate(UX_HOST_CLASS_COMMAND *command)
@@ -102,40 +92,40 @@ UINT                        status;
 
     /* If the interrupt endpoint is defined, clean any pending transfer.  */
     if (prolific -> ux_host_class_prolific_interrupt_endpoint != UX_NULL)
-    {    
-        
+    {
+
         /* Wait for any current transfer to be out of pending.  */
         transfer_request =  &prolific -> ux_host_class_prolific_interrupt_endpoint -> ux_endpoint_transfer_request;
         if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
 
             /* And abort any transfer.  */
             _ux_host_stack_endpoint_transfer_abort(prolific -> ux_host_class_prolific_interrupt_endpoint);
-        
+
         /* And free the memory used by the interrupt endpoint.  */
         _ux_utility_memory_free(transfer_request -> ux_transfer_request_data_pointer);
-        
+
     }
-    
-           
+
+
     /* First we take care of cleaning endpoint IN.  */
     transfer_request =  &prolific -> ux_host_class_prolific_bulk_in_endpoint -> ux_endpoint_transfer_request;
     if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
 
         /* We need to abort transactions on the bulk In pipe.  */
         _ux_host_stack_endpoint_transfer_abort(prolific -> ux_host_class_prolific_bulk_in_endpoint);
-    
-    
-    /* Then endpoint OUT.  */       
+
+
+    /* Then endpoint OUT.  */
     transfer_request =  &prolific -> ux_host_class_prolific_bulk_out_endpoint -> ux_endpoint_transfer_request;
     if (transfer_request -> ux_transfer_request_completion_code == UX_TRANSFER_STATUS_PENDING)
 
         /* We need to abort transactions on the bulk Out pipe. */
         _ux_host_stack_endpoint_transfer_abort(prolific -> ux_host_class_prolific_bulk_out_endpoint);
-    
+
 
     /* The enumeration thread needs to sleep a while to allow the application or the class that may be using
        endpoints to exit properly.  */
-    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM); 
+    _ux_host_thread_schedule_other(UX_THREAD_PRIORITY_ENUM);
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(prolific -> ux_host_class_prolific_class, (VOID *) prolific);
@@ -147,7 +137,7 @@ UINT                        status;
         that the device is removed.  */
     if (_ux_system_host -> ux_system_host_change_function != UX_NULL)
     {
-        
+
         /* Inform the application the device is removed.  */
         _ux_system_host -> ux_system_host_change_function(UX_DEVICE_REMOVAL, prolific -> ux_host_class_prolific_class, (VOID *) prolific);
     }
@@ -162,6 +152,6 @@ UINT                        status;
     _ux_utility_memory_free(prolific);
 
     /* Return successful status.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
 

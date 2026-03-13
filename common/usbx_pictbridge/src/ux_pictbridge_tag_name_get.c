@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -28,60 +29,50 @@
 #include "ux_pictbridge.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_tag_name_get                         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_tag_name_get                         PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function isolates a tag name from the XML script.              */ 
+/*                                                                        */
+/*    This function isolates a tag name from the XML script.              */
 /*                                                                        */
 /*    Note: the buffer size of tag_name, variable_name, variable_string   */
 /*    and xml_parameter must be equal to or greater than                  */
 /*    UX_PICTBRIDGE_MAX_TAG_SIZE, UX_PICTBRIDGE_MAX_VARIABLE_SIZE,        */
 /*    UX_PICTBRIDGE_MAX_STRING_SIZE and UX_PICTBRIDGE_MAX_STRING_SIZE.    */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    input_buffer                           Pointer to object buffer     */ 
-/*    input_length                           Length of the object         */ 
-/*    tag_name                               Where to store the tag       */ 
-/*    variable_name                          Variable name                */  
-/*    variable_string                        Variable string              */  
-/*    xml_parameter                          ML parameter                 */  
-/*    output_buffer                          Pointer after the tag        */ 
-/*    output_length                          Length of the object         */ 
-/*    tag_flag                               flag specific to this tag    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_parse                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    input_buffer                           Pointer to object buffer     */
+/*    input_length                           Length of the object         */
+/*    tag_name                               Where to store the tag       */
+/*    variable_name                          Variable name                */
+/*    variable_string                        Variable string              */
+/*    xml_parameter                          ML parameter                 */
+/*    output_buffer                          Pointer after the tag        */
+/*    output_length                          Length of the object         */
+/*    tag_flag                               flag specific to this tag    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_object_parse                                         */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_pictbridge_tag_name_get(UCHAR *input_buffer, ULONG input_length, 
+UINT  _ux_pictbridge_tag_name_get(UCHAR *input_buffer, ULONG input_length,
                                   UCHAR *tag_name,
                                   UCHAR *variable_name,
                                   UCHAR *variable_string,
@@ -98,13 +89,13 @@ UCHAR                   *xml_parameter_end;
 
     /* Reset the local flags.  */
     flag = 0;
-    
+
     /* Reset the caller's tag_flag.  */
     *tag_flag = 0;
-    
+
     /* Char count reset.  */
     char_count = 0;
-    
+
     /* Reset the tag name buffer.  */
    _ux_utility_memory_set(tag_name, 0, UX_PICTBRIDGE_MAX_TAG_SIZE); /* Use case of memset is verified. */
    tag_name_end = tag_name + UX_PICTBRIDGE_MAX_TAG_SIZE - 1;
@@ -127,9 +118,9 @@ UCHAR                   *xml_parameter_end;
         /* Get a character from the tag line.  */
         switch (*input_buffer)
         {
-                
+
             case    UX_PICTBRIDGE_TAG_CHAR_START_BRACKET  :
-            
+
                 /* Check to see if we are within a quote.  */
                 if (flag & UX_PICTBRIDGE_TAG_FLAG_IN_STRING)
                 {
@@ -141,7 +132,7 @@ UCHAR                   *xml_parameter_end;
 
                     break;
                 }
-                
+
                 /* Check to see if we are already in the bracket.  */
                 if (flag & UX_PICTBRIDGE_TAG_FLAG_BEGIN)
 
@@ -154,8 +145,8 @@ UCHAR                   *xml_parameter_end;
 
 
                 break;
-                
-            
+
+
             case    UX_PICTBRIDGE_TAG_CHAR_CR             :
             case    UX_PICTBRIDGE_TAG_CHAR_LF             :
 
@@ -165,11 +156,11 @@ UCHAR                   *xml_parameter_end;
                     /* We have a XML tag violation.  */
                     return(UX_PICTBRIDGE_ERROR_PARAMETER_MISSING);
                 else
-                    break;                    
-                
+                    break;
+
             case    UX_PICTBRIDGE_TAG_CHAR_SPACE          :
 
-                /* If we are within a tag already, this masks the end.  If not, continue looking for 
+                /* If we are within a tag already, this masks the end.  If not, continue looking for
                    an open bracket. */
                 if ((flag & UX_PICTBRIDGE_TAG_FLAG_BEGIN) == 0)
                     break;
@@ -192,15 +183,15 @@ UCHAR                   *xml_parameter_end;
 
                     /* get out of tag state machine.  */
                     flag &= (ULONG)~UX_PICTBRIDGE_TAG_FLAG_IN_TAG;
-                    
+
                     /* Change state machine to variable.  */
                     flag |= (ULONG)UX_PICTBRIDGE_TAG_FLAG_IN_VARIABLE;
 
                 }
                 break;
-                
+
             case    UX_PICTBRIDGE_TAG_CHAR_EQUAL          :
-            
+
                 /* If we are not within a bracket, this is a loose character ! */
                 if ((flag & UX_PICTBRIDGE_TAG_FLAG_BEGIN) == 0)
                     break;
@@ -228,12 +219,12 @@ UCHAR                   *xml_parameter_end;
 
                     /* Get out of the variable state machine.  */
                     flag &= (ULONG)~UX_PICTBRIDGE_TAG_FLAG_IN_VARIABLE;
-                    
+
                     /* Change state machine to expecting string.  */
                     flag |= UX_PICTBRIDGE_TAG_FLAG_EXPECTING_STRING;
 
-                }                   
-                break;        
+                }
+                break;
 
             case    UX_PICTBRIDGE_TAG_CHAR_QUOTE          :
 
@@ -242,7 +233,7 @@ UCHAR                   *xml_parameter_end;
 
                     /* Get out of the in string state machine.  We are out of any state now.  */
                     flag &= (ULONG)~UX_PICTBRIDGE_TAG_FLAG_IN_STRING;
-                
+
                 else
                 {
 
@@ -252,88 +243,88 @@ UCHAR                   *xml_parameter_end;
 
                         /* Get out of the expecting string state machine.  */
                         flag &= (ULONG)~UX_PICTBRIDGE_TAG_FLAG_EXPECTING_STRING;
-                    
+
                         /* Change state machine to in string.  */
                         flag |= UX_PICTBRIDGE_TAG_FLAG_IN_STRING;
 
-                    }                   
+                    }
 
                     else
 
                         /* Loose character ! */
                         return(UX_PICTBRIDGE_ERROR_PARAMETER_MISSING);
-                    
+
                 }
 
-                break;                
+                break;
 
             case    UX_PICTBRIDGE_TAG_CHAR_SLASH          :
-                
+
                 /* If we are in no particular state at the moment, we could have a begin slash or end slash.  */
                 if (flag & UX_PICTBRIDGE_TAG_FLAG_IN_STRING)
-                {                                
+                {
 
                     /* We are in the variable string state machine.  Store the "/" as a normal character. */
                     if (variable_string > variable_string_end)
                         return(UX_BUFFER_OVERFLOW);
                     *variable_string++ = *input_buffer;
-                    
+
                     break;
                 }
                 /* Check other states.  */
                 if (flag & UX_PICTBRIDGE_TAG_FLAG_IN_TAG)
                 {
-                
+
                     /* We are in a tag. 2 scenario here. We are either at the beginning or at the end.  */
-                    if (char_count != 0) 
-        
+                    if (char_count != 0)
+
                         /* We are at the end of the tag, this is a self closing tag.  */
                         *tag_flag |= UX_PICTBRIDGE_TAG_FLAG_SELF_CLOSING;
-    
+
                     else
-                        
+
                         /* This is a normal closing tag.  */
                         *tag_flag |= UX_PICTBRIDGE_TAG_FLAG_CLOSING;
-                
+
                     /* We are done here.  */
-                    break;                   
+                    break;
                 }
 
                 else
                 {
-                                
+
                     /* If we are out of any state machine, it must be a self closing tag.  */
                     if (flag & (UX_PICTBRIDGE_TAG_FLAG_IN_VARIABLE | UX_PICTBRIDGE_TAG_FLAG_EXPECTING_STRING))
 
                         /* This is a syntax error, abort.  */
                         return(UX_PICTBRIDGE_ERROR_PARAMETER_MISSING);
-                    
+
                     else
                     {
                         /* We are at the end of the tag, this is a self closing tag.  */
                         *tag_flag |= UX_PICTBRIDGE_TAG_FLAG_SELF_CLOSING;
 
                         /* We are done here.  */
-                        break;    
+                        break;
                     }
 
                 }
-                
-                
+
+
             case    UX_PICTBRIDGE_TAG_CHAR_QUESTION_MARK          :
-                
+
                 /* If we are in no particular state at the moment, we could have a begin ? or end ?.  */
                 if (flag & UX_PICTBRIDGE_TAG_FLAG_IN_STRING)
-                                
+
                     /* We are within a quoted string, do not proceed.  */
                     break;
 
                 else
-                
+
                     /* This is a comment line, no need for a closing tag.  */
                     *tag_flag |= UX_PICTBRIDGE_TAG_FLAG_COMMENT;
 
-                break;                
+                break;
 
             case    UX_PICTBRIDGE_TAG_CHAR_END_BRACKET    :
 
@@ -348,17 +339,17 @@ UCHAR                   *xml_parameter_end;
 
                     break;
                 }
-            
+
                 /* Check if we are within a bracket.  */
                 if (flag & UX_PICTBRIDGE_TAG_FLAG_BEGIN)
                 {
 
                     /* Skip the closing bracket.  */
                     input_buffer++;
-    
+
                     /* Update length.  */
                     input_length--;
-                    
+
                     /* We may have a xml parameter between the current tag and its closing counterpart. */
                     while(input_length)
                     {
@@ -372,53 +363,53 @@ UCHAR                   *xml_parameter_end;
 
                                 /* Skip potential CR/LF.  */
                                 break;
-                            
-                            
+
+
                             case    UX_PICTBRIDGE_TAG_CHAR_START_BRACKET    :
-                            
+
                                 /* We have found the beginning of the next tag.
                                    Set the output buffer position to the next "<".  */
                                 *output_buffer = input_buffer;
-                
+
                                 /* Set the length remaining.  */
                                 *output_length = input_length;
 
                                 /* We are done here.  */
                                 return(UX_SUCCESS);
-                
+
                             default :
-                            
+
                                 /* Whatever we have now, we store into the XML parameter.  */
                                 if (xml_parameter > xml_parameter_end)
                                     return(UX_BUFFER_OVERFLOW);
                                 *xml_parameter++ = *input_buffer;
                                 break;
-                                
+
                         }
 
                         /* Next position.  */
                         input_buffer++;
-    
+
                         /* Update length.  */
                         input_length--;
-                        
-                    }    
+
+                    }
 
                     /* Set the output buffer position.  */
                     *output_buffer = input_buffer;
-                
+
                     /* Set the length remaining.  */
                     *output_length = input_length;
 
                     /* We have reached the end of the xml object.  */
                     return(UX_SUCCESS);
-                    
+
                 }
                 else
-                    
+
                     /* We have a syntax error.  */
                     return(UX_PICTBRIDGE_ERROR_SCRIPT_SYNTAX_ERROR);
-                
+
             default :
 
                 /* Check if we are within a bracket.  */
@@ -452,31 +443,31 @@ UCHAR                   *xml_parameter_end;
                         return(UX_BUFFER_OVERFLOW);
                     *variable_string++ = *input_buffer;
                 }
-                
+
                 break;
 
         }
 
         /* Next position.  */
         input_buffer++;
-    
+
         /* Update length.  */
         input_length--;
-        
-    }       
 
-    /* We get here when we reached an unexpected end of the XML object.  
+    }
+
+    /* We get here when we reached an unexpected end of the XML object.
        if we had a begin bracket, there is an unexpected end. If not, we
        have an empty line.  */
     if (flag & UX_PICTBRIDGE_TAG_FLAG_BEGIN)
 
         /* We have an error.  */
-        return(UX_PICTBRIDGE_ERROR_PARAMETER_MISSING);    
-        
+        return(UX_PICTBRIDGE_ERROR_PARAMETER_MISSING);
+
     else
 
         /* Not really an error, but we need to inform the caller there is no tag to process.  */
-        return(UX_PICTBRIDGE_ERROR_EMPTY_LINE);    
-            
+        return(UX_PICTBRIDGE_ERROR_EMPTY_LINE);
+
 }
 

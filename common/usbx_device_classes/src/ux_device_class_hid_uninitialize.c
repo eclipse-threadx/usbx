@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -8,6 +9,7 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
@@ -59,34 +61,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Source Code                                                    */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            added interrupt OUT support,*/
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            resulting in version 6.3.0  */
-/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
-/*                                            added sanity check before   */
-/*                                            freed hid memory,           */
-/*                                            remove extra spaces,        */
-/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_uninitialize(UX_SLAVE_CLASS_COMMAND *command)
@@ -149,4 +123,3 @@ UX_SLAVE_CLASS                          *class_ptr;
     /* Return completion status.  */
     return(UX_SUCCESS);
 }
-

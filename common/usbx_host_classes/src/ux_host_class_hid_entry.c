@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -79,23 +80,6 @@ static inline UINT _ux_host_class_hid_activate_wait(UX_HOST_CLASS_COMMAND *comma
 /*                                                                        */
 /*    Application                                                         */
 /*    HID Class                                                           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added destroy command,      */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed uninited variable,    */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_entry(UX_HOST_CLASS_COMMAND *command)
@@ -374,7 +358,7 @@ UINT                    status = UX_SUCCESS;
     {
 
         /* Get one item from the report and analyze it.  */
-        _ux_host_class_hid_report_item_analyse(descriptor, &item);
+        _ux_host_class_hid_report_item_analyse(descriptor, length, &item);
 
         /* Point the descriptor right after the item identifier.  */
         descriptor +=  item.ux_host_class_hid_item_report_format;
@@ -389,7 +373,7 @@ UINT                    status = UX_SUCCESS;
             status =  _ux_host_class_hid_global_item_parse(hid, &item, descriptor);
             break;
 
-        
+
         case UX_HOST_CLASS_HID_TYPE_MAIN:
 
             /* This is a main item.  */
@@ -401,13 +385,13 @@ UINT                    status = UX_SUCCESS;
 
             /* This is a local item.  */
             status =  _ux_host_class_hid_local_item_parse(hid, &item, descriptor);
-            break;          
+            break;
 
         default:
 
             /* This is a reserved item, meaning it shouldn't be used!  */
 
-            /* Set status to error. The check after this switch statement 
+            /* Set status to error. The check after this switch statement
                 will handle the rest.  */
             status =  UX_DESCRIPTOR_CORRUPTED;
             break;
@@ -421,7 +405,7 @@ UINT                    status = UX_SUCCESS;
 
         /* Jump to the next item.  */
         descriptor +=  item.ux_host_class_hid_item_report_length;
-    
+
         /* Verify that the report descriptor is not corrupted.  */
         if (length < item.ux_host_class_hid_item_report_length)
         {

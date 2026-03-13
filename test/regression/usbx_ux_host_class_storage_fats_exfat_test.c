@@ -409,32 +409,32 @@ static UINT _test_format_exFAT(void)
 UINT status;
 
     /* Format the media.  This needs to be done before opening it!  */
-    status =  fx_media_exFAT_format(&ram_disk1, 
+    status =  fx_media_exFAT_format(&ram_disk1,
                             _fx_ram_driver,         // Driver entry
                             ram_disk_memory1,       // RAM disk memory pointer
                             buffer1,                // Media buffer pointer
-                            512,                    // Media buffer size 
+                            512,                    // Media buffer size
                             "RAM_DISK1",            // Volume Name
                             1,                      // Number of FATs
                             0,                      // Hidden sectors
-                            UX_RAM_DISK_SIZE/512,   // Total sectors 
-                            512,                    // Sector size   
+                            UX_RAM_DISK_SIZE/512,   // Total sectors
+                            512,                    // Sector size
                             1,                      // exFAT Sectors per cluster
                             11111,                  // Volume ID
                             0);                     // Boundary unit
     if (status != FX_SUCCESS)
         return(status);
 
-    status =  fx_media_exFAT_format(&ram_disk2, 
+    status =  fx_media_exFAT_format(&ram_disk2,
                             _fx_ram_driver,         // Driver entry
                             ram_disk_memory2,       // RAM disk memory pointer
                             buffer1,                // Media buffer pointer
-                            512,                    // Media buffer size 
+                            512,                    // Media buffer size
                             "RAM_DISK1",            // Volume Name
                             1,                      // Number of FATs
                             0,                      // Hidden sectors
-                            UX_RAM_DISK_SIZE/512,   // Total sectors 
-                            512,                    // Sector size   
+                            UX_RAM_DISK_SIZE/512,   // Total sectors
+                            512,                    // Sector size
                             1,                      // exFAT Sectors per cluster
                             22222,                  // Volume ID
                             0);                     // Boundary unit
@@ -472,7 +472,7 @@ UCHAR           local_buffer[32];
     if (status != FX_SUCCESS)
     {
 
-        /* Check for an already created status.  This is not fatal, just 
+        /* Check for an already created status.  This is not fatal, just
            let the user know.  */
         if (status != FX_ALREADY_CREATED)
         {
@@ -705,16 +705,16 @@ UINT    status =  0;
         ram_disks[lun]->fx_media_driver_buffer =  data_pointer;
         _fx_ram_driver(ram_disks[lun]);
         status = ram_disks[lun]->fx_media_driver_status;
-    }        
+    }
     else
-    {        
+    {
         while(number_blocks--)
         {
             status =  fx_media_read(ram_disks[lun],lba,data_pointer);
             data_pointer+=512;
             lba++;
         }
-    }        
+    }
     return(status);
 }
 
@@ -733,7 +733,7 @@ UINT    status =  0;
 
         status = ram_disks[lun]->fx_media_driver_status;
 
-    }        
+    }
     else
     {
 
@@ -742,7 +742,7 @@ UINT    status =  0;
             status =  fx_media_write(ram_disks[lun],lba,data_pointer);
             data_pointer+=512;
             lba++;
-        }        
+        }
         return(status);
     }
     return(1);

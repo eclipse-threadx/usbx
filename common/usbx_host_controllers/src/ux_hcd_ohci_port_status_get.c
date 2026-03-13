@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   OHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,32 +30,32 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_port_status_get                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ohci_port_status_get                        PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function will return the status for each port attached to the */
-/*     root HUB.                                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ohci                              Pointer to OHCI controller    */ 
-/*    port_index                            Port index                    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    port_status                                                         */ 
-/*                                                                        */ 
+/*     root HUB.                                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ohci                              Pointer to OHCI controller    */
+/*    port_index                            Port index                    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    port_status                                                         */
+/*                                                                        */
 /*      Status of the root HUB port with the following format:            */
-/*                                                                        */ 
+/*                                                                        */
 /*               bit 0         device connection status                   */
 /*                             if 0 : no device connected                 */
 /*                             if 1 : device connected to the port        */
@@ -77,22 +78,14 @@
 /*                             if 00 : low speed device attached          */
 /*                             if 01 : full speed device attached         */
 /*                             if 10 : high speed device attached         */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ohci_register_read            Read OHCI register            */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    OHCI Controller Driver                                              */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ohci_register_read            Read OHCI register            */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    OHCI Controller Driver                                              */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _ux_hcd_ohci_port_status_get(UX_HCD_OHCI *hcd_ohci, ULONG port_index)
@@ -114,16 +107,16 @@ ULONG       port_status;
 
         return(UX_PORT_INDEX_UNKNOWN);
     }
-    
+
     /* The port is valid, build the status mask for this port. This function
        returns a controller agnostic bit field.  */
     port_status =  0;
     ohci_register_port_status =  _ux_hcd_ohci_register_read(hcd_ohci, OHCI_HC_RH_PORT_STATUS + port_index);
-                                    
+
     /* Device Connection Status.  */
     if (ohci_register_port_status & OHCI_HC_PS_CCS)
         port_status |=  UX_PS_CCS;
-                                    
+
     /* Port Enable Status */
     if (ohci_register_port_status & OHCI_HC_PS_PES)
         port_status |=  UX_PS_PES;
@@ -144,7 +137,7 @@ ULONG       port_status;
     if (ohci_register_port_status & OHCI_HC_PS_PPS)
         port_status |=  UX_PS_PPS;
 
-    /* Port Device Attached speed. This field is valid only if the CCS bit is active. 
+    /* Port Device Attached speed. This field is valid only if the CCS bit is active.
        On OHCI, only low speed or full speed are available.  */
     if (ohci_register_port_status & OHCI_HC_PS_CCS)
     {
@@ -156,6 +149,6 @@ ULONG       port_status;
     }
 
     /* Return port status.  */
-    return(port_status);            
+    return(port_status);
 }
 

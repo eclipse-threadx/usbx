@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   PIMA Class                                                          */
 /**                                                                       */
@@ -29,48 +30,40 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_pima_request_cancel                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_pima_request_cancel                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function cancels a request.                                    */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                       Pointer to pima class    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function cancels a request.                                    */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                       Pointer to pima class    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_transfer_request       Transfer request              */
 /*    _ux_utility_memory_allocate           Allocate memory               */
 /*    _ux_utility_memory_free               Free memory                   */
 /*    _ux_utility_short_put                 Put 16-bit value              */
 /*    _ux_utility_short_get                 Get 16-bit value              */
 /*    _ux_utility_long_put                  Put 32-bit value              */
-/*    _ux_utility_delay_ms                  Delay ms                      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USB application                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*    _ux_utility_delay_ms                  Delay ms                      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USB application                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_pima_request_cancel(UX_HOST_CLASS_PIMA *pima)
@@ -94,13 +87,13 @@ ULONG                               command_retry_counter;
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Fill in the payload buffer with cancellation code.  */
-    _ux_utility_short_put(request_payload + UX_HOST_CLASS_PIMA_REQUEST_CANCEL_OFFSET_CODE, 
+    _ux_utility_short_put(request_payload + UX_HOST_CLASS_PIMA_REQUEST_CANCEL_OFFSET_CODE,
                         UX_HOST_CLASS_PIMA_REQUEST_CANCEL_CODE );
-    
+
     /* Fill in the payload buffer with transactionID.  */
-    _ux_utility_long_put(request_payload + UX_HOST_CLASS_PIMA_REQUEST_CANCEL_OFFSET_TRANSACTION_ID, 
+    _ux_utility_long_put(request_payload + UX_HOST_CLASS_PIMA_REQUEST_CANCEL_OFFSET_TRANSACTION_ID,
                         pima -> ux_host_class_pima_transaction_id++);
-    
+
     /* We need to get the default control endpoint transfer request pointer.  */
     control_endpoint =  &pima -> ux_host_class_pima_device -> ux_device_control_endpoint;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
@@ -134,7 +127,7 @@ ULONG                               command_retry_counter;
             transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
             transfer_request -> ux_transfer_request_value =             0;
             transfer_request -> ux_transfer_request_index  =            0;
-        
+
             /* Send request to HCD layer.  */
             status =  _ux_host_stack_transfer_request(transfer_request);
 
@@ -153,10 +146,10 @@ ULONG                               command_retry_counter;
                 status =  UX_ERROR;
                 break;
             }
-            
+
             /* Extract the device status.  */
             device_status =  _ux_utility_short_get(request_payload + UX_HOST_CLASS_PIMA_REQUEST_STATUS_OFFSET_CODE);
-            
+
             /* If the device status is OK, we have a successful cancellation.  */
             if (device_status == UX_HOST_CLASS_PIMA_RC_OK)
             {
@@ -164,18 +157,18 @@ ULONG                               command_retry_counter;
                 /* Status is OK. exit the command loop.  */
                 status = UX_SUCCESS;
                 break;
-            }         
+            }
             else
             {
                 /* Force the status to error.  */
-                status = UX_ERROR;       
+                status = UX_ERROR;
 
 
                 /* We should wait a little bit before re-issuing the command.  */
-                _ux_utility_delay_ms(UX_HOST_CLASS_PIMA_REQUEST_STATUS_COMMAND_DELAY); 
-                
-            }            
-        } 
+                _ux_utility_delay_ms(UX_HOST_CLASS_PIMA_REQUEST_STATUS_COMMAND_DELAY);
+
+            }
+        }
 
     }
 

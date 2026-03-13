@@ -134,8 +134,8 @@ static unsigned char no_interrupt_endpoint_configuration_descriptor[] = {
 };
 
 static DEVICE_INIT_DATA device_init_data = {
-    .framework = no_interrupt_endpoint_configuration_descriptor, 
-    .framework_length = sizeof(no_interrupt_endpoint_configuration_descriptor), 
+    .framework = no_interrupt_endpoint_configuration_descriptor,
+    .framework_length = sizeof(no_interrupt_endpoint_configuration_descriptor),
     .dont_register_hcd = 1,
 };
 

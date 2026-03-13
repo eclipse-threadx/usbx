@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -29,54 +30,34 @@
 #include "ux_host_class_pima.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_dpshost_start                        PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_dpshost_start                        PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function starts the DPS host (usually a printer).              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                   Pima instance associated     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    user application                                                    */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  04-25-2022     Yajun Xia                Modified comment(s),          */
-/*                                            internal clean up,          */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed string length check,  */
-/*                                            fixed possible overflow,    */
-/*                                            used define instead of num, */
-/*                                            used macros for RTOS calls, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*    This function starts the DPS host (usually a printer).              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                   Pima instance associated     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    user application                                                    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_dpshost_start(UX_PICTBRIDGE *pictbridge, UX_HOST_CLASS_PIMA *pima)
@@ -148,10 +129,10 @@ UINT                                length, length1;
         /* Store the Pictbridge instance in the pima application. This is used for the Pima callback
         into the Pictbridge (or other application) layer.  */
         pima -> ux_host_class_pima_application = (VOID *) pictbridge;
-        
+
         /* State machine for the dpshost is idle.  */
         pictbridge -> ux_pictbridge_host_client_state_machine = UX_PICTBRIDGE_STATE_MACHINE_IDLE;
-        
+
         /* Create the semaphore to wake up the thread.  */
         status =  _ux_system_semaphore_create(&pictbridge -> ux_pictbridge_notification_semaphore, "ux_pictbridge_notification_semaphore", 0);
         if (status != UX_SUCCESS)
@@ -163,7 +144,7 @@ UINT                                length, length1;
     {
 
         /* Allocate a Thread stack.  */
-        pictbridge -> ux_pictbridge_thread_stack =  
+        pictbridge -> ux_pictbridge_thread_stack =
                     _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, UX_PICTBRIDGE_THREAD_STACK_SIZE);
 
         /* Check the completion status.  */
@@ -178,13 +159,13 @@ UINT                                length, length1;
         /* Create the pictbridge class thread.  */
         status =  _ux_system_thread_create(&pictbridge -> ux_pictbridge_thread,
                                 "ux_pictbridge_thread", _ux_pictbridge_dpshost_thread,
-                                (ULONG)(ALIGN_TYPE) pictbridge, 
+                                (ULONG)(ALIGN_TYPE) pictbridge,
                                 pictbridge -> ux_pictbridge_thread_stack,
-                                UX_PICTBRIDGE_THREAD_STACK_SIZE, 
+                                UX_PICTBRIDGE_THREAD_STACK_SIZE,
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
                                 UX_PICTBRIDGE_THREAD_PRIORITY_CLASS,
                                 UX_NO_TIME_SLICE, UX_AUTO_START);
-                    
+
         /* Check the completion status.  */
         if (status != UX_SUCCESS)
             status = (UX_THREAD_ERROR);
@@ -236,7 +217,7 @@ UINT                                length, length1;
     /* Initialize the pictbridge state machine to request expected.  */
     pictbridge -> ux_pictbridge_request_response = UX_PICTBRIDGE_REQUEST;
 
-    /* Initialize the head and tail of the notification round robin buffers. 
+    /* Initialize the head and tail of the notification round robin buffers.
        At first, the head and tail are pointing to the beginning of the array.  */
     pictbridge -> ux_pictbridge_event_array_head =  pictbridge -> ux_pictbridge_event_array;
     pictbridge -> ux_pictbridge_event_array_tail =  pictbridge -> ux_pictbridge_event_array;
@@ -249,14 +230,14 @@ UINT                                length, length1;
 
     /* Set a callback for the pima session notification.  */
     pima_session -> ux_host_class_pima_session_event_callback =  _ux_pictbridge_dpshost_notification_callback;
-    
+
     /* Open a pima session.  */
     status = _ux_host_class_pima_session_open(pima, pima_session);
     if (status != UX_SUCCESS)
         return(UX_PICTBRIDGE_ERROR_SESSION_NOT_OPEN);
 
     /* Get the number of storage IDs.  */
-    status = _ux_host_class_pima_storage_ids_get(pima, pima_session, 
+    status = _ux_host_class_pima_storage_ids_get(pima, pima_session,
                                                  pictbridge -> ux_pictbridge_storage_ids,
                                                  UX_PICTBRIDGE_MAX_NUMBER_STORAGE_IDS);
     if (status != UX_SUCCESS)
@@ -265,10 +246,10 @@ UINT                                length, length1;
         _ux_host_class_pima_session_close(pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
-    }        
+    }
 
     /* Get the first storage ID info container.    */
-    status = _ux_host_class_pima_storage_info_get(pima, pima_session, 
+    status = _ux_host_class_pima_storage_info_get(pima, pima_session,
                                                  pictbridge -> ux_pictbridge_storage_ids[0],
                                                  (UX_HOST_CLASS_PIMA_STORAGE *)pictbridge -> ux_pictbridge_storage);
     if (status != UX_SUCCESS)
@@ -277,10 +258,10 @@ UINT                                length, length1;
         _ux_host_class_pima_session_close(pictbridge -> ux_pictbridge_pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
-    }        
+    }
 
     /* Get the number of objects on the container.  */
-    status = _ux_host_class_pima_num_objects_get(pima, pima_session, 
+    status = _ux_host_class_pima_num_objects_get(pima, pima_session,
                                                  UX_PICTBRIDGE_ALL_CONTAINERS, UX_PICTBRIDGE_OBJECT_SCRIPT);
     if (status != UX_SUCCESS)
     {
@@ -288,15 +269,15 @@ UINT                                length, length1;
         _ux_host_class_pima_session_close(pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
-    }        
+    }
 
     /* Get the array of objects handles on the container.  */
     if (pima_session -> ux_host_class_pima_session_nb_objects > UX_PICTBRIDGE_MAX_NUMBER_OBJECT_HANDLES)
         length = UX_PICTBRIDGE_MAX_NUMBER_OBJECT_HANDLES;
     else
         length = pima_session -> ux_host_class_pima_session_nb_objects;
-    status = _ux_host_class_pima_object_handles_get(pima, pima_session, 
-                                                 pictbridge -> ux_pictbridge_object_handles_array, 
+    status = _ux_host_class_pima_object_handles_get(pima, pima_session,
+                                                 pictbridge -> ux_pictbridge_object_handles_array,
                                                  length,
                                                  UX_PICTBRIDGE_ALL_CONTAINERS, UX_PICTBRIDGE_OBJECT_SCRIPT, 0);
     if (status != UX_SUCCESS)
@@ -305,7 +286,7 @@ UINT                                length, length1;
         _ux_host_class_pima_session_close(pima, pima_session);
 
         return(UX_PICTBRIDGE_ERROR_STORE_NOT_AVAILABLE);
-    }        
+    }
 
     /* We search for an object that is a picture or a script.  */
     object_index =  0;
@@ -313,7 +294,7 @@ UINT                                length, length1;
     {
 
         /* Get the object info structure.  */
-        status = _ux_host_class_pima_object_info_get(pima, pima_session, 
+        status = _ux_host_class_pima_object_info_get(pima, pima_session,
                                                  pictbridge -> ux_pictbridge_object_handles_array[object_index], pima_object);
         if (status != UX_SUCCESS)
         {
@@ -321,9 +302,9 @@ UINT                                length, length1;
             _ux_host_class_pima_session_close(pima, pima_session);
 
             return(UX_PICTBRIDGE_ERROR_INVALID_OBJECT_HANDLE );
-        }        
+        }
 
-        /* Check if this is a script.  */        
+        /* Check if this is a script.  */
         if (pima_object -> ux_host_class_pima_object_format == UX_HOST_CLASS_PIMA_OFC_SCRIPT)
         {
 
@@ -350,14 +331,14 @@ UINT                                length, length1;
                                                     length) ==  UX_SUCCESS)
                     {
 
-                        /* We have found a script with the DDISCVRY.DPS file name. Prepare a reply with a HDISCVRY. DPS name.  
+                        /* We have found a script with the DDISCVRY.DPS file name. Prepare a reply with a HDISCVRY. DPS name.
                         We use the same object container. Just change the name of the file.  */
-                        _ux_utility_string_to_unicode(_ux_pictbridge_hdiscovery_name, pima_object -> ux_host_class_pima_object_filename);                    
-                        
+                        _ux_utility_string_to_unicode(_ux_pictbridge_hdiscovery_name, pima_object -> ux_host_class_pima_object_filename);
+
                         /* Send the script info.  */
                         status = _ux_host_class_pima_object_info_send(pima, pima_session, 0,0,
                                                             pima_object);
-                        
+
                         /* Check the status of this operation.  */
                         if (status != UX_SUCCESS)
                         {
@@ -366,23 +347,23 @@ UINT                                length, length1;
                             _ux_host_class_pima_session_close(pima, pima_session);
 
                             return(UX_PICTBRIDGE_ERROR_INVALID_OBJECT_HANDLE);
-                        }        
+                        }
                         else
-            
-                            /* We return to the application with a success status. We leave the session opened. */         
+
+                            /* We return to the application with a success status. We leave the session opened. */
                             return(UX_SUCCESS);
-                        
+
                     }
-                    
+
                 }
             }
         }
 
         /* Next object index.  */
         object_index++;
-    
+
     }
-    
+
     /* We come here when we have not found any script or the script does not have the DDISCVRY.DPS file. Close the pima session.  */
     _ux_host_class_pima_session_close(pima, pima_session);
     return(UX_PICTBRIDGE_ERROR_NO_DISCOVERY_SCRIPT);

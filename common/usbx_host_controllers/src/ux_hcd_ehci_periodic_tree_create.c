@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,48 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_periodic_tree_create                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_periodic_tree_create                   PORTABLE C      */
 /*                                                           6.1.2        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function creates the periodic static tree for the interrupt    */
-/*    and isochronous eds.                                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_ed_obtain                Obtain an ED                  */ 
-/*    _ux_utility_physical_address          Get physical address          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*    and isochronous eds.                                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ehci_ed_obtain                Obtain an ED                  */
+/*    _ux_utility_physical_address          Get physical address          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.1.2  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_periodic_tree_create(UX_HCD_EHCI *hcd_ehci)
@@ -84,7 +74,7 @@ UINT                            current_list_entry;
 UX_EHCI_ED                      *ed_list[32];
 UX_EHCI_ED                      *ed_start_list[32];
 UX_EHCI_PERIODIC_LINK_POINTER   lp;
-    
+
     /* Start with the 1st list - it has 32 entries.  */
     list_entries =  32;
 
@@ -122,7 +112,7 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
             }
             else
             {
- 
+
                 /* We need to update the previous ED with the link to this new ED. Since
                    this is a tree structure, this operation is done twice to the 2 previous
                    eds in the previous list.  */
@@ -149,21 +139,21 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
 
     /* Check the value of the ehci frame list entries. If 0, it was not initialized by the controller init function.  */
     if (hcd_ehci -> ux_hcd_ehci_frame_list_size == 0)
-    
+
         /* Value not initialized. Use default.  */
         hcd_ehci -> ux_hcd_ehci_frame_list_size = UX_EHCI_FRAME_LIST_ENTRIES;
 
     /* The tree has been completed but the entries in the EHCI frame list are in the wrong order.
-       We need to swap each entry according to the EHCI specified entry order list so that we 
-       have a fair interval frequency for each periodic ED. The primary eds are fetched from the 
-       start list, translated into physical addresses and stored into the frame List.  */      
+       We need to swap each entry according to the EHCI specified entry order list so that we
+       have a fair interval frequency for each periodic ED. The primary eds are fetched from the
+       start list, translated into physical addresses and stored into the frame List.  */
     for (current_list_entry = 0; current_list_entry < 32; current_list_entry++)
     {
 
         ed =  ed_start_list[_ux_system_host_hcd_periodic_tree_entries[current_list_entry]];
         *(hcd_ehci -> ux_hcd_ehci_frame_list+current_list_entry) =  (UX_EHCI_ED *) _ux_utility_physical_address(ed);
     }
- 
+
     /* We still haven't set the type of each queue head in the list itself. Do that now. */
     for (current_list_entry = 0; current_list_entry < 32; current_list_entry++)
     {
@@ -173,7 +163,7 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
         hcd_ehci -> ux_hcd_ehci_frame_list[current_list_entry] =  lp.ed_ptr;
     }
 
-    /* Now the first 32 entries in the frame list have to be duplicated to fill the other entries in the frame list.  
+    /* Now the first 32 entries in the frame list have to be duplicated to fill the other entries in the frame list.
        If the list is set to 32 entries, nothing is done here.  */
     for (current_list_entry = 32; current_list_entry < hcd_ehci -> ux_hcd_ehci_frame_list_size; current_list_entry++)
         hcd_ehci -> ux_hcd_ehci_frame_list[current_list_entry] =  hcd_ehci -> ux_hcd_ehci_frame_list[current_list_entry & 0x1f];
@@ -183,7 +173,7 @@ UX_EHCI_PERIODIC_LINK_POINTER   lp;
      * 32ms, 16ms, 8ms, 4ms, 2ms, 1ms -- micro-frames
      */
 
-    /* Return successful completion.  */       
+    /* Return successful completion.  */
     return(UX_SUCCESS);
 }
 

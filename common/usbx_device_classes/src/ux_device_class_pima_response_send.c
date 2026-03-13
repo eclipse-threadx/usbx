@@ -1,17 +1,18 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device PIMA Class                                                   */
 /**                                                                       */
@@ -27,57 +28,46 @@
 #include "ux_device_class_pima.h"
 #include "ux_device_stack.h"
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_pima_response_send                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_pima_response_send                 PORTABLE C      */
 /*                                                           6.1.10       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function returns a response to a pima command to the host.     */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    pima                                  Pointer to pima class         */ 
-/*    response_code                         Response code                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function returns a response to a pima command to the host.     */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    pima                                  Pointer to pima class         */
+/*    response_code                         Response code                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_device_stack_transfer_request     Transfer request              */
 /*    _ux_utility_long_put                  Put 32-bit value              */
 /*    _ux_utility_short_put                 Put 32-bit value              */
 /*    _ux_device_class_pima_response_send   Send PIMA response            */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Device Storage Class                                                */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            updated command phase,      */
-/*                                            resulting in version 6.1.10 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Device Storage Class                                                */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_pima_response_send(UX_SLAVE_CLASS_PIMA *pima, ULONG response_code, 
+UINT  _ux_device_class_pima_response_send(UX_SLAVE_CLASS_PIMA *pima, ULONG response_code,
                       ULONG number_parameters,
-                      ULONG pima_parameter_1, 
-                      ULONG pima_parameter_2, 
-                      ULONG pima_parameter_3) 
+                      ULONG pima_parameter_1,
+                      ULONG pima_parameter_2,
+                      ULONG pima_parameter_3)
 {
 
 UINT                    status;
@@ -99,17 +89,17 @@ ULONG                   header_size;
 
     /* Fill in the size of the response header.  */
     _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_LENGTH, header_size);
-    
+
     /* Fill in the response container type.  */
     _ux_utility_short_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_TYPE,
                             UX_DEVICE_CLASS_PIMA_CT_RESPONSE_BLOCK);
-    
+
     /* Fill in the response code.  */
     _ux_utility_short_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_CODE,
             (USHORT)response_code);
-    
+
     /* Fill in the Transaction ID.  */
-    _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_TRANSACTION_ID, 
+    _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_TRANSACTION_ID,
                             pima -> ux_device_class_pima_transaction_id);
 
     /* Parse each parameter and insert it if needed.  */
@@ -117,31 +107,31 @@ ULONG                   header_size;
     {
 
         case 3 :
-            _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_PARAMETERS + (sizeof(ULONG) * 2), 
+            _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_PARAMETERS + (sizeof(ULONG) * 2),
                                  pima_parameter_3);
             /* Intentionally fallthrough to "case 2" */
             /* fall through */
-        case 2 :                            
-            _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_PARAMETERS + (sizeof(ULONG) * 1), 
+        case 2 :
+            _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_PARAMETERS + (sizeof(ULONG) * 1),
                                  pima_parameter_2);
             /* Intentionally fallthrough to "case 1" */
             /* fall through */
-        case 1 :                            
-            _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_PARAMETERS , 
+        case 1 :
+            _ux_utility_long_put(response + UX_DEVICE_CLASS_PIMA_RESPONSE_HEADER_PARAMETERS ,
                                  pima_parameter_1);
             /* Intentionally fallthrough to "default" */
             /* fall through */
         default :
             break;
-            
-    }    
+
+    }
 
     /* Set phase to response.  */
     pima -> ux_device_class_pima_state = UX_DEVICE_CLASS_PIMA_PHASE_RESPONSE;
 
     /* Send the response block.  */
     status =  _ux_device_stack_transfer_request(transfer_request, header_size, 0);
-    
+
     /* Return completion status.  */
     return(status);
 }

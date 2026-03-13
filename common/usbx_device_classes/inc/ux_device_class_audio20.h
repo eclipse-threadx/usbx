@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -35,46 +36,20 @@
 /*    This file contains all the header and extern functions used by the  */
 /*    USBX audio class version 2.0.                                       */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added volume RES support,   */
-/*                                            resulting in version 6.1.6  */
-/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added support of multiple   */
-/*                                            sampling frequencies,       */
-/*                                            added clock multiplier DEFs,*/
-/*                                            resulting in version 6.1.12 */
-/*  03-08-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added error checks support, */
-/*                                            resulting in version 6.2.1  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized USB descriptors,  */
-/*                                            resulting in version 6.3.0  */
-/*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_AUDIO20_H
 #define UX_DEVICE_CLASS_AUDIO20_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
@@ -494,10 +469,10 @@ UINT _uxe_device_class_audio20_control_process(UX_DEVICE_CLASS_AUDIO *audio,
 
 #endif
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif /* ifndef UX_DEVICE_CLASS_AUDIO20_H */

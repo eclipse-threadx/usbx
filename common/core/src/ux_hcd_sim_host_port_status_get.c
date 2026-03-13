@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Simulator Controller Driver                                    */
 /**                                                                       */
@@ -28,32 +29,32 @@
 #include "ux_hcd_sim_host.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_sim_host_port_status_get                    PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_sim_host_port_status_get                    PORTABLE C      */
 /*                                                           6.1.6        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*     This function will return the status for each port attached to the */
-/*     root HUB.                                                          */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_sim_host                          Pointer to host controller    */ 
-/*    port_index                            Port index                    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Host Simulator Port Status                                          */ 
-/*                                                                        */ 
+/*     root HUB.                                                          */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_sim_host                          Pointer to host controller    */
+/*    port_index                            Port index                    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Host Simulator Port Status                                          */
+/*                                                                        */
 /*    Where port status has the following format:                         */
-/*                                                                        */ 
+/*                                                                        */
 /*               bit 0         device connection status                   */
 /*                             if 0 : no device connected                 */
 /*                             if 1 : device connected to the port        */
@@ -76,25 +77,14 @@
 /*                             if 00 : low speed device attached          */
 /*                             if 01 : full speed device attached         */
 /*                             if 10 : high speed device attached         */
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    None                                                                */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Host Simulator Controller Driver                                    */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used changeable status,     */
-/*                                            resulting in version 6.1.6  */
 /*                                                                        */
 /**************************************************************************/
 ULONG  _ux_hcd_sim_host_port_status_get(UX_HCD_SIM_HOST *hcd_sim_host, ULONG port_index)
@@ -115,11 +105,11 @@ ULONG       port_status;
 
         return(UX_PORT_INDEX_UNKNOWN);
     }
-    
+
     /* Returns current port status.  */
     port_status = hcd_sim_host -> ux_hcd_sim_host_port_status[port_index];
 
     /* Return port status.  */
-    return(port_status);            
+    return(port_status);
 }
 

@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -69,12 +70,6 @@
 /*                                                                        */
 /*    Application                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  07-29-2022     Chaoqiong Xiao           Initial Version 6.1.12        */
-/*                                                                        */
 /**************************************************************************/
 UINT    _ux_host_class_audio_interrupt_start(UX_HOST_CLASS_AUDIO_AC *audio,
                         VOID(*callback_function)(UX_HOST_CLASS_AUDIO_AC *audio,
@@ -110,7 +105,7 @@ UINT            status;
     endpoint = audio -> ux_host_class_audio_interrupt_endpoint;
     if (endpoint == UX_NULL)
         return(UX_FUNCTION_NOT_SUPPORTED);
-    
+
     /* Check if interrupt started.  */
     if (audio -> ux_host_class_audio_interrupt_started)
         return(UX_ALREADY_ACTIVATED);
@@ -173,12 +168,6 @@ UINT            status;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT    _uxe_host_class_audio_interrupt_start(UX_HOST_CLASS_AUDIO_AC *audio,

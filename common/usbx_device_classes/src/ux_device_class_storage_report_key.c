@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -34,67 +35,46 @@
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_report_key                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_report_key                 PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function performs a REPORT_KEY SCSI command.                   */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
+/*                                                                        */
+/*    This function performs a REPORT_KEY SCSI command.                   */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
 /*    endpoint_in                           Pointer to IN endpoint        */
 /*    endpoint_out                          Pointer to OUT endpoint       */
-/*    cbwcb                                 Pointer to CBWCB              */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
-/*    _ux_device_class_storage_csw_send     Send CSW                      */ 
+/*    cbwcb                                 Pointer to CBWCB              */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
+/*    _ux_device_class_storage_csw_send     Send CSW                      */
 /*    _ux_utility_memory_set                Set memory                    */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Storage Class                                                */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warning,      */
-/*                                            resulting in version 6.1.3  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked compiling options   */
-/*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage, 
-                      ULONG               lun, 
+UINT  _ux_device_class_storage_report_key(UX_SLAVE_CLASS_STORAGE *storage,
+                      ULONG               lun,
                       UX_SLAVE_ENDPOINT   *endpoint_in,
-                      UX_SLAVE_ENDPOINT   *endpoint_out, 
+                      UX_SLAVE_ENDPOINT   *endpoint_out,
                       UCHAR               *cbwcb)
 {
 
@@ -118,13 +98,13 @@ ULONG                   key_format;
 
     /* Get the report key.  */
     key_format =  (ULONG) *(cbwcb + UX_SLAVE_CLASS_STORAGE_REPORT_KEY_FORMAT);
-    
+
     /* Extract the length to be returned by the cbwcb.  */
     allocation_length =  _ux_utility_short_get_big_endian(cbwcb + UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ALLOCATION_LENGTH);
 
     /* Ensure memory buffer cleaned.  */
     _ux_utility_memory_set(transfer_request -> ux_slave_transfer_request_data_pointer, 0, UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH); /* Use case of memset is verified. */
-    
+
     /* Filter page code. This is necessary to isolate the CD-ROM mode sense response.  */
     switch (key_format)
     {
@@ -133,7 +113,7 @@ ULONG                   key_format;
 
 
             /* Put the length to be returned. */
-            _ux_utility_short_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer, 
+            _ux_utility_short_put_big_endian(transfer_request -> ux_slave_transfer_request_data_pointer,
                                             UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_PAYLOAD);
 
             /* Put the reset field. */
@@ -147,16 +127,16 @@ ULONG                   key_format;
 
             /* Compute the payload to return. Depends on the request.  */
             if (allocation_length >  UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH)
-            
+
                 /* Adjust the reply.  */
-                allocation_length = UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH;                
+                allocation_length = UX_SLAVE_CLASS_STORAGE_REPORT_KEY_ANSWER_LENGTH;
 
             break;
-          
+
         default :
             allocation_length = 0;
             break;
-                
+
     }
 
 #if defined(UX_DEVICE_STANDALONE)
@@ -183,4 +163,4 @@ ULONG                   key_format;
     /* Return completion status.  */
     return(status);
 }
-    
+

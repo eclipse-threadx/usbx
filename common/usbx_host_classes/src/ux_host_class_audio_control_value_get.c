@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Audio Class                                                         */
 /**                                                                       */
@@ -29,21 +30,21 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_audio_control_value_get              PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_audio_control_value_get              PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function obtains the dynamic feature values for a single audio */
-/*    control on either the master channel or a specific channel.         */ 
-/*                                                                        */ 
+/*    control on either the master channel or a specific channel.         */
+/*                                                                        */
 /*    Note only control value of BYTE, WORD and DWORD (<4) is supported.  */
 /*    E.g., Graphic Equalizer Control is not supported.                   */
 /*                                                                        */
@@ -53,50 +54,29 @@
 /*    ux_host_class_audio_control_request or ux_host_class_audio_feature  */
 /*    functions.                                                          */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    audio                                 Pointer to audio class        */ 
-/*    audio_control                         Pointer to audio control      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_class_instance_verify  Verify instance is valid      */ 
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio class        */
+/*    audio_control                         Pointer to audio control      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_class_instance_verify  Verify instance is valid      */
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_host_semaphore_get                Get semaphore                 */
 /*    _ux_host_mutex_on                     Get mutex                     */
 /*    _ux_host_mutex_off                    Release mutex                 */
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
-/*    _ux_utility_short_get                 Read 16-bit value             */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Audio Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added audio 2.0 support,    */
-/*                                            protect reentry with mutex, */
-/*                                            fixed error return code,    */
-/*                                            fixed EP0 protection,       */
-/*                                            supported more selectors,   */
-/*                                            resulting in version 6.1.12 */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
+/*    _ux_utility_short_get                 Read 16-bit value             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Audio Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_control_value_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control)
@@ -117,7 +97,7 @@ UCHAR *         control_buffer;
 
     /* Ensure the instance is valid.  */
     if (_ux_host_stack_class_instance_verify(_ux_system_host_class_audio_name, (VOID *) audio) != UX_SUCCESS)
-    {        
+    {
 
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_HOST_CLASS_INSTANCE_UNKNOWN);
@@ -143,11 +123,11 @@ UCHAR *         control_buffer;
         /* Unprotect thread reentry to this instance.  */
         _ux_host_mutex_off(&audio -> ux_host_class_audio_mutex);
 
-        /* Return error.  */        
+        /* Return error.  */
         return(UX_MEMORY_INSUFFICIENT);
     }
 
-    /* Protect the control endpoint semaphore here.  It will be unprotected in the 
+    /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
     status =  _ux_host_semaphore_get(&audio -> ux_host_class_audio_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
 
@@ -219,8 +199,8 @@ UCHAR *         control_buffer;
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    audio                                 Pointer to audio class        */ 
-/*    audio_control                         Pointer to audio control      */ 
+/*    audio                                 Pointer to audio class        */
+/*    audio_control                         Pointer to audio control      */
 /*                                                                        */
 /*  OUTPUT                                                                */
 /*                                                                        */
@@ -234,12 +214,6 @@ UCHAR *         control_buffer;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _uxe_host_class_audio_control_value_get(UX_HOST_CLASS_AUDIO *audio, UX_HOST_CLASS_AUDIO_CONTROL *audio_control)

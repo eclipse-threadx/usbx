@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Sierra Wireless AR module class                                */
 /**                                                                       */
@@ -29,52 +30,39 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_configure                       PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_swar_configure                       PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function calls the USBX stack to do a SET_CONFIGURATION to the */
-/*    swar. Once the swar is configured, its interface will be            */ 
-/*    activated. The bulk endpoints enumerated(1 IN, 1 OUT ).             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    swar                                   Pointer to swar class        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_configuration_interface_get  Get interface           */ 
-/*    _ux_host_stack_device_configuration_get     Get configuration       */ 
-/*    _ux_host_stack_device_configuration_select  Select configuration    */  
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_host_class_swar_activate                swar class activate     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            removed interface link,     */
-/*                                            resulting in version 6.3.0  */
+/*    swar. Once the swar is configured, its interface will be            */
+/*    activated. The bulk endpoints enumerated(1 IN, 1 OUT ).             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    swar                                   Pointer to swar class        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_configuration_interface_get  Get interface           */
+/*    _ux_host_stack_device_configuration_get     Get configuration       */
+/*    _ux_host_stack_device_configuration_select  Select configuration    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_host_class_swar_activate                swar class activate     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_swar_configure(UX_HOST_CLASS_SWAR *swar)
@@ -97,29 +85,29 @@ UX_DEVICE               *parent_device;
     status =  _ux_host_stack_device_configuration_get(swar -> ux_host_class_swar_device, 0, &configuration);
     if (status != UX_SUCCESS)
     {
-    
+
         /* Error trap. */
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CONFIGURATION_HANDLE_UNKNOWN);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
         UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONFIGURATION_HANDLE_UNKNOWN, swar -> ux_host_class_swar_device, 0, 0, UX_TRACE_ERRORS, 0, 0)
-    
+
         return(UX_CONFIGURATION_HANDLE_UNKNOWN);
     }
 
 #if UX_MAX_DEVICES > 1
-    /* Check the swar power source and check the parent power source for 
+    /* Check the swar power source and check the parent power source for
        incompatible connections.  */
     if (swar -> ux_host_class_swar_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED)
     {
 
         /* Get parent device pointer.  */
         parent_device =  swar -> ux_host_class_swar_device -> ux_device_parent;
-        
-        /* If the device is NULL, the parent is the root swar and we don't have to worry 
+
+        /* If the device is NULL, the parent is the root swar and we don't have to worry
            if the parent is not the root swar, check for its power source.  */
         if ((parent_device != UX_NULL) && (parent_device -> ux_device_power_source == UX_DEVICE_BUS_POWERED))
-        {                        
+        {
 
             /* Error trap. */
             _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_CONNECTION_INCOMPATIBLE);
@@ -128,16 +116,16 @@ UX_DEVICE               *parent_device;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_CONNECTION_INCOMPATIBLE, swar, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_CONNECTION_INCOMPATIBLE);
-        }            
+        }
     }
 #endif
 
-    /* We have the valid configuration. Ask the USBX stack to set this configuration.  */        
+    /* We have the valid configuration. Ask the USBX stack to set this configuration.  */
     status =  _ux_host_stack_device_configuration_select(configuration);
     if (status != UX_SUCCESS)
         return(status);
 
-    /* If the operation went well, the swar default alternate setting for the swar interface is 
+    /* If the operation went well, the swar default alternate setting for the swar interface is
        active. We have to memorize the data interface since the bulk in/out endpoints are hooked to it. */
     status =  _ux_host_stack_configuration_interface_get(configuration, UX_HOST_CLASS_SWAR_DATA_INTERFACE, 0, &swar -> ux_host_class_swar_interface);
 

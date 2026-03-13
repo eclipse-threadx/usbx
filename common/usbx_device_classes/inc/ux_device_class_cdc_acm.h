@@ -1,83 +1,56 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
 /**                                                                       */
-/**   CDC Class                                                           */
+/** USBX Component                                                        */
+/**                                                                       */
+/**   Device CDC ACM Class                                                */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  COMPONENT DEFINITION                                   RELEASE        */ 
-/*                                                                        */ 
-/*    ux_device_class_cdc_acm.h                           PORTABLE C      */ 
+
+/**************************************************************************/
+/**************************************************************************/
+/*                                                                        */
+/*  COMPONENT DEFINITION                                   RELEASE        */
+/*                                                                        */
+/*    ux_device_class_cdc_acm.h                           PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This file defines the equivalences for the USBX Device Class CDC    */ 
-/*    ACM component.                                                      */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  04-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added macro to disable      */
-/*                                            transmission support,       */
-/*                                            resulting in version 6.1.6  */
-/*  08-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added write auto ZLP,       */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Yajun xia, CQ Xiao       Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            added error checks support, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*    This file defines the equivalences for the USBX Device Class CDC    */
+/*    ACM component.                                                      */
 /*                                                                        */
 /**************************************************************************/
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_H
 #define UX_DEVICE_CLASS_CDC_ACM_H
 
-/* Determine if a C++ compiler is being used.  If so, ensure that standard 
-   C is used to process the API information.  */ 
+/* Determine if a C++ compiler is being used.  If so, ensure that standard
+   C is used to process the API information.  */
 
-#ifdef   __cplusplus 
+#ifdef   __cplusplus
 
-/* Yes, C++ compiler is present.  Use standard C.  */ 
-extern   "C" { 
+/* Yes, C++ compiler is present.  Use standard C.  */
+extern   "C" {
 
-#endif  
+#endif
 
 /* Internal option: enable the basic USBX error checking. This define is typically used
    while debugging application.  */
@@ -251,6 +224,7 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
     UCHAR                               ux_slave_class_cdc_acm_data_bit;
     UCHAR                               ux_slave_class_cdc_acm_data_dtr_state;
     UCHAR                               ux_slave_class_cdc_acm_data_rts_state;
+    ULONG                               ux_slave_class_cdc_acm_break_duration;
     UCHAR                               reserved[3];
 
 #ifndef UX_DEVICE_CLASS_CDC_ACM_TRANSMISSION_DISABLE
@@ -289,23 +263,23 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_STRUCT
 
 /* Define some CDC Class structures */
 
-typedef struct UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_PARAMETER_STRUCT 
+typedef struct UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_PARAMETER_STRUCT
 {
     ULONG                               ux_slave_class_cdc_acm_parameter_baudrate;
     UCHAR                               ux_slave_class_cdc_acm_parameter_stop_bit;
     UCHAR                               ux_slave_class_cdc_acm_parameter_parity;
     UCHAR                               ux_slave_class_cdc_acm_parameter_data_bit;
-    
+
 } UX_SLAVE_CLASS_CDC_ACM_LINE_CODING_PARAMETER;
 
-typedef struct UX_SLAVE_CLASS_CDC_ACM_LINE_STATE_PARAMETER_STRUCT 
+typedef struct UX_SLAVE_CLASS_CDC_ACM_LINE_STATE_PARAMETER_STRUCT
 {
     UCHAR                               ux_slave_class_cdc_acm_parameter_rts;
     UCHAR                               ux_slave_class_cdc_acm_parameter_dtr;
-    
+
 } UX_SLAVE_CLASS_CDC_ACM_LINE_STATE_PARAMETER;
 
-typedef struct UX_SLAVE_CLASS_CDC_ACM_CALLBACK_PARAMETER_STRUCT 
+typedef struct UX_SLAVE_CLASS_CDC_ACM_CALLBACK_PARAMETER_STRUCT
 {
     UINT                                (*ux_device_class_cdc_acm_parameter_write_callback)(struct UX_SLAVE_CLASS_CDC_ACM_STRUCT *cdc_acm, UINT status, ULONG length);
     UINT                                (*ux_device_class_cdc_acm_parameter_read_callback)(struct UX_SLAVE_CLASS_CDC_ACM_STRUCT *cdc_acm, UINT status, UCHAR *data_pointer, ULONG length);
@@ -316,22 +290,22 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_CALLBACK_PARAMETER_STRUCT
 
 /* Requests - Ethernet Networking Control Model */
 
-#define UX_SLAVE_CLASS_CDC_ACM_SEND_ENCAPSULATED_COMMAND                        0x00        
+#define UX_SLAVE_CLASS_CDC_ACM_SEND_ENCAPSULATED_COMMAND                        0x00
                                         /* Issues a command in the format of the supported control
                                            protocol. The intent of this mechanism is to support
                                            networking devices (e.g., host-based cable modems)
                                            that require an additional vendor-defined interface for
                                            media specific hardware configuration and
                                            management.  */
-#define UX_SLAVE_CLASS_CDC_ACM_GET_ENCAPSULATED_RESPONSE                        0x01        
+#define UX_SLAVE_CLASS_CDC_ACM_GET_ENCAPSULATED_RESPONSE                        0x01
                                         /* Requests a response in the format of the supported
                                            control protocol.  */
-#define UX_SLAVE_CLASS_CDC_ACM_SET_ETHERNET_MULTICAST_FILTERS                   0x40        
+#define UX_SLAVE_CLASS_CDC_ACM_SET_ETHERNET_MULTICAST_FILTERS                   0x40
                                         /* As applications are loaded and unloaded on the host,
                                            the networking transport will instruct the device's MAC
                                            driver to change settings of the Networking device's
                                            multicast filters.  */
-#define UX_SLAVE_CLASS_CDC_ACM_SET_ETHERNET_POWER_MANAGEMENT_PATTERN_FILTER     0x41        
+#define UX_SLAVE_CLASS_CDC_ACM_SET_ETHERNET_POWER_MANAGEMENT_PATTERN_FILTER     0x41
                                         /* Some hosts are able to conserve energy and stay quiet
                                            in a 'sleeping' state while not being used. USB
                                            Networking devices may provide special pattern filtering
@@ -340,13 +314,13 @@ typedef struct UX_SLAVE_CLASS_CDC_ACM_CALLBACK_PARAMETER_STRUCT
                                            host (e.g., an incoming web browser connection).
                                            Primitives are needed in management plane to negotiate
                                            the setting of these special filters  */
-#define UX_SLAVE_CLASS_CDC_ACM_GET_ETHERNET_POWER_MANAGEMENT_PATTERN_FILTER     0x42 
+#define UX_SLAVE_CLASS_CDC_ACM_GET_ETHERNET_POWER_MANAGEMENT_PATTERN_FILTER     0x42
                                         /* Retrieves the status of the above power management
                                            pattern filter setting  */
-#define UX_SLAVE_CLASS_CDC_ACM_SET_ETHERNET_PACKET_FILTER                       0x43 
+#define UX_SLAVE_CLASS_CDC_ACM_SET_ETHERNET_PACKET_FILTER                       0x43
                                         /* Sets device filter for running a network analyzer
                                            application on the host machine  */
-#define UX_SLAVE_CLASS_CDC_ACM_GET_ETHERNET_STATISTIC                           0x44 
+#define UX_SLAVE_CLASS_CDC_ACM_GET_ETHERNET_STATISTIC                           0x44
                                         /* Retrieves Ethernet device statistics such as frames
                                            transmitted, frames received, and bad frames received.  */
 
@@ -363,20 +337,20 @@ UINT  _ux_device_class_cdc_acm_deactivate(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_cdc_acm_entry(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_cdc_acm_initialize(UX_SLAVE_CLASS_COMMAND *command);
 UINT  _ux_device_class_cdc_acm_uninitialize(UX_SLAVE_CLASS_COMMAND *command);
-UINT  _ux_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+UINT  _ux_device_class_cdc_acm_write(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
-UINT  _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+UINT  _ux_device_class_cdc_acm_read(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
 UINT  _ux_device_class_cdc_acm_ioctl(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, ULONG ioctl_function,
                                     VOID *parameter);
 VOID  _ux_device_class_cdc_acm_bulkin_thread(ULONG class_pointer);
 VOID  _ux_device_class_cdc_acm_bulkout_thread(ULONG class_pointer);
-UINT  _ux_device_class_cdc_acm_write_with_callback(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+UINT  _ux_device_class_cdc_acm_write_with_callback(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
                                 ULONG requested_length);
 
-UINT  _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+UINT  _ux_device_class_cdc_acm_write_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
-UINT  _ux_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer, 
+UINT  _ux_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR *buffer,
                                 ULONG requested_length, ULONG *actual_length);
 
 UINT  _ux_device_class_cdc_acm_tasks_run(VOID *instance);
@@ -419,10 +393,10 @@ UINT  _uxe_device_class_cdc_acm_read_run(UX_SLAVE_CLASS_CDC_ACM *cdc_acm, UCHAR 
 
 #endif
 
-/* Determine if a C++ compiler is being used.  If so, complete the standard 
-   C conditional started above.  */   
+/* Determine if a C++ compiler is being used.  If so, complete the standard
+   C conditional started above.  */
 #ifdef __cplusplus
-} 
-#endif 
+}
+#endif
 
 #endif /* UX_DEVICE_CLASS_CDC_ACM_H */

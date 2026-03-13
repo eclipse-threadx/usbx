@@ -149,10 +149,10 @@ UINT      tracex_id = 0;
     switch(tracex_id){
         case UX_TRACE_DEVICE_STACK_CONFIGURATION_GET:
         case UX_TRACE_DEVICE_STACK_CONFIGURATION_SET:
-        case UX_TRACE_DEVICE_CLASS_DPUMP_WRITE:                               
+        case UX_TRACE_DEVICE_CLASS_DPUMP_WRITE:
         case UX_TRACE_DEVICE_CLASS_DPUMP_CHANGE:
         default:
-            break;      
+            break;
     }
 #endif
     /* Successful test.  */

@@ -24,8 +24,8 @@ static void post_init_host()
 UX_HOST_CLASS_CDC_ECM   my_cdc_ecm;
 UX_TRANSFER             transfer_request;
 UCHAR                   transfer_request_data[16];
-UX_ENDPOINT             endpoint;  
-ULONG                   notification_count;  
+UX_ENDPOINT             endpoint;
+ULONG                   notification_count;
 
     /** Test the class in shutdown mode. **/
 

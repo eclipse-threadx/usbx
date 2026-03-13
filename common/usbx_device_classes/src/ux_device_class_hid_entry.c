@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -7,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -64,21 +66,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    HID Class                                                           */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added error checks support, */
-/*                                            resulting in version 6.3.0  */
-/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
-/*                                            fix typo,                   */
-/*                                            remove extra spaces,        */
-/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_device_class_hid_entry(UX_SLAVE_CLASS_COMMAND *command)
@@ -156,4 +143,3 @@ UINT        status;
         return(UX_FUNCTION_NOT_SUPPORTED);
     }
 }
-

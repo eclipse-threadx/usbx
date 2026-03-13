@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Video Class                                                         */
 /**                                                                       */
@@ -29,68 +30,46 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_video_channel_start                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_video_channel_start                  PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function starts the video channel.                             */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    video                                 Pointer to video class        */ 
-/*    channel_parameter                     Pointer to video channel      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function starts the video channel.                             */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    video                                 Pointer to video class        */
+/*    channel_parameter                     Pointer to video channel      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_class_video_alternate_setting_locate                       */
 /*                                          Search alternate setting      */
 /*    _ux_host_stack_interface_setting_select                             */
 /*                                          Select alternate setting      */
 /*    _ux_host_stack_interface_endpoint_get Get interface endpoint        */
-/*    _ux_host_stack_transfer_request       Process transfer request      */ 
-/*    _ux_host_semaphore_get                Get semaphore                 */ 
-/*    _ux_host_semaphore_put                Release semaphore             */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*    _ux_utility_memory_free               Release memory block          */ 
+/*    _ux_host_stack_transfer_request       Process transfer request      */
+/*    _ux_host_semaphore_get                Get semaphore                 */
+/*    _ux_host_semaphore_put                Release semaphore             */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*    _ux_utility_memory_free               Release memory block          */
 /*    _ux_utility_long_get                  Get 32-bit value              */
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Video Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed bandwidth check,      */
-/*                                            saved max payload size,     */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            refined macros names,       */
-/*                                            resulting in version 6.1.10 */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Video Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_video_channel_start(UX_HOST_CLASS_VIDEO *video, UX_HOST_CLASS_VIDEO_PARAMETER_CHANNEL *video_parameter)
@@ -127,7 +106,7 @@ UINT                    max_payload_size;
         /* Unprotect thread reentry to this instance.  */
         _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
 
-        /* Return error.  */        
+        /* Return error.  */
         return(UX_MEMORY_INSUFFICIENT);
     }
 
@@ -150,12 +129,12 @@ UINT                    max_payload_size;
 
         /* Send request to HCD layer.  */
         status =  _ux_host_stack_transfer_request(transfer_request);
-    
+
         /* Check for correct transfer. Buffer may not be all what we asked for.  */
         if (status == UX_SUCCESS)
         {
-    
-    
+
+
             /* Create a transfer request for the SET_CUR_buffer request.  */
             transfer_request -> ux_transfer_request_data_pointer =      control_buffer;
             transfer_request -> ux_transfer_request_requested_length =  UX_HOST_CLASS_VIDEO_PROBE_COMMIT_LENGTH;
@@ -163,14 +142,14 @@ UINT                    max_payload_size;
             transfer_request -> ux_transfer_request_type =              UX_REQUEST_IN | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
             transfer_request -> ux_transfer_request_value =             UX_HOST_CLASS_VIDEO_VS_PROBE_CONTROL << 8;
             transfer_request -> ux_transfer_request_index =             streaming_interface;
-    
+
             /* Send request to HCD layer.  */
             status =  _ux_host_stack_transfer_request(transfer_request);
-    
+
             /* Check for correct transfer.  */
             if (status == UX_SUCCESS)
             {
-            
+
                 /* We did the GET_CUR and SET_CUR for Probe Control. Now we can commit to the bandwidth.  */
                 /* Create a transfer request for the SET_CUR_buffer request.  */
                 transfer_request -> ux_transfer_request_data_pointer =      control_buffer;
@@ -179,14 +158,14 @@ UINT                    max_payload_size;
                 transfer_request -> ux_transfer_request_type =              UX_REQUEST_OUT | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
                 transfer_request -> ux_transfer_request_value =             UX_HOST_CLASS_VIDEO_VS_COMMIT_CONTROL << 8;
                 transfer_request -> ux_transfer_request_index =             streaming_interface;
-        
+
                 /* Send request to HCD layer.  */
                 status =  _ux_host_stack_transfer_request(transfer_request);
-        
+
                 /* Check for correct transfer.  */
                 if (status == UX_SUCCESS)
                 {
-        
+
                     /* Check if user has request specific bandwidth selection.  */
                     if (video_parameter -> ux_host_class_video_parameter_channel_bandwidth_selection == 0)
                     {
@@ -208,69 +187,69 @@ UINT                    max_payload_size;
                     {
 
                         /* Now the Commit has been done, the alternate setting can be requested.  */
-                        /* We found the alternate setting for the sampling values demanded, now we need 
+                        /* We found the alternate setting for the sampling values demanded, now we need
                             to search its container.  */
                         configuration =        video -> ux_host_class_video_streaming_interface -> ux_interface_configuration;
-                        interface_ptr =        configuration -> ux_configuration_first_interface;  
+                        interface_ptr =        configuration -> ux_configuration_first_interface;
 
                         /* Scan all interfaces.  */
-                        while (interface_ptr != UX_NULL)     
+                        while (interface_ptr != UX_NULL)
                         {
-                    
+
                             /* We search for both the right interface and alternate setting.  */
                             if ((interface_ptr -> ux_interface_descriptor.bInterfaceNumber == streaming_interface) &&
                                 (interface_ptr -> ux_interface_descriptor.bAlternateSetting == alternate_setting))
                             {
-                                
-                                /* We have found the right interface/alternate setting combination 
+
+                                /* We have found the right interface/alternate setting combination
                                 The stack will select it for us.  */
                                 status =  _ux_host_stack_interface_setting_select(interface_ptr);
-                                
+
                                 /* If the alternate setting for the streaming interface could be selected, we memorize it.  */
                                 if (status == UX_SUCCESS)
                                 {
-                    
+
                                     /* Memorize the interface.  */
                                     video -> ux_host_class_video_streaming_interface =  interface_ptr;
-                    
+
                                     /* We need to research the isoch endpoint now.  */
                                     for (endpoint_index = 0; endpoint_index < interface_ptr -> ux_interface_descriptor.bNumEndpoints; endpoint_index++)
-                                    {                        
-                    
+                                    {
+
                                         /* Get the list of endpoints one by one.  */
                                         status =  _ux_host_stack_interface_endpoint_get(video -> ux_host_class_video_streaming_interface,
                                                                                                         endpoint_index, &endpoint);
-                    
+
                                         /* Check completion status.  */
                                         if (status == UX_SUCCESS)
                                         {
-                    
+
                                             /* Check if endpoint is ISOCH, regardless of the direction.  */
                                             if ((endpoint -> ux_endpoint_descriptor.bmAttributes & UX_MASK_ENDPOINT_TYPE) == UX_ISOCHRONOUS_ENDPOINT)
                                             {
-                    
+
                                                 /* We have found the isoch endpoint, save it.  */
                                                 video -> ux_host_class_video_isochronous_endpoint =  endpoint;
-                    
+
                                                 /* Save the max payload size.
                                                 It's not exceeding endpoint bandwidth since the interface alternate
                                                 setting is located by max payload size.  */
                                                 video -> ux_host_class_video_current_max_payload_size = max_payload_size;
-                        
+
                                                 /* Free all used resources.  */
                                                 _ux_utility_memory_free(control_buffer);
 
                                                 /* Unprotect thread reentry to this instance.  */
                                                 _ux_host_semaphore_put(&video -> ux_host_class_video_semaphore);
-                    
+
                                                 /* Return successful completion.  */
-                                                return(UX_SUCCESS);             
+                                                return(UX_SUCCESS);
                                             }
-                                        }                
-                                    }            
+                                        }
+                                    }
                                 }
                             }
-                    
+
                             /* Move to next interface.  */
                             interface_ptr =  interface_ptr -> ux_interface_next_interface;
                         }

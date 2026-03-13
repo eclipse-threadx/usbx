@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   EHCI Controller Driver                                              */
 /**                                                                       */
@@ -29,54 +30,38 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_asynchronous_endpoint_create           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_hcd_ehci_asynchronous_endpoint_create           PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function will create an asynchronous endpoint. The control     */
-/*    and bulk endpoints fall into this category.                         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hcd_ehci                              Pointer to EHCI controller    */ 
-/*    endpoint                              Pointer to endpoint           */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_hcd_ehci_ed_obtain                Obtain EHCI ED                */ 
-/*    _ux_utility_physical_address          Get physical address          */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*    and bulk endpoints fall into this category.                         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hcd_ehci                              Pointer to EHCI controller    */
+/*    endpoint                              Pointer to endpoint           */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_hcd_ehci_ed_obtain                Obtain EHCI ED                */
+/*    _ux_utility_physical_address          Get physical address          */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    EHCI Controller Driver                                              */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  11-09-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.1.2  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed compile warnings,     */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_hcd_ehci_asynchronous_endpoint_create(UX_HCD_EHCI *hcd_ehci, UX_ENDPOINT *endpoint)
@@ -90,8 +75,8 @@ UX_EHCI_LINK_POINTER    queue_head;
     /* We need to take into account the nature of the HCD to define the max size
        of any transfer in the transfer request.  */
     endpoint -> ux_endpoint_transfer_request.ux_transfer_request_maximum_length =  UX_EHCI_MAX_PAYLOAD;
-    
-    /* Obtain a ED for this new endpoint. This ED will live as long as the endpoint is active 
+
+    /* Obtain a ED for this new endpoint. This ED will live as long as the endpoint is active
        and will be the container for the tds.  */
     ed =  _ux_hcd_ehci_ed_obtain(hcd_ehci);
     if (ed == UX_NULL)
@@ -105,10 +90,10 @@ UX_EHCI_LINK_POINTER    queue_head;
 
     /* Set the default MPS Capability info in the ED.  */
     ed -> ux_ehci_ed_cap0 =  (ULONG)endpoint -> ux_endpoint_descriptor.wMaxPacketSize << UX_EHCI_QH_MPS_LOC;
-    
+
     /* Set the default NAK reload count.  */
     ed -> ux_ehci_ed_cap0 |=  UX_EHCI_QH_NCR;
-    
+
     /* If the device is not high speed and the endpoint is control, then the CEF bit must be set to on.  */
     device =  endpoint -> ux_endpoint_device;
     if ((device -> ux_device_speed != UX_HIGH_SPEED_DEVICE) &&
@@ -117,15 +102,15 @@ UX_EHCI_LINK_POINTER    queue_head;
 
     /* Set the device address.  */
     ed -> ux_ehci_ed_cap0 |=  device -> ux_device_address;
-    
+
     /* Add the endpoint address.  */
     ed -> ux_ehci_ed_cap0 |=  (endpoint -> ux_endpoint_descriptor.bEndpointAddress &
                                             ~UX_ENDPOINT_DIRECTION) << UX_EHCI_QH_ED_AD_LOC;
 
-    /* Set the High Bandwidth Pipe Multiplier to 1.  */    
+    /* Set the High Bandwidth Pipe Multiplier to 1.  */
     ed -> ux_ehci_ed_cap1 |=  UX_EHCI_QH_HBPM;
-    
-    /* Set the device speed for full and low speed devices behind a hub the hub address and the 
+
+    /* Set the device speed for full and low speed devices behind a hub the hub address and the
        port index must be stored in the endpoint.  */
     switch (device -> ux_device_speed)
     {
@@ -137,7 +122,7 @@ UX_EHCI_LINK_POINTER    queue_head;
 
 
     case  UX_LOW_SPEED_DEVICE:
-        
+
         ed -> ux_ehci_ed_cap0 |=  UX_EHCI_QH_LOW_SPEED;
         break;
 
@@ -151,14 +136,14 @@ UX_EHCI_LINK_POINTER    queue_head;
             /* Store the parent hub device address.  */
             ed -> ux_ehci_ed_cap1 |=  device -> ux_device_parent -> ux_device_address << UX_EHCI_QH_HUB_ADDR_LOC;
 
-            /* And the port index onto which this device is attached.  */                                    
+            /* And the port index onto which this device is attached.  */
             ed -> ux_ehci_ed_cap1 |=  device -> ux_device_port_location << UX_EHCI_QH_PORT_NUMBER_LOC;
         }
 #endif
         break;
     }
-            
-    /* We need to insert this new endpoint into the asynchronous list. All new EDs are inserted at the 
+
+    /* We need to insert this new endpoint into the asynchronous list. All new EDs are inserted at the
        end of the list. The current ED will be pointing to the first ED in the list.  */
     queue_head.void_ptr = _ux_utility_physical_address(hcd_ehci -> ux_hcd_ehci_asynch_first_list);
     queue_head.value |= UX_EHCI_QH_TYP_QH;
@@ -173,11 +158,11 @@ UX_EHCI_LINK_POINTER    queue_head;
 
     /* Update the link of the previous ED.  */
     ed -> ux_ehci_ed_previous_ed -> ux_ehci_ed_next_ed =  ed;
-    
+
     /* Remember the new last QH.  */
     hcd_ehci -> ux_hcd_ehci_asynch_last_list =  ed;
 
     /* Return successful completion.  */
-    return(UX_SUCCESS);         
+    return(UX_SUCCESS);
 }
 

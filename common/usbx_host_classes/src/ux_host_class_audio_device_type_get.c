@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Audio Class                                                         */
 /**                                                                       */
@@ -29,50 +30,35 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_audio_device_type_get                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_audio_device_type_get                PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function obtains the device type.                              */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    audio                                 Pointer to audio class        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Audio Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            removed protocol store,     */
-/*                                            added audio 2.0 support,    */
-/*                                            resulting in version 6.1.12 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved descriptors check, */
-/*                                            resulting in version 6.3.0  */
+/*                                                                        */
+/*    This function obtains the device type.                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio class        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Audio Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_device_type_get(UX_HOST_CLASS_AUDIO *audio)
@@ -92,14 +78,14 @@ UINT                                            i;
     /* Get the descriptor to the entire configuration.  */
     descriptor =               audio -> ux_host_class_audio_configuration_descriptor;
     total_descriptor_length =  audio -> ux_host_class_audio_configuration_descriptor_length;
-    
-    /* Default is Interface descriptor not yet found.  */    
+
+    /* Default is Interface descriptor not yet found.  */
     descriptor_found =  UX_FALSE;
     iad = UX_NULL;
     interface_descriptor = UX_NULL;
     interface_number = audio -> ux_host_class_audio_streaming_interface
                                     -> ux_interface_descriptor.bInterfaceNumber;
-    
+
     /* Scan the descriptor for the Audio Streaming interface.  */
     while (total_descriptor_length)
     {
@@ -232,7 +218,7 @@ UINT                                            i;
 
         default:
             break;
-        }       
+        }
 
         /* Verify if the descriptor is still valid.  */
         if (descriptor_length > total_descriptor_length)
@@ -245,7 +231,7 @@ UINT                                            i;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_DESCRIPTOR_CORRUPTED);
-        }            
+        }
 
         /* Jump to the next descriptor if we have not reached the end.  */
         descriptor +=  descriptor_length;

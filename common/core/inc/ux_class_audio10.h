@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -34,12 +35,6 @@
 /*                                                                        */
 /*    This file contains all the header and structures used by the        */
 /*    USBX Audio Class (UAC) 1.0.                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  07-29-2022     Chaoqiong Xiao           Initial Version 6.1.12        */
 /*                                                                        */
 /**************************************************************************/
 
@@ -933,7 +928,7 @@ typedef struct UX_CLASS_AUDIO10_TYPE_I_FORMAT_TYPE_CONTINUOUS_DESCRIPTOR_STRUCT
     UCHAR           tLowerSamFreq[3];
     UCHAR           tUpperSamFreq[3];
 }
-UX_CLASS_AUDIO10_TYPE_I_FORMAT_TYPE_CONTINUOUS_DESCRIPTOR, 
+UX_CLASS_AUDIO10_TYPE_I_FORMAT_TYPE_CONTINUOUS_DESCRIPTOR,
 UX_CLASS_AUDIO10_TYPE_I_FORMAT_TYPE_DESCRIPTOR_0;
 
 typedef struct UX_CLASS_AUDIO10_TYPE_I_FORMAT_TYPE_DISCRETE_DESCRIPTOR_STRUCT

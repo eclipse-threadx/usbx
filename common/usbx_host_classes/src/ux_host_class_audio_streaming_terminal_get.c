@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Audio Class                                                         */
 /**                                                                       */
@@ -29,45 +30,37 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_audio_streaming_terminal_get         PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_audio_streaming_terminal_get         PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function searches and retrieves the streaming terminal. This   */
-/*    terminal is used to further search which of the input\output        */ 
-/*    terminals describes if the device is audio IN or audio OUT.         */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    audio                                 Pointer to audio class        */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_utility_descriptor_parse          Parse descriptor              */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Audio Class                                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
+/*    terminal is used to further search which of the input\output        */
+/*    terminals describes if the device is audio IN or audio OUT.         */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    audio                                 Pointer to audio class        */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_utility_descriptor_parse          Parse descriptor              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Audio Class                                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_audio_streaming_terminal_get(UX_HOST_CLASS_AUDIO *audio)
@@ -81,16 +74,16 @@ ULONG                                               descriptor_length;
 ULONG                                               descriptor_type;
 ULONG                                               descriptor_subtype;
 ULONG                                               descriptor_found;
-    
+
 
     /* Get the descriptor to the entire configuration */
     descriptor =  audio -> ux_host_class_audio_configuration_descriptor;
     total_descriptor_length =  audio -> ux_host_class_audio_configuration_descriptor_length;
-    
-    /* Default is Interface descriptor not yet found.  */    
+
+    /* Default is Interface descriptor not yet found.  */
     descriptor_found =  UX_FALSE;
     audio -> ux_host_class_audio_terminal_link =  0xffffffff;
-    
+
     /* Scan the descriptor for the Audio Streaming interface.  */
     while (total_descriptor_length)
     {
@@ -112,7 +105,7 @@ ULONG                                               descriptor_found;
 
             return(UX_DESCRIPTOR_CORRUPTED);
         }
-        
+
         /* Process relative to the descriptor type.  */
         switch(descriptor_type)
         {
@@ -128,15 +121,15 @@ ULONG                                               descriptor_found;
             if ((interface_descriptor.bInterfaceClass == UX_HOST_CLASS_AUDIO_CLASS) &&
                 (interface_descriptor.bInterfaceSubClass == UX_HOST_CLASS_AUDIO_SUBCLASS_STREAMING) &&
                 (interface_descriptor.bInterfaceNumber == audio -> ux_host_class_audio_streaming_interface -> ux_interface_descriptor.bInterfaceNumber))
-                
+
                 /* Mark we have found it.  */
                 descriptor_found =  UX_TRUE;
             else
-            
+
                 descriptor_found =  UX_FALSE;
             break;
-                
-     
+
+
         case UX_HOST_CLASS_AUDIO_CS_INTERFACE:
 
             /* First make sure we have found the correct generic interface descriptor.  */
@@ -149,18 +142,18 @@ ULONG                                               descriptor_found;
 
 
                 case UX_HOST_CLASS_AUDIO_CS_AS_GENERAL:
-                        
+
                     /* Make the descriptor machine independent.  */
                     _ux_utility_descriptor_parse(descriptor, _ux_system_class_audio_streaming_interface_descriptor_structure,
                                             UX_HOST_CLASS_AUDIO_STREAMING_INTERFACE_DESCRIPTOR_ENTRIES, (UCHAR *) &streaming_interface_descriptor);
-                    
+
                     /* Save the terminal link.  */
                     audio -> ux_host_class_audio_terminal_link =  streaming_interface_descriptor.bTerminalLink;
                     return(UX_SUCCESS);
                 }
             }
             break;
-        }       
+        }
 
         /* Verify if the descriptor is still valid.  */
         if (descriptor_length > total_descriptor_length)
@@ -173,7 +166,7 @@ ULONG                                               descriptor_found;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_DESCRIPTOR_CORRUPTED);
-        }            
+        }
 
         /* Jump to the next descriptor if we have not reached the end.  */
         descriptor +=  descriptor_length;

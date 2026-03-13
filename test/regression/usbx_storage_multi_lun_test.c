@@ -99,37 +99,37 @@ static UINT ux_test_system_host_change_function(ULONG event, UX_HOST_CLASS *cls,
 
 
 #define DEVICE_FRAMEWORK_LENGTH_FULL_SPEED 50
-static UCHAR device_framework_full_speed[] = { 
+static UCHAR device_framework_full_speed[] = {
 
     /* Device descriptor */
         0x12, 0x01, 0x10, 0x01, 0x00, 0x00, 0x00, 0x08,
         0x81, 0x07, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02,
-        0x03, 0x01,                                      
+        0x03, 0x01,
 
     /* Configuration descriptor */
         0x09, 0x02, 0x20, 0x00, 0x01, 0x01, 0x00, 0xc0,
-        0x32, 
+        0x32,
 
     /* Interface descriptor */
         0x09, 0x04, 0x00, 0x00, 0x02, 0x08, 0x06, 0x50,
         0x00,
 
     /* Endpoint descriptor (Bulk In) */
-        0x07, 0x05, 0x81, 0x02, 0x40, 0x00, 0x00, 
+        0x07, 0x05, 0x81, 0x02, 0x40, 0x00, 0x00,
 
     /* Endpoint descriptor (Bulk Out) */
         0x07, 0x05, 0x02, 0x02, 0x40, 0x00, 0x00
 
     };
-    
-    
+
+
 #define DEVICE_FRAMEWORK_LENGTH_HIGH_SPEED 60
-static UCHAR device_framework_high_speed[] = { 
+static UCHAR device_framework_high_speed[] = {
 
     /* Device descriptor */
         0x12, 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x40,
         0x81, 0x07, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02,
-        0x03, 0x01,                                      
+        0x03, 0x01,
 
     /* Device qualifier descriptor */
         0x0a, 0x06, 0x00, 0x02, 0x00, 0x00, 0x00, 0x40,
@@ -137,42 +137,42 @@ static UCHAR device_framework_high_speed[] = {
 
     /* Configuration descriptor */
         0x09, 0x02, 0x20, 0x00, 0x01, 0x01, 0x00, 0xc0,
-        0x32, 
+        0x32,
 
     /* Interface descriptor */
         0x09, 0x04, 0x00, 0x00, 0x02, 0x08, 0x06, 0x50,
         0x00,
 
     /* Endpoint descriptor (Bulk In) */
-        0x07, 0x05, 0x81, 0x02, 0x00, 0x01, 0x00, 
+        0x07, 0x05, 0x81, 0x02, 0x00, 0x01, 0x00,
 
     /* Endpoint descriptor (Bulk Out) */
         0x07, 0x05, 0x02, 0x02, 0x00, 0x01, 0x00
 
     };
-    
+
 
     /* String Device Framework :
      Byte 0 and 1 : Word containing the language ID : 0x0904 for US
      Byte 2       : Byte containing the index of the descriptor
      Byte 3       : Byte containing the length of the descriptor string
     */
-   
+
 #define STRING_FRAMEWORK_LENGTH 38
-static UCHAR string_framework[] = { 
+static UCHAR string_framework[] = {
 
     /* Manufacturer string descriptor : Index 1 */
-        0x09, 0x04, 0x01, 0x0c, 
-        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c, 
+        0x09, 0x04, 0x01, 0x0c,
+        0x45, 0x78, 0x70, 0x72,0x65, 0x73, 0x20, 0x4c,
         0x6f, 0x67, 0x69, 0x63,
 
     /* Product string descriptor : Index 2 */
-        0x09, 0x04, 0x02, 0x0a, 
-        0x46, 0x6c, 0x61, 0x73, 0x68, 0x20, 0x44, 0x69, 
-        0x73, 0x6b,             
+        0x09, 0x04, 0x02, 0x0a,
+        0x46, 0x6c, 0x61, 0x73, 0x68, 0x20, 0x44, 0x69,
+        0x73, 0x6b,
 
     /* Serial Number string descriptor : Index 3 */
-        0x09, 0x04, 0x03, 0x04, 
+        0x09, 0x04, 0x03, 0x04,
         0x30, 0x30, 0x30, 0x31
     };
 
@@ -182,7 +182,7 @@ static UCHAR string_framework[] = {
        be appended to the language_id_framework array and the length
        adjusted accordingly. */
 #define LANGUAGE_ID_FRAMEWORK_LENGTH 2
-static UCHAR language_id_framework[] = { 
+static UCHAR language_id_framework[] = {
 
     /* English. */
         0x09, 0x04
@@ -209,7 +209,7 @@ static void    test_isr(void)
 
     /* For further expansion of interrupt-level testing.  */
 }
-    
+
 
 static VOID error_callback(UINT system_level, UINT system_context, UINT error_code)
 {
@@ -227,7 +227,7 @@ void test_application_define(void *first_unused_memory)
 void    usbx_storage_multi_lun_test_application_define(void *first_unused_memory)
 #endif
 {
-    
+
 UINT                            status;
 CHAR *                          stack_pointer;
 CHAR *                          memory_pointer;
@@ -258,7 +258,7 @@ CHAR *                          memory_pointer;
     ux_utility_memory_set(ram_disk_memory1, 0, UX_RAM_DISK_SIZE);
     ux_utility_memory_set(ram_disk_memory2, 0, UX_RAM_DISK_SIZE);
 
-    /* The code below is required for installing the device portion of USBX. 
+    /* The code below is required for installing the device portion of USBX.
        In this demo, DFU is possible and we have a call back for state change. */
     status =  ux_device_stack_initialize(device_framework_high_speed, DEVICE_FRAMEWORK_LENGTH_HIGH_SPEED,
                                        device_framework_full_speed, DEVICE_FRAMEWORK_LENGTH_FULL_SPEED,
@@ -280,7 +280,7 @@ CHAR *                          memory_pointer;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_type            =  0;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_removable_flag  =  0x80;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_read            =  demo_thread_media_read1;
-    global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_write           =  demo_thread_media_write1; 
+    global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_write           =  demo_thread_media_write1;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_status          =  demo_thread_media_status1;
 
     /* Initialize the storage class parameters for reading/writing to the second Flash Disk.  */
@@ -289,11 +289,11 @@ CHAR *                          memory_pointer;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[1].ux_slave_class_storage_media_type            =  0;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[1].ux_slave_class_storage_media_removable_flag  =  0x80;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[1].ux_slave_class_storage_media_read            =  demo_thread_media_read2;
-    global_storage_parameter.ux_slave_class_storage_parameter_lun[1].ux_slave_class_storage_media_write           =  demo_thread_media_write2; 
+    global_storage_parameter.ux_slave_class_storage_parameter_lun[1].ux_slave_class_storage_media_write           =  demo_thread_media_write2;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[1].ux_slave_class_storage_media_status          =  demo_thread_media_status2;
 
     /* Initilize the device storage class. The class is connected with interface 0 on configuration 1. */
-    status =  ux_device_stack_class_register(_ux_system_slave_class_storage_name, ux_device_class_storage_entry, 
+    status =  ux_device_stack_class_register(_ux_system_slave_class_storage_name, ux_device_class_storage_entry,
                                                 1, 0, (VOID *)&global_storage_parameter);
     if(status!=UX_SUCCESS)
     {
@@ -321,7 +321,7 @@ CHAR *                          memory_pointer;
         printf("Running Multiple LUN Storage Test................................... ERROR #2\n");
         test_control_return(1);
     }
-    
+
     /* Register storage class.  */
     status =  ux_host_stack_class_register(_ux_system_host_class_storage_name, ux_host_class_storage_entry);
     if (status != UX_SUCCESS)
@@ -341,10 +341,10 @@ CHAR *                          memory_pointer;
         printf("Running Multiple LUN Storage Test................................... ERROR #4\n");
         test_control_return(1);
     }
-    
+
     /* Create the main host simulation thread.  */
-    status =  tx_thread_create(&tx_demo_thread_host_simulation, "tx demo host simulation", tx_demo_thread_host_simulation_entry, 0,  
-            stack_pointer, UX_DEMO_STACK_SIZE, 
+    status =  tx_thread_create(&tx_demo_thread_host_simulation, "tx demo host simulation", tx_demo_thread_host_simulation_entry, 0,
+            stack_pointer, UX_DEMO_STACK_SIZE,
             20, 20, 1, TX_AUTO_START);
 
     /* Check for error.  */
@@ -354,7 +354,7 @@ CHAR *                          memory_pointer;
         printf("Running Multiple LUN Storage Test................................... ERROR #8\n");
         test_control_return(1);
     }
-            
+
 }
 
 static UINT  host_storage_instance_get(void)
@@ -370,7 +370,7 @@ UX_HOST_CLASS       *class;
         return(status);
 
     /* We get the first instance of the storage device */
-    do  
+    do
     {
 
         status =  ux_host_stack_class_instance_get(class, 0, (void **) &storage);
@@ -427,7 +427,7 @@ UCHAR       buffer_pattern;
         printf("ERROR #9\n");
         test_control_return(1);
     }
-    
+
     /* Format the ram drive 2. */
     status =  fx_media_format(&ram_disk2, _fx_ram_driver, ram_disk_memory2, buffer, 512, "RAM DISK", 2, 512, 0, UX_RAM_DISK_SIZE/512, 512, 4, 1, 1);
 
@@ -439,7 +439,7 @@ UCHAR       buffer_pattern;
         printf("ERROR #10\n");
         test_control_return(1);
     }
-    
+
 
     /* Open the ram_disk1 .  */
     status =  fx_media_open(&ram_disk1, "RAM DISK", _fx_ram_driver, ram_disk_memory1, buffer, 512);
@@ -452,7 +452,7 @@ UCHAR       buffer_pattern;
         printf("ERROR #11\n");
         test_control_return(1);
     }
-    
+
     /* Open the ram_disk2 .  */
     status =  fx_media_open(&ram_disk2, "RAM DISK", _fx_ram_driver, ram_disk_memory2, buffer, 512);
 
@@ -464,7 +464,7 @@ UCHAR       buffer_pattern;
         printf("ERROR #12\n");
         test_control_return(1);
     }
-    
+
 
     /* Find the storage class */
     status =  host_storage_instance_get();
@@ -475,8 +475,8 @@ UCHAR       buffer_pattern;
         printf("ERROR #13\n");
         test_control_return(1);
     }
-    
-    /* Medfia 1.  */            
+
+    /* Medfia 1.  */
     /* Delete the target file.  */
     status =  fx_file_delete(media1, "FILE.CPY");
 
@@ -504,18 +504,18 @@ UCHAR       buffer_pattern;
 
     /* Seek to the beginning to copy over an existing file.  */
     fx_file_seek(&my_file, 0);
-    
+
     /* Set the file length.  */
     total_length = UX_DEMO_FILE_SIZE;
-    
+
     /* Set pattern first letter.  */
     buffer_pattern = 'a';
-    
+
     while(total_length !=0)
     {
-    
+
         /* Set the buffer with pattern.  */
-        ux_utility_memory_set(global_buffer, buffer_pattern, UX_DEMO_FILE_BUFFER_SIZE); 
+        ux_utility_memory_set(global_buffer, buffer_pattern, UX_DEMO_FILE_BUFFER_SIZE);
 
         /* Copy the file in blocks */
         status = fx_file_write(&my_file, global_buffer, UX_DEMO_FILE_BUFFER_SIZE);
@@ -531,21 +531,21 @@ UCHAR       buffer_pattern;
 
         /* Decrement the length remaining. */
         total_length -= UX_DEMO_FILE_BUFFER_SIZE;
-        
+
         /* Next pattern.  */
         buffer_pattern++;
-        
+
         /* Check pattern end.  */
         if (buffer_pattern > 'z')
-        
+
             /* Back to beginning.  */
             buffer_pattern = 'a';
-    
+
     }
     /* Finished reading file either at the end or because of error. */
     fx_file_close(&my_file);
-    
-    /* Media 2.  */            
+
+    /* Media 2.  */
     /* Delete the target file.  */
     status =  fx_file_delete(media2, "FILE.CPY");
 
@@ -571,18 +571,18 @@ UCHAR       buffer_pattern;
 
     /* Seek to the beginning to copy over an existing file.  */
     fx_file_seek(&my_file, 0);
-    
+
     /* Set the file length.  */
     total_length = UX_DEMO_FILE_SIZE;
-    
+
     /* Set pattern first letter.  */
     buffer_pattern = 'a';
-    
+
     while(total_length !=0)
     {
-    
+
         /* Set the buffer with pattern.  */
-        ux_utility_memory_set(global_buffer, buffer_pattern, UX_DEMO_FILE_BUFFER_SIZE); 
+        ux_utility_memory_set(global_buffer, buffer_pattern, UX_DEMO_FILE_BUFFER_SIZE);
 
         /* Copy the file in blocks */
         status = fx_file_write(&my_file, global_buffer, UX_DEMO_FILE_BUFFER_SIZE);
@@ -598,16 +598,16 @@ UCHAR       buffer_pattern;
 
         /* Decrement the length remaining. */
         total_length -= UX_DEMO_FILE_BUFFER_SIZE;
-        
+
         /* Next pattern.  */
         buffer_pattern++;
-        
+
         /* Check pattern end.  */
         if (buffer_pattern > 'z')
-        
+
             /* Back to beginning.  */
             buffer_pattern = 'a';
-    
+
     }
     /* Finished reading file either at the end or because of error. */
     fx_file_close(&my_file);
@@ -652,16 +652,16 @@ UINT status;
 
 
         status = ram_disk1.fx_media_driver_status;
-    }        
+    }
     else
-    {        
+    {
         while(number_blocks--)
         {
             status =  fx_media_read(&ram_disk1,lba,data_pointer);
             data_pointer+=512;
             lba++;
         }
-    }        
+    }
     return(status);
 }
 
@@ -680,7 +680,7 @@ UINT status;
 
         status = ram_disk1.fx_media_driver_status;
 
-    }        
+    }
     else
     {
 
@@ -689,7 +689,7 @@ UINT status;
             status =  fx_media_write(&ram_disk1,lba,data_pointer);
             data_pointer+=512;
             lba++;
-        }        
+        }
         return(status);
     }
     return(1);
@@ -732,16 +732,16 @@ UINT status;
 
 
         status = ram_disk2.fx_media_driver_status;
-    }        
+    }
     else
-    {        
+    {
         while(number_blocks--)
         {
             status =  fx_media_read(&ram_disk2,lba,data_pointer);
             data_pointer+=512;
             lba++;
         }
-    }        
+    }
     return(status);
 }
 
@@ -760,7 +760,7 @@ UINT status;
 
         status = ram_disk2.fx_media_driver_status;
 
-    }        
+    }
     else
     {
 
@@ -769,7 +769,7 @@ UINT status;
             status =  fx_media_write(&ram_disk2,lba,data_pointer);
             data_pointer+=512;
             lba++;
-        }        
+        }
         return(status);
     }
     return(1);

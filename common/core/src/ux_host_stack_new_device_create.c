@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -87,28 +88,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    USBX Components                                                     */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized based on compile  */
-/*                                            definitions,                */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added a new parameter to    */
-/*                                            return created device,      */
-/*                                            resulting in version 6.1.4  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            reset device power source,  */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            freed shared device config  */
-/*                                            descriptor after enum scan, */
-/*                                            resulting in version 6.1.12 */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_new_device_create(UX_HCD *hcd, UX_DEVICE *device_owner,
@@ -295,7 +274,7 @@ UX_ENDPOINT         *control_endpoint;
     }
 #endif
 
-    /* Return status. If there's an error, device resources that have been 
+    /* Return status. If there's an error, device resources that have been
        allocated until this point should be freed by the caller via _ux_host_stack_device_resources_free.  */
     return(status);
 }

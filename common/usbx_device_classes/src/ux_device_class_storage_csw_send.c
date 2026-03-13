@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Device Storage Class                                                */
 /**                                                                       */
@@ -33,69 +34,45 @@
 /* Build option checked runtime by UX_ASSERT  */
 #endif
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_device_class_storage_csw_send                   PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_device_class_storage_csw_send                   PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function sends the status phase of SCSI transaction. Note that */ 
-/*    dCSWDataResidue is always set to 0 because we either transfer all   */ 
-/*    the data, or report command failure.                                */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
-/*    endpoint_in                           Pointer to IN endpoint        */ 
-/*    status                                Status of CSW                 */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_device_stack_transfer_request     Transfer request              */ 
-/*    _ux_utility_long_put                  Put long word                 */ 
-/*    _ux_utility_memory_copy               Copy memory                   */ 
-/*    _ux_utility_memory_set                Set memory                    */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function sends the status phase of SCSI transaction. Note that */
+/*    dCSWDataResidue is always set to 0 because we either transfer all   */
+/*    the data, or report command failure.                                */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*    endpoint_in                           Pointer to IN endpoint        */
+/*    status                                Status of CSW                 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_device_stack_transfer_request     Transfer request              */
+/*    _ux_utility_long_put                  Put long word                 */
+/*    _ux_utility_memory_copy               Copy memory                   */
+/*    _ux_utility_memory_set                Set memory                    */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
 /*    Device Storage Class                                                */
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            optimized command logic,    */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
-/*  12-31-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed USB CV test issues,   */
-/*                                            resulting in version 6.1.3  */
-/*  10-15-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved TAG management,    */
-/*                                            resulting in version 6.1.9  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added standalone support,   */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            checked compiling options   */
-/*                                            by runtime UX_ASSERT,       */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-UINT  _ux_device_class_storage_csw_send(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun, 
+UINT  _ux_device_class_storage_csw_send(UX_SLAVE_CLASS_STORAGE *storage, ULONG lun,
                                 UX_SLAVE_ENDPOINT *endpoint_in, UCHAR csw_status)
 {
 
@@ -158,10 +135,10 @@ UCHAR                   *csw_buffer;
 #else
 
     /* We may be in a special state machine condition where the endpoint is stalled waiting for
-       a CLEAR_FEATURE.  We will wait until the host clears the endpoint.  
+       a CLEAR_FEATURE.  We will wait until the host clears the endpoint.
        The transfer_request function does that.  */
     /* Send the CSW back to the host.  */
-    status =  _ux_device_stack_transfer_request(transfer_request, UX_SLAVE_CLASS_STORAGE_CSW_LENGTH, 
+    status =  _ux_device_stack_transfer_request(transfer_request, UX_SLAVE_CLASS_STORAGE_CSW_LENGTH,
                                     UX_SLAVE_CLASS_STORAGE_CSW_LENGTH);
 #endif
 

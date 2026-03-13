@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   HID Class                                                           */
 /**                                                                       */
@@ -29,48 +30,38 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_global_item_parse                PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_hid_global_item_parse                PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function parses a global item from the report descriptor.      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hid                                   Pointer to HID class          */ 
-/*    item                                  Pointer to item               */ 
-/*    descriptor                            Pointer to descriptor         */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_hid_item_data_get      Get data item                 */ 
-/*    _ux_utility_memory_copy               Copy memory block             */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    HID Class                                                           */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
+/*                                                                        */
+/*    This function parses a global item from the report descriptor.      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hid                                   Pointer to HID class          */
+/*    item                                  Pointer to item               */
+/*    descriptor                            Pointer to descriptor         */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_hid_item_data_get      Get data item                 */
+/*    _ux_utility_memory_copy               Copy memory block             */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    HID Class                                                           */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_hid_global_item_parse(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_ITEM *item, UCHAR *descriptor)
@@ -89,7 +80,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_USAGE_PAGE:
 
         /* Usage Page Tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_usage_page =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_usage_page =
                                                 _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
@@ -97,7 +88,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_LOGICAL_MINIMUM:
 
         /* Logical Minimum Tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_logical_min =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_logical_min =
                                                 (SLONG) _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
@@ -105,7 +96,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_LOGICAL_MAXIMUM:
 
         /* Logical Maximum Tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_logical_max =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_logical_max =
                                                 (SLONG) _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
@@ -113,7 +104,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_PHYSICAL_MINIMUM:
 
         /* Physical Minimum Tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_physical_min =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_physical_min =
                                                 (SLONG) _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
@@ -121,7 +112,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_PHYSICAL_MAXIMUM:
 
         /* Physical Maximum Tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_physical_max =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_physical_max =
                                                 (SLONG) _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
@@ -129,15 +120,15 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_UNIT_EXPONENT:
 
         /* Unit Exponent Tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_unit_expo =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_unit_expo =
                                                 _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
-    
+
     case UX_HOST_CLASS_HID_GLOBAL_TAG_UNIT:
 
         /* Unit tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_unit =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_unit =
                                                 _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
@@ -145,7 +136,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_REPORT_SIZE:
 
         /* Report Size tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_size =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_size =
                                                 _ux_host_class_hid_item_data_get(descriptor, item);
 
         if (hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_size > UX_HOST_CLASS_HID_REPORT_SIZE)
@@ -156,9 +147,9 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
 
             /* If trace is enabled, insert this event into the trace buffer.  */
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_HOST_CLASS_HID_REPORT_OVERFLOW, hid, 0, 0, UX_TRACE_ERRORS, 0, 0)
-        
+
             return(UX_HOST_CLASS_HID_REPORT_OVERFLOW);
-        }        
+        }
 
         break;
 
@@ -166,7 +157,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_REPORT_ID:
 
         /* Report ID tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_id =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_id =
                                                 _ux_host_class_hid_item_data_get(descriptor, item);
         break;
 
@@ -174,7 +165,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
     case UX_HOST_CLASS_HID_GLOBAL_TAG_REPORT_COUNT:
 
         /* Report Count tag.  */
-        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_count =  
+        hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_count =
                                                 _ux_host_class_hid_item_data_get(descriptor, item);
 
         if (hid_parser -> ux_host_class_hid_parser_global.ux_host_class_hid_global_item_report_count > UX_HOST_CLASS_HID_USAGES)
@@ -188,7 +179,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
 
             return(UX_HOST_CLASS_HID_USAGE_OVERFLOW);
         }
-        
+
         break;
 
     case UX_HOST_CLASS_HID_GLOBAL_TAG_PUSH:
@@ -205,13 +196,13 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
 
             return(UX_HOST_CLASS_HID_PUSH_OVERFLOW);
         }
-                        
+
         else
             _ux_utility_memory_copy(&hid_parser -> ux_host_class_hid_parser_global_pool[hid_parser -> ux_host_class_hid_parser_number_global++],
                                         &hid_parser -> ux_host_class_hid_parser_global, sizeof(UX_HOST_CLASS_HID_GLOBAL_ITEM)); /* Use case of memcpy is verified. */
         break;
 
-     
+
     case UX_HOST_CLASS_HID_GLOBAL_TAG_POP:
 
         /* Pop tag.  */
@@ -244,7 +235,7 @@ UX_HOST_CLASS_HID_PARSER     *hid_parser;
 
         /* This tag was not recognized or is not supported.  */
         return(UX_HOST_CLASS_HID_TAG_UNSUPPORTED);
-    }                                               
+    }
 
     /* We get here when the tag has been processed successfully.  */
     return(UX_SUCCESS);

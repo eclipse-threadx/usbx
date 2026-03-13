@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,61 +29,49 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_new_interface_create                 PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_new_interface_create                 PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function creates a new interface for the current configuration */
-/*    scanned. A device has at least 1 alternate setting per interface    */ 
+/*    scanned. A device has at least 1 alternate setting per interface    */
 /*    which is the default one.                                           */
 /*                                                                        */
 /*    The interface is hooked to the configuration that owns it.          */
 /*                                                                        */
 /*    From the interface descriptor, all the endpoints are hooked but     */
-/*    not activated.                                                      */ 
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    configuration                         Configuration container that  */ 
+/*    not activated.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    configuration                         Configuration container that  */
 /*                                            owns this interface         */
-/*    interface_pointer                     Pointer to a unparsed         */ 
+/*    interface_pointer                     Pointer to a unparsed         */
 /*                                            interface descriptor        */
-/*    length                                Length remaining in this      */ 
+/*    length                                Length remaining in this      */
 /*                                            descriptor                  */
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_stack_new_endpoint_create    Create new endpoint           */ 
-/*    _ux_utility_descriptor_parse          Parse the descriptor          */ 
-/*    _ux_utility_memory_allocate           Allocate memory block         */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed parameter/variable    */
-/*                                            names conflict C++ keyword, */
-/*                                            resulting in version 6.1.12 */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_stack_new_endpoint_create    Create new endpoint           */
+/*    _ux_utility_descriptor_parse          Parse the descriptor          */
+/*    _ux_utility_memory_allocate           Allocate memory block         */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_new_interface_create(UX_CONFIGURATION *configuration,
@@ -99,8 +88,8 @@ UCHAR               *this_interface_descriptor;
 
     /* Obtain memory for storing this new interface.  */
     interface_ptr =  (UX_INTERFACE *) _ux_utility_memory_allocate(UX_NO_ALIGN, UX_REGULAR_MEMORY, sizeof(UX_INTERFACE));
-    
-    /* If no memory left, exit with error.  */        
+
+    /* If no memory left, exit with error.  */
     if (interface_ptr == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
@@ -114,18 +103,18 @@ UCHAR               *this_interface_descriptor;
                             UX_INTERFACE_DESCRIPTOR_ENTRIES,
                             (UCHAR *) &interface_ptr -> ux_interface_descriptor);
 
-    /* The configuration that owns this interface is memorized in the 
+    /* The configuration that owns this interface is memorized in the
        interface container itself, easier for back chaining.  */
     interface_ptr -> ux_interface_configuration =  configuration;
-    
+
     /* If the interface belongs to an IAD, remember the IAD Class/SubClass/Protocol.  */
     interface_ptr -> ux_interface_iad_class    = configuration -> ux_configuration_iad_class;
     interface_ptr -> ux_interface_iad_subclass = configuration -> ux_configuration_iad_subclass;
     interface_ptr -> ux_interface_iad_protocol = configuration -> ux_configuration_iad_protocol;
 
-    /* There is 2 cases for the creation of the interface descriptor 
+    /* There is 2 cases for the creation of the interface descriptor
        if this is the first one, the interface descriptor is hooked
-       to the configuration. If it is not the first one, the interface 
+       to the configuration. If it is not the first one, the interface
        is hooked to the end of the chain of interfaces.  */
     if (configuration -> ux_configuration_first_interface == UX_NULL)
     {
@@ -133,9 +122,9 @@ UCHAR               *this_interface_descriptor;
     }
     else
     {
-    
+
         list_interface =  configuration -> ux_configuration_first_interface;
-        
+
         /* Traverse the list until we reach the end */
         while (list_interface -> ux_interface_next_interface != UX_NULL)
         {
@@ -172,7 +161,7 @@ UCHAR               *this_interface_descriptor;
             UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
             return(UX_DESCRIPTOR_CORRUPTED);
-        }            
+        }
 
         /* Check the type for an interface descriptor.  */
         if (descriptor_type == UX_ENDPOINT_DESCRIPTOR_ITEM)
@@ -186,7 +175,7 @@ UCHAR               *this_interface_descriptor;
                 return(status);
 
             number_endpoints--;
-        }       
+        }
 
         /* Verify if the descriptor is still valid, or we moved to next interface.  */
         if ((descriptor_length > length) || (descriptor_type == UX_INTERFACE_DESCRIPTOR_ITEM && descriptor != this_interface_descriptor))

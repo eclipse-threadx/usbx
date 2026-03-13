@@ -97,8 +97,8 @@ static unsigned char one_data_interface_with_no_endpoints_framework[] = {
 };
 
 static DEVICE_INIT_DATA device_init_data = {
-    .framework = one_data_interface_with_no_endpoints_framework, 
-    .framework_length = sizeof(one_data_interface_with_no_endpoints_framework), 
+    .framework = one_data_interface_with_no_endpoints_framework,
+    .framework_length = sizeof(one_data_interface_with_no_endpoints_framework),
     .dont_register_hcd = 1,
 };
 

@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Storage Class                                                       */
 /**                                                                       */
@@ -30,67 +31,44 @@
 
 
 #if !defined(UX_HOST_STANDALONE)
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_device_initialize            PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_class_storage_device_initialize            PORTABLE C      */
 /*                                                           6.3.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function initializes the USB storage device.                   */ 
-/*                                                                        */ 
+/*                                                                        */
+/*    This function initializes the USB storage device.                   */
+/*                                                                        */
 /*    This function is for RTOS mode.                                     */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    storage                               Pointer to storage class      */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*    _ux_host_class_storage_device_reset   Reset device                  */ 
-/*    _ux_host_class_storage_max_lun_get    Get maximum number of LUNs    */ 
-/*    _ux_host_class_storage_media_characteristics_get                    */ 
-/*                                          Get media characteristics     */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    storage                               Pointer to storage class      */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _ux_host_class_storage_device_reset   Reset device                  */
+/*    _ux_host_class_storage_max_lun_get    Get maximum number of LUNs    */
+/*    _ux_host_class_storage_media_characteristics_get                    */
+/*                                          Get media characteristics     */
 /*    _ux_host_class_storage_media_format_capacity_get                    */
 /*                                          Get format capacity           */
-/*    _ux_host_class_storage_media_mount    Mount the media               */ 
-/*    _ux_utility_delay_ms                  Delay ms                      */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    Storage Class                                                       */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added option to disable FX  */
-/*                                            media integration,          */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed logic of creating     */
-/*                                            multiple storage media,     */
-/*                                            resulting in version 6.1.8  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            improved media insert/eject */
-/*                                            management without FX,      */
-/*                                            resulting in version 6.1.10 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            moved class/sub/protocol    */
-/*                                            check and endpoints get     */
-/*                                            into _activate function,    */
-/*                                            resulting in version 6.3.0  */
+/*    _ux_host_class_storage_media_mount    Mount the media               */
+/*    _ux_utility_delay_ms                  Delay ms                      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Storage Class                                                       */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_class_storage_device_initialize(UX_HOST_CLASS_STORAGE *storage)
@@ -112,8 +90,8 @@ UINT                            inst_index;
         return(status);
 
     /* We need to wait for some device to settle. The INTUIX Flash disk is an example of
-       these device who fail the first Inquiry command if sent too quickly.  
-       The timing does not have to be precise so we use the thread sleep function.  
+       these device who fail the first Inquiry command if sent too quickly.
+       The timing does not have to be precise so we use the thread sleep function.
        The default sleep value is 2 seconds.  */
     _ux_utility_delay_ms(UX_HOST_CLASS_STORAGE_DEVICE_INIT_DELAY);
 
@@ -154,7 +132,7 @@ UINT                            inst_index;
         /* Store the LUN type in the LUN type array. */
         storage -> ux_host_class_storage_lun_types[lun_index] = storage -> ux_host_class_storage_media_type;
 
-        /* Check the media type. We support regular FAT drives and optical drives. 
+        /* Check the media type. We support regular FAT drives and optical drives.
            No CD-ROM support in this release.  */
         switch (storage -> ux_host_class_storage_media_type)
         {
@@ -166,6 +144,12 @@ UINT                            inst_index;
         case UX_HOST_CLASS_STORAGE_MEDIA_IOMEGA_CLICK:
 
 #if !defined(UX_HOST_CLASS_STORAGE_NO_FILEX)
+            /* the ux_host_class_storage_mounted_partitions_count is needed to avoid
+             infinite recursive loops when mounting extended partions.
+             The value is checked against the UX_HOST_CLASS_STORAGE_MAX_PARTITIONS_COUNT
+             */
+            storage -> ux_host_class_storage_mounted_partitions_count = 0;
+
             /* Try to read the device media in search for a partition table or boot sector.
                We are at the root of the disk, so use sector 0 as the starting point.  */
             _ux_host_class_storage_media_mount(storage, 0);

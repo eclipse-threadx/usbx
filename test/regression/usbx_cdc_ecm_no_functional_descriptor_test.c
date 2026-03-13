@@ -114,8 +114,8 @@ static unsigned char no_function_descriptor_framework[] = {
 };
 
 static DEVICE_INIT_DATA device_init_data = {
-    .framework = no_function_descriptor_framework, 
-    .framework_length = sizeof(no_function_descriptor_framework), 
+    .framework = no_function_descriptor_framework,
+    .framework_length = sizeof(no_function_descriptor_framework),
     .dont_register_hcd = 1,
 };
 

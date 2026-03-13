@@ -1,12 +1,14 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -45,7 +47,7 @@
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
-/*    hid_class                                 Address of hid class      */
+/*    hid_instance                              Address of hid class      */
 /*                                                container               */
 /*                                                                        */
 /*  OUTPUT                                                                */
@@ -62,18 +64,6 @@
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    ThreadX                                                             */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  01-31-2022     Chaoqiong Xiao           Initial Version 6.1.10        */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added receiver callback,    */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
 VOID  _ux_device_class_hid_receiver_thread(ULONG hid_instance)
@@ -145,7 +135,7 @@ ULONG                               temp;
 #endif
 
         /* Issue the transfer request.  */
-        status = _ux_device_stack_transfer_request(transfer, 
+        status = _ux_device_stack_transfer_request(transfer,
                     receiver -> ux_device_class_hid_receiver_event_buffer_size,
                     receiver -> ux_device_class_hid_receiver_event_buffer_size);
 
@@ -188,4 +178,4 @@ ULONG                               temp;
             receiver -> ux_device_class_hid_receiver_event_callback(hid);
     }
 }
-#endif
+#endif  /* UX_DEVICE_CLASS_HID_INTERRUPT_OUT_SUPPORT && !UX_DEVICE_STANDALONE */

@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
  *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
@@ -32,38 +33,6 @@
 /*                                                                        */
 /*    This file defines the equivalences for the USBX Device Class RNDIS  */
 /*    component.                                                          */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used UX prefix to refer to  */
-/*                                            TX symbols instead of using */
-/*                                            them directly,              */
-/*                                            resulting in version 6.1    */
-/*  08-02-2021     Wen Wang                 Modified comment(s),          */
-/*                                            fixed spelling error,       */
-/*                                            added extern "C" keyword    */
-/*                                            for compatibility with C++, */
-/*                                            resulting in version 6.1.8  */
-/*  04-25-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed standalone compile,   */
-/*                                            resulting in version 6.1.11 */
-/*  10-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added wait and length DEFs, */
-/*                                            resulting in version 6.2.0  */
-/*  10-31-2023     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            added zero copy support,    */
-/*                                            added a new mode to manage  */
-/*                                            endpoint buffer in classes, */
-/*                                            improved error checking,    */
-/*                                            resulting in version 6.3.0  */
-/*  xx-xx-xxxx     Mohamed ayed             Modified comment(s),          */
-/*                                            added rndis deinit function,*/
-/*                                            remove extra spaces,        */
-/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -201,7 +170,7 @@ VOID  _ux_network_driver_link_down(VOID *ux_network_handle);
 /* Define RNDIS Packet size and types supported.  */
 #define UX_DEVICE_CLASS_RNDIS_MAX_PACKET_PER_TRANSFER                           0x00000001
 #define UX_DEVICE_CLASS_RNDIS_MAX_PACKET_TRANSFER_SIZE                          0x00000640
-#define UX_DEVICE_CLASS_RNDIS_PACKET_ALIGNEMENT_FACTOR                          0x00000003
+#define UX_DEVICE_CLASS_RNDIS_PACKET_ALIGNMENT_FACTOR                           0x00000003
 #define UX_DEVICE_CLASS_RNDIS_MAX_FRAME_SIZE                                    0x000005DC
 #define UX_DEVICE_CLASS_RNDIS_MAX_PACKET_LENGTH                                 0x000005EA
 

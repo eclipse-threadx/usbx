@@ -20,7 +20,7 @@ static unsigned char invalid_mac_address_string_length[] = {
         0x30, 0x30, 0x30, 0x31,
 
     /* MAC Address string descriptor : Index 4 - "001E5841B878" */
-        0x09, 0x04, 0x04, 
+        0x09, 0x04, 0x04,
         0x1, /* This byte is the length of the string. It just needs to be small (look in mac_address_get.c). */
         0x30, 0x30,
 

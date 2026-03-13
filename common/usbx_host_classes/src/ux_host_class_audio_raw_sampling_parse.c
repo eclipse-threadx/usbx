@@ -1,10 +1,11 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
@@ -117,12 +118,6 @@ static inline UINT _ux_host_class_audio20_sampling_parse(UX_HOST_CLASS_AUDIO *au
 /*    Application                                                         */
 /*    Audio Class                                                         */
 /*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  07-29-2022     Chaoqiong Xiao           Initial Version 6.1.12        */
-/*                                                                        */
 /**************************************************************************/
 UINT _ux_host_class_audio_raw_sampling_parse(UX_HOST_CLASS_AUDIO *audio,
         UINT(*parse_function)(VOID  *arg,
@@ -185,7 +180,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_DESCRIPTOR_CORRUPTED);
     }
@@ -200,7 +195,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(UX_DESCRIPTOR_CORRUPTED);
     }
@@ -225,7 +220,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
           _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
           /* If trace is enabled, insert this event into the trace buffer.  */
-          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
           return(UX_DESCRIPTOR_CORRUPTED);
         }
@@ -252,7 +247,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
           _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
           /* If trace is enabled, insert this event into the trace buffer.  */
-          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+          UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
           return(UX_DESCRIPTOR_CORRUPTED);
         }
@@ -339,7 +334,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         return(0);
     }
@@ -634,7 +629,7 @@ UINT descriptor_length = packed_audio_descriptor[0];
         _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
 
         /* If trace is enabled, insert this event into the trace buffer.  */
-        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor_length, 0, 0, UX_TRACE_ERRORS, 0, 0)
 
         parser -> status = UX_DESCRIPTOR_CORRUPTED;
         return(1);
@@ -851,12 +846,6 @@ UINT                                    status;
 /*  CALLED BY                                                             */
 /*                                                                        */
 /*    Application                                                         */
-/*                                                                        */
-/*  RELEASE HISTORY                                                       */
-/*                                                                        */
-/*    DATE              NAME                      DESCRIPTION             */
-/*                                                                        */
-/*  10-31-2023     Chaoqiong Xiao           Initial Version 6.3.0         */
 /*                                                                        */
 /**************************************************************************/
 UINT _uxe_host_class_audio_raw_sampling_parse(UX_HOST_CLASS_AUDIO *audio,

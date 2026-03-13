@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Host Stack                                                          */
 /**                                                                       */
@@ -28,56 +29,36 @@
 #include "ux_host_stack.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_host_stack_device_configuration_reset           PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_host_stack_device_configuration_reset           PORTABLE C      */
 /*                                                           6.1.12       */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
+/*                                                                        */
 /*    This function resets the configuration of the device to zero.       */
-/*                                                                        */ 
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    configuration                          Pointer to configuration     */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    configuration                          Pointer to configuration     */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
 /*    _ux_host_stack_configuration_instance_delete                        */
-/*                                           Delete configuration instance*/ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    USBX Components                                                     */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            resulting in version 6.1    */
-/*  02-02-2021     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            used pointer for current    */
-/*                                            selected configuration,     */
-/*                                            resulting in version 6.1.4  */
-/*  01-31-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            fixed device state support, */
-/*                                            reset device power source,  */
-/*                                            resulting in version 6.1.10 */
-/*  07-29-2022     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            reset shared device config  */
-/*                                            descriptor for enum scan,   */
-/*                                            resulting in version 6.1.12 */
+/*                                           Delete configuration instance*/
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    USBX Components                                                     */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_host_stack_device_configuration_reset(UX_DEVICE *device)
@@ -87,16 +68,16 @@ UX_TRANSFER             *transfer_request;
 UX_ENDPOINT             *control_endpoint;
 UX_CONFIGURATION        *current_configuration;
 UINT                    status;
-    
+
     /* If trace is enabled, insert this event into the trace buffer.  */
     UX_TRACE_IN_LINE_INSERT(UX_TRACE_HOST_STACK_DEVICE_CONFIGURATION_SELECT, device, 0, 0, 0, UX_TRACE_HOST_STACK_EVENTS, 0, 0)
 
-    /* A configuration is selected. Retrieve the pointer to the control endpoint 
+    /* A configuration is selected. Retrieve the pointer to the control endpoint
        and its transfer request.  */
     control_endpoint =  &device -> ux_device_control_endpoint;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
-    /* Check for the state of the device . If the device is already configured, 
+    /* Check for the state of the device . If the device is already configured,
        we need to cancel the existing configuration before resetting it.   */
     if (device -> ux_device_state == UX_DEVICE_CONFIGURED)
     {

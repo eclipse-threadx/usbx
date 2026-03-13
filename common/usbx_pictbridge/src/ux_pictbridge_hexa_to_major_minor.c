@@ -1,18 +1,19 @@
 /***************************************************************************
- * Copyright (c) 2024 Microsoft Corporation 
- * 
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
  * This program and the accompanying materials are made available under the
  * terms of the MIT License which is available at
  * https://opensource.org/licenses/MIT.
- * 
+ *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
 
 /**************************************************************************/
 /**************************************************************************/
-/**                                                                       */ 
-/** USBX Component                                                        */ 
+/**                                                                       */
+/** USBX Component                                                        */
 /**                                                                       */
 /**   Pictbridge Application                                              */
 /**                                                                       */
@@ -29,49 +30,39 @@
 #include "ux_pictbridge.h"
 
 
-/**************************************************************************/ 
-/*                                                                        */ 
-/*  FUNCTION                                               RELEASE        */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_hexa_to_major_minor                  PORTABLE C      */ 
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _ux_pictbridge_hexa_to_major_minor                  PORTABLE C      */
 /*                                                           6.1          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    Chaoqiong Xiao, Microsoft Corporation                               */
 /*                                                                        */
 /*  DESCRIPTION                                                           */
-/*                                                                        */ 
-/*    This function translates an hexa value into an major.minor value    */ 
+/*                                                                        */
+/*    This function translates an hexa value into an major.minor value    */
 /*    (xx.xx).                                                            */
-/*                                                                        */ 
+/*                                                                        */
 /*    Note: the space of the output_buffer must be equal to or larger     */
 /*    than 5 to fill all converted characters.                            */
 /*                                                                        */
-/*  INPUT                                                                 */ 
-/*                                                                        */ 
-/*    hexa_value                             Value to be translated       */ 
-/*    output_buffer                          Where to store the result    */ 
-/*                                                                        */ 
-/*  OUTPUT                                                                */ 
-/*                                                                        */ 
-/*    Completion Status                                                   */ 
-/*                                                                        */ 
-/*  CALLS                                                                 */ 
-/*                                                                        */ 
-/*                                                                        */ 
-/*  CALLED BY                                                             */ 
-/*                                                                        */ 
-/*    _ux_pictbridge_object_parse                                         */ 
-/*                                                                        */ 
-/*  RELEASE HISTORY                                                       */ 
-/*                                                                        */ 
-/*    DATE              NAME                      DESCRIPTION             */ 
-/*                                                                        */ 
-/*  05-19-2020     Chaoqiong Xiao           Initial Version 6.0           */
-/*  09-30-2020     Chaoqiong Xiao           Modified comment(s),          */
-/*                                            verified memset and memcpy  */
-/*                                            cases,                      */
-/*                                            resulting in version 6.1    */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    hexa_value                             Value to be translated       */
+/*    output_buffer                          Where to store the result    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    Completion Status                                                   */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    _ux_pictbridge_object_parse                                         */
 /*                                                                        */
 /**************************************************************************/
 UINT  _ux_pictbridge_hexa_to_major_minor(ULONG hexa_value, UCHAR *output_buffer)
@@ -84,11 +75,11 @@ UINT                    status;
 
     /* Reset the output buffer.  */
     _ux_utility_memory_set(output_buffer, 0, 5); /* Use case of memset is verified. */
-       
+
     /* Isolate the major.  */
     hexa_major = (UCHAR)(hexa_value >> 16);
 
-    /* Isolate the minor.  */                                           
+    /* Isolate the minor.  */
     hexa_minor = (UCHAR)(hexa_value & 0xFFFF);
 
     /* Insert the decimal value of the major.  */
@@ -98,7 +89,7 @@ UINT                    status;
 
     /* Update the address of the destination.  */
     output_buffer += 2;
-    
+
     /* Insert the '.' between major and minor.  */
     *output_buffer++ = '.';
 
@@ -108,6 +99,6 @@ UINT                    status;
         return(status);
 
     /* Operation was successful.  */
-    return(UX_SUCCESS);    
+    return(UX_SUCCESS);
 }
 
