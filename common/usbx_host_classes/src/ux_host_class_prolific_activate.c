@@ -125,8 +125,8 @@ UINT                                status;
     if (status == UX_SUCCESS)
     {
         line_coding.ux_host_class_prolific_line_coding_dter      = UX_HOST_CLASS_PROLIFIC_LINE_CODING_DEFAULT_RATE;
-        line_coding.ux_host_class_prolific_line_coding_stop_bit  = UX_HOST_CLASS_PROLIFIC_LINE_CODING_STOP_BIT_0;
-        line_coding.ux_host_class_prolific_line_coding_parity    = UX_HOST_CLASS_PROLIFIC_LINE_CODING_PARITY_NONE;
+        line_coding.ux_host_class_prolific_line_coding_stop_bit  = UX_HOST_CLASS_PROLIFIC_LINE_CODING_DEFAULT_STOP_BIT;
+        line_coding.ux_host_class_prolific_line_coding_parity    = UX_HOST_CLASS_PROLIFIC_LINE_CODING_DEFAULT_PARITY;
         line_coding.ux_host_class_prolific_line_coding_data_bits = UX_HOST_CLASS_PROLIFIC_LINE_CODING_DEFAULT_DATA_BIT;
         status = _ux_host_class_prolific_ioctl(prolific, UX_HOST_CLASS_PROLIFIC_IOCTL_SET_LINE_CODING, (VOID *) &line_coding);
     }
