@@ -426,7 +426,6 @@ VOID ux_test_turn_off_expedient(UCHAR *);
 VOID ux_test_turn_on_expedient(UCHAR *);
 UCHAR ux_test_is_expedient_on();
 VOID ux_test_set_expedient(UCHAR);
-ULONG ux_test_calc_total_memory_allocated(ULONG memory_alignment, ULONG memory_cache_flag, ULONG memory_size_requested);
 UCHAR ux_test_check_actions_empty();
 UINT ux_test_wait_for_empty_actions();
 UINT ux_test_get_num_actions_left();

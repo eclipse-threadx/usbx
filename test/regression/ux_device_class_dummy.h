@@ -48,6 +48,5 @@ UX_SLAVE_TRANSFER *_ux_device_class_dummy_get_transfer_request(UX_DEVICE_CLASS_D
 ULONG _ux_device_class_dummy_get_max_packet_size(UX_DEVICE_CLASS_DUMMY *dummy, UCHAR endpoint_address);
 
 UINT  _ux_device_class_dummy_transfer(UX_DEVICE_CLASS_DUMMY *dummy, UCHAR endpoint_address, UCHAR *buffer, ULONG length, ULONG *actual_length);
-UINT  _ux_device_class_dummy_abort(UX_DEVICE_CLASS_DUMMY *dummy, UCHAR endpoint_address);
 
 #endif

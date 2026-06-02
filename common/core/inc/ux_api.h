@@ -2745,7 +2745,6 @@ typedef struct UX_HOST_CLASS_DPUMP_STRUCT
 #define ux_device_stack_transfer_run                            _ux_device_stack_transfer_run
 
 #define ux_hcd_ehci_initialize                                  _ux_hcd_ehci_initialize
-#define ux_hcd_isp1161_initialize                               _ux_hcd_isp1161_initialize
 #define ux_hcd_ohci_initialize                                  _ux_hcd_ohci_initialize
 #define ux_hcd_sim_host_initialize                              _ux_hcd_sim_host_initialize
 #define ux_dcd_sim_slave_initialize                             _ux_dcd_sim_slave_initialize
@@ -2769,7 +2768,6 @@ UINT    uxe_system_initialize(VOID *non_cached_memory_pool_start, ULONG non_cach
 /* Define USBX Host API prototypes.  */
 
 UINT    ux_hcd_ehci_initialize(UX_HCD *hcd);
-UINT    ux_hcd_isp1161_initialize(UX_HCD *hcd);
 UINT    ux_hcd_ohci_initialize(UX_HCD *hcd);
 UINT    ux_hcd_sim_host_initialize(UX_HCD *hcd);
 
@@ -2805,13 +2803,9 @@ UINT    ux_host_stack_transfer_run(UX_TRANSFER *transfer_request);
 
 /* Define USBX Device API prototypes.  */
 
-UINT    ux_dcd_at91_initialize(ULONG dcd_io);
-UINT    ux_dcd_isp1181_initialize(ULONG dcd_io, ULONG dcd_irq, ULONG dcd_vbus_address);
-UINT    ux_dcd_ml6965_initialize(ULONG dcd_io, ULONG dcd_irq, ULONG dcd_vbus_address);
 UINT    ux_dcd_sim_slave_initialize(VOID);
 
 UINT    ux_device_class_storage_entry(UX_SLAVE_CLASS_COMMAND *command);
-VOID    ux_device_class_storage_thread(ULONG);
 UINT    ux_device_stack_alternate_setting_get(ULONG interface_value);
 UINT    ux_device_stack_alternate_setting_set(ULONG interface_value, ULONG alternate_setting_value);
 UINT    ux_device_stack_class_register(UCHAR *class_name,
@@ -2839,7 +2833,6 @@ UINT    ux_device_stack_interface_set(UCHAR * device_framework, ULONG device_fra
                                     ULONG alternate_setting_value);
 UINT    ux_device_stack_interface_start(UX_SLAVE_INTERFACE *ux_interface);
 UINT    ux_device_stack_transfer_request(UX_SLAVE_TRANSFER *transfer_request, ULONG slave_length, ULONG host_length);
-UINT    ux_device_stack_transfer_request_abort(UX_SLAVE_TRANSFER *transfer_request, ULONG completion_code);
 UINT    ux_device_stack_microsoft_extension_register(ULONG vendor_request,
                                     UINT (*vendor_request_function)(ULONG, ULONG, ULONG, ULONG, UCHAR *, ULONG *));
 
