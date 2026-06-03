@@ -239,8 +239,8 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            5
-#define USBX_PATCH_VERSION            0
-#define USBX_BUILD_VERSION            202601
+#define USBX_PATCH_VERSION            1
+#define USBX_BUILD_VERSION            202602
 #define USBX_HOTFIX_VERSION           ' '
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
