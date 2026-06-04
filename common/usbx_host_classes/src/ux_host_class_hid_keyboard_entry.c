@@ -226,8 +226,11 @@ UINT                                    status;
             if (keyboard -> ux_host_class_hid_keyboard_usage_array)
                 _ux_utility_memory_free(keyboard -> ux_host_class_hid_keyboard_usage_array);
 
-            /* Free instance.  */
+            /* Free instance (= combined allocation; hid_client is embedded inside it).  */
             _ux_utility_memory_free(keyboard);
+
+            /* Signal to entry.c that the per-instance client has been freed.  */
+            hid -> ux_host_class_hid_client = UX_NULL;
 
             return(UX_STATE_ERROR);
         }
