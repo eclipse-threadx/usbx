@@ -69,14 +69,8 @@
 UINT  _ux_host_class_hid_idle_set(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id)
 {
 #if defined(UX_HOST_STANDALONE)
-UINT            status;
-    do
-    {
-        status = _ux_host_class_hid_idle_set_run(hid, idle_time, report_id);
-    } while(status == UX_STATE_WAIT || status == UX_STATE_LOCK);
-    return(hid -> ux_host_class_hid_status);
-#else
-
+UX_INTERRUPT_SAVE_AREA
+#endif
 UX_ENDPOINT     *control_endpoint;
 UX_TRANSFER     *transfer_request;
 UINT            status;
@@ -99,6 +93,16 @@ UINT            status;
     transfer_request =  &control_endpoint -> ux_endpoint_transfer_request;
 
     /* Protect thread reentry to this instance.  */
+#if defined(UX_HOST_STANDALONE)
+    UX_DISABLE
+    if (hid -> ux_host_class_hid_flags & UX_HOST_CLASS_HID_FLAG_LOCK)
+    {
+        UX_RESTORE
+        return(UX_BUSY);
+    }
+    hid -> ux_host_class_hid_flags |= UX_HOST_CLASS_HID_FLAG_LOCK;
+    UX_RESTORE
+#else
     status =  _ux_host_semaphore_get(&hid -> ux_host_class_hid_semaphore, UX_WAIT_FOREVER);
     if (status != UX_SUCCESS)
         return(status);
@@ -106,17 +110,27 @@ UINT            status;
     /* Protect the control endpoint semaphore here.  It will be unprotected in the
        transfer request function.  */
     status =  _ux_host_semaphore_get(&hid -> ux_host_class_hid_device -> ux_device_protection_semaphore, UX_WAIT_FOREVER);
-
-    /* Check for status.  */
     if (status != UX_SUCCESS)
     {
-
-        /* Something went wrong. */
-        /* Unprotect thread reentry to this instance.  */
         _ux_host_semaphore_put(&hid -> ux_host_class_hid_semaphore);
-
         return(status);
     }
+#endif
+
+#if defined(UX_HOST_STANDALONE)
+    /* Protect the control endpoint.  It will be unprotected in the transfer request function.  */
+    UX_DISABLE
+    if (hid -> ux_host_class_hid_device -> ux_device_flags & UX_DEVICE_FLAG_LOCK)
+    {
+        _ux_host_class_hid_unlock(hid);
+        UX_RESTORE
+        return(UX_BUSY);
+    }
+    hid -> ux_host_class_hid_device -> ux_device_flags |=  UX_DEVICE_FLAG_LOCK;
+    transfer_request -> ux_transfer_request_flags |=  UX_TRANSFER_FLAG_AUTO_DEVICE_UNLOCK;
+    UX_TRANSFER_STATE_RESET(transfer_request);
+    UX_RESTORE
+#endif
 
     /* Create a transfer request for the SET_IDLE request.  */
     transfer_request -> ux_transfer_request_data_pointer =      UX_NULL;
@@ -129,12 +143,17 @@ UINT            status;
     /* Send request to HCD layer.  */
     status =  _ux_host_stack_transfer_request(transfer_request);
 
+#if defined(UX_HOST_STANDALONE)
+    if (!(transfer_request -> ux_transfer_request_flags & UX_TRANSFER_FLAG_AUTO_WAIT))
+        return(status);
+    _ux_host_class_hid_unlock(hid);
+#else
     /* Unprotect thread reentry to this instance.  */
     _ux_host_semaphore_put(&hid -> ux_host_class_hid_semaphore);
+#endif
 
     /* Return the function status.  */
     return(status);
-#endif
 }
 
 /**************************************************************************/
