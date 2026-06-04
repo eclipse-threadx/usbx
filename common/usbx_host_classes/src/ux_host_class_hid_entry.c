@@ -456,6 +456,7 @@ UINT                                status;
     /* Error.  */
     if (status < UX_STATE_NEXT)
     {
+        _ux_utility_memory_free(hid -> ux_host_class_hid_client);
         hid -> ux_host_class_hid_client = UX_NULL;
         hid -> ux_host_class_hid_status = UX_DEVICE_ENUMERATION_FAILURE;
         hid -> ux_host_class_hid_enum_state = UX_HOST_CLASS_HID_ENUM_ERROR;
