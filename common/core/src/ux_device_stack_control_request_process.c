@@ -109,13 +109,22 @@ ULONG                       application_data_length;
         request_index  =   _ux_utility_short_get(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_INDEX);
         request_length =   _ux_utility_short_get(transfer_request -> ux_slave_transfer_request_setup + UX_SETUP_LENGTH);
 
-        /* Filter for GET_DESCRIPTOR/SET_DESCRIPTOR commands. If the descriptor to be returned is not a standard descriptor,
-           treat the command as a CLASS command.  */
-        if ((request == UX_GET_DESCRIPTOR || request == UX_SET_DESCRIPTOR) && ((request_type & UX_REQUEST_TYPE) != UX_REQUEST_TYPE_STANDARD))
-        {        
+        /* Per USB HID 1.11 section 7.1.1, GET_DESCRIPTOR/SET_DESCRIPTOR for a
+           class-defined descriptor type (e.g. HID Report 0x22, Physical 0x23)
+           may arrive with bmRequestType set to STANDARD rather than CLASS.
+           Detect this via the high byte of wValue (bDescriptorType): USB-IF
+           allocates 0x21..0x2F to class-defined descriptors, so re-route any
+           such request to the class layer.  Standard descriptors (< 0x21,
+           including BOS 0x0F) and vendor descriptors (>= 0x40) are left
+           unchanged.  */
+        if ((request == UX_GET_DESCRIPTOR || request == UX_SET_DESCRIPTOR) &&
+            ((request_type & UX_REQUEST_TYPE) == UX_REQUEST_TYPE_STANDARD) &&
+            (((request_value >> 8) & 0xFFu) >= 0x21u) &&
+            (((request_value >> 8) & 0xFFu) <= 0x2Fu))
+        {
 
             /* This request is to be handled by the class layer.  */
-            request_type &=  (UINT)~UX_REQUEST_TYPE;
+            request_type &= (ULONG)~UX_REQUEST_TYPE;
             request_type |= UX_REQUEST_TYPE_CLASS;
         }
 
