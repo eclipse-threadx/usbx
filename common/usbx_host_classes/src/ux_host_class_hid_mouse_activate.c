@@ -128,6 +128,9 @@ UINT                                    status;
 
     }
 
+    /* Free the per-instance client copy from client_search, as we now use our own embedded copy.  */
+    _ux_utility_memory_free(hid -> ux_host_class_hid_client);
+
     /* Use our copy of client.  */
     hid -> ux_host_class_hid_client = hid_client;
     return(status);
@@ -181,6 +184,9 @@ UINT                                    status;
 
         if (status == UX_SUCCESS)
         {
+
+            /* Free the per-instance client copy from client_search, as we now use our own embedded copy.  */
+            _ux_utility_memory_free(hid -> ux_host_class_hid_client);
 
             /* Use our copy of client.  */
             hid -> ux_host_class_hid_client = hid_client;

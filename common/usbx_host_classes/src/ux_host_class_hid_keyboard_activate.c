@@ -347,6 +347,9 @@ UX_HOST_CLASS_HID_FIELD                 *field;
             - _periodic_report_start()  */
         keyboard_instance -> ux_host_class_hid_keyboard_enum_state = UX_STATE_WAIT;
 
+        /* Free the per-instance client copy from client_search, as we now use our own embedded copy.  */
+        _ux_utility_memory_free(hid -> ux_host_class_hid_client);
+
         /* It's fine, replace client with our copy.  */
         hid -> ux_host_class_hid_client = hid_client;
         return(status);
@@ -401,6 +404,9 @@ UX_HOST_CLASS_HID_FIELD                 *field;
         /* If we are OK, go on.  */
         if (status == UX_SUCCESS)
         {
+
+            /* Free the per-instance client copy from client_search, as we now use our own embedded copy.  */
+            _ux_utility_memory_free(hid -> ux_host_class_hid_client);
 
             /* It's fine, replace client copy.  */
             hid -> ux_host_class_hid_client = hid_client;

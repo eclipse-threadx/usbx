@@ -103,6 +103,9 @@ UINT                                status;
     /* Now free the instance memory.  */
     _ux_utility_memory_free(hid_client -> ux_host_class_hid_client_local_instance);
 
+    /* Signal to _ux_host_class_hid_deactivate that the client memory has been freed.  */
+    hid -> ux_host_class_hid_client = UX_NULL;
+
     /* Return completion status.  */
     return(status);
 }
