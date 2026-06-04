@@ -15,7 +15,7 @@
 /**                                                                       */
 /** USBX Component                                                        */
 /**                                                                       */
-/**   HID Class                                                           */
+/**   Host HID Class                                                      */
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
@@ -548,7 +548,7 @@ extern   "C" {
 #define UX_HOST_CLASS_HID_CONSUMER_ALTERNATE_AUDIO_DECREMENT    0x173
 #define UX_HOST_CLASS_HID_CONSUMER_APPLICATION_LAUNCH_BUTTONS   0x174
 #define UX_HOST_CLASS_HID_CONSUMER_AL_LAUNCH_BUTTON_CONFIGURATION 0x180
-#define UX_HOST_CLASS_HID_CONSUMER_AL_PROGRAMMABLE_BUTTON       0x181
+#define UX_HOST_CLASS_HID_CONSUMER_AL_PROGRAMMABLE_BUTTON         0x181
 #define UX_HOST_CLASS_HID_CONSUMER_AL_CONSUMER_CONTROL_CONFIGURATION 0x182
 #define UX_HOST_CLASS_HID_CONSUMER_AL_WORD_PROCESSOR            0x183
 #define UX_HOST_CLASS_HID_CONSUMER_AL_TEXT_EDITOR               0x184
@@ -763,6 +763,10 @@ extern   "C" {
 #ifndef UX_HOST_CLASS_HID_REPORT_TRANSFER_TIMEOUT
 #define UX_HOST_CLASS_HID_REPORT_TRANSFER_TIMEOUT               10000
 #endif
+
+/* HID protocol values.  */
+#define UX_HOST_CLASS_HID_PROTOCOL_BOOT                         0x00
+#define UX_HOST_CLASS_HID_PROTOCOL_REPORT                       0x01
 
 /* Define HID Class descriptor.  */
 
@@ -1077,7 +1081,8 @@ VOID    _ux_host_class_hid_transfer_request_completed(UX_TRANSFER *transfer_requ
 UINT    _ux_host_class_hid_tasks_run(UX_HOST_CLASS *hid_class);
 UINT    _ux_host_class_hid_idle_set_run(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id);
 UINT    _ux_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
-
+UINT    _ux_host_class_hid_protocol_set(UX_HOST_CLASS_HID *hid, USHORT protocol);
+UINT    _ux_host_class_hid_protocol_get(UX_HOST_CLASS_HID *hid, USHORT *protocol);
 
 UINT    _uxe_host_class_hid_client_register(UCHAR *hid_client_name,
                                 UINT (*hid_client_handler)(struct UX_HOST_CLASS_HID_CLIENT_COMMAND_STRUCT *));
@@ -1095,7 +1100,8 @@ UINT    _uxe_host_class_hid_report_set(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID
 
 UINT    _uxe_host_class_hid_idle_set_run(UX_HOST_CLASS_HID *hid, USHORT idle_time, USHORT report_id);
 UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS_HID_CLIENT_REPORT *client_report);
-
+UINT    _uxe_host_class_hid_protocol_set(UX_HOST_CLASS_HID *hid, USHORT protocol);
+UINT    _uxe_host_class_hid_protocol_get(UX_HOST_CLASS_HID *hid, USHORT *protocol);
 
 /* Define HID Class API prototypes.  */
 
@@ -1122,6 +1128,8 @@ UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS
 #define ux_host_class_hid_report_id_get                     _uxe_host_class_hid_report_id_get
 #define ux_host_class_hid_report_get                        _uxe_host_class_hid_report_get
 #define ux_host_class_hid_report_set                        _uxe_host_class_hid_report_set
+#define ux_host_class_hid_protocol_set                      _uxe_host_class_hid_protocol_set
+#define ux_host_class_hid_protocol_get                      _uxe_host_class_hid_protocol_get
 
 #else
 
@@ -1137,6 +1145,8 @@ UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS
 #define ux_host_class_hid_report_id_get                     _ux_host_class_hid_report_id_get
 #define ux_host_class_hid_report_get                        _ux_host_class_hid_report_get
 #define ux_host_class_hid_report_set                        _ux_host_class_hid_report_set
+#define ux_host_class_hid_protocol_set                      _ux_host_class_hid_protocol_set
+#define ux_host_class_hid_protocol_get                      _ux_host_class_hid_protocol_get
 
 #endif
 
@@ -1148,4 +1158,3 @@ UINT    _uxe_host_class_hid_report_set_run(UX_HOST_CLASS_HID *hid, UX_HOST_CLASS
 #endif
 
 #endif
-
