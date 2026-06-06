@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /**************************************************/
 /** Test case: if (hid -> ux_device_class_hid_callback != UX_NULL) fails. **/
 /** How: Do hid_parameter.ux_device_class_hid_parameter_callback = UX_NULL; before passing hid_parameter to device class register function. **/

@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This test concentrates on failed hid transfer requests and ensuring they're resent and received correctly.
  * Note: USBX HID has a thread for polling the device. Upon completion, ux_host_class_hid_transfer_request_completed is called,
  * and if the transfer request status is set to unsuccessful, ux_host_class_hid_transfer_request_completed retries the transfer request. */

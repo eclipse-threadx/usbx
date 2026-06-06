@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /**************************************************/
 /** Test case: _ux_host_class_hid_report_id_get(hid, &report_id) fails **/
 /** Why direct: In order to make _ux_host_class_hid_report_id_get() fail, we must either make _ux_host_stack_class_instance_verify fail, or **/
