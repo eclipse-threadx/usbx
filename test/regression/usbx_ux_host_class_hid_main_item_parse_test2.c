@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /**************************************************/
 /** Test case: hid_parser -> ux_host_class_hid_parser_main_usage == 0) fails in **/
 /** if ((hid_parser -> ux_host_class_hid_parser_main_page == 0) && (hid_parser -> ux_host_class_hid_parser_main_usage == 0)) **/

@@ -207,8 +207,11 @@ UX_HOST_CLASS_HID_REPORT_CALLBACK       call_back;
             /* Detach instance.  */
             hid_client -> ux_host_class_hid_client_local_instance = UX_NULL;
 
-            /* Free instance.  */
+            /* Free instance (= combined allocation; hid_client is embedded inside it).  */
             _ux_utility_memory_free(mouse);
+
+            /* Signal to entry.c that the per-instance client has been freed.  */
+            hid -> ux_host_class_hid_client = UX_NULL;
 
             return(UX_STATE_ERROR);
         }

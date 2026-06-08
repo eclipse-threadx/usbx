@@ -456,7 +456,13 @@ UINT                                status;
     /* Error.  */
     if (status < UX_STATE_NEXT)
     {
-        hid -> ux_host_class_hid_client = UX_NULL;
+
+        /* Free per-instance client copy if not already freed by the ACTIVATE_WAIT handler.  */
+        if (hid -> ux_host_class_hid_client != UX_NULL)
+        {
+            _ux_utility_memory_free(hid -> ux_host_class_hid_client);
+            hid -> ux_host_class_hid_client = UX_NULL;
+        }
         hid -> ux_host_class_hid_status = UX_DEVICE_ENUMERATION_FAILURE;
         hid -> ux_host_class_hid_enum_state = UX_HOST_CLASS_HID_ENUM_ERROR;
         return;

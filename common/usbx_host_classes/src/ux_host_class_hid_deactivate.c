@@ -138,10 +138,21 @@ UINT                                status;
     hid_client_command.ux_host_class_hid_client_command_instance =   (VOID *) hid;
     hid_client_command.ux_host_class_hid_client_command_container =  (VOID *) hid -> ux_host_class_hid_class;
     hid_client_command.ux_host_class_hid_client_command_request =    UX_HOST_CLASS_COMMAND_DEACTIVATE;
-
+    
     /* Call the HID client with a deactivate command if there was a client registered.  */
     if (hid -> ux_host_class_hid_client != UX_NULL)
+    {
         hid -> ux_host_class_hid_client -> ux_host_class_hid_client_handler(&hid_client_command);
+
+        /* Free the per-instance client copy allocated in _ux_host_class_hid_client_search.
+           Handlers for keyboard/mouse/remote_control null hid_client after freeing their own
+           combined allocation; simple clients leave hid_client pointing at the per-instance copy.  */
+        if (hid -> ux_host_class_hid_client != UX_NULL)
+        {
+            _ux_utility_memory_free(hid -> ux_host_class_hid_client);
+            hid -> ux_host_class_hid_client = UX_NULL;
+        }
+    }
 
     /* Clean all the HID memory fields.  */
     _ux_host_class_hid_instance_clean(hid);

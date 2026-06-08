@@ -963,9 +963,6 @@ UINT  _ux_pictbridge_object_tag_line_add(UCHAR *pima_object_buffer,
                                                  UCHAR **pima_object_buffer_updated,
                                                  ULONG *object_length_updated);
 
-UINT  _ux_pictbridge_input_object_create(UX_PICTBRIDGE *pictbridge, ULONG input_function);
-
-
 
 /* Define external strings and xml tag lines.  */
 extern UCHAR _ux_pictbridge_volume_description[];

@@ -243,6 +243,8 @@ UINT    _ux_hcd_sim_host_transfer_run(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER
 /* Define Device Simulator Class API prototypes.  */
 
 #define ux_hcd_sim_host_initialize                 _ux_hcd_sim_host_initialize
+#define ux_hcd_sim_host_uninitialize               _ux_hcd_sim_host_uninitialize
+
 /* Determine if a C++ compiler is being used.  If so, complete the standard
    C conditional started above.  */
 #ifdef __cplusplus
@@ -250,4 +252,3 @@ UINT    _ux_hcd_sim_host_transfer_run(UX_HCD_SIM_HOST *hcd_sim_host, UX_TRANSFER
 #endif
 
 #endif
-

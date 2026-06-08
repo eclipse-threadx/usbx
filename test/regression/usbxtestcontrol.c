@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This is the test control routine of the USBX kernel.  All tests are dispatched from this routine.  */
 
 #include "tx_api.h"
@@ -238,6 +249,7 @@ void    usbx_ux_host_class_hid_descriptor_parse_test5_application_define(void *)
 void    usbx_ux_host_class_hid_descriptor_parse_test6_application_define(void *);
 void    usbx_ux_host_class_hid_descriptor_parse_test7_application_define(void *);
 void    usbx_ux_host_class_hid_report_descriptor_get_test_application_define(void *);
+void    usbx_ux_device_class_hid_set_protocol_callback_test_application_define(void *);
 void    usbx_ux_host_class_hid_remote_control_callback_test_application_define(void *);
 void    usbx_ux_host_class_hid_interrupt_endpoint_search_test2_application_define(void *);
 void    usbx_ux_host_class_hid_periodic_report_start_test2_application_define(void *);
@@ -801,6 +813,7 @@ TEST_ENTRY  test_control_tests[] =
     usbx_ux_device_class_hid_descriptor_send_test_application_define,
     usbx_ux_device_class_hid_entry_test_application_define,
     usbx_ux_device_class_hid_event_get_AND_set_test_application_define,
+    usbx_ux_device_class_hid_set_protocol_callback_test_application_define,
     usbx_ux_device_class_hid_initialize_test_application_define,
     usbx_ux_device_class_hid_interrupt_thread_test_application_define,
     usbx_ux_device_class_hid_interrupt_thread_test2_application_define,

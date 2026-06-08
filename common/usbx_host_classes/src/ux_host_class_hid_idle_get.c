@@ -101,7 +101,7 @@ UINT            status;
         UX_RESTORE
         return(UX_BUSY);
     }
-    hid -> ux_host_class_hid_flags &= ~UX_HOST_CLASS_HID_FLAG_LOCK;
+    hid -> ux_host_class_hid_flags |= UX_HOST_CLASS_HID_FLAG_LOCK;
     UX_RESTORE
 #else
 

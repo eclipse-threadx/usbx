@@ -1,3 +1,14 @@
+/***************************************************************************/
+/* Copyright (c) 2024 Microsoft Corporation                                */
+/* Copyright (c) 2026 Eclipse ThreadX contributors                         */
+/*                                                                         */
+/* This program and the accompanying materials are made available under    */
+/* the terms of the MIT License which is available at                      */
+/* https://opensource.org/licenses/MIT.                                    */
+/*                                                                         */
+/* SPDX-License-Identifier: MIT                                            */
+/***************************************************************************/
+
 /* This file tests _ux_device_class_hid_control_request(). Note that the 4 requests we're testing
 (GET_IDLE, SET_IDLE, GET_PROTOCOL, and SET_PROTOCOL) have yet to be implemented on the device;
 Therefore, right now, not much is done in the way of checking output. */
