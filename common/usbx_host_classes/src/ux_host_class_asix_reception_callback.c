@@ -42,11 +42,9 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function is the callback from the USBX transfer functions,     */
-/*    it is called when a full or partial transfer has been done for a    */
-/*    bulk in transfer. It calls back the application.                    */
-/*                                                                        */
-/*    It's deprecated.                                                    */
+/*    DEPRECATED. The ASIX host class reception path has been redesigned; */
+/*    this callback is no longer registered or invoked by the driver.     */
+/*    Do not call this function directly.                                 */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */

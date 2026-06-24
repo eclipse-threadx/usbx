@@ -40,9 +40,10 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function returns the best free memory block.                   */
-/*                                                                        */
-/*    It's deprecated.                                                    */
+/*    DEPRECATED. This function is already disabled (compiled out via     */
+/*    #if 0) and exists only as a reference. The allocator implementation */
+/*    it served has been superseded by the current USBX memory            */
+/*    management layer. Do not re-enable or reference this function.      */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */
