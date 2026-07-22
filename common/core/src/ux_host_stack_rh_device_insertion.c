@@ -112,7 +112,7 @@ UINT        status;
         return(port_status);
 
     /* A debounce interval with a minimum duration of 100 ms on attach.  */
-    _ux_utility_delay_ms(100);
+    _ux_utility_delay_ms(UX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY);
 
     /* The first attempts to do a device enumeration may fail.
        Typically, after the port is reset and the first command is sent to
