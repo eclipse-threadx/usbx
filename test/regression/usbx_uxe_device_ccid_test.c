@@ -1,4 +1,4 @@
-/***************************************************************************/
+﻿/***************************************************************************/
 /* Copyright (c) 2024 Microsoft Corporation                                */
 /* Copyright (c) 2026 Eclipse ThreadX contributors                         */
 /*                                                                         */
@@ -170,7 +170,7 @@ CHAR                            *memory_pointer;
     /* Inform user.  */
     printf("Running uxe_device_printer APIs Test.................................. ");
 #if !defined(UX_DEVICE_CLASS_CCID_ENABLE_ERROR_CHECKING)
-#warning Tests skipped due to compile option!
+#pragma message("warning: Tests skipped due to compile option!")
     printf("SKIP SUCCESS!\n");
     test_control_return(0);
     return;

@@ -1,4 +1,4 @@
-/***************************************************************************/
+﻿/***************************************************************************/
 /* Copyright (c) 2024 Microsoft Corporation                                */
 /* Copyright (c) 2026 Eclipse ThreadX contributors                         */
 /*                                                                         */
@@ -690,7 +690,7 @@ CHAR *                  memory_pointer;
 
 #if !UX_TEST_MULTI_IFC_ON || !UX_TEST_MULTI_ALT_ON || !UX_TEST_MULTI_CLS_ON || \
     (_CONFIGURE_DESCRIPTORS_LEN  > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)
-#warning Tests skipped due to compile option!
+#pragma message("warning: Tests skipped due to compile option!")
     printf("SKIP SUCCESS!\n");
     test_control_return(0);
     return;

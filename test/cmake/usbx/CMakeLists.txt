@@ -3,6 +3,12 @@ cmake_policy(SET CMP0054 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0077 NEW)
 
+# Suppress try_compile link step when MSVC cannot produce a runnable executable
+# (e.g. when the VS environment is not fully initialised for a given target arch).
+if(MSVC)
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+endif()
+
 project(usbx_test LANGUAGES C)
 
 option(USBX_CI_COVERAGE "Instrument every selected configuration" "$ENV{TX_COVERAGE}")
@@ -216,31 +222,75 @@ if($ENV{USBX_STATIC})
 else()
   message(STATUS "Building usbx BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
 endif()
-if(NOT BUILD_SHARED_LIBS)
+if(NOT BUILD_SHARED_LIBS AND NOT MSVC)
   if(USBX_CI_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage")
     add_link_options(-fprofile-arcs)
     add_link_options(-lgcov)
   endif()
 endif()
 
-# Control if it's for 64 bit or 32 bit
-if($ENV{ENABLE_64})
-  message(STATUS "Building for 64bit")
+if(MSVC)
+  # Win64/Win32 MSVC simulation path -------------------------------------------
+  message(STATUS "Building for Windows (MSVC) - ${THREADX_ARCH}")
+  add_compile_options(/W3 /Zi -DUX_INCLUDE_USER_DEFINE_FILE -DUX_USE_IO_INSTRUCTIONS
+                      ${${CMAKE_BUILD_TYPE}})
+  add_link_options(/DEBUG /INCREMENTAL:NO)
+
+  # Copy ux_user_win.h into the same custom_inc directory where ux_user.h lands
+  # so that ux_user.h can #include "ux_user_win.h" without additional -I flags.
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ux_user_win.h
+                 ${CMAKE_BINARY_DIR}/usbx/custom_inc/ux_user_win.h COPYONLY)
+
+  # On Windows, build ThreadX, FileX and NetXDuo from source.
+  if(NOT DEFINED THREADX_SOURCE_DIR)
+    message(FATAL_ERROR
+      "THREADX_SOURCE_DIR must point to a ThreadX source tree. "
+      "Pass -DTHREADX_SOURCE_DIR=<path> or use build_usbx.ps1.")
+  endif()
+  if(NOT DEFINED FILEX_SOURCE_DIR)
+    message(FATAL_ERROR
+      "FILEX_SOURCE_DIR must point to a FileX source tree. "
+      "Pass -DFILEX_SOURCE_DIR=<path> or use build_usbx.ps1.")
+  endif()
+  if(NOT DEFINED NETXDUO_SOURCE_DIR)
+    message(FATAL_ERROR
+      "NETXDUO_SOURCE_DIR must point to a NetXDuo source tree. "
+      "Pass -DNETXDUO_SOURCE_DIR=<path> or use build_usbx.ps1.")
+  endif()
+
+  add_subdirectory(${THREADX_SOURCE_DIR} threadx_build)
+  add_subdirectory(${FILEX_SOURCE_DIR}   filex_build)
+  # Supply the win64 pointer-extension macros to NetXDuo before adding it.
+  set(NX_USER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/libs/nx_user.h"
+      CACHE FILEPATH "NetX Duo user configuration file" FORCE)
+  add_subdirectory(${NETXDUO_SOURCE_DIR} netxduo_build)
 else()
-  add_compile_options(-m32)
-  add_link_options(-m32)
-  message(STATUS "Building for 32bit")
+  if(NOT BUILD_SHARED_LIBS)
+    if(CMAKE_BUILD_TYPE MATCHES ".*_coverage")
+      add_link_options(-fprofile-arcs)
+      add_link_options(-lgcov)
+    endif()
+  endif()
+
+  # Control if it's for 64 bit or 32 bit
+  if($ENV{ENABLE_64})
+    message(STATUS "Building for 64bit")
+  else()
+    add_compile_options(-m32)
+    add_link_options(-m32)
+    message(STATUS "Building for 32bit")
+  endif()
+  add_compile_options(
+    -std=c99
+    -ggdb
+    -g3
+    -gdwarf-2
+    -fdiagnostics-color
+    -DUX_USE_IO_INSTRUCTIONS
+    #-DUX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE
+    #-DUX_DEVICE_CLASS_DFU_STATUS_MODE=1
+    ${${CMAKE_BUILD_TYPE}})
 endif()
-add_compile_options(
-  -std=c99
-  -ggdb
-  -g3
-  -gdwarf-2
-  -fdiagnostics-color
-  -DUX_USE_IO_INSTRUCTIONS
-  #-DUX_DEVICE_CLASS_DFU_CUSTOM_REQUEST_ENABLE
-  #-DUX_DEVICE_CLASS_DFU_STATUS_MODE=1
-  ${${CMAKE_BUILD_TYPE}})
 
 enable_testing()
 
@@ -252,65 +302,71 @@ else()
 endif()
 
 # TODO: Unmask after adding sample for STANDALONE
-if(NOT (CMAKE_BUILD_TYPE MATCHES "standalone.*"))
+if(NOT MSVC AND NOT (CMAKE_BUILD_TYPE MATCHES "standalone.*"))
   add_subdirectory(../usbx/samples samples)
 endif()
 
-# Coverage
-if(USBX_CI_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage")
+# Coverage instrumentation (GCC/Clang only — not supported by MSVC)
+if(NOT MSVC AND (USBX_CI_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage"))
   target_compile_options(usbx PRIVATE -fprofile-arcs -ftest-coverage)
   target_link_options(usbx PRIVATE -fprofile-arcs -ftest-coverage)
 endif()
 
-# Build ThreadX library once
-execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/run.sh build_libs
-                RESULT_VARIABLE dependency_status)
-if(NOT dependency_status EQUAL 0)
-  message(FATAL_ERROR "Dependency build failed: ${dependency_status}")
+# Build ThreadX/FileX/NetXDuo shared libraries (Linux only)
+if(NOT MSVC)
+  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/run.sh build_libs
+                  RESULT_VARIABLE dependency_status)
+  if(NOT dependency_status EQUAL 0)
+    message(FATAL_ERROR "Dependency build failed: ${dependency_status}")
+  endif()
+  add_custom_target(build_libs ALL COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/run.sh
+                                           build_libs)
+
+  add_dependencies(usbx build_libs)
+  target_include_directories(usbx PUBLIC ${CMAKE_BINARY_DIR}/../libs/inc)
+
+  add_library(threadx SHARED IMPORTED GLOBAL)
+  add_library("azrtos::threadx" ALIAS threadx)
+  set_target_properties(
+    threadx PROPERTIES IMPORTED_LOCATION
+                       ${CMAKE_BINARY_DIR}/../libs/threadx/libthreadx.so)
+
+  add_library(netxduo SHARED IMPORTED GLOBAL)
+  add_library("azrtos::netxduo" ALIAS netxduo)
+  set_target_properties(
+    netxduo PROPERTIES IMPORTED_LOCATION
+                       ${CMAKE_BINARY_DIR}/../libs/netxduo/libnetxduo.so)
+
+  add_library(filex SHARED IMPORTED GLOBAL)
+  add_library("azrtos::filex" ALIAS filex)
+  set_target_properties(
+    filex PROPERTIES IMPORTED_LOCATION
+                     ${CMAKE_BINARY_DIR}/../libs/filex/libfilex.so)
 endif()
-add_custom_target(build_libs ALL COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/run.sh
-                                         build_libs)
 
-add_dependencies(usbx build_libs)
-target_include_directories(usbx PUBLIC ${CMAKE_BINARY_DIR}/../libs/inc)
-
-add_library(threadx SHARED IMPORTED GLOBAL)
-add_library("azrtos::threadx" ALIAS threadx)
-set_target_properties(
-  threadx PROPERTIES IMPORTED_LOCATION
-                     ${CMAKE_BINARY_DIR}/../libs/threadx/libthreadx.so)
-
-add_library(netxduo SHARED IMPORTED GLOBAL)
-add_library("azrtos::netxduo" ALIAS netxduo)
-set_target_properties(
-  netxduo PROPERTIES IMPORTED_LOCATION
-                     ${CMAKE_BINARY_DIR}/../libs/netxduo/libnetxduo.so)
-
-add_library(filex SHARED IMPORTED GLOBAL)
-add_library("azrtos::filex" ALIAS filex)
-set_target_properties(
-  filex PROPERTIES IMPORTED_LOCATION
-                   ${CMAKE_BINARY_DIR}/../libs/filex/libfilex.so)
-
-target_compile_options(
-  usbx
-  PRIVATE -Werror
-          -Wall
-          -Wextra
-          -pedantic
-          -fmessage-length=0
-          -fsigned-char
-          -ffunction-sections
-          -fdata-sections
-          -Wunused
-          -Wuninitialized
-          -Wmissing-declarations
-          -Wconversion
-          -Wpointer-arith
-          -Wshadow
-          -Wlogical-op
-          -Waggregate-return
-          -Wfloat-equal)
+if(MSVC)
+  target_compile_options(usbx PRIVATE /W3)
+else()
+  target_compile_options(
+    usbx
+    PRIVATE -Werror
+            -Wall
+            -Wextra
+            -pedantic
+            -fmessage-length=0
+            -fsigned-char
+            -ffunction-sections
+            -fdata-sections
+            -Wunused
+            -Wuninitialized
+            -Wmissing-declarations
+            -Wconversion
+            -Wpointer-arith
+            -Wshadow
+            -Wlogical-op
+            -Waggregate-return
+            -Wfloat-equal)
+endif()
 
 # Remove includes and files not needed from usbx build
 set(UX_STANDALONE_HOST_EXCLUDES
@@ -434,8 +490,13 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "generic_build")
   get_target_property(INCLUDES_LIST usbx INCLUDE_DIRECTORIES)
   set(NEW_INCLUDES_LIST "")
+  if(MSVC)
+    set(_port_to_replace "ports/win64/vs_2022")
+  else()
+    set(_port_to_replace "ports/linux/gnu")
+  endif()
   foreach(INCLUDE_LIST ${INCLUDES_LIST})
-    string(REPLACE "ports/linux/gnu" "ports/generic" INCLUDE_LIST ${INCLUDE_LIST})
+    string(REPLACE "${_port_to_replace}" "ports/generic" INCLUDE_LIST ${INCLUDE_LIST})
     list(APPEND NEW_INCLUDES_LIST "${INCLUDE_LIST}")
   endforeach()
   set_target_properties(usbx PROPERTIES INCLUDE_DIRECTORIES "${NEW_INCLUDES_LIST}")

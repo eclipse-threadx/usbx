@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+
+project(libs LANGUAGES C)
+
+if($ENV{ENABLE_64})
+  message(STATUS "Building for 64bit")
+  set(NX_USER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/nx_user.h)
+else()
+  add_compile_options(-m32)
+  add_link_options(-m32)
+  message(STATUS "Building for 32bit")
+endif()
+message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}.")
+
+get_filename_component(externals ${CMAKE_CURRENT_SOURCE_DIR}/../../../externals
+                       ABSOLUTE)
+add_subdirectory(${externals}/threadx threadx)
+add_subdirectory(${externals}/netxduo netxduo)
+add_subdirectory(${externals}/filex filex)
+target_compile_options(threadx PRIVATE -DTX_ENABLE_EVENT_TRACE)
+if(NOT DEFINED ENV{ENABLE_IDLE})
+  target_compile_options(threadx PRIVATE -DTX_LINUX_NO_IDLE_ENABLE)
+endif()
+target_compile_options(filex PRIVATE -DFX_ENABLE_EXFAT)
+
+target_compile_options(netxduo PRIVATE -DTX_ENABLE_EVENT_TRACE -DNX_PHYSICAL_HEADER=20)
+
+foreach(lib threadx netxduo filex)
+  get_target_property(dirs ${lib} INCLUDE_DIRECTORIES)
+  execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/inc)
+  foreach(dir ${dirs})
+    file(GLOB header_files ${dir}/*.h)
+    foreach(header_file ${header_files})
+      execute_process(COMMAND ln -sf ${header_file} ${CMAKE_BINARY_DIR}/inc)
+    endforeach()
+  endforeach()
+endforeach()
