@@ -14,6 +14,19 @@
 #include "tx_api.h"
 #include "tx_thread.h"
 
+/* Number of ticks for enum thread to process connect/disconnect.
+   Override via compile flags for ports where ticks fire faster than 1ms
+   (e.g. Win64 tick batching with TX_WIN32_TICKS_PER_INTERRUPT=5).
+   Connect sleep must be long enough for full enumeration to complete.
+   Disconnect sleep must be short enough that device structures are not
+   freed before tests that intentionally use them after disconnect. */
+#ifndef UX_TEST_HCD_CONNECT_SLEEP
+#define UX_TEST_HCD_CONNECT_SLEEP 100
+#endif
+#ifndef UX_TEST_HCD_DISCONNECT_SLEEP
+#define UX_TEST_HCD_DISCONNECT_SLEEP 100
+#endif
+
 #include "ux_api.h"
 #include "ux_hcd_sim_host.h"
 
@@ -74,7 +87,7 @@ VOID ux_test_hcd_sim_host_disconnect(VOID)
 #else
 
     /* Sleep current thread for enum thread to run. */
-    tx_thread_sleep(100);
+    tx_thread_sleep(UX_TEST_HCD_DISCONNECT_SLEEP);
 #endif
 }
 
@@ -133,7 +146,7 @@ VOID ux_test_hcd_sim_host_connect(ULONG speed)
     ux_test_hcd_sim_host_connect_no_wait(speed);
 
     /* Sleep current thread for enum thread to run. */
-    tx_thread_sleep(100);
+    tx_thread_sleep(UX_TEST_HCD_CONNECT_SLEEP);
 }
 
 /* Fork and modify _ux_hcd_sim_host_port_status_get. */

@@ -233,18 +233,27 @@ if(MSVC)
   # Win64/Win32 MSVC simulation path -------------------------------------------
   message(STATUS "Building for Windows (MSVC) - ${THREADX_ARCH}")
   # Reduce timing constants so tests run faster under the Win64 simulation
-  # (ThreadX Win64 runs at 10x wall-clock: TX_TIMER_PERIODIC=1ms but
-  # TX_TIMER_TICKS_PER_SECOND=100, so _ux_utility_delay_ms(X) takes X/10 ms).
+  # (ThreadX Win64 runs at 5x wall-clock: TX_TIMER_PERIODIC=1ms but
+  # TX_WIN32_TICKS_PER_INTERRUPT=5, so _ux_utility_delay_ms(X) takes X/5 ms).
   # CDC-ACM device init delay: 1000ms → 100ms (saves ~3s in connection tests).
-  # Enumeration debounce: 100ms → 50ms (saves ~5ms/connect real time).
+  # Enumeration debounce: 100 → 10 ticks (2ms real at N=5) — safe in the
+  # simulator (no spurious disconnects), leaving more time for enumeration in the
+  # 100-tick poll windows used by tests.
   # NOTE: UX_DEVICE_ADDRESS_SET_WAIT is intentionally left at default (50ms)
   # because reducing it causes non-deterministic test failures — the simulated
   # device needs sufficient time to switch to its new address.
-  # NOTE: UX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY is set to 50 (not lower)
-  # to avoid intermittent enumeration failures under Windows scheduling jitter.
+  # NOTE: UX_TEST_HCD_CONNECT_SLEEP and UX_TEST_HCD_DISCONNECT_SLEEP are left at
+  # their default of 100 ticks. At N=5, 100 ticks = 20ms real — short enough that
+  # tests relying on device memory being still valid after disconnect (e.g.
+  # usbx_ux_host_stack_transfer_request_test) are not broken.
+  # NOTE: UX_TEST_TICK_SCALE=5 compensates for the 5× faster ThreadX clock only
+  # in ux_test_sleep_break_if() timeouts (which use tx_time_get() comparisons),
+  # so tests like CCID that poll for disconnect/connect completion with tick-based
+  # timeouts get the same real-time budget as on Linux.
   add_compile_options(/W3 /Zi -DUX_INCLUDE_USER_DEFINE_FILE -DUX_USE_IO_INSTRUCTIONS
                       -DUX_HOST_CLASS_CDC_ACM_DEVICE_INIT_DELAY=100
-                      -DUX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY=50
+                      -DUX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY=10
+                      -DUX_TEST_TICK_SCALE=5
                       ${${CMAKE_BUILD_TYPE}})
   add_link_options(/DEBUG /INCREMENTAL:NO)
 
