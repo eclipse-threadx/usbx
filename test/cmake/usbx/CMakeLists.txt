@@ -250,10 +250,17 @@ if(MSVC)
   # in ux_test_sleep_break_if() timeouts (which use tx_time_get() comparisons),
   # so tests like CCID that poll for disconnect/connect completion with tick-based
   # timeouts get the same real-time budget as on Linux.
+  # NOTE: UX_HOST_CLASS_STORAGE_THREAD_SLEEP_TIME reduced from 2000ms to 400ms.
+  # The storage management thread cycles at this interval; the test suite uses it
+  # as a wait unit (×2 to ×6), so 2000ms causes usbx_ux_host_class_storage_
+  # thread_entry_test to take 66s. At 400ms the simulated storage operations
+  # still complete well within one cycle (operations are near-instant in sim)
+  # while the ×N multipliers provide enough cycle count margin.
   add_compile_options(/W3 /Zi -DUX_INCLUDE_USER_DEFINE_FILE -DUX_USE_IO_INSTRUCTIONS
                       -DUX_HOST_CLASS_CDC_ACM_DEVICE_INIT_DELAY=100
                       -DUX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY=10
                       -DUX_TEST_TICK_SCALE=5
+                      -DUX_HOST_CLASS_STORAGE_THREAD_SLEEP_TIME=400
                       ${${CMAKE_BUILD_TYPE}})
   add_link_options(/DEBUG /INCREMENTAL:NO)
 
