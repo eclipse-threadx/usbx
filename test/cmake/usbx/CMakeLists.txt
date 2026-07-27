@@ -242,10 +242,26 @@ if(MSVC)
   # NOTE: UX_DEVICE_ADDRESS_SET_WAIT is intentionally left at default (50ms)
   # because reducing it causes non-deterministic test failures — the simulated
   # device needs sufficient time to switch to its new address.
-  # NOTE: UX_TEST_HCD_CONNECT_SLEEP and UX_TEST_HCD_DISCONNECT_SLEEP are left at
-  # their default of 100 ticks. At N=5, 100 ticks = 20ms real — short enough that
-  # tests relying on device memory being still valid after disconnect (e.g.
-  # usbx_ux_host_stack_transfer_request_test) are not broken.
+  # NOTE: UX_TEST_HCD_CONNECT_SLEEP left at default (100 ticks). Reducing it
+  # below 100 broke CDC-ACM and CCID activation (UX_HOST_CLASS_CDC_ACM_DEVICE_
+  # INIT_DELAY=100 is already applied, but the host enumeration thread still
+  # needs ~100 ticks to complete class activation).
+  # NOTE: UX_TEST_HCD_DISCONNECT_SLEEP reduced from 100 to 80 ticks.  DISCONNECT_
+  # SLEEP must be at least DEACTIVATE_WAIT + ~25-30 ticks (overhead after the
+  # dummy-class sleep completes) so that the old device is fully removed before
+  # the next connect is signalled.  At 60-70 ticks the "interfaces_scan" test
+  # failed because the new connect overlapped with the tail-end of the prior
+  # device teardown (freeing interfaces/configuration/device structures).  At 80
+  # ticks the gap is large enough for reliable cleanup.
+  # NOTE: UX_TEST_DUMMY_DEACTIVATE_WAIT reduced from 200 to 50 ticks.  The
+  # original 200-tick sleep exists to let pending host-class transfers finish,
+  # but the Win64 simulator processes all transfers near-instantly (no real
+  # hardware), so 50 ticks (80ms real) is ample.  This means device teardown
+  # completes at ~55 ticks from disconnect; tests that poll for device=NULL
+  # (e.g. CCID, HID-memory, enum_bMaxPacketSize0) can start their next iteration
+  # 145 ticks sooner than with the default 200-tick wait.  This constant has a
+  # #ifndef guard in ux_host_class_dummy.c (defaulting to UX_ENUMERATION_THREAD_
+  # WAIT=200) so Linux targets are unaffected.
   # NOTE: UX_TEST_TICK_SCALE=5 compensates for the 5× faster ThreadX clock only
   # in ux_test_sleep_break_if() timeouts (which use tx_time_get() comparisons),
   # so tests like CCID that poll for disconnect/connect completion with tick-based
@@ -261,6 +277,8 @@ if(MSVC)
                       -DUX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY=10
                       -DUX_TEST_TICK_SCALE=5
                       -DUX_HOST_CLASS_STORAGE_THREAD_SLEEP_TIME=400
+                      -DUX_TEST_HCD_DISCONNECT_SLEEP=80
+                      -DUX_TEST_DUMMY_DEACTIVATE_WAIT=50
                       ${${CMAKE_BUILD_TYPE}})
   add_link_options(/DEBUG /INCREMENTAL:NO)
 

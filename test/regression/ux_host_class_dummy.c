@@ -15,6 +15,12 @@
 #include "ux_host_class_dummy.h"
 #include "ux_host_stack.h"
 
+/* Overridable deactivation wait so the Win64 simulator can reduce
+   the 200-tick default without affecting Linux/hardware targets.  */
+#ifndef UX_TEST_DUMMY_DEACTIVATE_WAIT
+#define UX_TEST_DUMMY_DEACTIVATE_WAIT  UX_ENUMERATION_THREAD_WAIT
+#endif
+
 static UINT _ux_host_class_dummy_activate(UX_HOST_CLASS_COMMAND *command);
 static UINT _ux_host_class_dummy_deactivate(UX_HOST_CLASS_COMMAND *command);
 
@@ -217,7 +223,7 @@ UX_ENDPOINT                 *endpoint;
     }
 
     /* If the class instance was busy, let it finish properly and not return.  */
-    _ux_host_thread_sleep(UX_ENUMERATION_THREAD_WAIT);
+    _ux_host_thread_sleep(UX_TEST_DUMMY_DEACTIVATE_WAIT);
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(dummy -> ux_host_class_dummy_class, (VOID *) dummy);
@@ -347,7 +353,7 @@ UX_ENDPOINT                 *endpoint;
     }
 
     /* If the class instance was busy, let it finish properly and not return.  */
-    _ux_host_thread_sleep(UX_ENUMERATION_THREAD_WAIT);
+    _ux_host_thread_sleep(UX_TEST_DUMMY_DEACTIVATE_WAIT);
 
     /* Destroy the instance.  */
     _ux_host_stack_class_instance_destroy(dummy -> ux_host_class_dummy_class, (VOID *) dummy);
