@@ -129,6 +129,10 @@ ULONG                           actual_length;
 
             /* Get actual transfer length.  */
             actual_length = transfer -> ux_slave_transfer_request_actual_length;
+            
+            if (actual_length == 0) {
+                continue;
+            }
 
             /* Frame received, log it.  */
             stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_length = actual_length;
