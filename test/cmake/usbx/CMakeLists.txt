@@ -305,6 +305,10 @@ if(MSVC)
   endif()
 
   add_subdirectory(${THREADX_SOURCE_DIR} threadx_build)
+  # Fast-forward the ThreadX Win64 simulated clock through idle periods so the
+  # regression suite is CPU-bound rather than wall-clock-bound (mirrors the
+  # Linux port's TX_LINUX_NO_IDLE_ENABLE).  Applied only to the ThreadX port.
+  target_compile_options(threadx PRIVATE -DTX_WIN32_NO_IDLE_ENABLE)
   add_subdirectory(${FILEX_SOURCE_DIR}   filex_build)
   # Supply the win64 pointer-extension macros to NetXDuo before adding it.
   set(NX_USER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/libs/nx_user.h"
