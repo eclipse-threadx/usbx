@@ -364,6 +364,7 @@ UINT                            status;
     UX_HOST_CLASS_HID_REPORT *hid_report;
     UX_HOST_CLASS_HID_FIELD *hid_field;
     get_id.ux_host_class_hid_report_get_type = UX_HOST_CLASS_HID_REPORT_TYPE_INPUT;
+    get_id.ux_host_class_hid_report_get_report = UX_NULL;
     status = ux_host_class_hid_report_id_get(hid, &get_id);
     hid_report = get_id.ux_host_class_hid_report_get_report;
     while(hid_report != UX_NULL)

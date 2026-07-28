@@ -21,6 +21,18 @@
 #include "ux_test.h"
 
 
+/* Scale factor for the hand-rolled tick-based connect/remove wait loops below.
+   On ports where ThreadX ticks advance faster than 1ms/tick (e.g. the Win32/
+   Win64 simulator with tick batching TX_WIN32_TICKS_PER_INTERRUPT=5) a raw
+   N-tick budget represents 1/scale of the intended real time, which is too
+   tight on slower single-core hosts.  Multiplying by UX_TEST_TICK_SCALE (set
+   to the batch factor on those ports, 1 elsewhere) restores the same real-time
+   budget these waits get on Linux.  */
+#ifndef UX_TEST_TICK_SCALE
+#define UX_TEST_TICK_SCALE 1
+#endif
+
+
 /* Define USBX demo constants.  */
 
 #define UX_DEMO_STACK_SIZE      4096
@@ -345,6 +357,8 @@ UX_HOST_CLASS   *cls;
 static UINT ux_demo_dummy_instance_connect_wait(ULONG wait_ticks)
 {
 ULONG   t0 = tx_time_get(), t1;
+    if (wait_ticks != 0 && wait_ticks != 0xFFFFFFFFul)
+        wait_ticks *= UX_TEST_TICK_SCALE;
     while(1)
     {
 #if defined(UX_HOST_STANDALONE)
@@ -377,6 +391,8 @@ ULONG   t0 = tx_time_get(), t1;
 static UINT ux_demo_dummy_instance_remove_wait(ULONG wait_ticks)
 {
 ULONG   t0 = tx_time_get(), t1;
+    if (wait_ticks != 0 && wait_ticks != 0xFFFFFFFFul)
+        wait_ticks *= UX_TEST_TICK_SCALE;
     while(1)
     {
 #if defined(UX_HOST_STANDALONE)
