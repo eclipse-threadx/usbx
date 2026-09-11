@@ -303,6 +303,61 @@ function Remove-NinjaLock {
     }
 }
 
+function Invoke-ProcessWithTimeout {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FilePath,
+
+        [Parameter()]
+        [string[]]$Arguments = @(),
+
+        [Parameter()]
+        [int]$TimeoutSeconds = 0
+    )
+
+    $argumentList = @()
+    foreach ($argument in $Arguments) {
+        if ($argument -match '\s|"') {
+            $argumentList += '"' + ($argument -replace '"', '\"') + '"'
+        }
+        else {
+            $argumentList += $argument
+        }
+    }
+
+    $process = Start-Process -FilePath $FilePath -ArgumentList $argumentList -NoNewWindow -PassThru
+    if ($TimeoutSeconds -le 0) {
+        $process | Wait-Process
+        $completed = $true
+    }
+    else {
+        try {
+            $process | Wait-Process -Timeout $TimeoutSeconds -ErrorAction Stop
+            $completed = $true
+        }
+        catch {
+            $completed = $false
+        }
+    }
+
+    if (-not $completed) {
+        $null = Start-Process -FilePath 'taskkill.exe' `
+            -ArgumentList @('/PID', $process.Id.ToString(), '/T', '/F') `
+            -WindowStyle Hidden -Wait -PassThru
+
+        return @{
+            Completed = $false
+            ExitCode  = $null
+        }
+    }
+
+    $process.Refresh()
+    return @{
+        Completed = $true
+        ExitCode  = $process.ExitCode
+    }
+}
+
 function Invoke-CMakeBuild {
     param(
         [Parameter(Mandatory = $true)]
@@ -315,19 +370,34 @@ function Invoke-CMakeBuild {
         [int]$TimeoutSeconds = 600
     )
 
-    $buildToolName = 'Ninja'
+    Remove-NinjaLock -Path $BuildDir
+    $buildResult = Invoke-ProcessWithTimeout -FilePath 'ninja' -Arguments @(
+        '-C', $BuildDir,
+        '-j', $Parallel.ToString()
+    ) -TimeoutSeconds $TimeoutSeconds
 
-    $buildProcess = Start-Process -FilePath 'cmake' `
-        -ArgumentList @('--build', $BuildDir, '--parallel', $Parallel.ToString()) `
-        -NoNewWindow -PassThru
-
-    $completed = $buildProcess.WaitForExit($TimeoutSeconds * 1000)
-    if (-not $completed) {
-        $buildProcess.Kill()
-        throw "$buildToolName build timed out after ${TimeoutSeconds}s in $BuildDir"
+    if ($buildResult.Completed -and ($buildResult.ExitCode -eq 0)) {
+        return
     }
 
-    if ($buildProcess.ExitCode -ne 0) {
-        throw "$buildToolName build failed with exit code $($buildProcess.ExitCode) in $BuildDir"
+    if ($buildResult.Completed) {
+        throw "Ninja build failed with exit code $($buildResult.ExitCode) in $BuildDir"
     }
+
+    Write-Warning "Ninja build timed out after ${TimeoutSeconds}s in $BuildDir. Retrying the interrupted build."
+    Remove-NinjaLock -Path $BuildDir
+    $retryResult = Invoke-ProcessWithTimeout -FilePath 'ninja' -Arguments @(
+        '-C', $BuildDir,
+        '-j', $Parallel.ToString()
+    ) -TimeoutSeconds $TimeoutSeconds
+
+    if ($retryResult.Completed -and ($retryResult.ExitCode -eq 0)) {
+        return
+    }
+
+    if (-not $retryResult.Completed) {
+        throw "Ninja build timed out again after ${TimeoutSeconds}s in $BuildDir"
+    }
+
+    throw "Ninja retry failed with exit code $($retryResult.ExitCode) in $BuildDir"
 }
