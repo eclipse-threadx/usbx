@@ -1,6 +1,8 @@
 # Eclipse ThreadX USBX
 
-A high-performance USB host, device, and on-the-go (OTG) embedded stack, Eclipse ThreadX USBX is fully integrated with Eclipse ThreadX RTOS and available for all Eclipse ThreadX RTOS–supported processors. Like Eclipse ThreadX RTOS, Eclipse ThreadX USBX is designed to have a small footprint and high performance, making it ideal for deeply embedded applications that require an interface with USB devices.
+A high-performance USB host and device embedded stack, Eclipse ThreadX USBX is integrated with Eclipse ThreadX RTOS. Like Eclipse ThreadX RTOS, Eclipse ThreadX USBX is designed to have a small footprint and high performance, making it ideal for deeply embedded applications that require an interface with USB devices.
+
+USBX includes OTG protocol hooks, but this repository does not include a ready-to-use OTG controller driver. Switching between host and device at runtime requires controller-specific role detection, VBUS and interrupt handling, and host/device stack transitions. No i.MX RT1024 OTG integration is provided here. The regular threaded build uses ThreadX; `UX_STANDALONE` removes USBX's RTOS dependency but does not supply a FreeRTOS adapter or an OTG controller driver. See the [USBX OTG chapter](https://github.com/eclipse-threadx/rtos-docs-asciidoc/blob/main/rtos-docs/usbx/modules/ROOT/pages/usbx-host-stack-supplemental-5.adoc) for the integration requirements.
 
 Here are the key features and modules of USBX:
 
@@ -12,7 +14,7 @@ Eclipse ThreadX USBX as part of Eclipse ThreadX has been integrated to the semic
 
 We also provide [samples](https://github.com/azure-rtos/samples) using hero development boards from semiconductors you can build and test with.
 
-See [Overview of Eclipse ThreadX USBX](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/usbx/overview-usbx.md) for the high-level overview.
+See [Overview of Eclipse ThreadX USBX](https://github.com/eclipse-threadx/rtos-docs-asciidoc/blob/main/rtos-docs/usbx/modules/ROOT/pages/overview-usbx.adoc) for the high-level overview.
 
 ## Repository Structure and Usage
 
