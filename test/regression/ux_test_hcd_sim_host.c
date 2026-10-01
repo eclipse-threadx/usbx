@@ -1,5 +1,4 @@
 /***************************************************************************/
-// Portions of this file were generated with AI assistance.
 /* Copyright (c) 2024 Microsoft Corporation                                */
 /* Copyright (c) 2026 Eclipse ThreadX contributors                         */
 /*                                                                         */
@@ -9,6 +8,8 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+
+// Portions of this file were generated with AI assistance.
 
 /* This test simulator is designed to simulate ux_hcd_ APIs for test. */
 
