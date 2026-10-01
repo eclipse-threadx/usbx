@@ -12,7 +12,7 @@ Eclipse ThreadX USBX as part of Eclipse ThreadX has been integrated to the semic
 
 We also provide [samples](https://github.com/azure-rtos/samples) using hero development boards from semiconductors you can build and test with.
 
-See [Overview of Eclipse ThreadX USBX](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/usbx/overview-usbx.md) for the high-level overview.
+See [Overview of Eclipse ThreadX USBX](https://threadx.io/releases/6.5.2/usbx/main/overview-usbx.html) for the high-level overview.
 
 ## Repository Structure and Usage
 
@@ -130,7 +130,7 @@ License terms for using Eclipse ThreadX are defined in the LICENSE.txt file of t
 
 The following are references to additional Eclipse ThreadX resources:
 
-- **Product introduction**: https://github.com/eclipse-threadx/rtos-docs
+- **Product introduction**: https://threadx.io/releases/latest
 - **Product issues and bugs, or feature requests**: https://github.com/eclipse-threadx/usbx/issues
 - **TraceX Installer**: https://aka.ms/azrtos-tracex-installer
 
