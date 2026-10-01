@@ -130,6 +130,14 @@ ULONG                           actual_length;
             /* Get actual transfer length.  */
             actual_length = transfer -> ux_slave_transfer_request_actual_length;
 
+            /* A zero length packet carries no audio. Logging it would leave a
+               frame whose length is zero, which is what marks a slot free, and
+               the transfer position would still advance past it.  */
+            if (actual_length == 0)
+            {
+                continue;
+            }
+
             /* Frame received, log it.  */
             stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_length = actual_length;
             stream -> ux_device_class_audio_stream_transfer_pos -> ux_device_class_audio_frame_pos = 0;
