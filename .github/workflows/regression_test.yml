@@ -1,29 +1,27 @@
 name: USBX Regression Test
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   workflow_dispatch:
     inputs:
       tests_to_run:
-        description: 'all, single or multiple of default_build_coverage error_check_build_full_coverage tracex_enable_build device_buffer_owner_build device_zero_copy_build nofx_build_coverage optimized_build standalone_device_build_coverage standalone_device_buffer_owner_build standalone_device_zero_copy_build standalone_host_build_coverage standalone_build_coverage generic_build otg_support_build memory_management_build_coverage msrc_rtos_build msrc_standalone_build'
-        required: false
+        description: 'all, or space-separated profiles from test/cmake/usbx/CMakeLists.txt'
+        required: true
         default: 'all'
+        type: string
       skip_coverage:
         required: false
         type: boolean
         default: false
-      coverage_name:
-        required: false
-        default: 'default_build_coverage'
   push:
-    branches: [ master ]
+    branches: [dev, master]
   pull_request:
-    branches: [ master ]
+    branches: [dev, master]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+concurrency:
+  group: usbx-regression-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-
   manual_tests:
     if: github.event_name == 'workflow_dispatch'
     permissions:
@@ -31,16 +29,19 @@ jobs:
       issues: read
       checks: write
       pull-requests: write
+      # GitHub validates deployment permissions even when that job is skipped.
+      # The called test job narrows its own token scope.
       pages: write
       id-token: write
-
-    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@master
+    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@b37cd4a81a1cb8c2ebefc438220ab7f009e13362
     with:
       cmake_path: ./test/cmake/usbx
-      build_script: ./scripts/build.sh ${{ inputs.tests_to_run }}
-      test_script: ./scripts/test.sh ${{ inputs.tests_to_run }}
-      coverage_name: ${{ inputs.coverage_name }}
-      skip_coverage: ${{ !!inputs.skip_coverage }}
+      build_script: ./scripts/build.sh --manual
+      test_script: ./scripts/test.sh --manual
+      coverage_name: ${{ inputs.tests_to_run == 'all' && 'merged' || 'subset' }}
+      coverage_thresholds: '0 100'
+      skip_coverage: ${{ inputs.skip_coverage }}
+      skip_deploy: ${{ github.ref != 'refs/heads/master' || inputs.tests_to_run != 'all' }}
 
   auto_tests:
     if: github.event_name != 'workflow_dispatch'
@@ -49,13 +50,15 @@ jobs:
       issues: read
       checks: write
       pull-requests: write
+      # The reusable workflow declares a separate deployment job.
       pages: write
       id-token: write
-
-    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@master
+    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@b37cd4a81a1cb8c2ebefc438220ab7f009e13362
     with:
       cmake_path: ./test/cmake/usbx
       build_script: ./scripts/build.sh all
       test_script: ./scripts/test.sh all
-      coverage_name: default_build_coverage
+      coverage_name: merged
+      coverage_thresholds: '66 100'
       skip_coverage: false
+      skip_deploy: ${{ github.event_name != 'push' || github.ref != 'refs/heads/master' }}

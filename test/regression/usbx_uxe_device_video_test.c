@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+/* Portions of this file were generated with AI assistance. */
 
 /* This test is designed to test the ux_utility_descriptor_pack.  */
 
@@ -559,9 +560,10 @@ static void  ux_test_thread_simulation_0_entry(ULONG arg)
 UINT                                    status;
 UX_DEVICE_CLASS_VIDEO_STREAM            dummy_video_stream;
 ULONG                                   dummy_length;
-UCHAR payload_data[64];
-ULONG payload_length;
-UCHAR **dummy_payload = &payload_data;
+UCHAR                                   payload_data[64];
+ULONG                                   payload_length;
+UCHAR                                   *payload = payload_data;
+UCHAR                                   **dummy_payload = &payload;
 
     dummy_length = ux_device_class_video_max_payload_length(UX_NULL);
     if (dummy_length != 0)

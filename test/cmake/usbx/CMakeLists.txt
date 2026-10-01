@@ -5,6 +5,8 @@ cmake_policy(SET CMP0077 NEW)
 
 project(usbx_test LANGUAGES C)
 
+option(USBX_CI_COVERAGE "Instrument every selected configuration" "$ENV{TX_COVERAGE}")
+
 # Use customized ux_user.h
 set(UX_USER_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ux_user.h)
 
@@ -215,7 +217,7 @@ else()
   message(STATUS "Building usbx BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
 endif()
 if(NOT BUILD_SHARED_LIBS)
-  if(CMAKE_BUILD_TYPE MATCHES ".*_coverage")
+  if(USBX_CI_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage")
     add_link_options(-fprofile-arcs)
     add_link_options(-lgcov)
   endif()
@@ -255,13 +257,17 @@ if(NOT (CMAKE_BUILD_TYPE MATCHES "standalone.*"))
 endif()
 
 # Coverage
-if(CMAKE_BUILD_TYPE MATCHES ".*_coverage")
+if(USBX_CI_COVERAGE OR CMAKE_BUILD_TYPE MATCHES ".*_coverage")
   target_compile_options(usbx PRIVATE -fprofile-arcs -ftest-coverage)
   target_link_options(usbx PRIVATE -fprofile-arcs -ftest-coverage)
 endif()
 
 # Build ThreadX library once
-execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/run.sh build_libs)
+execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/run.sh build_libs
+                RESULT_VARIABLE dependency_status)
+if(NOT dependency_status EQUAL 0)
+  message(FATAL_ERROR "Dependency build failed: ${dependency_status}")
+endif()
 add_custom_target(build_libs ALL COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/run.sh
                                          build_libs)
 

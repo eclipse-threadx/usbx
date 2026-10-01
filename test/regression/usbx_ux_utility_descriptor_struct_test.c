@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+/* Portions of this file were generated with AI assistance. */
 
 /* This test is designed to test the ux_utility_descriptor_parse.  */
 
@@ -143,6 +144,19 @@ CHAR                            *memory_pointer;
 
 static void  ux_test_thread_simulation_0_entry(ULONG arg)
 {
+
+UCHAR invalid_zero[] = {0};
+UCHAR invalid_three[] = {1, 3};
+UCHAR invalid_eight[] = {8};
+UCHAR aligned_fields[] = {1, 2, 4};
+
+    /* Reject unsupported field sizes and align valid descriptor layouts.  */
+    UX_TEST_ASSERT(_ux_utility_descriptor_parse_size(invalid_zero, 1, 3u) == 0);
+    UX_TEST_ASSERT(_ux_utility_descriptor_parse_size(invalid_three, 2, 3u) == 0);
+    UX_TEST_ASSERT(_ux_utility_descriptor_parse_size(invalid_eight, 1, 3u) == 0);
+    UX_TEST_ASSERT(_ux_utility_descriptor_parse_size(aligned_fields, 0, 3u) == 0);
+    UX_TEST_ASSERT(_ux_utility_descriptor_parse_size(aligned_fields, 3, 3u) == 8);
+    UX_TEST_ASSERT(_ux_utility_descriptor_parse_size(aligned_fields, 3, 15u) == 16);
 
     /* Print STD framework descriptor's sizes  */
     printf("\n");

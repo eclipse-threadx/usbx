@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+/* Portions of this file were generated with AI assistance. */
 
 /* This test is designed to test the ux_utility_descriptor_pack.  */
 
@@ -105,6 +106,7 @@ UINT                                            status;
 UX_HOST_CLASS_VIDEO                             dummy_video_inst;
 UX_HOST_CLASS_VIDEO                             *dummy_video = &dummy_video_inst;
 UCHAR                                           dummy_buffer[64];
+UCHAR                                           *buffer = dummy_buffer;
 UX_HOST_CLASS_VIDEO_CONTROL                     dummy_video_control;
 UX_HOST_CLASS_VIDEO_TRANSFER_REQUEST            dummy_video_request;
 ULONG                                           max_payload = 0xff;
@@ -160,11 +162,11 @@ ULONG                                           max_payload = 0xff;
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER, status);
 
     /* ux_host_class_video_transfer_buffers_add()  */
-    status = ux_host_class_video_transfer_buffers_add(UX_NULL, &dummy_buffer, 1);
+    status = ux_host_class_video_transfer_buffers_add(UX_NULL, &buffer, 1);
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER, status);
     status = ux_host_class_video_transfer_buffers_add(dummy_video, UX_NULL, 1);
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER, status);
-    status = ux_host_class_video_transfer_buffers_add(dummy_video, &dummy_buffer, 0);
+    status = ux_host_class_video_transfer_buffers_add(dummy_video, &buffer, 0);
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER, status);
 
     /* ux_host_class_video_transfer_callback_set()  */

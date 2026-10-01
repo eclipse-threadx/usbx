@@ -8,8 +8,10 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+/* Portions of this file were generated with AI assistance. */
 
 #include "usbx_test_common_hid.h"
+#include "ux_host_stack.h"
 #include "ux_host_class_hid_keyboard.h"
 
 

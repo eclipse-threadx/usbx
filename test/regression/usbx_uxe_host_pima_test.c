@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+/* Portions of this file were generated with AI assistance. */
 
 /* This test is designed to test the ux_utility_descriptor_pack.  */
 
@@ -105,6 +106,7 @@ UINT                                            status;
 UX_HOST_CLASS_PIMA                              dummy_pima_inst;
 UX_HOST_CLASS_PIMA                             *dummy_pima = &dummy_pima_inst;
 UX_HOST_CLASS_PIMA_SESSION                      pima_session;
+UX_HOST_CLASS_PIMA_DEVICE                       pima_device;
 UCHAR                                           object_buffer[64];
 UX_HOST_CLASS_PIMA_OBJECT                       object;
 ULONG                                           object_actual_length;
@@ -113,7 +115,7 @@ UX_HOST_CLASS_PIMA_STORAGE                      storage;
 ULONG                                           object_handles_array[32];
 
     /* Unit test for function ux_host_class_pima_device_info_get() */
-    status = ux_host_class_pima_device_info_get(NX_NULL, &pima_session);
+    status = ux_host_class_pima_device_info_get(NX_NULL, &pima_device);
     UX_TEST_CHECK_CODE(UX_INVALID_PARAMETER ,status);
 
     status = ux_host_class_pima_device_info_get(dummy_pima, NX_NULL);
