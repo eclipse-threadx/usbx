@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -154,9 +156,17 @@ UINT                                            status;
                     /* Yes, parse the entity descriptor.  */
                     status = parse_function(arg, interface_descriptor, descriptor);
 
-                    /* Terminate the parsing if status is not 0.  */
+                    /* A corrupted descriptor fails the parse; any other non-zero
+                       status just stops it early.  */
+                    if (status == UX_DESCRIPTOR_CORRUPTED)
+                    {
+                        return(UX_DESCRIPTOR_CORRUPTED);
+                    }
+
                     if (status)
+                    {
                         return(UX_SUCCESS);
+                    }
                 }
                 break;
         }

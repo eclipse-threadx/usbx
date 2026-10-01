@@ -534,6 +534,7 @@ set(ux_class_video_test_cases
     ${SOURCE_DIR}/usbx_ux_host_class_video_dwMaxPayloadTransferSize_test.c
     ${SOURCE_DIR}/usbx_ux_host_class_video_format_frame_based_test.c # device control buffer > 512
     ${SOURCE_DIR}/usbx_ux_host_class_video_format_h264_test.c        # device control buffer > 512
+    ${SOURCE_DIR}/usbx_ux_host_class_video_format_walk_bounds_test.c
     ${SOURCE_DIR}/usbx_uxe_device_video_test.c
     ${SOURCE_DIR}/usbx_uxe_host_video_test.c
 )

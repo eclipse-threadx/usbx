@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -151,8 +153,15 @@ ULONG                                           descriptor_found;
                     /* Get the number of formats.  */
                     video -> ux_host_class_video_number_formats = input_header_descriptor.bNumFormats;
 
-                    /* Get the length of formats.  */
+                    /* Get the length of formats and verify it fits in the configuration buffer.  */
                     video -> ux_host_class_video_length_formats = input_header_descriptor.wTotalLength;
+                    if (video -> ux_host_class_video_length_formats >
+                        (ULONG)(video -> ux_host_class_video_configuration_descriptor_length -
+                                (ULONG)(descriptor - video -> ux_host_class_video_configuration_descriptor)))
+                    {
+                        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+                        return(UX_DESCRIPTOR_CORRUPTED);
+                    }
 
                     /* Save the descriptor where the formats reside.  */
                     video -> ux_host_class_video_format_address = descriptor;

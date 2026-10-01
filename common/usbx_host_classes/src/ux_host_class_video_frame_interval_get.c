@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -75,10 +77,40 @@ ULONG                                           descriptor_type;
 ULONG                                           descriptor_subtype;
 ULONG                                           intervals_to_copy;
 ULONG                                           i;
+ULONG                                           format_offset;
 
     /* Get the descriptor to the selected format.  */
     descriptor =  video -> ux_host_class_video_current_format_address;
-    total_descriptor_length =  video -> ux_host_class_video_length_formats;
+
+    /* The formats length is counted from the input header, so the walk that starts
+       at the current format only owns what is left of the block behind it.  */
+    format_offset =  (ULONG)(descriptor - video -> ux_host_class_video_format_address);
+    if (format_offset > video -> ux_host_class_video_length_formats)
+    {
+
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_DESCRIPTOR_CORRUPTED);
+    }
+    total_descriptor_length =  video -> ux_host_class_video_length_formats - format_offset;
+
+    /* That block is device reported, so hold it to the configuration buffer too.  */
+    if (total_descriptor_length > (ULONG)(video -> ux_host_class_video_configuration_descriptor +
+                                          video -> ux_host_class_video_configuration_descriptor_length - descriptor))
+    {
+
+        /* Error trap. */
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+        /* If trace is enabled, insert this event into the trace buffer.  */
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+        return(UX_DESCRIPTOR_CORRUPTED);
+    }
 
     /* Descriptors are arranged in order. First FORMAT then FRAME.  */
     while (total_descriptor_length)
