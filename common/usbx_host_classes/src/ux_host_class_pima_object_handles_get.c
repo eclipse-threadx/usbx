@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -144,14 +146,19 @@ UINT                                 status;
         /* Read the number of Object handles in the returned array.  */
         nb_object_handles =  _ux_utility_long_get(object_handles_array_raw);
 
-        /* Save the number of object handles.  */
-        pima_session ->  ux_host_class_pima_session_nb_objects =  nb_object_handles;
+        /* The buffer was sized from the count the session already held, so a device
+           returning more handles than that is reporting handles it never sent.  */
+        if (nb_object_handles > ((object_handle_length_raw / (ULONG)sizeof(ULONG)) - 1))
+        {
 
-        /* Check if the user gave us enough memory.  */
-        if (nb_object_handles > object_handles_length)
-
-            /* No, not enough memory to store the array.  */
+            /* Not enough memory to store the array.  */
+            _ux_utility_memory_free(object_handles_array_raw);
             return(UX_MEMORY_INSUFFICIENT);
+        }
+
+        /* Save the number of object handles.  The caller's array was already measured
+           against the session count, which now bounds this one, so it holds them all.  */
+        pima_session ->  ux_host_class_pima_session_nb_objects =  nb_object_handles;
 
         /* Unpack all object handles.  */
         for(count_object_handles = 0; count_object_handles < nb_object_handles; count_object_handles++)

@@ -562,6 +562,8 @@ set(ux_msrc_test_cases_rtos
   ${SOURCE_DIR}/usbx_msrc_66679_test.c
   ${SOURCE_DIR}/usbx_msrc_72427_ecm_host_mac_test.c
   ${SOURCE_DIR}/usbx_msrc_72525_host_pima_obj_handles_get_test.c
+  ${SOURCE_DIR}/usbx_ghsa_2ch9_host_pima_obj_handles_bound_test.c
+  ${SOURCE_DIR}/usbx_ghsa_2ch9_host_pima_info_bounds_test.c
   ${SOURCE_DIR}/usbx_msrc_72619_host_pima_stor_ids_get_test.c
   ${SOURCE_DIR}/usbx_msrc_72526_pictbridge_dps_host_start_test.c
   ${SOURCE_DIR}/usbx_msrc_72227_host_pima_read_test.c

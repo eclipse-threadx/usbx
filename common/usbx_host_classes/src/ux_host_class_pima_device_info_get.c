@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -74,6 +76,7 @@ UINT  _ux_host_class_pima_device_info_get(UX_HOST_CLASS_PIMA *pima,
 
 UX_HOST_CLASS_PIMA_COMMAND           command;
 UCHAR                                *device_buffer;
+UCHAR                                *device_buffer_end;
 UCHAR                                *device_pointer;
 ULONG                                unicode_string_length;
 ULONG                                array_length = 0;
@@ -108,6 +111,9 @@ UINT                                 status;
     if (status == UX_SUCCESS)
     {
 
+        /* Bound the source cursor against the buffer actually allocated/received.  */
+        device_buffer_end = device_buffer + UX_HOST_CLASS_PIMA_DEVICE_MAX_LENGTH;
+
         /* Read and store the Standard Version field (2).  */
         pima_device -> ux_host_class_pima_device_standard_version =  _ux_utility_short_get(device_buffer +
                                                                                             UX_HOST_CLASS_PIMA_DEVICE_STANDARD_VERSION);
@@ -126,8 +132,9 @@ UINT                                 status;
         /* Get the unicode string length in chars.  */
         unicode_string_length =  (ULONG) *device_pointer;
 
-        /* Check if the string can fit in our buffer.  */
-        if (unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH / 2)
+        /* Check if the string can fit in our buffer and in what was actually received.  */
+        if ((unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH / 2) ||
+            ((unicode_string_length << 1) + 1 > (ULONG) (device_buffer_end - device_pointer)))
 
             /* Return error.  */
             status =  UX_MEMORY_INSUFFICIENT;
@@ -142,6 +149,15 @@ UINT                                 status;
             /* Point to the next field.  */
             device_pointer += 1 + (unicode_string_length << 1);
 
+            /* Ensure the buffer still holds the Functional Mode (2) and next array length prefix (4).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < sizeof(USHORT) + sizeof(ULONG))
+                status = UX_MEMORY_INSUFFICIENT;
+        }
+
+        /* Is there enough space?  */
+        if (status == UX_SUCCESS)
+        {
+
             /* Read and store the Functional Mode (2).  */
             pima_device -> ux_host_class_pima_device_functional_mode =  _ux_utility_short_get(device_pointer);
 
@@ -151,7 +167,8 @@ UINT                                 status;
             /* Get the number of elements in array and compute total length.  */
             array_length = _ux_utility_long_get(device_pointer);
 
-            if (array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2)
+            if ((array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2) ||
+                ((array_length << 1) + sizeof(ULONG) > (ULONG) (device_buffer_end - device_pointer)))
                 status = UX_MEMORY_INSUFFICIENT;
             else
             {
@@ -170,14 +187,22 @@ UINT                                 status;
             /* Point to the next field (EventsSupported EventCode Array of 16-bit).  */
             device_pointer += array_length;
 
-            /* Get the number of elements in array and compute total length.  */
-            array_length = _ux_utility_long_get(device_pointer);
-            if (array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2)
+            /* Ensure the buffer still holds the next array length prefix (4).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < sizeof(ULONG))
                 status = UX_MEMORY_INSUFFICIENT;
             else
             {
-                array_length <<= 1;
-                array_length += (ULONG)sizeof(ULONG);
+
+                /* Get the number of elements in array and compute total length.  */
+                array_length = _ux_utility_long_get(device_pointer);
+                if ((array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2) ||
+                    ((array_length << 1) + sizeof(ULONG) > (ULONG) (device_buffer_end - device_pointer)))
+                    status = UX_MEMORY_INSUFFICIENT;
+                else
+                {
+                    array_length <<= 1;
+                    array_length += (ULONG)sizeof(ULONG);
+                }
             }
         }
 
@@ -191,14 +216,22 @@ UINT                                 status;
             /* Point to the next field (DevicePropertiesSupported DevicePropCode Array of 16-bit).  */
             device_pointer += array_length;
 
-            /* Get the number of elements in array and compute total length.  */
-            array_length = _ux_utility_long_get(device_pointer);
-            if (array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2)
+            /* Ensure the buffer still holds the next array length prefix (4).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < sizeof(ULONG))
                 status = UX_MEMORY_INSUFFICIENT;
             else
             {
-                array_length <<= 1;
-                array_length += (ULONG)sizeof(ULONG);
+
+                /* Get the number of elements in array and compute total length.  */
+                array_length = _ux_utility_long_get(device_pointer);
+                if ((array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2) ||
+                    ((array_length << 1) + sizeof(ULONG) > (ULONG) (device_buffer_end - device_pointer)))
+                    status = UX_MEMORY_INSUFFICIENT;
+                else
+                {
+                    array_length <<= 1;
+                    array_length += (ULONG)sizeof(ULONG);
+                }
             }
         }
 
@@ -212,14 +245,22 @@ UINT                                 status;
             /* Point to the next field (CaptureFormats ObjectFormatCode Array of 16-bit).  */
             device_pointer += array_length;
 
-            /* Get the number of elements in array and compute total length.  */
-            array_length = _ux_utility_long_get(device_pointer);
-            if (array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2)
+            /* Ensure the buffer still holds the next array length prefix (4).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < sizeof(ULONG))
                 status = UX_MEMORY_INSUFFICIENT;
             else
             {
-                array_length <<= 1;
-                array_length += (ULONG)sizeof(ULONG);
+
+                /* Get the number of elements in array and compute total length.  */
+                array_length = _ux_utility_long_get(device_pointer);
+                if ((array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2) ||
+                    ((array_length << 1) + sizeof(ULONG) > (ULONG) (device_buffer_end - device_pointer)))
+                    status = UX_MEMORY_INSUFFICIENT;
+                else
+                {
+                    array_length <<= 1;
+                    array_length += (ULONG)sizeof(ULONG);
+                }
             }
         }
 
@@ -233,14 +274,22 @@ UINT                                 status;
             /* Point to the next field (ImageFormats ObjectFormatCode Array of 16-bit).  */
             device_pointer += array_length;
 
-            /* Get the number of elements in array and compute total length.  */
-            array_length = _ux_utility_long_get(device_pointer);
-            if (array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2)
+            /* Ensure the buffer still holds the next array length prefix (4).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < sizeof(ULONG))
                 status = UX_MEMORY_INSUFFICIENT;
             else
             {
-                array_length <<= 1;
-                array_length += (ULONG)sizeof(ULONG);
+
+                /* Get the number of elements in array and compute total length.  */
+                array_length = _ux_utility_long_get(device_pointer);
+                if ((array_length > (UX_HOST_CLASS_PIMA_ARRAY_MAX_LENGTH - sizeof(ULONG)) / 2) ||
+                    ((array_length << 1) + sizeof(ULONG) > (ULONG) (device_buffer_end - device_pointer)))
+                    status = UX_MEMORY_INSUFFICIENT;
+                else
+                {
+                    array_length <<= 1;
+                    array_length += (ULONG)sizeof(ULONG);
+                }
             }
         }
 
@@ -254,14 +303,22 @@ UINT                                 status;
             /* Point to the next field (Manufacturer String).  */
             device_pointer += array_length;
 
-            /* Get the unicode string length.  */
-            unicode_string_length =  (ULONG) *device_pointer;
+            /* Ensure the buffer still holds the next string length prefix (1).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < 1)
+                status = UX_MEMORY_INSUFFICIENT;
+            else
+            {
 
-            /* Ensure the string can fit in our buffer.  */
-            if (unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH / 2)
+                /* Get the unicode string length.  */
+                unicode_string_length =  (ULONG) *device_pointer;
 
-                /* Return overflow error.  */
-                status =  UX_MEMORY_INSUFFICIENT;
+                /* Ensure the string can fit in our buffer and in what was actually received.  */
+                if ((unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH / 2) ||
+                    ((unicode_string_length << 1) + 1 > (ULONG) (device_buffer_end - device_pointer)))
+
+                    /* Return overflow error.  */
+                    status =  UX_MEMORY_INSUFFICIENT;
+            }
         }
 
         /* Is there enough space?  */
@@ -274,14 +331,22 @@ UINT                                 status;
             /* Point to the next field (Model String).  */
             device_pointer += (unicode_string_length << 1) + 1;
 
-            /* Get the unicode string length.  */
-            unicode_string_length =  (ULONG) *device_pointer ;
+            /* Ensure the buffer still holds the next string length prefix (1).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < 1)
+                status = UX_MEMORY_INSUFFICIENT;
+            else
+            {
 
-            /* Ensure the string can fit in our buffer.  */
-            if (unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH / 2)
+                /* Get the unicode string length.  */
+                unicode_string_length =  (ULONG) *device_pointer ;
 
-                /* Return overflow error.  */
-                status =  UX_MEMORY_INSUFFICIENT;
+                /* Ensure the string can fit in our buffer and in what was actually received.  */
+                if ((unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH / 2) ||
+                    ((unicode_string_length << 1) + 1 > (ULONG) (device_buffer_end - device_pointer)))
+
+                    /* Return overflow error.  */
+                    status =  UX_MEMORY_INSUFFICIENT;
+            }
         }
 
         /* Is there enough space?  */
@@ -294,14 +359,22 @@ UINT                                 status;
             /* Point to the next field (DeviceVersion String).  */
             device_pointer += (unicode_string_length << 1) + 1;
 
-            /* Get the unicode string length.  */
-            unicode_string_length =  (ULONG) *device_pointer ;
+            /* Ensure the buffer still holds the next string length prefix (1).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < 1)
+                status = UX_MEMORY_INSUFFICIENT;
+            else
+            {
 
-            /* Ensure the string can fit in our buffer.  */
-            if (unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH / 2)
+                /* Get the unicode string length.  */
+                unicode_string_length =  (ULONG) *device_pointer ;
 
-                /* Return overflow error.  */
-                status =  UX_MEMORY_INSUFFICIENT;
+                /* Ensure the string can fit in our buffer and in what was actually received.  */
+                if ((unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH / 2) ||
+                    ((unicode_string_length << 1) + 1 > (ULONG) (device_buffer_end - device_pointer)))
+
+                    /* Return overflow error.  */
+                    status =  UX_MEMORY_INSUFFICIENT;
+            }
         }
 
         /* Is there enough space?  */
@@ -314,14 +387,22 @@ UINT                                 status;
             /* Point to the next field (SerialNumber String).  */
             device_pointer += (unicode_string_length << 1) + 1;
 
-            /* Get the unicode string length.  */
-            unicode_string_length =  (ULONG) *device_pointer ;
+            /* Ensure the buffer still holds the next string length prefix (1).  */
+            if ((ULONG) (device_buffer_end - device_pointer) < 1)
+                status = UX_MEMORY_INSUFFICIENT;
+            else
+            {
 
-            /* Ensure the string can fit in our buffer.  */
-            if (unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH / 2)
+                /* Get the unicode string length.  */
+                unicode_string_length =  (ULONG) *device_pointer ;
 
-                /* Return overflow error.  */
-                status =  UX_MEMORY_INSUFFICIENT;
+                /* Ensure the string can fit in our buffer and in what was actually received.  */
+                if ((unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH / 2) ||
+                    ((unicode_string_length << 1) + 1 > (ULONG) (device_buffer_end - device_pointer)))
+
+                    /* Return overflow error.  */
+                    status =  UX_MEMORY_INSUFFICIENT;
+            }
         }
 
         /* Is there enough space?  */

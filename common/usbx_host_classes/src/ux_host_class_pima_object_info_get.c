@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -75,6 +77,7 @@ UINT  _ux_host_class_pima_object_info_get(UX_HOST_CLASS_PIMA *pima,
 
 UX_HOST_CLASS_PIMA_COMMAND           command;
 UCHAR                                *object_buffer;
+UCHAR                                *object_buffer_end;
 UCHAR                                *object_pointer;
 ULONG                                unicode_string_length;
 UINT                                 status;
@@ -126,11 +129,15 @@ UINT                                 status;
         /* Copy the object filename  field.  Point to the beginning of the object description string.  */
         object_pointer =  object_buffer + UX_HOST_CLASS_PIMA_OBJECT_VARIABLE_OFFSET;
 
+        /* Bound the source cursor against the buffer actually allocated/received.  */
+        object_buffer_end = object_buffer + UX_HOST_CLASS_PIMA_OBJECT_MAX_LENGTH;
+
         /* Get the unicode string length.  */
         unicode_string_length =  ((ULONG) *object_pointer * 2) + 1;
 
-        /* Check if string can fit in our buffer.  */
-        if (unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH)
+        /* Check if string can fit in our buffer and in what was actually received.  */
+        if ((unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH) ||
+            (unicode_string_length > (ULONG) (object_buffer_end - object_pointer)))
 
             /* Return error.  */
             status =  UX_MEMORY_INSUFFICIENT;
@@ -145,14 +152,22 @@ UINT                                 status;
             /* Point to the next field.  */
             object_pointer += unicode_string_length;
 
-            /* Get the unicode string length.  */
-            unicode_string_length =  ((ULONG) *object_pointer  * 2) + 1;
+            /* Ensure a length prefix byte remains in the received buffer.  */
+            if ((ULONG) (object_buffer_end - object_pointer) < 1)
+                status = UX_MEMORY_INSUFFICIENT;
+            else
+            {
 
-            /* Ensure the string can fit in our buffer.  */
-            if (unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH)
+                /* Get the unicode string length.  */
+                unicode_string_length =  ((ULONG) *object_pointer  * 2) + 1;
 
-                /* Return error.  */
-                status =  UX_MEMORY_INSUFFICIENT;
+                /* Ensure the string can fit in our buffer and in what was actually received.  */
+                if ((unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH) ||
+                    (unicode_string_length > (ULONG) (object_buffer_end - object_pointer)))
+
+                    /* Return error.  */
+                    status =  UX_MEMORY_INSUFFICIENT;
+            }
         }
 
         /* Is there enough space?  */
@@ -165,14 +180,22 @@ UINT                                 status;
             /* Point to the next field.  */
             object_pointer += unicode_string_length;
 
-            /* Get the unicode string length.  */
-            unicode_string_length =  ((ULONG) *object_pointer  * 2) + 1;
+            /* Ensure a length prefix byte remains in the received buffer.  */
+            if ((ULONG) (object_buffer_end - object_pointer) < 1)
+                status = UX_MEMORY_INSUFFICIENT;
+            else
+            {
 
-            /* Ensure the string can fit in our buffer.  */
-            if (unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH)
+                /* Get the unicode string length.  */
+                unicode_string_length =  ((ULONG) *object_pointer  * 2) + 1;
 
-                /* Return error.  */
-                status =  UX_MEMORY_INSUFFICIENT;
+                /* Ensure the string can fit in our buffer and in what was actually received.  */
+                if ((unicode_string_length > UX_HOST_CLASS_PIMA_DATE_TIME_STRING_MAX_LENGTH) ||
+                    (unicode_string_length > (ULONG) (object_buffer_end - object_pointer)))
+
+                    /* Return error.  */
+                    status =  UX_MEMORY_INSUFFICIENT;
+            }
         }
 
         /* Is there enough space?  */
@@ -185,14 +208,22 @@ UINT                                 status;
             /* Point to the next field.  */
             object_pointer += unicode_string_length;
 
-            /* Get the unicode string length.  */
-            unicode_string_length =  ((ULONG) *object_pointer  * 2) + 1;
+            /* Ensure a length prefix byte remains in the received buffer.  */
+            if ((ULONG) (object_buffer_end - object_pointer) < 1)
+                status = UX_MEMORY_INSUFFICIENT;
+            else
+            {
 
-            /* Ensure the string can fit in our buffer.  */
-            if (unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH)
+                /* Get the unicode string length.  */
+                unicode_string_length =  ((ULONG) *object_pointer  * 2) + 1;
 
-                /* Return error.  */
-                status =  UX_MEMORY_INSUFFICIENT;
+                /* Ensure the string can fit in our buffer and in what was actually received.  */
+                if ((unicode_string_length > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH) ||
+                    (unicode_string_length > (ULONG) (object_buffer_end - object_pointer)))
+
+                    /* Return error.  */
+                    status =  UX_MEMORY_INSUFFICIENT;
+            }
         }
 
         /* Is there enough space?  */
