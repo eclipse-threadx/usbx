@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 #include "usbx_test_common_hid.h"
 #include "ux_host_class_hid_keyboard.h"
@@ -435,7 +436,7 @@ UCHAR                          *hid_class_descriptor = device_framework_high_spe
      * Test case: string descriptor is too large for device to send.
      **************************************************/
 #if UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH > 255
-#warning String descriptor too large not tested due to control buffer too big
+#pragma message("warning: String descriptor too large not tested due to control buffer too big")
 #else
 
     /* Make the language ID framework too large.  */

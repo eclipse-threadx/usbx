@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 /* This test is designed to test the simple dpump host/device class operation.  */
 
@@ -265,7 +266,7 @@ ULONG                   test_n;
     /* Inform user.  */
     printf("Running uxe_device_dfu APIs Test.................................... ");
 #if !defined(UX_DEVICE_CLASS_DFU_ENABLE_ERROR_CHECKING)
-#warning Tests skipped due to compile option!
+#pragma message("warning: Tests skipped due to compile option!")
     printf("SKIP SUCCESS!\n");
     test_control_return(0);
     return;

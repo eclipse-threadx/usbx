@@ -653,7 +653,7 @@ ALIGN_TYPE                      tmp;
     /** Test case: 'if (hid_descriptor_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH)' **/
     /**************************************************/
 #if UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH > 255
-#warning (hid_descriptor_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH) not tested due to buffer size too big
+#pragma message("warning: (hid_descriptor_length > UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH) not tested due to buffer size too big")
 #else
 
     /* Create a transfer request for the HID class descriptor.  */

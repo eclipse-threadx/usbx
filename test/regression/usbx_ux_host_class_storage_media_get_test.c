@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 /* This test is designed to test the storage host/device class operation.  */
 
@@ -590,7 +591,7 @@ INT                                         media_index;
         test_control_return(1);
     }
 #if UX_MAX_HOST_LUN < 2 || UX_HOST_CLASS_STORAGE_MAX_MEDIA < 2
-#warning Increase UX_MAX_HOST_LUN and UX_HOST_CLASS_STORAGE_MAX_MEDIA for coverage test
+#pragma message("warning: Increase UX_MAX_HOST_LUN and UX_HOST_CLASS_STORAGE_MAX_MEDIA for coverage test")
 #else
     stepinfo(">>>>>>>>>>>>>>> ux_host_class_storage_media_get(0) - SUCCESS\n");
     storage_medias[0].ux_host_class_storage_media_storage = UX_NULL;

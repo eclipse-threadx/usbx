@@ -652,6 +652,9 @@ set(test_utility_files
 add_library(test_utility ${test_utility_files})
 target_link_libraries(test_utility PUBLIC azrtos::usbx azrtos::threadx azrtos::netxduo azrtos::filex)
 target_compile_definitions(test_utility PUBLIC CTEST)
+if(MSVC)
+  target_compile_options(test_utility PRIVATE /W3)
+endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "msrc_rtos_build")
   set(test_cases
@@ -740,9 +743,38 @@ else()
   endif()
 endif()
 
+# Exclude test files that use GCC/Clang-specific directives (#warning) not
+# supported by MSVC in C mode.  At configure time, create patched copies in
+# the build directory that replace "#warning <text>" with the MSVC-compatible
+# "#pragma message()" directive.  Original source files are never modified, so
+# Linux builds are unaffected.
+if(MSVC)
+  set(_msvc_test_cases)
+  foreach(_src ${test_cases})
+    file(READ "${_src}" _content)
+    if(_content MATCHES "#warning")
+      get_filename_component(_fname "${_src}" NAME)
+      set(_dst "${CMAKE_CURRENT_BINARY_DIR}/msvc_compat/${_fname}")
+      string(REGEX REPLACE
+        "#warning ([^\n\r]*)"
+        "#pragma message(\"warning: \\1\")"
+        _content "${_content}")
+      file(WRITE "${_dst}" "${_content}")
+      list(APPEND _msvc_test_cases "${_dst}")
+    else()
+      list(APPEND _msvc_test_cases "${_src}")
+    endif()
+  endforeach()
+  set(test_cases "${_msvc_test_cases}")
+endif()
+
 foreach(test_case ${test_cases})
   get_filename_component(test_name ${test_case} NAME_WE)
   add_executable(${test_name} ${test_case})
   target_link_libraries(${test_name} PRIVATE test_utility)
+  if(MSVC)
+    target_compile_options(${test_name} PRIVATE /W3)
+  endif()
   add_test(${CMAKE_BUILD_TYPE}::${test_name} ${test_name})
 endforeach()
+# Portions of this file were generated with AI assistance.
