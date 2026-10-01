@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -358,7 +360,20 @@ UINT                    status = UX_SUCCESS;
     {
 
         /* Get one item from the report and analyze it.  */
-        _ux_host_class_hid_report_item_analyse(descriptor, length, &item);
+        status =  _ux_host_class_hid_report_item_analyse(descriptor, length, &item);
+        if (status != UX_SUCCESS)
+        {
+
+            /* Error trap. */
+            _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+
+            /* If trace is enabled, insert this event into the trace buffer.  */
+            UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+
+            /* Return error status.  */
+            status = (UX_DESCRIPTOR_CORRUPTED);
+            break;
+        }
 
         /* Point the descriptor right after the item identifier.  */
         descriptor +=  item.ux_host_class_hid_item_report_format;
@@ -406,8 +421,10 @@ UINT                    status = UX_SUCCESS;
         /* Jump to the next item.  */
         descriptor +=  item.ux_host_class_hid_item_report_length;
 
-        /* Verify that the report descriptor is not corrupted.  */
-        if (length < item.ux_host_class_hid_item_report_length)
+        /* Verify that the report descriptor is not corrupted.  The header counts
+           as well as the data, or the subtraction below runs past zero.  */
+        if (length < (ULONG)(item.ux_host_class_hid_item_report_length +
+                             item.ux_host_class_hid_item_report_format))
         {
 
             /* Return error status.  */

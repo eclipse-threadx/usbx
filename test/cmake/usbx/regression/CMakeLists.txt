@@ -173,6 +173,7 @@ set(ux_class_hid_test_cases
     ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_coverage_test.c
     ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_test2.c
     ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_test4.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_item_bounds_test.c
     ${SOURCE_DIR}/usbx_ux_host_class_hid_descriptor_parse_test5.c
     ${SOURCE_DIR}/usbx_hid_keyboard_extraction_test2.c
     ${SOURCE_DIR}/usbx_hid_mouse_extraction_test2.c
@@ -236,6 +237,7 @@ set(ux_class_hid_test_cases
     ${SOURCE_DIR}/usbx_hid_report_descriptor_delimiter_test.c
     ${SOURCE_DIR}/usbx_hid_report_descriptor_delimiter_unknown_test.c
     ${SOURCE_DIR}/usbx_hid_report_descriptor_end_collection_error_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_walk_bounds_test.c
     ${SOURCE_DIR}/usbx_hid_report_descriptor_example_andisplay_test.c
     ${SOURCE_DIR}/usbx_hid_report_descriptor_example_delimit_test.c
     ${SOURCE_DIR}/usbx_hid_report_descriptor_example_digit_test.c
@@ -291,6 +293,7 @@ set(ux_class_hid_host_standalone_test_cases
     ${SOURCE_DIR}/usbx_class_hid_basic_memory_test.c
     ${SOURCE_DIR}/usbx_ux_host_class_hid_report_set_int_out_test.c
     ${SOURCE_DIR}/usbx_uxe_host_hid_test.c
+    ${SOURCE_DIR}/usbx_ux_host_class_hid_report_walk_bounds_test.c
 )
 set(ux_class_hid_standalone_test_cases
 )
