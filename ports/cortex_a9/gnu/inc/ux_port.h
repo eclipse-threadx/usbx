@@ -247,7 +247,7 @@ VOID    outpl(ULONG,ULONG);
 
 #ifdef  UX_SYSTEM_INIT
 CHAR                            _ux_version_id[] =
-                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * USBX ARM9/GNU Version 6.5.1.202602 *";
+                                    "(c) 2024 Microsoft Corp. (c) 2026-present Eclipse ThreadX contributors. * USBX ARM9/GNU Version 6.5.2.202603 *";
 #else
 extern  CHAR                    _ux_version_id[];
 #endif
