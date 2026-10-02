@@ -10,4 +10,10 @@
 # SPDX-License-Identifier: MIT
 ##############################################################################
 
-CTEST_PARALLEL_LEVEL=4 $(dirname `realpath $0`)/../test/cmake/usbx/run.sh test $@
+set -euo pipefail
+export CTEST_PARALLEL_LEVEL=${CTEST_PARALLEL_LEVEL:-4}
+export CTEST_REPEAT_FAIL=1
+export CC=${CC:-gcc-14}
+export GCOV=${GCOV:-gcov-14}
+export CMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL:-4}
+exec "$(dirname "$(realpath "$0")")/../test/cmake/usbx/run.sh" test "$@"

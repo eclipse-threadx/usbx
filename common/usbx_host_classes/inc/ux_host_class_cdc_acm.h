@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -61,7 +62,9 @@ extern   "C" {
 
 /* Define CDC ACM Class constants.  */
 
+#ifndef UX_HOST_CLASS_CDC_ACM_DEVICE_INIT_DELAY
 #define UX_HOST_CLASS_CDC_ACM_DEVICE_INIT_DELAY                 1000
+#endif
 #define UX_HOST_CLASS_CDC_ACM_CLASS_TRANSFER_TIMEOUT            300000
 #define UX_HOST_CLASS_CDC_DATA_CLASS                            0x0A
 #define UX_HOST_CLASS_CDC_CONTROL_CLASS                         0x02

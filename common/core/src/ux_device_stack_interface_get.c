@@ -29,6 +29,19 @@
 #include "ux_device_stack.h"
 
 
+/* DEPRECATION NOTICE
+ * _ux_device_stack_interface_get() is deprecated. Do not use it in new code.
+ *
+ * WHY: this function was renamed to _ux_device_stack_alternate_setting_get()
+ * to better reflect its semantics (it retrieves the current alternate setting
+ * for an interface, not the interface itself). The core stack uses the new
+ * name exclusively.
+ *
+ * WHAT TO DO: replace calls with ux_device_stack_alternate_setting_get().
+ */
+#pragma message("_ux_device_stack_interface_get() is deprecated. " \
+                "Use ux_device_stack_alternate_setting_get() instead.")
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -41,10 +54,8 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function is deprecated, ux_device_stack_alternate_setting_get  */
-/*    does the same thing and used by the core stack.                     */
-/*                                                                        */
-/*    This function gets the current alternate setting for an interface.  */
+/*    DEPRECATED. Use _ux_device_stack_alternate_setting_get() instead.   */
+/*    This function was renamed; the two are functionally identical.      */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */

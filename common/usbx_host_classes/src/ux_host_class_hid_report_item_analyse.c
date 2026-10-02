@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -83,8 +85,9 @@ UINT        result = UX_SUCCESS;
     if ((item_byte & UX_HOST_CLASS_HID_ITEM_TAG_MASK) == UX_HOST_CLASS_HID_ITEM_TAG_LONG)
     {
 
-        /* We have a long item, mark its format.  */
-        item -> ux_host_class_hid_item_report_format =  UX_HOST_CLASS_HID_ITEM_TAG_LONG;
+        /* We have a long item. Its header is the prefix, the data size and the
+           tag, and the format is what the walks advance by to clear it.  */
+        item -> ux_host_class_hid_item_report_format =  3;
 
         /* Set the type.  */
         item -> ux_host_class_hid_item_report_type =  (item_byte >> 2) & 3;
@@ -133,6 +136,13 @@ UINT        result = UX_SUCCESS;
         /* Mark its format. For short items, this is always 1. */
         item -> ux_host_class_hid_item_report_format = 1;
 
+    }
+
+    /* Verify that the item header and its declared data fit within the remaining descriptor. */
+    if (length < ((ULONG) item -> ux_host_class_hid_item_report_length +
+                  item -> ux_host_class_hid_item_report_format))
+    {
+        result = UX_DESCRIPTOR_CORRUPTED;
     }
 
     /* Return result.  */

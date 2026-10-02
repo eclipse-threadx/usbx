@@ -8,6 +8,7 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+/* Portions of this file were generated with AI assistance. */
 
 /* This test is designed to test the ux_host_stack_device_configuration_get.  */
 
@@ -15,6 +16,7 @@
 #include "tx_api.h"
 #include "ux_api.h"
 #include "ux_system.h"
+#include "ux_host_stack.h"
 #include "ux_utility.h"
 #include "ux_host_class_dpump.h"
 #include "ux_device_class_dpump.h"

@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -239,8 +240,8 @@ typedef signed char               SCHAR;
 #define AZURE_RTOS_USBX
 #define USBX_MAJOR_VERSION            6
 #define USBX_MINOR_VERSION            5
-#define USBX_PATCH_VERSION            1
-#define USBX_BUILD_VERSION            202602
+#define USBX_PATCH_VERSION            2
+#define USBX_BUILD_VERSION            202603
 #define USBX_HOTFIX_VERSION           ' '
 
 /* Macros for concatenating tokens, where UX_CONCATn concatenates n tokens.  */
@@ -1168,7 +1169,9 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 #define UX_NON_CONTROL_TRANSFER_TIMEOUT                                 50000
 #endif
 #define UX_PORT_ENABLE_WAIT                                             50
+#ifndef UX_DEVICE_ADDRESS_SET_WAIT
 #define UX_DEVICE_ADDRESS_SET_WAIT                                      50
+#endif
 #define UX_HIGH_SPEED_DETECTION_HANDSHAKE_SUSPEND_WAIT                  200
 #define UX_ENUMERATION_THREAD_WAIT                                      200
 
@@ -1543,8 +1546,16 @@ VOID    _ux_trace_event_update(TX_TRACE_BUFFER_ENTRY *event, ULONG timestamp, UL
 
 /* Define USBX root HUB constants.  */
 
+#ifndef UX_RH_ENUMERATION_RETRY
 #define UX_RH_ENUMERATION_RETRY                                         3
+#endif
+#ifndef UX_RH_ENUMERATION_RETRY_DELAY
 #define UX_RH_ENUMERATION_RETRY_DELAY                                   100
+#endif
+/* USB spec minimum debounce interval (ms) on device attach.  */
+#ifndef UX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY
+#define UX_HOST_STACK_DEVICE_ATTACH_DEBOUNCE_DELAY                      100
+#endif
 
 
 /* Define USBX PCI driver constants.  */
@@ -2855,5 +2866,4 @@ UINT    ux_device_stack_transfer_run(UX_SLAVE_TRANSFER *transfer_request, ULONG 
 
 
 #endif
-
 

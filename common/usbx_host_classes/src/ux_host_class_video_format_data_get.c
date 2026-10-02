@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -76,6 +78,13 @@ UCHAR                                           *guid;
     /* Get the descriptor to the selected format.  */
     descriptor =  video -> ux_host_class_video_format_address;
     total_descriptor_length =  video -> ux_host_class_video_length_formats;
+    if (total_descriptor_length > (ULONG)(video -> ux_host_class_video_configuration_descriptor +
+                                           video -> ux_host_class_video_configuration_descriptor_length - descriptor))
+    {
+        _ux_system_error_handler(UX_SYSTEM_LEVEL_THREAD, UX_SYSTEM_CONTEXT_CLASS, UX_DESCRIPTOR_CORRUPTED);
+        UX_TRACE_IN_LINE_INSERT(UX_TRACE_ERROR, UX_DESCRIPTOR_CORRUPTED, descriptor, 0, 0, UX_TRACE_ERRORS, 0, 0)
+        return(UX_DESCRIPTOR_CORRUPTED);
+    }
 
     /* Descriptors are arranged in order. First FORMAT then FRAME.  */
     while (total_descriptor_length)

@@ -10,27 +10,50 @@
 # SPDX-License-Identifier: MIT
 ##############################################################################
 
-#
-# Install necessary softwares for Ubuntu.
+set -euo pipefail
 
-sudo apt-get update
-sudo apt-get install -y \
-    gcc-multilib \
-    git \
-    g++ \
-    python3-pip \
-    ninja-build \
-    unifdef \
-    p7zip-full \
-    tofrodos \
-    gawk \
-    software-properties-common
+retry() {
+    local attempt
+    for attempt in 1 2 3; do
+        if "$@"; then
+            return 0
+        fi
+        if [ "$attempt" -lt 3 ]; then
+            sleep $((attempt * 5))
+        fi
+    done
+    return 1
+}
 
-wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
-CODENAME=$(lsb_release -c | cut -f2 -d':' | sed 's/\t//')
-sudo apt-add-repository -y "deb https://apt.kitware.com/ubuntu/ $CODENAME main"
-sudo apt-get -y install cmake
+apt_options=(-o Acquire::Retries=3 -o DPkg::Lock::Timeout=60)
+if ! retry sudo timeout 150 apt-get "${apt_options[@]}" update; then
+    echo "Package index update failed; package installation will verify availability." >&2
+fi
+retry sudo timeout 150 apt-get "${apt_options[@]}" install -y \
+    cmake gcc-14 gcc-14-multilib git ninja-build python3-venv \
+    unifdef p7zip-full tofrodos gawk
 
-python3 -m pip install --upgrade pip
-pip3 install gcovr==4.1
-pip3 install --upgrade cmake
+venv_dir="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/usbx-ci-venv"
+python3 -m venv "$venv_dir"
+retry timeout 120 "$venv_dir/bin/python" -m pip install \
+    --retries 3 --timeout 30 gcovr==8.6
+
+cc="${CC:-gcc-14}"
+gcov="${GCOV:-gcov-14}"
+cc_version=$("$cc" -dumpfullversion)
+gcov_version=$("$gcov" --version | sed -n '1{s/.* \([0-9][0-9]*\.[0-9][0-9]*\(\.[0-9][0-9]*\)\?\).*/\1/p;}')
+if [ -z "$gcov_version" ] || [ "$cc_version" != "$gcov_version" ]; then
+    echo "Compiler $cc and coverage tool $gcov have different versions." >&2
+    exit 1
+fi
+
+if [ -n "${GITHUB_ENV:-}" ]; then
+    printf 'CC=%s\nGCOV=%s\n' "$cc" "$gcov" >> "$GITHUB_ENV"
+    printf '%s\n' "$venv_dir/bin" >> "$GITHUB_PATH"
+fi
+
+"$venv_dir/bin/gcovr" --version | head -1
+"$cc" --version | head -1
+"$gcov" --version | head -1
+
+printf 'Coverage environment: %s\n' "$venv_dir/bin/activate"

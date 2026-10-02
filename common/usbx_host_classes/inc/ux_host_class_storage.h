@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -131,8 +132,12 @@ extern   "C" {
 
 /* Define Storage Class constants.  */
 
+#ifndef UX_HOST_CLASS_STORAGE_DEVICE_INIT_DELAY
 #define UX_HOST_CLASS_STORAGE_DEVICE_INIT_DELAY             (200)
+#endif
+#ifndef UX_HOST_CLASS_STORAGE_THREAD_SLEEP_TIME
 #define UX_HOST_CLASS_STORAGE_THREAD_SLEEP_TIME             (2000)
+#endif
 #define UX_HOST_CLASS_STORAGE_INSTANCE_SHUTDOWN_TIMER       (10)
 #define UX_HOST_CLASS_STORAGE_THREAD_PRIORITY_CLASS         20
 #define UX_HOST_CLASS_STORAGE_TRANSFER_TIMEOUT              10000

@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -122,6 +124,7 @@ UINT                    status;
 
               /* Return error status.  */
               status = (UX_DESCRIPTOR_CORRUPTED);
+              break;
             }
 
             /* Point the descriptor right after the item identifier.  */

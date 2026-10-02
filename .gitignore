@@ -13,3 +13,8 @@ compile_commands.json
 CTestTestfile.cmake
 
 coverage_report/
+
+/test/externals/
+/test/cmake/usbx/.run.sh
+/test/cmake/usbx/libs/
+__pycache__/

@@ -28,6 +28,19 @@
 #include "ux_api.h"
 
 
+/* DEPRECATION NOTICE
+ * _ux_utility_string_length_get() is deprecated. Do not use it in new code.
+ *
+ * WHY: this function scans the string until it finds a NUL byte with no
+ * upper bound on the search. If the buffer is not properly NUL-terminated,
+ * the scan reads past the end of the buffer, which is undefined behaviour.
+ *
+ * WHAT TO DO: replace calls with _ux_utility_string_length_check(), passing
+ * the maximum buffer length as an additional argument.
+ */
+#pragma message("_ux_utility_string_length_get() is deprecated. " \
+                "Use _ux_utility_string_length_check() and pass the buffer length.")
+
 /**************************************************************************/
 /*                                                                        */
 /*  FUNCTION                                               RELEASE        */
@@ -40,13 +53,9 @@
 /*                                                                        */
 /*  DESCRIPTION                                                           */
 /*                                                                        */
-/*    This function derives the length of a NULL-terminated string.       */
-/*                                                                        */
-/*    This function is deprecated, for the possible issue of operating on */
-/*    a buffer that is not NULL-terminated. As a replacement,             */
-/*    _ux_utility_string_length_check should be used, where the length of */
-/*    the buffer is introduced to validate the string by checking for the */
-/*    NULL-terminator within the buffer length.                           */
+/*    DEPRECATED. Use _ux_utility_string_length_check() instead, passing  */
+/*    the maximum buffer length. This function scans without an upper     */
+/*    bound; a non-NUL-terminated buffer causes an overread.              */
 /*                                                                        */
 /*  INPUT                                                                 */
 /*                                                                        */

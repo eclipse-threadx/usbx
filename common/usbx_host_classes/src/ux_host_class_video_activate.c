@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -154,8 +156,14 @@ UCHAR                                   *baInterfaceNr;
             /* Get the number of formats.  */
             video -> ux_host_class_video_number_formats = packed_entity_descriptor[3];
 
-            /* Get the length of formats.  */
+            /* Get the length of formats and verify it fits in the configuration buffer.  */
             video -> ux_host_class_video_length_formats = _ux_utility_short_get(packed_entity_descriptor + 4);
+            if (video -> ux_host_class_video_length_formats >
+                (ULONG)(video -> ux_host_class_video_configuration_descriptor_length -
+                        (ULONG)(packed_entity_descriptor - video -> ux_host_class_video_configuration_descriptor)))
+            {
+                return(UX_DESCRIPTOR_CORRUPTED);
+            }
 
             /* Save the descriptor where the formats reside.  */
             video -> ux_host_class_video_format_address = packed_entity_descriptor;
@@ -263,7 +271,8 @@ UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER  parser;
         video -> ux_host_class_video_control_interface_number = 0xFF;
         status = _ux_host_class_video_entities_parse(video,
                         _ux_host_class_video_descriptors_parser, (VOID *)&parser);
-        if (parser.parsed_flags != UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_DONE)
+        if ((status == UX_SUCCESS) &&
+            (parser.parsed_flags != UX_HOST_CLASS_VIDEO_DESCRIPTORS_PARSER_DONE))
 
             /* Some of expected descriptors not found.  */
             status = UX_HOST_CLASS_VIDEO_WRONG_TYPE;

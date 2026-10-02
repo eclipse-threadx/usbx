@@ -8,6 +8,7 @@
  *
  * SPDX-License-Identifier: MIT
  **************************************************************************/
+// Portions of this file were generated with AI assistance.
 
 
 /**************************************************************************/
@@ -330,5 +331,9 @@ void ux_test_assert_hit(char* file, int line);
 #include "usbh_core.h"
 #endif
 
+/* Windows simulation port overrides (LLP64 pointer extension macros, etc.) */
+#ifdef _WIN32
+#include "ux_user_win.h"
 #endif
 
+#endif

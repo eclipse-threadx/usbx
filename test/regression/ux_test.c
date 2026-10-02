@@ -8,10 +8,20 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+// Portions of this file were generated with AI assistance.
 
-﻿#include "ux_test.h"
+#include "ux_test.h"
 #include "ux_test_hcd_sim_host.h"
 #include "ux_test_dcd_sim_slave.h"
+
+/* Scale factor for tick-based timeouts in ux_test_sleep_break_if().
+   On ports where ThreadX ticks advance faster than 1ms/tick (e.g. Win64 with
+   tick batching TX_WIN32_TICKS_PER_INTERRUPT=5), set this to the batch factor
+   so that ux_test_sleep_break_if(N, ...) waits N*scale ticks — the same real
+   time as N ticks would give on Linux (1ms/tick). */
+#ifndef UX_TEST_TICK_SCALE
+#define UX_TEST_TICK_SCALE 1
+#endif
 
 #define UX_TEST_TIMEOUT_MS 3000
 
@@ -1312,7 +1322,7 @@ UINT    status;
             }
         }
         t1 = tx_time_get();
-        if (_ux_utility_time_elapsed(t0, t1) >= tick)
+        if (_ux_utility_time_elapsed(t0, t1) >= (tick * UX_TEST_TICK_SCALE))
         {
             return(UX_TIMEOUT);
         }

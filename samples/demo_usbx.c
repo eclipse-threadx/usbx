@@ -8,10 +8,12 @@
 /*                                                                         */
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
+/* Portions of this file were generated with AI assistance. */
 
 /* This is a small demo of the USBX   */
 
 #include "ux_api.h"
+#include "ux_device_stack.h"
 #include "ux_system.h"
 #include "ux_utility.h"
 #include "ux_host_class_dpump.h"

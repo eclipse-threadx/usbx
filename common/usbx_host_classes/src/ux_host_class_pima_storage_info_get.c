@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -76,6 +78,7 @@ UINT  _ux_host_class_pima_storage_info_get(UX_HOST_CLASS_PIMA *pima,
 UX_HOST_CLASS_PIMA_COMMAND           command;
 UINT                                 status;
 UCHAR                                *storage_buffer;
+UCHAR                                *storage_buffer_end;
 UCHAR                                *storage_pointer;
 ULONG                                unicode_string_length, unicode_string_bytes;
 
@@ -107,7 +110,7 @@ ULONG                                unicode_string_length, unicode_string_bytes
 
     /* Allocate some DMA safe memory for receiving the storage info block.  */
     storage_buffer =  _ux_utility_memory_allocate(UX_SAFE_ALIGN, UX_CACHE_SAFE_MEMORY, UX_HOST_CLASS_PIMA_STORAGE_MAX_LENGTH);
-    if (storage == UX_NULL)
+    if (storage_buffer == UX_NULL)
         return(UX_MEMORY_INSUFFICIENT);
 
     /* Issue the command.  */
@@ -123,6 +126,9 @@ ULONG                                unicode_string_length, unicode_string_bytes
                             UX_HOST_CLASS_PIMA_OBJECT_ENTRIES,
                             (UCHAR *) storage);
 
+        /* Bound the source cursor against the buffer actually allocated/received.  */
+        storage_buffer_end = storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_MAX_LENGTH;
+
         /* Copy the storage description field.  Point to the beginning of the storage description string.  */
         storage_pointer =  storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET;
 
@@ -133,8 +139,9 @@ ULONG                                unicode_string_length, unicode_string_bytes
            unicode_string_length * 2 + 1 will not overflow.  */
         unicode_string_bytes = (unicode_string_length << 1) + 1;
 
-        /* Check target buffer length.  */
-        if (unicode_string_bytes > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH)
+        /* Check target buffer length and that the bytes are actually available in what was received.  */
+        if ((unicode_string_bytes > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH) ||
+            (unicode_string_bytes > (ULONG) (storage_buffer_end - storage_pointer)))
         {
             _ux_utility_memory_free(storage_buffer);
             return(UX_BUFFER_OVERFLOW);
@@ -148,6 +155,13 @@ ULONG                                unicode_string_length, unicode_string_bytes
         /* Point to the volume label.  */
         storage_pointer =  storage_buffer + UX_HOST_CLASS_PIMA_STORAGE_VARIABLE_OFFSET + unicode_string_bytes;
 
+        /* Ensure a length prefix byte remains in the received buffer.  */
+        if ((ULONG) (storage_buffer_end - storage_pointer) < 1)
+        {
+            _ux_utility_memory_free(storage_buffer);
+            return(UX_BUFFER_OVERFLOW);
+        }
+
         /* Get the unicode string length.  */
         unicode_string_length =  (ULONG) *storage_pointer ;
 
@@ -155,8 +169,9 @@ ULONG                                unicode_string_length, unicode_string_bytes
            unicode_string_length * 2 + 1 will not overflow.  */
         unicode_string_bytes = (unicode_string_length << 1) + 1;
 
-        /* Check target buffer length.  */
-        if (unicode_string_bytes > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH)
+        /* Check target buffer length and that the bytes are actually available in what was received.  */
+        if ((unicode_string_bytes > UX_HOST_CLASS_PIMA_UNICODE_MAX_LENGTH) ||
+            (unicode_string_bytes > (ULONG) (storage_buffer_end - storage_pointer)))
         {
             _ux_utility_memory_free(storage_buffer);
             return(UX_BUFFER_OVERFLOW);

@@ -10,4 +10,10 @@
 # SPDX-License-Identifier: MIT
 ##############################################################################
 
-$(dirname `realpath $0`)/../test/cmake/usbx/run.sh build $@
+set -euo pipefail
+export CC=${CC:-gcc-14}
+export GCOV=${GCOV:-gcov-14}
+export CMAKE_BUILD_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL:-4}
+"$(dirname "$(realpath "$0")")/../test/cmake/usbx/run.sh" build "$@"
+echo "Checking runner and coverage failure handling in isolated fixtures."
+python3 "$(dirname "$(realpath "$0")")/../test/cmake/usbx/test_runner.py"
