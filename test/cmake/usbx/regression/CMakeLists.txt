@@ -395,6 +395,9 @@ set(ux_class_memory_management_test_cases
     ${SOURCE_DIR}/usbx_cdc_acm_basic_memory_test.c
     ${SOURCE_DIR}/usbx_storage_basic_memory_test.c
 )
+set(ux_stack_device_standalone_test_cases
+    ${SOURCE_DIR}/usbx_device_stack_class_tasks_run_test.c
+)
 set(ux_class_storage_device_standalone_test_cases
     ${SOURCE_DIR}/usbx_standalone_device_storage_basic_test.c
     ${SOURCE_DIR}/usbx_standalone_device_storage_read_write_test.c
@@ -716,6 +719,7 @@ else()
     )
   if (CMAKE_BUILD_TYPE MATCHES "standalone_device.*")
     list(APPEND test_cases
+      ${ux_stack_device_standalone_test_cases}
       ${ux_utility_os_test_cases}
       ${ux_class_storage_device_standalone_test_cases}
       ${ux_class_cdc_acm_device_standalone_test_cases}
