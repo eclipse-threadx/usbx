@@ -98,6 +98,7 @@ set(error_check_build_full_coverage
 set(msrc_rtos_build
   ${error_check_build_full_coverage}
   -DUX_SLAVE_REQUEST_CONTROL_MAX_LENGTH=512
+  -DUX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
   -DUX_HOST_CLASS_AUDIO_2_SUPPORT
   -DUX_HOST_CLASS_AUDIO_INTERRUPT_SUPPORT
 )
