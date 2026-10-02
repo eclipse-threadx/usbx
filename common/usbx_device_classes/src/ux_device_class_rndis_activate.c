@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /**************************************************************************/
 /**                                                                       */
 /** USBX Component                                                        */
@@ -53,6 +55,7 @@
 /*  CALLS                                                                 */
 /*                                                                        */
 /*    _ux_network_driver_activate         Activate NetX USB interface     */
+/*    _ux_network_driver_link_up          Set network link up             */
 /*    _ux_utility_memory_set              Set memory                      */
 /*    _ux_device_thread_resume            Resume thread                   */
 /*                                                                        */
@@ -183,6 +186,9 @@ ULONG                       physical_address_lsw;
                                         &rndis -> ux_slave_class_rndis_network_handle,
                                         physical_address_msw,
                                         physical_address_lsw);
+
+        /* Communicate the link state to the network driver.  */
+        _ux_network_driver_link_up(rndis -> ux_slave_class_rndis_network_handle);
 
         /* Reset the endpoint buffers.  */
 #if (UX_DEVICE_ENDPOINT_BUFFER_OWNER == 1) && !defined(UX_DEVICE_CLASS_RNDIS_ZERO_COPY)

@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 #include "ux_api.h"
 #include "ux_system.h"
 #include "ux_utility.h"
@@ -557,6 +559,7 @@ UINT 		        status;
 UINT                num_iters;
 UCHAR               *notification_buffer;
 UX_SLAVE_TRANSFER   *interrupt_transfer;
+USB_NETWORK_DEVICE_TYPE *network_device;
 
     /* Create the IP instance.  */
 
@@ -629,6 +632,11 @@ UX_SLAVE_TRANSFER   *interrupt_transfer;
 
     while (rndis_device -> ux_slave_class_rndis_link_state != UX_DEVICE_CLASS_RNDIS_LINK_STATE_UP)
         tx_thread_sleep(10);
+
+    /* The USB link must be visible to the network driver.  */
+    network_device = (USB_NETWORK_DEVICE_TYPE *)rndis_device -> ux_slave_class_rndis_network_handle;
+    UX_TEST_ASSERT(network_device -> ux_network_device_usb_link_up == NX_TRUE);
+    UX_TEST_ASSERT(network_device -> ux_network_device_link_status == NX_TRUE);
 
     /* Since host is CDC-ECM, it's waiting for the LINK_UP notification from the
        interrupt endpoint. RNDIS does not send this, so we have to do it manually. */
