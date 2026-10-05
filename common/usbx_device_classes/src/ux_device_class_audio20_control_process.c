@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -87,7 +89,7 @@ UCHAR                               channel_number;
 ULONG                               request_length;
 ULONG                               data_length;
 ULONG                               i;
-ULONG                               n_sub, pos, min, max, res, freq;
+ULONG                               n_sub, pos, min, max, freq;
 
 
     /* Get instances.  */
@@ -130,25 +132,22 @@ ULONG                               n_sub, pos, min, max, res, freq;
                     if (request_length != 4)
                         break;
 
-                    /* Check if multiple frequency supported.  */
+                    /* Get frequency to set.  */
+                    freq = _ux_utility_long_get(transfer -> ux_slave_transfer_request_data_pointer);
+
+                    /* A fixed clock accepts its advertised frequency.  */
                     if (control -> ux_device_class_audio20_control_sampling_frequency != 0)
+                    {
+                        if (freq == control -> ux_device_class_audio20_control_sampling_frequency)
+                            return(UX_SUCCESS);
                         break;
+                    }
 
                     /* Sanity check.  */
                     UX_ASSERT(control -> ux_device_class_audio20_control_sampling_frequency_range != UX_NULL);
 
                     /* Get wNumSubRanges.  */
                     n_sub = _ux_utility_short_get(control -> ux_device_class_audio20_control_sampling_frequency_range);
-
-                    /* Get first RES.  */
-                    res = _ux_utility_long_get(control -> ux_device_class_audio20_control_sampling_frequency_range + 2 + 8);
-
-                    /* Check if it's fixed single frequency.  */
-                    if (n_sub <= 1 && res == 0)
-                        break;
-
-                    /* Get frequency to set.  */
-                    freq = _ux_utility_long_get(transfer -> ux_slave_transfer_request_data_pointer);
 
                     /* Check if frequency to set is inside range.  */
                     for (pos = 2; pos < (2 + n_sub * 12); pos += 12)
