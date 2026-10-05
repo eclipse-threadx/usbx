@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /**************************************************************************/
 /**************************************************************************/
 /**                                                                       */
@@ -82,6 +84,9 @@ UX_SLAVE_CLASS_RNDIS     *rndis;
     /* Protect this thread.  */
     _ux_device_mutex_on(&rndis -> ux_slave_class_rndis_mutex);
 
+    /* The packet to be sent is the last in the chain.  */
+    packet -> nx_packet_queue_next = NX_NULL;
+
     /* Check the queue. See if there is something that is being sent. */
     if (rndis -> ux_slave_class_rndis_xmit_queue == UX_NULL)
 
@@ -115,9 +120,6 @@ UX_SLAVE_CLASS_RNDIS     *rndis;
 
     /* Free Mutex resource.  */
     _ux_device_mutex_off(&rndis -> ux_slave_class_rndis_mutex);
-
-    /* The packet to be sent is the last in the chain.  */
-    packet -> nx_packet_queue_next = NX_NULL;
 
     /* Set an event to wake up the bulkin thread.  */
     _ux_device_event_flags_set(&rndis -> ux_slave_class_rndis_event_flags_group, UX_DEVICE_CLASS_RNDIS_NEW_BULKIN_EVENT, UX_OR);
