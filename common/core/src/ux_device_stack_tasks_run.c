@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -81,9 +83,10 @@ UINT                        status;
     dcd -> ux_slave_dcd_function(dcd, UX_DCD_TASKS_RUN, UX_NULL);
 
     /* Run all Class instance tasks.  */
-    class_instance =  _ux_system_slave -> ux_system_slave_class_array;
     for (class_index = 0; class_index < UX_SYSTEM_DEVICE_MAX_CLASS_GET(); class_index++)
     {
+
+        class_instance =  &_ux_system_slave -> ux_system_slave_class_array[class_index];
 
         /* Skip classes not used.  */
         if (class_instance -> ux_slave_class_status == UX_UNUSED)
@@ -95,9 +98,6 @@ UINT                        status;
 
         /* Invoke task function.  */
         status |= class_instance -> ux_slave_class_task_function(class_instance -> ux_slave_class_instance);
-
-        /* Move to the next class.  */
-        class_instance ++;
     }
 
     /* Return overall status.  */
