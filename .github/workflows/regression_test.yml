@@ -33,7 +33,7 @@ jobs:
       # The called test job narrows its own token scope.
       pages: write
       id-token: write
-    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@b37cd4a81a1cb8c2ebefc438220ab7f009e13362
+    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@c735b12c714e27431374a40163aa0af9619a52d3
     with:
       cmake_path: ./test/cmake/usbx
       build_script: ./scripts/build.sh --manual
@@ -53,7 +53,7 @@ jobs:
       # The reusable workflow declares a separate deployment job.
       pages: write
       id-token: write
-    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@b37cd4a81a1cb8c2ebefc438220ab7f009e13362
+    uses: eclipse-threadx/threadx/.github/workflows/regression_template.yml@c735b12c714e27431374a40163aa0af9619a52d3
     with:
       cmake_path: ./test/cmake/usbx
       build_script: ./scripts/build.sh all
