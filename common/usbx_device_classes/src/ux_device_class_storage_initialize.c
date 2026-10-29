@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -162,6 +164,7 @@ ULONG                                   lun_index;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_type           = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_type;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_removable_flag = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_removable_flag;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_read_only_flag = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_read_only_flag;
+            storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_id             = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_id;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_read           = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_read;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_flush          = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_flush;
             storage -> ux_slave_class_storage_lun[lun_index].ux_slave_class_storage_media_write          = storage_parameter -> ux_slave_class_storage_parameter_lun[lun_index].ux_slave_class_storage_media_write;

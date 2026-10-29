@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the simple dpump host/device class operation.  */
 
 #include <stdio.h>
@@ -35,6 +37,7 @@
 
 #define                             UX_RAM_DISK_SIZE                (200 * 1024)
 #define                             UX_RAM_DISK_LAST_LBA            ((UX_RAM_DISK_SIZE / 512) -1)
+#define                             UX_RAM_DISK_MEDIA_ID            0x12345678UL
 
 /* Define local/extern function prototypes.  */
 
@@ -75,6 +78,7 @@ static CHAR                         *ram_disk_memory[] =
 };
 static UINT                         ram_disk_status = UX_SUCCESS;
 static ULONG                        ram_disk_media_status = 0;
+static ULONG                        ram_disk_media_id_seen = 0;
 static CHAR                         ram_disk_status_sent = 0;
 
 static ULONG                               set_cfg_counter;
@@ -337,6 +341,7 @@ CHAR *                          memory_pointer;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_block_length    =  512;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_type            =  0;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_removable_flag  =  0x80;
+    global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_id              =  UX_RAM_DISK_MEDIA_ID;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_read            =  demo_thread_media_read;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_write           =  demo_thread_media_write;
     global_storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_status          =  demo_thread_media_status;
@@ -702,6 +707,12 @@ UX_SLAVE_CLASS                              *slave_class;
         test_control_return(1);
     }
 
+    if (ram_disk_media_id_seen != UX_RAM_DISK_MEDIA_ID)
+    {
+        printf("ERROR #%d: media id 0x%lx\n", __LINE__, ram_disk_media_id_seen);
+        test_control_return(1);
+    }
+
     /* Pause the class driver thread.  */
     _ux_utility_thread_suspend(&((UX_HOST_CLASS_STORAGE_EXT*)class->ux_host_class_ext)->ux_host_class_thread);
 
@@ -798,7 +809,7 @@ UINT status = ram_disk_status;
 
 
     (void)storage;
-    (void)media_id;
+    ram_disk_media_id_seen = media_id;
 
     if (media_status)
         *media_status = ram_disk_media_status;
