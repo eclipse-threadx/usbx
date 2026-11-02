@@ -9,6 +9,8 @@
  * SPDX-License-Identifier: MIT
  **************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 
 /**************************************************************************/
 /**************************************************************************/
@@ -67,7 +69,7 @@ UINT  _ux_utility_semaphore_get(UX_SEMAPHORE *semaphore, ULONG semaphore_signal)
 
 UINT        status;
 UX_THREAD   *my_thread;
-CHAR        *name;
+const CHAR  *name;
 UINT        state;
 ULONG       run_count;
 UINT        priority;
