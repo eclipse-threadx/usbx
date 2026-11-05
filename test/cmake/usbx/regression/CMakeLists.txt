@@ -78,7 +78,9 @@ set(ux_class_audio_device_standalone_test_cases
     ${SOURCE_DIR}/usbx_audio10_iad_device_interrupt_test.c
 )
 
-set(ux_class_rndis_test_cases ${SOURCE_DIR}/usbx_rndis_basic_test.c)
+set(ux_class_rndis_test_cases
+    ${SOURCE_DIR}/usbx_rndis_basic_test.c
+    ${SOURCE_DIR}/usbx_rndis_packet_queue_race_test.c)
 
 set(ux_class_cdc_ecm_test_cases
     ${SOURCE_DIR}/usbx_cdc_ecm_basic_test.c
