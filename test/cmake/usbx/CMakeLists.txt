@@ -309,6 +309,9 @@ if(MSVC)
   # regression suite is CPU-bound rather than wall-clock-bound (mirrors the
   # Linux port's TX_LINUX_NO_IDLE_ENABLE).  Applied only to the ThreadX port.
   target_compile_options(threadx PRIVATE -DTX_WIN32_NO_IDLE_ENABLE)
+  # The ThreadX Windows simulators keep simulated time on the host clock by
+  # default. The delays above assume five ticks per millisecond.
+  target_compile_options(threadx PRIVATE -DTX_TIMER_PERIODIC=1 -DTX_WIN32_TICKS_PER_INTERRUPT=5)
   add_subdirectory(${FILEX_SOURCE_DIR}   filex_build)
   # Supply the win64 pointer-extension macros to NetXDuo before adding it.
   set(NX_USER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/libs/nx_user.h"
