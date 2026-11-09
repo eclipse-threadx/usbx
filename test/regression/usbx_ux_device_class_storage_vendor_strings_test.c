@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+// Portions of this file were generated with AI assistance.
+
 /* This test is designed to test the simple dpump host/device class operation.  */
 
 #include <stdio.h>
@@ -535,6 +537,12 @@ UINT            status;
 UCHAR           *cbw;
 UINT            command_length;
 
+    /* The class sends its own commands from its thread through the same CBW,
+       so hold the instance while this one is built and sent.  */
+    status =  _ux_host_class_storage_lock(storage, UX_WAIT_FOREVER);
+    if (status != UX_SUCCESS)
+        return(status);
+
     /* Use a pointer for the cbw, easier to manipulate.  */
     cbw =  (UCHAR *) storage -> ux_host_class_storage_cbw;
 
@@ -555,6 +563,8 @@ UINT            command_length;
 
     /* Send the command to transport layer.  */
     status =  _ux_host_class_storage_transport(storage, response);
+
+    _ux_host_class_storage_unlock(storage);
 
     /* Return completion status.  */
     return(status);
@@ -764,6 +774,16 @@ UX_DEVICE                                          *device;
 
     ux_test_dcd_sim_slave_disconnect();
     ux_test_hcd_sim_host_disconnect();
+
+    /* Wait for the host to remove the old instance, so that the readiness
+       check after reconnecting cannot find it.  */
+    ux_test_breakable_sleep(100, break_on_removal);
+    if (storage != UX_NULL)
+    {
+
+        printf("ERROR #%d: disconnect fail\n", __LINE__);
+        test_control_return(1);
+    }
 
     test_device_stack_storage_uninit();
 
