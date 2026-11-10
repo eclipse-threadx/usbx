@@ -660,6 +660,7 @@ if (CMAKE_BUILD_TYPE MATCHES "msrc_rtos_build")
   set(test_cases
     ${ux_msrc_test_cases}
     ${ux_msrc_test_cases_rtos}
+    ${SOURCE_DIR}/usbx_audio20_device_controls_test.c
   )
 elseif (CMAKE_BUILD_TYPE MATCHES "msrc_standalone_build")
   set(test_cases

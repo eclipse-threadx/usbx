@@ -9,6 +9,8 @@
 /* SPDX-License-Identifier: MIT                                            */
 /***************************************************************************/
 
+/* Portions of this file were generated with AI assistance. */
+
 /* This test is designed to test the simple dpump host/device class operation.  */
 
 #include <stdio.h>
@@ -83,7 +85,7 @@ static UX_HOST_CLASS_AUDIO                      *audio;
 
 static UX_DEVICE_CLASS_AUDIO20_CONTROL          g_slave_audio20_control[2];
 static UCHAR                                    audio20_cs_range[] = {
-    UX_W0 (    2), UX_W0 (    2), /* Number of subs.  */
+    UX_W0 (    2), UX_W1 (    2), /* Number of subs.  */
 
     UX_DW0(44100), UX_DW1(44100), UX_DW2(44100), UX_DW3(44100), /* dMIN  */
     UX_DW0(44100), UX_DW1(44100), UX_DW2(44100), UX_DW3(44100), /* dMAX  */
@@ -92,6 +94,12 @@ static UCHAR                                    audio20_cs_range[] = {
     UX_DW0( 8000), UX_DW1( 8000), UX_DW2( 8000), UX_DW3( 8000), /* dMIN  */
     UX_DW0(48000), UX_DW1(48000), UX_DW2(48000), UX_DW3(48000), /* dMAX  */
     UX_DW0( 8000), UX_DW1( 8000), UX_DW2( 8000), UX_DW3( 8000), /* dRES  */
+};
+static UCHAR                                    audio20_cs_fixed_range[] = {
+    UX_W0 (    1), UX_W1 (    1), /* Number of subs.  */
+    UX_DW0(48000), UX_DW1(48000), UX_DW2(48000), UX_DW3(48000), /* dMIN  */
+    UX_DW0(48000), UX_DW1(48000), UX_DW2(48000), UX_DW3(48000), /* dMAX  */
+    UX_DW0(    0), UX_DW1(    0), UX_DW2(    0), UX_DW3(    0), /* dRES  */
 };
 
 static ULONG                               error_counter;
@@ -210,7 +218,7 @@ static unsigned char device_framework_full_speed[] = {
 /* 8 bmControls                                              */ 0x00,
 /* -------------------- Audio 2.0 AC Clock Source Descriptor */
 /* 0 bLength, bDescriptorType, bDescriptorSubtype            */ 8,    0x24, 0x0A,
-/* 3 bClockID, bmAttributes, bmControls                      */ 0x10, 0x05, 0x01,
+/* 3 bClockID, bmAttributes, bmControls                      */ 0x10, 0x05, 0x03,
 /* 6 bAssocTerminal, iClockSource                            */ 0x00, 0,
 /* ------------------- Audio 2.0 AC Input Terminal Descriptor */
 /* 0  bLength, bDescriptorType, bDescriptorSubtype            */ 17,   0x24,                   0x02,
@@ -361,7 +369,7 @@ static unsigned char device_framework_high_speed[] = {
 /* 8 bmControls                                              */ 0x00,
 /* -------------------- Audio 2.0 AC Clock Source Descriptor */
 /* 0 bLength, bDescriptorType, bDescriptorSubtype            */ 8,    0x24, 0x0A,
-/* 3 bClockID, bmAttributes, bmControls                      */ 0x10, 0x05, 0x01,
+/* 3 bClockID, bmAttributes, bmControls                      */ 0x10, 0x05, 0x03,
 /* 6 bAssocTerminal, iClockSource                            */ 0x00, 0,
 /* ------------------- Audio 2.0 AC Input Terminal Descriptor */
 /* 0  bLength, bDescriptorType, bDescriptorSubtype            */ 17,   0x24,                   0x02,
@@ -1162,11 +1170,38 @@ ULONG                                               temp;
         UX_TEST_ASSERT(buffer[ 9] == D3(48000));
     }
 
-    /* Issue SetClockSamplingFrequency(0x10) - STALL.  */
+    /* A fixed clock accepts its frequency without reporting a change.  */
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_OUT | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_function =          UX_DEVICE_CLASS_AUDIO20_CUR;
+    transfer_request -> ux_transfer_request_requested_length =  4;
     transfer_request -> ux_transfer_request_index =             (0x10 << 8) | 0;
     transfer_request -> ux_transfer_request_value =             (UX_DEVICE_CLASS_AUDIO20_CS_SAM_FREQ_CONTROL << 8) | 0;
+    ux_utility_long_put(transfer_request -> ux_transfer_request_data_pointer, 48000);
+    status = ux_host_stack_transfer_request(transfer_request);
+    UX_TEST_CHECK_SUCCESS(status);
+    UX_TEST_ASSERT(g_slave_audio20_control[0].ux_device_class_audio20_control_changed == 0);
+
+    /* A different frequency is outside the fixed clock's range.  */
+    ux_utility_long_put(transfer_request -> ux_transfer_request_data_pointer, 44100);
+    status = ux_host_stack_transfer_request(transfer_request);
+    UX_TEST_CHECK_CODE(UX_TRANSFER_STALLED, status);
+
+    /* SET_CUR requires a four-byte frequency value.  */
+    transfer_request -> ux_transfer_request_requested_length = 3;
+    status = ux_host_stack_transfer_request(transfer_request);
+    UX_TEST_CHECK_CODE(UX_TRANSFER_STALLED, status);
+    transfer_request -> ux_transfer_request_requested_length = 4;
+
+    /* A single discrete range also accepts its only frequency.  */
+    g_slave_audio20_control[0].ux_device_class_audio20_control_sampling_frequency = 0;
+    g_slave_audio20_control[0].ux_device_class_audio20_control_sampling_frequency_cur = 48000;
+    g_slave_audio20_control[0].ux_device_class_audio20_control_sampling_frequency_range = audio20_cs_fixed_range;
+    ux_utility_long_put(transfer_request -> ux_transfer_request_data_pointer, 48000);
+    status = ux_host_stack_transfer_request(transfer_request);
+    UX_TEST_CHECK_SUCCESS(status);
+    UX_TEST_ASSERT(g_slave_audio20_control[0].ux_device_class_audio20_control_changed == 0);
+
+    ux_utility_long_put(transfer_request -> ux_transfer_request_data_pointer, 44100);
     status = ux_host_stack_transfer_request(transfer_request);
     UX_TEST_CHECK_CODE(UX_TRANSFER_STALLED, status);
 
@@ -1196,7 +1231,7 @@ ULONG                                               temp;
     transfer_request -> ux_transfer_request_value =             (UX_DEVICE_CLASS_AUDIO20_CS_SAM_FREQ_CONTROL << 8) | 0;
     status = ux_host_stack_transfer_request(transfer_request);
     UX_TEST_CHECK_SUCCESS(status);
-    UX_TEST_ASSERT(transfer_request -> ux_transfer_request_actual_length == sizeof(audio20_cs_range));
+    UX_TEST_ASSERT(transfer_request -> ux_transfer_request_actual_length == 14);
     UX_TEST_ASSERT(buffer[ 0] == D0(2));
     UX_TEST_ASSERT(buffer[ 1] == D1(2));
     UX_TEST_ASSERT(buffer[ 2] == D0(44100));
@@ -1207,11 +1242,12 @@ ULONG                                               temp;
     UX_TEST_ASSERT(buffer[ 7] == D1(44100));
     UX_TEST_ASSERT(buffer[ 8] == D2(44100));
     UX_TEST_ASSERT(buffer[ 9] == D3(44100));
-    UX_TEST_ASSERT(UX_SUCCESS == ux_utility_memory_compare(audio20_cs_range, buffer, sizeof(audio20_cs_range)));
+    UX_TEST_ASSERT(UX_SUCCESS == ux_utility_memory_compare(audio20_cs_range, buffer, 14));
 
     /* Issue SetClockSamplingFrequency(0x10) - STALL.  */
     transfer_request -> ux_transfer_request_type =              UX_REQUEST_OUT | UX_REQUEST_TYPE_CLASS | UX_REQUEST_TARGET_INTERFACE;
     transfer_request -> ux_transfer_request_function =          UX_DEVICE_CLASS_AUDIO20_CUR;
+    transfer_request -> ux_transfer_request_requested_length =  4;
     transfer_request -> ux_transfer_request_index =             (0x10 << 8) | 0;
     transfer_request -> ux_transfer_request_value =             (UX_DEVICE_CLASS_AUDIO20_CS_SAM_FREQ_CONTROL << 8) | 0;
     ux_utility_long_put(transfer_request -> ux_transfer_request_data_pointer, 64000);
